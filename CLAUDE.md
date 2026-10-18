@@ -18,10 +18,6 @@ Read it before any work.
   `Version-3.14.1`. `sclang` and `scsynth` 3.14.1 are on the PATH.
 - Never touch the scsynth on UDP 57110. A test boots its own scsynth on
   another port.
-- Every dependency must be at least 7 days old.
-- The sibling crate scsynth-osc (github.com/nicmell/scsynth-osc) sets the
-  conventions of the repository: the manifest, the lints, CI, cargo-deny and
-  the shape of the README.
 
 ## Commands
 
