@@ -1,0 +1,34 @@
+[package]
+name = "scsynth-synthdef"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["nicmell"]
+description = "The synth definitions of SuperCollider: a compiler of UGen graphs into the SynthDef file format (SCgf), as sclang compiles them, a strict reader of that format, and a catalogue of the core UGens."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/nicmell/scsynth-synthdef"
+readme = "README.md"
+keywords = ["supercollider", "scsynth", "synthdef", "audio", "synthesis"]
+categories = ["multimedia::audio", "encoding", "compilers"]
+include = ["/src", "/tests", "/generator/catalog.json", "/README.md", "/CHANGELOG.md", "/LICENSE-APACHE", "/LICENSE-MIT"]
+
+[dependencies]
+serde = { version = "1.0.140", features = ["derive"], optional = true }
+
+[dev-dependencies]
+serde_json = "1.0.60"
+
+[features]
+serde = ["dep:serde"]
+
+[package.metadata.docs.rs]
+all-features = true
+
+[lints.rust]
+missing_docs = "warn"
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"

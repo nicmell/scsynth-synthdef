@@ -5,9 +5,8 @@ the SynthDef file format (`SCgf`) and reads them back. It also carries a
 catalogue of the core UGens. SuperCollider 3.14.1 is the reference. This
 file is the operating manual.
 
-[docs/plan.md](docs/plan.md) is the plan of version 0.1: the decisions, the
-sources of truth, the facts established so far, the design and the steps.
-Read it before any work.
+The README is the reference of the crate. [docs/plan.md](docs/plan.md) holds
+what is still open after version 0.1. Read both before any work.
 
 ## Ground rules
 
@@ -16,12 +15,24 @@ Read it before any work.
   `sc-crates/crates/scsynthdef-compiler`.
 - The SuperCollider source is in `~/Projects/supercollider`, at the tag
   `Version-3.14.1`. `sclang` and `scsynth` 3.14.1 are on the PATH.
-- Never touch the scsynth on UDP 57110. A test boots its own scsynth on
-  another port.
-- Every dependency must be at least 7 days old.
-- The sibling crate scsynth-osc (github.com/nicmell/scsynth-osc) sets the
-  conventions of the repository: the manifest, the lints, CI, cargo-deny and
-  the shape of the README.
+- Never touch the scsynth on UDP 57110. A test runs its own scsynth in NRT
+  mode, which opens no port.
+
+## Commands
+
+```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-features
+RUSTDOCFLAGS=-Dwarnings cargo doc --no-deps --all-features
+cargo check --all-features --target wasm32-unknown-unknown
+cargo +1.85.0 test --all-features    # the MSRV
+cargo deny check
+```
+
+CI (`.github/workflows/ci.yml`) runs them with `--locked`, and also
+`cargo package`.
 
 ## Conventions
 
