@@ -21,3 +21,6 @@
   SuperCollider 3.14.1, with their arguments, their categories, the rules
   of their `checkInputs`, and the wiring of each rate method that `ugen`
   can add. See [The catalogue](README.md#the-catalogue).
+- `SynthDefBuilder::ugen` and `ArgValue`: a UGen by its class name, with
+  the arguments by name, the defaults and the wiring of the catalogue, and
+  the checks of `checkInputs`. See [Building](README.md#building).

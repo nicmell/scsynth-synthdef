@@ -73,3 +73,56 @@ impl OutputProxy {
         self.output
     }
 }
+
+/// The value of an argument of `SynthDefBuilder::ugen`: an input, or the text
+/// of a symbol argument.
+#[derive(Clone, Debug, PartialEq)]
+pub enum ArgValue {
+    /// A number, an output, or an array of them.
+    Input(UGenInput),
+    /// The text of a symbol argument, such as the command name of
+    /// `SendReply`.
+    Text(String),
+}
+
+impl From<UGenInput> for ArgValue {
+    fn from(input: UGenInput) -> Self {
+        Self::Input(input)
+    }
+}
+
+impl From<f64> for ArgValue {
+    fn from(number: f64) -> Self {
+        Self::Input(number.into())
+    }
+}
+
+impl From<i32> for ArgValue {
+    fn from(number: i32) -> Self {
+        Self::Input(number.into())
+    }
+}
+
+impl From<OutputProxy> for ArgValue {
+    fn from(output: OutputProxy) -> Self {
+        Self::Input(output.into())
+    }
+}
+
+impl From<Vec<UGenInput>> for ArgValue {
+    fn from(inputs: Vec<UGenInput>) -> Self {
+        Self::Input(inputs.into())
+    }
+}
+
+impl From<&str> for ArgValue {
+    fn from(text: &str) -> Self {
+        Self::Text(text.to_owned())
+    }
+}
+
+impl From<String> for ArgValue {
+    fn from(text: String) -> Self {
+        Self::Text(text)
+    }
+}

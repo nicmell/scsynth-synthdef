@@ -45,8 +45,9 @@ the crate refuses what scsynth refuses, and this file lists the difference.
 
 ## Status
 
-The work is in progress. The definition files, the builder, the operators
-and the catalogue are done. Adding a UGen by its class name is not.
+The work is in progress. The definition files, the builder, the
+operators, the catalogue and the build by class name are done. The
+acceptance test with scsynth is not.
 [The plan](https://github.com/nicmell/scsynth-synthdef/blob/main/docs/plan.md)
 describes version 0.1 and its steps.
 
@@ -79,13 +80,13 @@ A `SynthDefBuilder` is the `SynthDef` of sclang during a build. It builds
 as `SynthDef.new` does, without `optimizeGraph`.
 
 ```rust
-use scsynth_synthdef::{Arg, NewUGen, Rate, SynthDefBuilder};
+use scsynth_synthdef::{Arg, SynthDefBuilder};
 
 // SynthDef(\sine, { |freq = 440| Out.ar(0, SinOsc.ar(freq)) })
 let mut builder = SynthDefBuilder::new("sine", vec![Arg::new("freq", 440.0)])?;
 let freq = builder.arguments()[0].clone();
-let sin = builder.add(NewUGen::new("SinOsc", Rate::Audio).inputs([freq, 0.0.into()]))?;
-builder.add(NewUGen::new("Out", Rate::Audio).inputs([0.0.into(), sin]).outputs([]))?;
+let sine = builder.ugen("SinOsc", "ar", &[("freq", freq.into())])?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", sine.into())])?;
 let def = builder.finish()?;
 assert_eq!(def.children.len(), 3);
 # Ok::<(), Box<dyn std::error::Error>>(())
@@ -105,6 +106,12 @@ assert_eq!(def.children.len(), 3);
     follows the order of the arguments.
 - `arguments` gives one `UGenInput` per argument: an output, or an array of
   outputs for an array.
+- `ugen` adds a UGen by its class name and the selector of a rate method,
+  `ar`, `kr`, `ir` or `new`, with the arguments by name. The catalogue
+  gives the order of the arguments, their defaults, the wiring and the
+  rule of `checkInputs`. An `ArgValue` is an input, or the text of a symbol
+  argument such as the command name of `SendReply`. A single input goes
+  where the method takes an array, as `asArray` makes it.
 - `add` adds a UGen at the level of `UGen:new1`: its class, its rate, its
   inputs in the order of the wire, the rate of each output, its special
   index, and whether it is a `WidthFirstUGen`. Every UGen added after a
@@ -121,6 +128,22 @@ assert_eq!(def.children.len(), 3);
 
 A `UGenInput` is a number, an `OutputProxy` or an array of them. An
 `OutputProxy` gives its rate and the index of its output.
+
+### The checks of the inputs
+
+`ugen` checks the inputs as sclang checks them at the end of the build:
+
+- No input is NaN. `add`, `unary_op` and `binary_op` check this too.
+- The rule of `checkInputs` of the class holds. One rule asks for the first
+  input at the rate of the UGen. If the UGen runs at audio rate, other
+  rules ask for some of its inputs at audio rate. At audio rate,
+  `AbstractOut` asks for audio-rate channels.
+- A class with a rule of its own is not addable: `T2K`, `Duty`, `TDuty`,
+  `BufWr`, `Peak`, `RunningMax` and `RunningMin`.
+
+scsynth does not check the rate of an input. For `Out.ar(0, 0.5)`, it
+copies a buffer's length of floats from the one float of the constant
+(`IOUGens.cpp:944`). `add` takes the inputs as they come.
 
 ## The catalogue
 
@@ -215,6 +238,11 @@ byte, and reading checks every definition after it reads it. A
 - The operators: sclang folds `* 0`, `* 1`, `* -1`, `+ 0`, `- 0`, `0 -`,
   `/ 1` and `/ -1` before it makes a UGen, and computes the operator of
   numbers. `unary_op` and `binary_op` always make a UGen.
+- `mul` and `add`: sclang applies `madd`. `ugen` refuses a value other than
+  their defaults, 1 and 0.
+- A 0 channel of `Out.ar`, `XOut.ar` or `LocalOut.ar`: sclang puts a `DC`
+  in its place. `ugen` keeps the 0, and the rule of `AbstractOut` refuses
+  it.
 
 ## Tests
 

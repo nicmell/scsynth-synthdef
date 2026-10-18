@@ -3,6 +3,11 @@
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
+use crate::catalog::{
+    self, Addable, ArgDefault, ArgKind, CheckInputs, InputSlot, Outputs, RateMethod, UGenClass,
+    Wiring,
+};
+use crate::check_inputs;
 use crate::error::BuildError;
 use crate::file::Version;
 use crate::limits;
@@ -10,7 +15,7 @@ use crate::operator;
 use crate::rate::Rate;
 use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
 use crate::topo;
-use crate::ugen_input::{OutputProxy, UGenInput};
+use crate::ugen_input::{ArgValue, OutputProxy, UGenInput};
 
 static NEXT_BUILD: AtomicU64 = AtomicU64::new(0);
 
@@ -375,6 +380,50 @@ impl SynthDefBuilder {
         )
     }
 
+    /// Adds a UGen by its class name and the selector of a rate method, with
+    /// the arguments by name, as `SinOsc.ar(freq: 440)` adds one in sclang.
+    /// The catalogue gives the order of the arguments, their defaults, the
+    /// wiring and the rule of `checkInputs`. It gives back one output, or an
+    /// array of the outputs when the UGen has none or several.
+    ///
+    /// A single input is an array of one where the method takes an array, as
+    /// `asArray` makes it.
+    ///
+    /// # Errors
+    ///
+    /// A [`BuildError`] for a class, a method or an argument that the
+    /// catalogue does not have, for a method that it marks as not addable,
+    /// for an argument without a value or with a value of another kind, for
+    /// `mul` other than 1 and `add` other than 0, for an array where the
+    /// method takes one input, for a bad count of channels, for inputs that
+    /// break the rule of `checkInputs`, and for an input that
+    /// [`add`](Self::add) refuses.
+    pub fn ugen(
+        &mut self,
+        class: &str,
+        selector: &str,
+        args: &[(&str, ArgValue)],
+    ) -> Result<UGenInput, BuildError> {
+        let (ugen_class, method, wiring) = addable_method(class, selector)?;
+        let values = bind_arguments(class, method, args)?;
+        check_madd(method, wiring, &values)?;
+        let inputs = wire_inputs(class, method, wiring, &values)?;
+        let outputs = wire_outputs(class, method, wiring, &values)?;
+        check_inputs::check(ugen_class.check_inputs, wiring.rate, &inputs).map_err(|message| {
+            BuildError::CheckInputs {
+                class: class.to_owned(),
+                message,
+            }
+        })?;
+        self.add(
+            NewUGen::new(class, wiring.rate)
+                .inputs(inputs)
+                .outputs(outputs)
+                .special_index(wiring.special_index)
+                .width_first(ugen_class.is_width_first),
+        )
+    }
+
     /// Adds a variant: the defaults of the parameters, with the values of
     /// `values` by control name, as the `variants` of `SynthDef.new` give
     /// them. Its name is `<definition>.<name>`.
@@ -610,6 +659,184 @@ fn to_float32(value: f64) -> f32 {
     value as f32
 }
 
+/// The class, the method and its wiring, if `ugen` can add the method.
+fn addable_method(
+    class: &str,
+    selector: &str,
+) -> Result<(&'static UGenClass, &'static RateMethod, Wiring), BuildError> {
+    let ugen_class =
+        catalog::lookup(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
+    let method = ugen_class
+        .method(selector)
+        .ok_or_else(|| BuildError::UnknownMethod {
+            class: class.to_owned(),
+            selector: selector.to_owned(),
+        })?;
+    let not_addable = |reason: String| BuildError::NotAddable {
+        class: class.to_owned(),
+        selector: selector.to_owned(),
+        reason,
+    };
+    let wiring = match method.addable {
+        Addable::Yes(wiring) => wiring,
+        Addable::No(reason) => return Err(not_addable(reason.to_owned())),
+    };
+    if let CheckInputs::Custom(owner) = ugen_class.check_inputs {
+        return Err(not_addable(format!(
+            "the checkInputs of {owner} is a rule of its own"
+        )));
+    }
+    Ok((ugen_class, method, wiring))
+}
+
+/// The value of each argument of `method`: the one that `args` gives by
+/// name, or the default.
+fn bind_arguments(
+    class: &str,
+    method: &RateMethod,
+    args: &[(&str, ArgValue)],
+) -> Result<Vec<ArgValue>, BuildError> {
+    let mut values: Vec<Option<ArgValue>> = vec![None; method.args.len()];
+    for (name, value) in args {
+        let position = method
+            .args
+            .iter()
+            .position(|arg| arg.name == *name)
+            .ok_or_else(|| BuildError::UnknownArgument {
+                class: class.to_owned(),
+                argument: (*name).to_owned(),
+            })?;
+        if values[position].is_some() {
+            return Err(BuildError::ArgumentTwice((*name).to_owned()));
+        }
+        values[position] = Some(value.clone());
+    }
+    method
+        .args
+        .iter()
+        .zip(values)
+        .map(|(arg, value)| match (value, arg.default) {
+            (Some(value), _) => Ok(value),
+            (None, Some(ArgDefault::Float(number))) => Ok(ArgValue::from(number)),
+            (None, Some(ArgDefault::Symbol(text))) if arg.kind == ArgKind::Symbol => {
+                Ok(ArgValue::from(text))
+            }
+            _ => Err(BuildError::MissingArgument {
+                class: class.to_owned(),
+                argument: arg.name.to_owned(),
+            }),
+        })
+        .collect()
+}
+
+/// `mul` and `add` keep their defaults, 1 and 0, since the builder does not
+/// apply `madd`.
+fn check_madd(method: &RateMethod, wiring: Wiring, values: &[ArgValue]) -> Result<(), BuildError> {
+    if !wiring.madd {
+        return Ok(());
+    }
+    for (arg, value) in method.args.iter().zip(values) {
+        let default = match arg.name {
+            "mul" => 1.0,
+            "add" => 0.0,
+            _ => continue,
+        };
+        if *value != ArgValue::from(default) {
+            return Err(BuildError::MaddNotSupported(arg.name.to_owned()));
+        }
+    }
+    Ok(())
+}
+
+fn wrong_kind(
+    class: &str,
+    method: &RateMethod,
+    position: usize,
+    expected: &'static str,
+) -> BuildError {
+    BuildError::WrongKind {
+        class: class.to_owned(),
+        argument: method.args[position].name.to_owned(),
+        expected,
+    }
+}
+
+/// The inputs of the wire, slot by slot.
+fn wire_inputs(
+    class: &str,
+    method: &RateMethod,
+    wiring: Wiring,
+    values: &[ArgValue],
+) -> Result<Vec<UGenInput>, BuildError> {
+    let mut inputs = Vec::new();
+    for &slot in wiring.inputs {
+        match slot {
+            InputSlot::Arg(position) => match &values[position] {
+                ArgValue::Input(UGenInput::Array(_)) => {
+                    return Err(BuildError::MultichannelExpansion {
+                        ugen: class.to_owned(),
+                        input: inputs.len(),
+                    });
+                }
+                ArgValue::Input(input) => inputs.push(input.clone()),
+                ArgValue::Text(_) => {
+                    return Err(wrong_kind(class, method, position, "a number or an output"));
+                }
+            },
+            InputSlot::ArgArray(position) => match &values[position] {
+                ArgValue::Input(UGenInput::Array(items)) => inputs.extend(items.iter().cloned()),
+                ArgValue::Input(input) => inputs.push(input.clone()),
+                ArgValue::Text(_) => return Err(wrong_kind(class, method, position, "an array")),
+            },
+            InputSlot::ArgString(position) => match &values[position] {
+                ArgValue::Text(text) => {
+                    inputs.push(UGenInput::from(f64::from(to_u32(text.len()))));
+                    inputs.extend(text.bytes().map(|byte| UGenInput::from(f64::from(byte))));
+                }
+                ArgValue::Input(_) => return Err(wrong_kind(class, method, position, "a symbol")),
+            },
+        }
+    }
+    Ok(inputs)
+}
+
+/// The rate of each output.
+fn wire_outputs(
+    class: &str,
+    method: &RateMethod,
+    wiring: Wiring,
+    values: &[ArgValue],
+) -> Result<Vec<Rate>, BuildError> {
+    let bad_count = |position: usize| BuildError::BadCount {
+        class: class.to_owned(),
+        argument: method.args[position].name.to_owned(),
+    };
+    match wiring.outputs {
+        Outputs::Fixed(rates) => Ok(rates.to_vec()),
+        Outputs::Arg { arg, rate } => match values[arg] {
+            ArgValue::Input(UGenInput::Number(count))
+                if count >= 1.0 && count.fract() == 0.0 && count <= f64::from(u16::MAX) =>
+            {
+                Ok(vec![rate; count_to_usize(count)])
+            }
+            _ => Err(bad_count(arg)),
+        },
+        Outputs::ArraySize { arg, rate } => match &values[arg] {
+            ArgValue::Input(UGenInput::Array(items)) if !items.is_empty() => {
+                Ok(vec![rate; items.len()])
+            }
+            ArgValue::Input(UGenInput::Array(_)) | ArgValue::Text(_) => Err(bad_count(arg)),
+            ArgValue::Input(_) => Ok(vec![rate]),
+        },
+    }
+}
+
+/// A whole number from 1 to `u16::MAX`, as a count of outputs.
+#[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+fn count_to_usize(count: f64) -> usize {
+    count as usize
+}
+
 fn to_u32(value: usize) -> u32 {
     u32::try_from(value).unwrap_or(u32::MAX)
 }
@@ -624,7 +851,7 @@ mod tests {
     use crate::error::BuildError;
     use crate::rate::Rate;
     use crate::synth_def::{ControlName, InputSpec};
-    use crate::ugen_input::UGenInput;
+    use crate::ugen_input::{ArgValue, UGenInput};
 
     fn out(builder: &mut SynthDefBuilder, rate: Rate, inputs: Vec<UGenInput>) {
         builder
@@ -916,6 +1143,90 @@ mod tests {
                 input: 1
             })
         );
+    }
+
+    #[test]
+    fn ugen_refuses_what_the_catalogue_cannot_wire() {
+        let mut builder = SynthDefBuilder::new("refused", vec![]).unwrap();
+        let mut refuse = |class: &str, selector: &str, args: &[(&str, ArgValue)]| -> BuildError {
+            builder.ugen(class, selector, args).unwrap_err()
+        };
+        assert_eq!(
+            refuse("NoSuchUGen", "ar", &[]),
+            BuildError::UnknownClass("NoSuchUGen".to_owned())
+        );
+        assert!(matches!(
+            refuse("SinOsc", "ir", &[]),
+            BuildError::UnknownMethod { .. }
+        ));
+        assert!(matches!(
+            refuse("Lag", "kr", &[]),
+            BuildError::NotAddable { .. }
+        ));
+        assert!(matches!(
+            refuse("Duty", "kr", &[]),
+            BuildError::NotAddable { .. }
+        ));
+        assert!(matches!(
+            refuse("SinOsc", "ar", &[("pitch", 1.0.into())]),
+            BuildError::UnknownArgument { .. }
+        ));
+        assert_eq!(
+            refuse(
+                "SinOsc",
+                "ar",
+                &[("freq", 1.0.into()), ("freq", 2.0.into())]
+            ),
+            BuildError::ArgumentTwice("freq".to_owned())
+        );
+        assert!(matches!(
+            refuse("Out", "ar", &[]),
+            BuildError::MissingArgument { .. }
+        ));
+        assert_eq!(
+            refuse("SinOsc", "ar", &[("mul", 0.5.into())]),
+            BuildError::MaddNotSupported("mul".to_owned())
+        );
+        assert!(matches!(
+            refuse(
+                "SinOsc",
+                "ar",
+                &[("freq", vec![1.0.into(), 2.0.into()].into())]
+            ),
+            BuildError::MultichannelExpansion { .. }
+        ));
+        assert!(matches!(
+            refuse("SinOsc", "ar", &[("freq", "a".into())]),
+            BuildError::WrongKind { .. }
+        ));
+        for count in [1.5, 0.0, -1.0] {
+            assert!(matches!(
+                refuse("In", "ar", &[("numChannels", count.into())]),
+                BuildError::BadCount { .. }
+            ));
+        }
+    }
+
+    #[test]
+    fn ugen_checks_the_inputs_as_sclang_does() {
+        // Out.ar(0, 0.5), which sclang refuses, fact 34 of the plan.
+        let mut builder = SynthDefBuilder::new("checked", vec![]).unwrap();
+        let error = builder
+            .ugen(
+                "Out",
+                "ar",
+                &[("bus", 0.0.into()), ("channelsArray", 0.5.into())],
+            )
+            .unwrap_err();
+        assert!(matches!(error, BuildError::CheckInputs { .. }));
+        let sine = builder.ugen("SinOsc", "ar", &[]).unwrap();
+        builder
+            .ugen(
+                "Out",
+                "ar",
+                &[("bus", 0.0.into()), ("channelsArray", sine.into())],
+            )
+            .unwrap();
     }
 
     #[test]

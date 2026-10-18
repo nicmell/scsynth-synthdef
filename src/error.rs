@@ -366,6 +366,74 @@ pub enum BuildError {
         /// The number of values of the control.
         size: usize,
     },
+    /// The catalogue has no class of this name.
+    UnknownClass(String),
+    /// The class has no rate method of this selector.
+    #[non_exhaustive]
+    UnknownMethod {
+        /// The class.
+        class: String,
+        /// The selector.
+        selector: String,
+    },
+    /// The catalogue marks the method as not addable by name.
+    #[non_exhaustive]
+    NotAddable {
+        /// The class.
+        class: String,
+        /// The selector.
+        selector: String,
+        /// Why not.
+        reason: String,
+    },
+    /// The method has no argument of this name.
+    #[non_exhaustive]
+    UnknownArgument {
+        /// The class.
+        class: String,
+        /// The name of the argument.
+        argument: String,
+    },
+    /// The call gives this argument twice.
+    ArgumentTwice(String),
+    /// The argument has no value: no default, or a default that sclang
+    /// computes when the method runs.
+    #[non_exhaustive]
+    MissingArgument {
+        /// The class.
+        class: String,
+        /// The name of the argument.
+        argument: String,
+    },
+    /// The argument has a value of another kind than it takes.
+    #[non_exhaustive]
+    WrongKind {
+        /// The class.
+        class: String,
+        /// The name of the argument.
+        argument: String,
+        /// What the argument takes.
+        expected: &'static str,
+    },
+    /// `mul` is not 1, or `add` is not 0. The builder does not apply `madd`.
+    MaddNotSupported(String),
+    /// A count of channels is not a positive integer, or an array that sets
+    /// the outputs is empty.
+    #[non_exhaustive]
+    BadCount {
+        /// The class.
+        class: String,
+        /// The name of the argument.
+        argument: String,
+    },
+    /// The inputs break the rule of `checkInputs` of the class.
+    #[non_exhaustive]
+    CheckInputs {
+        /// The class.
+        class: String,
+        /// What is wrong.
+        message: String,
+    },
     /// The definition breaks a limit of scsynth.
     Limit(LimitError),
 }
@@ -407,6 +475,36 @@ impl fmt::Display for BuildError {
                 f,
                 "the variant '{variant}' gives '{control}' {values} values, but it has {size}"
             ),
+            Self::UnknownClass(class) => write!(f, "the catalogue has no class {class}"),
+            Self::UnknownMethod { class, selector } => {
+                write!(f, "{class} has no rate method {selector}")
+            }
+            Self::NotAddable {
+                class,
+                selector,
+                reason,
+            } => write!(f, "{class}.{selector} is not addable by name: {reason}"),
+            Self::UnknownArgument { class, argument } => {
+                write!(f, "{class} has no argument {argument}")
+            }
+            Self::ArgumentTwice(argument) => write!(f, "the argument {argument} comes twice"),
+            Self::MissingArgument { class, argument } => {
+                write!(f, "the argument {argument} of {class} needs a value")
+            }
+            Self::WrongKind {
+                class,
+                argument,
+                expected,
+            } => write!(f, "the argument {argument} of {class} takes {expected}"),
+            Self::MaddNotSupported(argument) => write!(
+                f,
+                "the builder does not apply madd, so {argument} must keep its default"
+            ),
+            Self::BadCount { class, argument } => write!(
+                f,
+                "the argument {argument} of {class} must give at least one channel"
+            ),
+            Self::CheckInputs { class, message } => write!(f, "{class}: {message}"),
             Self::Limit(error) => write!(f, "{error}"),
         }
     }

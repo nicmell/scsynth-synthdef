@@ -2,6 +2,7 @@
 
 mod builder;
 pub mod catalog;
+mod check_inputs;
 mod error;
 mod file;
 mod limits;
@@ -18,4 +19,4 @@ pub use error::{
 pub use file::{DefFile, Version, read_def_file, write_def_file, write_def_file_old};
 pub use rate::Rate;
 pub use synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
-pub use ugen_input::{OutputProxy, UGenInput};
+pub use ugen_input::{ArgValue, OutputProxy, UGenInput};
