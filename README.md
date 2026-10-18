@@ -45,9 +45,8 @@ the crate refuses what scsynth refuses, and this file lists the difference.
 
 ## Status
 
-The work is in progress. The definition files, the builder, the
-operators, the catalogue and the build by class name are done. The
-acceptance test with scsynth is not.
+The work is in progress. Everything of version 0.1 is done except its
+release.
 [The plan](https://github.com/nicmell/scsynth-synthdef/blob/main/docs/plan.md)
 describes version 0.1 and its steps.
 
@@ -202,8 +201,9 @@ byte, and reading checks every definition after it reads it. A
 - A definition name takes at most 255 bytes, the most that its length byte
   holds.
 - A UGen name, a parameter name and a variant name take at most 31 bytes.
-  scsynth throws "name too long (> 31 chars)" at 32 (`ReadName`). The name
-  of a variant includes the name of its definition: `<definition>.<variant>`.
+  scsynth throws "name too long (> 31 chars)" at 32 (`ReadName`), and the
+  acceptance test measures it. The name of a variant includes the name of
+  its definition: `<definition>.<variant>`.
 - An input reads a UGen before the UGen that reads it. scsynth runs the UGens
   in file order, and its buffer coloring reads the output of a later UGen
   before it is set (`SC_GraphDef.cpp:835-859`).
@@ -275,8 +275,29 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/catalog.scd"
 ```
 
 `tests/render.rs` renders the JSON into `src/operator/generated.rs` and
-`src/catalog/generated.rs`. If a committed file differs, the test fails. With `SCSYNTH_SYNTHDEF_BLESS=1` set,
-it writes the file instead.
+`src/catalog/generated.rs`. If a committed file differs, the test fails.
+With `SCSYNTH_SYNTHDEF_BLESS=1` set, it writes the file instead.
+
+`tests/scsynth.rs` sends definitions of the crate to scsynth 3.14.1. It is
+ignored by default:
+
+```sh
+cargo test --test scsynth -- --ignored
+```
+
+- scsynth runs in NRT mode: it opens no audio device and no port, and its
+  output is complete when it exits. `SCSYNTH` names the scsynth, and
+  `SCSYNTH_PLUGINS` its plugins. Both default to the bundle of
+  `/Applications/SuperCollider.app`. `-U` keeps the plugins of the
+  Extensions folder out.
+- scsynth must load every golden graph, built by the crate, without an
+  exception. A last definition with a name too long shows that it read
+  the whole score.
+- A parameter name and a variant name of 31 bytes load. A UGen name of 31
+  bytes reaches the message `UGen '<name>' not installed.`. Each of the
+  three at 32 bytes throws "name too long (> 31 chars)".
+- The test only loads definitions. In NRT mode, scsynth 3.14.1 crashes on
+  `/s_new` of a definition with an `AudioControl`.
 
 ## Features
 
