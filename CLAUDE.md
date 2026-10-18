@@ -16,8 +16,8 @@ Read it before any work.
   `sc-crates/crates/scsynthdef-compiler`.
 - The SuperCollider source is in `~/Projects/supercollider`, at the tag
   `Version-3.14.1`. `sclang` and `scsynth` 3.14.1 are on the PATH.
-- Never touch the scsynth on UDP 57110. A test boots its own scsynth on
-  another port.
+- Never touch the scsynth on UDP 57110. A test runs its own scsynth in NRT
+  mode, which opens no port.
 
 ## Commands
 
