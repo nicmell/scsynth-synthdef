@@ -1,5 +1,5 @@
-//! Why bytes are not a definition file, and why a definition breaks a limit
-//! of scsynth.
+//! Why bytes are not a definition file, why a definition breaks a limit of
+//! scsynth, and why a build fails.
 
 use std::fmt;
 
@@ -300,3 +300,112 @@ impl CountKind {
         }
     }
 }
+
+/// Why a build fails.
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum BuildError {
+    /// Two arguments have this name.
+    DuplicateArgument(String),
+    /// The argument has an empty array as its default.
+    EmptyArray(String),
+    /// The scalar, trigger or audio argument has a lag. sclang ignores the
+    /// lag, with a warning.
+    LagOnNonControl(String),
+    /// A lag of the argument is NaN.
+    NanLag(String),
+    /// The parameters before a control UGen do not fit its special index,
+    /// an int16.
+    TooManyParameters(usize),
+    /// An input is NaN, which `checkValidInputs` refuses.
+    #[non_exhaustive]
+    NotANumber {
+        /// The class of the UGen.
+        ugen: String,
+        /// The position of the input.
+        input: usize,
+    },
+    /// An input is an array, which needs multichannel expansion.
+    #[non_exhaustive]
+    MultichannelExpansion {
+        /// The class of the UGen.
+        ugen: String,
+        /// The position of the input.
+        input: usize,
+    },
+    /// An input is an output of another build.
+    #[non_exhaustive]
+    ForeignOutput {
+        /// The class of the UGen.
+        ugen: String,
+        /// The position of the input.
+        input: usize,
+    },
+    /// Two variants have this full name.
+    DuplicateVariant(String),
+    /// A variant sets a control that the definition does not have.
+    #[non_exhaustive]
+    UnknownControl {
+        /// The full name of the variant.
+        variant: String,
+        /// The name of the control.
+        control: String,
+    },
+    /// A variant gives a control more values than the control has.
+    #[non_exhaustive]
+    VariantSize {
+        /// The full name of the variant.
+        variant: String,
+        /// The name of the control.
+        control: String,
+        /// The number of values that the variant gives.
+        values: usize,
+        /// The number of values of the control.
+        size: usize,
+    },
+    /// The definition breaks a limit of scsynth.
+    Limit(LimitError),
+}
+
+impl fmt::Display for BuildError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::DuplicateArgument(name) => write!(f, "two arguments are named '{name}'"),
+            Self::EmptyArray(name) => write!(f, "the argument '{name}' has no value"),
+            Self::LagOnNonControl(name) => write!(
+                f,
+                "the argument '{name}' has a lag, but it is not at control rate"
+            ),
+            Self::NanLag(name) => write!(f, "a lag of the argument '{name}' is NaN"),
+            Self::TooManyParameters(count) => write!(
+                f,
+                "{count} parameters come before a control UGen, more than its special index holds"
+            ),
+            Self::NotANumber { ugen, input } => write!(f, "input {input} of {ugen} is NaN"),
+            Self::MultichannelExpansion { ugen, input } => write!(
+                f,
+                "input {input} of {ugen} is an array, which needs multichannel expansion"
+            ),
+            Self::ForeignOutput { ugen, input } => {
+                write!(f, "input {input} of {ugen} is an output of another build")
+            }
+            Self::DuplicateVariant(name) => write!(f, "two variants are named '{name}'"),
+            Self::UnknownControl { variant, control } => write!(
+                f,
+                "the variant '{variant}' sets '{control}', which is not a control"
+            ),
+            Self::VariantSize {
+                variant,
+                control,
+                values,
+                size,
+            } => write!(
+                f,
+                "the variant '{variant}' gives '{control}' {values} values, but it has {size}"
+            ),
+            Self::Limit(error) => write!(f, "{error}"),
+        }
+    }
+}
+
+impl std::error::Error for BuildError {}

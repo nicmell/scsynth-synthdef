@@ -45,8 +45,8 @@ the crate refuses what scsynth refuses, and this file lists the difference.
 
 ## Status
 
-The work is in progress. The definition files are done. The builder and
-the catalogue are not.
+The work is in progress. The definition files and the builder are done.
+The catalogue and the operators are not.
 [The plan](https://github.com/nicmell/scsynth-synthdef/blob/main/docs/plan.md)
 describes version 0.1 and its steps.
 
@@ -72,6 +72,49 @@ The versions differ in two places:
 
 The count of definitions and the count of variants are an int16 in every
 version.
+
+## Building
+
+A `SynthDefBuilder` is the `SynthDef` of sclang during a build. It builds
+as `SynthDef.new` does, without `optimizeGraph`.
+
+```rust
+use scsynth_synthdef::{Arg, NewUGen, Rate, SynthDefBuilder};
+
+// SynthDef(\sine, { |freq = 440| Out.ar(0, SinOsc.ar(freq)) })
+let mut builder = SynthDefBuilder::new("sine", vec![Arg::new("freq", 440.0)])?;
+let freq = builder.arguments()[0].clone();
+let sin = builder.add(NewUGen::new("SinOsc", Rate::Audio).inputs([freq, 0.0.into()]))?;
+builder.add(NewUGen::new("Out", Rate::Audio).inputs([0.0.into(), sin]).outputs([]))?;
+let def = builder.finish()?;
+assert_eq!(def.children.len(), 3);
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+- `SynthDefBuilder::new` takes the arguments of the graph function, and
+  builds their controls at once, as `buildUgenGraph` does. An `Arg` has a
+  default value, or an array of them, a rate entry and lags.
+  - The rate is the first match of scalar (`ArgRate::Ir` or the prefix
+    `i_`), trigger (`Tr` or `t_`) and audio (`Ar` or `a_`). Any other
+    argument is at control rate. So the prefix `i_` wins over `Kr`.
+  - Each rate has one control UGen, in the order `Control` at scalar rate,
+    `TrigControl`, `AudioControl` and `Control` at control rate. If a lag
+    is not 0, the control-rate group becomes `LagControl`s of 16 values,
+    with the lags as their inputs.
+  - The parameter indices follow the order of these groups. The names table
+    follows the order of the arguments.
+- `arguments` gives one `UGenInput` per argument: an output, or an array of
+  outputs for an array.
+- `add` adds a UGen at the level of `UGen:new1`: its class, its rate, its
+  inputs in the order of the wire, the rate of each output, its special
+  index, and whether it is a `WidthFirstUGen`. Every UGen added after a
+  width-first UGen runs after it.
+- `variant` adds a variant by control name, from the defaults.
+- `finish` collects the constants in the order of creation and of the
+  inputs, sorts the UGens as sclang sorts them, and checks the limits.
+
+A `UGenInput` is a number, an `OutputProxy` or an array of them. An
+`OutputProxy` gives its rate and the index of its output.
 
 ## Strictness
 
@@ -112,6 +155,24 @@ byte, and reading checks every definition after it reads it. A
 - Each count fits the integer of the version: `i32::MAX` in version 2, and
   `i16::MAX` in version 1. Each count of definitions and of variants fits
   `i16::MAX`.
+
+## Differences from sclang
+
+- A lag on a scalar, trigger or audio argument: sclang ignores it with a
+  warning, and the builder refuses it.
+- An empty array as a default: when it is alone at its rate, sclang fails.
+  The builder always refuses it.
+- The constants: the builder keeps one constant per bit pattern of the f64.
+  sclang looks constants up in two hash tables. For 0.0 against -0.0, the
+  layout of these tables decides: sclang keeps both, or fails with
+  "SimpleNumber-writeInputSpec constant not found: -0.0".
+- The variants: the builder writes them in the order of the calls. sclang
+  writes them in the order of its dictionary.
+- The builder does not run `optimizeGraph`. sclang fuses `*` and `+` into
+  `MulAdd`, `+` into `Sum3` and `Sum4`, rewrites `a + b.neg` and
+  `a - b.neg`, and removes unused pure UGens.
+- An array input: sclang expands it into several UGens, and the builder
+  refuses it.
 
 ## Tests
 

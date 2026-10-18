@@ -10,3 +10,7 @@
   scsynth. See [Definition files](README.md#definition-files) and
   [Strictness](README.md#strictness).
 - The feature `serde`, for the types of a definition and of a file.
+- `SynthDefBuilder`: the build of sclang without `optimizeGraph`. Controls
+  from the arguments, `add`, variants, the constants and the topological
+  sort of sclang. See [Building](README.md#building) and
+  [Differences from sclang](README.md#differences-from-sclang).
