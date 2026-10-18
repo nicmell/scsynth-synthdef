@@ -291,6 +291,7 @@ mod tests {
         assert!(reason("LocalBuf", "new").contains("MaxLocalBufs"));
         assert!(reason("Poll", "kr").contains("Impulse"));
         assert_eq!(wiring("DelayN", "kr").rate, Rate::Control);
+        assert!(reason("Duty", "kr").contains("rule of its own"));
     }
 
     #[test]

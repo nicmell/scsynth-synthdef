@@ -4,8 +4,7 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::catalog::{
-    self, Addable, ArgDefault, ArgKind, CheckInputs, InputSlot, Outputs, RateMethod, UGenClass,
-    Wiring,
+    self, Addable, ArgDefault, ArgKind, InputSlot, Outputs, RateMethod, UGenClass, Wiring,
 };
 use crate::check_inputs;
 use crate::error::BuildError;
@@ -672,20 +671,16 @@ fn addable_method(
             class: class.to_owned(),
             selector: selector.to_owned(),
         })?;
-    let not_addable = |reason: String| BuildError::NotAddable {
-        class: class.to_owned(),
-        selector: selector.to_owned(),
-        reason,
-    };
     let wiring = match method.addable {
         Addable::Yes(wiring) => wiring,
-        Addable::No(reason) => return Err(not_addable(reason.to_owned())),
+        Addable::No(reason) => {
+            return Err(BuildError::NotAddable {
+                class: class.to_owned(),
+                selector: selector.to_owned(),
+                reason: reason.to_owned(),
+            });
+        }
     };
-    if let CheckInputs::Custom(owner) = ugen_class.check_inputs {
-        return Err(not_addable(format!(
-            "the checkInputs of {owner} is a rule of its own"
-        )));
-    }
     Ok((ugen_class, method, wiring))
 }
 

@@ -1,54 +1,33 @@
 # scsynth-synthdef
 
-The synth definitions of SuperCollider, for Rust. This crate reads and
-writes the
+The synth definitions of SuperCollider, for Rust. This crate compiles a
+graph of UGens the way sclang compiles a `SynthDef`, into the
 [SynthDef file format](https://doc.sccode.org/Reference/Synth-Definition-File-Format.html)
-(`SCgf`), the bytes that scsynth loads with `/d_recv`. It will also compile
-a graph of UGens the way sclang compiles a `SynthDef`. A catalogue of the
-UGens of the core class library will come with it.
+(`SCgf`). scsynth loads these bytes with `/d_recv`. The crate reads them
+back, strictly. It carries a catalogue of the UGens of the core class
+library.
 
 ```rust
-use scsynth_synthdef::{InputSpec, Rate, SynthDef, UGen, read_def_file};
+use scsynth_synthdef::{Arg, SynthDefBuilder, read_def_file};
 
-// Out.ar(0, DC.ar(0.5)), the definition "dc".
-let def = SynthDef {
-    name: "dc".to_owned(),
-    constants: vec![0.5, 0.0],
-    controls: vec![],
-    control_names: vec![],
-    children: vec![
-        UGen {
-            name: "DC".to_owned(),
-            rate: Rate::Audio,
-            inputs: vec![InputSpec::Constant(0)],
-            outputs: vec![Rate::Audio],
-            special_index: 0,
-        },
-        UGen {
-            name: "Out".to_owned(),
-            rate: Rate::Audio,
-            inputs: vec![InputSpec::Constant(1), InputSpec::UGen { index: 0, output: 0 }],
-            outputs: vec![],
-            special_index: 0,
-        },
-    ],
-    variants: vec![],
-};
+// SynthDef(\sine, { |freq = 440, amp = 0.1| Out.ar(0, SinOsc.ar(freq) * amp) })
+let mut builder = SynthDefBuilder::new("sine", vec![Arg::new("freq", 440.0), Arg::new("amp", 0.1)])?;
+let (freq, amp) = (builder.arguments()[0].clone(), builder.arguments()[1].clone());
+let sine = builder.ugen("SinOsc", "ar", &[("freq", freq.into())])?;
+let sound = builder.binary_op("*", sine, amp)?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", sound.into())])?;
+let def = builder.finish()?;
+
+// The bytes for /d_recv, and back.
 let bytes = def.as_bytes()?;
-let file = read_def_file(&bytes)?;
-assert_eq!(file.synth_defs, [def]);
+assert_eq!(read_def_file(&bytes)?.synth_defs, [def]);
 # Ok::<(), Box<dyn std::error::Error>>(())
 ```
 
-The crate follows SuperCollider 3.14.1. Where sclang and scsynth differ,
-the crate refuses what scsynth refuses, and this file lists the difference.
-
-## Status
-
-The work is in progress. Everything of version 0.1 is done except its
-release.
-[The plan](https://github.com/nicmell/scsynth-synthdef/blob/main/docs/plan.md)
-describes version 0.1 and its steps.
+The crate follows SuperCollider 3.14.1. For the graphs that it builds, it
+writes the bytes that sclang writes, except for the differences that this
+file lists. Where sclang and scsynth differ, the crate refuses what scsynth
+refuses. It does no I/O, and it builds for `wasm32-unknown-unknown`.
 
 ## Definition files
 
@@ -79,13 +58,13 @@ A `SynthDefBuilder` is the `SynthDef` of sclang during a build. It builds
 as `SynthDef.new` does, without `optimizeGraph`.
 
 ```rust
-use scsynth_synthdef::{Arg, SynthDefBuilder};
+use scsynth_synthdef::{Arg, NewUGen, Rate, SynthDefBuilder};
 
-// SynthDef(\sine, { |freq = 440| Out.ar(0, SinOsc.ar(freq)) })
+// SynthDef(\sine, { |freq = 440| Out.ar(0, SinOsc.ar(freq)) }), at the level of new1
 let mut builder = SynthDefBuilder::new("sine", vec![Arg::new("freq", 440.0)])?;
 let freq = builder.arguments()[0].clone();
-let sine = builder.ugen("SinOsc", "ar", &[("freq", freq.into())])?;
-builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", sine.into())])?;
+let sine = builder.add(NewUGen::new("SinOsc", Rate::Audio).inputs([freq, 0.0.into()]))?;
+builder.add(NewUGen::new("Out", Rate::Audio).inputs([0.0.into(), sine]).outputs([]))?;
 let def = builder.finish()?;
 assert_eq!(def.children.len(), 3);
 # Ok::<(), Box<dyn std::error::Error>>(())
@@ -165,8 +144,8 @@ and once with distinct control-rate outputs. Both calls must create
 exactly one instance of the class, with the same wiring. Then the method is
 addable.
 More calls find whether a count or an array sets the number of outputs.
-544 of the 635 methods are addable. The others do more than `UGen:new1`
-does:
+531 of the 635 methods are addable. Most of the others do more than
+`UGen:new1` does:
 
 - The pseudo-UGens, such as `Changed`, create no instance of the class.
 - If its input is a number or its lag is 0, the Lag family returns the
@@ -176,6 +155,45 @@ does:
 - The control UGens take their special index from the build.
 - `UnaryOpUGen` and `BinaryOpUGen` take the name of an operator. Use
   `unary_op` and `binary_op` instead.
+
+The catalogue gives the page of each class in the help, and not its
+summary: the help of SuperCollider is GPL-3, and the crate copies none of
+it.
+
+### Methods that `ugen` refuses
+
+`tests/readme.rs` keeps this list equal to the catalogue.
+
+- They create no instance of their class: `Changed.ar`, `Changed.kr`,
+  `CompanderD.ar`, `Dstutter.new`, `Dunique.new`, `HilbertFIR.ar`,
+  `Lag.ar`, `Lag.kr`, `Lag2.ar`, `Lag2.kr`, `Lag2UD.ar`, `Lag2UD.kr`,
+  `Lag3.ar`, `Lag3.kr`, `Lag3UD.ar`, `Lag3UD.kr`, `LagControl.ar`,
+  `LagControl.kr`, `LagUD.ar`, `LagUD.kr`, `MulAdd.new`, `Ramp.ar`,
+  `Ramp.kr`, `Slew.ar`, `Slew.kr`, `Splay.ar`, `Splay.kr`, `SplayAz.ar`,
+  `SplayAz.kr`, `Tap.ar`, `UnpackFFT.new`, `VarLag.ar`, `VarLag.kr`.
+- They also create other UGens: `AllpassC.ar`, `AllpassL.ar`,
+  `AllpassN.ar`, `BeatTrack.kr`, `BufAllpassC.ar`, `BufAllpassL.ar`,
+  `BufAllpassN.ar`, `BufCombC.ar`, `BufCombL.ar`, `BufCombN.ar`,
+  `BufDelayC.ar`, `BufDelayL.ar`, `BufDelayN.ar`, `CombC.ar`, `CombL.ar`,
+  `CombN.ar`, `DelTapWr.ar`, `DelayC.ar`, `DelayL.ar`, `DelayN.ar`,
+  `LinXFade2.ar`, `LinXFade2.kr`, `LocalBuf.new`, `Poll.ar`, `Poll.kr`,
+  `Poll.new`.
+- An input comes from no argument, or the inputs follow a count:
+  `DecodeB2.ar`, `DecodeB2.kr`, `Dwrand.new`, `LocalIn.ar`, `LocalIn.kr`,
+  `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`, `SendPeakRMS.kr`,
+  `SetBuf.new`.
+- They need arguments that the probe does not make, such as a `Ref`, a
+  `Rect`, a `Bus` or an operator, or they do not exist: `BinaryOpUGen.new`,
+  `DynKlang.ar`, `DynKlang.kr`, `DynKlank.ar`, `DynKlank.kr`, `InBus.ar`,
+  `InBus.kr`, `InRect.ar`, `InRect.kr`, `Klang.ar`, `Klank.ar`,
+  `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new`, `UnaryOpUGen.new`.
+- They take their special index from the build: `AudioControl.ar`,
+  `Control.ir`, `Control.kr`, `TrigControl.ir`, `TrigControl.kr`.
+- They take their rate from their inputs: `Sum3.new`, `Sum4.new`.
+- Their class checks its inputs with a rule of its own: `BufWr.ar`,
+  `BufWr.kr`, `Duty.ar`, `Duty.kr`, `Peak.ar`, `Peak.kr`, `RunningMax.ar`,
+  `RunningMax.kr`, `RunningMin.ar`, `RunningMin.kr`, `T2K.kr`, `TDuty.ar`,
+  `TDuty.kr`.
 
 ## Strictness
 
@@ -218,6 +236,29 @@ byte, and reading checks every definition after it reads it. A
   `i16::MAX` in version 1. Each count of definitions and of variants fits
   `i16::MAX`.
 
+One limit depends on the server, so the crate does not check it. While the
+server runs, scsynth refuses a definition that needs more interconnect
+buffers than `-w` gives, 64 by default: "exceeded number of interconnect
+buffers." (`SC_GraphDef.cpp:909`). The count also depends on each plugin.
+
+### Traps
+
+The crate does not rule these out, and neither does sclang:
+
+- An array argument shorter than what the UGen reads. For example, a raw
+  envelope for `EnvGen` with too few values makes scsynth read past the
+  inputs of the unit.
+- The inputs of `add`, which take no check but NaN. A UGen with fewer
+  inputs than its plugin reads, or with inputs at the wrong rate, reaches
+  scsynth as it is.
+
+## Round trips
+
+A file that reads writes back to its own bytes, with the writer of its
+version: `write_def_file` for version 2, and `write_def_file_old` for
+version 1. Each float keeps its bits, NaN included. Version 0 has no
+writer. `tests/golden.rs` checks the round trip of every golden file.
+
 ## Differences from sclang
 
 - A lag on a scalar, trigger or audio argument: sclang ignores it with a
@@ -244,9 +285,29 @@ byte, and reading checks every definition after it reads it. A
   in its place. `ugen` keeps the 0, and the rule of `AbstractOut` refuses
   it.
 
+## Left out
+
+These are not in version 0.1, in the order of their value for sc-app3:
+
+1. `mul` and `add`, with the folds of `BinaryOpUGen:new1`
+2. multichannel expansion
+3. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
+4. what rate methods do besides `new1`: the Lag family,
+   `asAudioRateInput`, `LocalBuf`, `Poll` and the zeros of `Out`
+5. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs` and the
+   specs of the metadata
+6. `Env`, and the pseudo-UGens such as `Mix`, `Splay` and `SoundIn`
+7. the rules of `checkInputs` that classes define for themselves
+8. sc3-plugins
+
+Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
+and the count of interconnect buffers.
+
 ## Tests
 
-`cargo test --all-features` runs every test. It needs no SuperCollider.
+`cargo test --all-features` runs every test but the acceptance test. It
+needs no SuperCollider. `tests/readme.rs` checks the list of methods that
+`ugen` refuses.
 
 The golden files in `tests/fixtures` are definitions that sclang 3.14.1
 built and wrote. Each one reads, and writes back to its own bytes.
@@ -285,8 +346,8 @@ ignored by default:
 cargo test --test scsynth -- --ignored
 ```
 
-- scsynth runs in NRT mode: it opens no audio device and no port, and its
-  output is complete when it exits. `SCSYNTH` names the scsynth, and
+- scsynth runs in NRT mode: it opens no audio device and no port. When it
+  exits, its output is complete. `SCSYNTH` names the scsynth, and
   `SCSYNTH_PLUGINS` its plugins. Both default to the bundle of
   `/Applications/SuperCollider.app`. `-U` keeps the plugins of the
   Extensions folder out.

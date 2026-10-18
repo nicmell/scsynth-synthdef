@@ -5,9 +5,8 @@ the SynthDef file format (`SCgf`) and reads them back. It also carries a
 catalogue of the core UGens. SuperCollider 3.14.1 is the reference. This
 file is the operating manual.
 
-[docs/plan.md](docs/plan.md) is the plan of version 0.1: the decisions, the
-sources of truth, the facts established so far, the design and the steps.
-Read it before any work.
+The README is the reference of the crate. [docs/plan.md](docs/plan.md) holds
+what is still open after version 0.1. Read both before any work.
 
 ## Ground rules
 

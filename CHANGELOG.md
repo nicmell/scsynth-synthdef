@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 (2026-10-18)
+
+The first release. It compiles synth definitions as sclang 3.14.1 compiles
+them. It reads and writes their files. It carries a catalogue of the UGens
+of the core class library.
 
 ### Added
 
@@ -9,7 +13,6 @@
   types. Reading is strict, and both directions apply the limits of
   scsynth. See [Definition files](README.md#definition-files) and
   [Strictness](README.md#strictness).
-- The feature `serde`, for the types of a definition and of a file.
 - `SynthDefBuilder`: the build of sclang without `optimizeGraph`. Controls
   from the arguments, `add`, variants, the constants and the topological
   sort of sclang. See [Building](README.md#building) and
@@ -23,4 +26,10 @@
   can add. See [The catalogue](README.md#the-catalogue).
 - `SynthDefBuilder::ugen` and `ArgValue`: a UGen by its class name, with
   the arguments by name, the defaults and the wiring of the catalogue, and
-  the checks of `checkInputs`. See [Building](README.md#building).
+  the checks of `checkInputs`.
+- The feature `serde`, for the types of a definition and of a file.
+
+### Known issues
+
+- See [Left out](README.md#left-out) for what version 0.1 does not do yet,
+  and [Traps](README.md#traps) for what it does not rule out.

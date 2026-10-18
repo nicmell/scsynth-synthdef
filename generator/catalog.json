@@ -4797,29 +4797,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "audio",
-          "inputs": [
-            {
-              "arg": 1
-            },
-            {
-              "arg": 2
-            },
-            {
-              "arg": 3
-            },
-            {
-              "array": 0
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "audio"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of BufWr is a rule of its own"
         },
         {
           "selector": "kr",
@@ -4851,29 +4830,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "control",
-          "inputs": [
-            {
-              "arg": 1
-            },
-            {
-              "arg": 2
-            },
-            {
-              "arg": 3
-            },
-            {
-              "array": 0
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "control"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of BufWr is a rule of its own"
         }
       ]
     },
@@ -10696,29 +10654,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "audio",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            },
-            {
-              "arg": 3
-            },
-            {
-              "arg": 2
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "audio"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Duty is a rule of its own"
         },
         {
           "selector": "kr",
@@ -10752,29 +10689,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "control",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            },
-            {
-              "arg": 3
-            },
-            {
-              "arg": 2
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "control"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Duty is a rule of its own"
         }
       ]
     },
@@ -27411,23 +27327,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "audio",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "audio"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Peak is a rule of its own"
         },
         {
           "selector": "kr",
@@ -27447,23 +27348,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "control",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "control"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Peak is a rule of its own"
         }
       ]
     },
@@ -30404,23 +30290,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "audio",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "audio"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Peak is a rule of its own"
         },
         {
           "selector": "kr",
@@ -30440,23 +30311,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "control",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "control"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Peak is a rule of its own"
         }
       ]
     },
@@ -30494,23 +30350,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "audio",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "audio"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Peak is a rule of its own"
         },
         {
           "selector": "kr",
@@ -30530,23 +30371,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "control",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "control"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Peak is a rule of its own"
         }
       ]
     },
@@ -33956,20 +33782,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "control",
-          "inputs": [
-            {
-              "arg": 0
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "control"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of T2K is a rule of its own"
         }
       ]
     },
@@ -34247,32 +34061,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "audio",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            },
-            {
-              "arg": 3
-            },
-            {
-              "arg": 2
-            },
-            {
-              "arg": 4
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "audio"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Duty is a rule of its own"
         },
         {
           "selector": "kr",
@@ -34313,32 +34103,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "control",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            },
-            {
-              "arg": 3
-            },
-            {
-              "arg": 2
-            },
-            {
-              "arg": 4
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "control"
-            ]
-          },
-          "special_index": 0,
-          "madd": false
+          "addable": false,
+          "reason": "the checkInputs of Duty is a rule of its own"
         }
       ]
     },

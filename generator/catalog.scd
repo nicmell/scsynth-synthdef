@@ -534,12 +534,15 @@ try {
 		}
 	};
 
-	describeMethod = { |class, selector, method|
+	describeMethod = { |class, selector, method, customCheck|
 		var owner = ugenOwner.(method);
 		var names = (method.argNames ? []).drop(1).asArray;
 		var defaults = (method.prototypeFrame ? []).drop(1);
 		var kinds = kindsOf.(owner, selector, names);
 		var wired = wiring.(class, selector, kinds);
+		if (customCheck.notNil and: { wired.isString.not }) {
+			wired = "the checkInputs of % is a rule of its own".format(customCheck);
+		};
 		methods = methods + 1;
 		[
 			\selector -> selector,
@@ -598,7 +601,8 @@ try {
 				var method = class.class.findRespondingMethodFor(selector);
 				method.notNil and: { ugenOwner.(method).notNil }
 			}.collect { |selector|
-				describeMethod.(class, selector, class.class.findRespondingMethodFor(selector))
+				describeMethod.(class, selector, class.class.findRespondingMethodFor(selector),
+					if (rule[0] == \custom) { check.name })
 			}
 		]
 	};
