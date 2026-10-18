@@ -17,3 +17,7 @@
 - `SynthDefBuilder::unary_op` and `binary_op`, and the module `operator`:
   the operators of scsynth by name and by special index, generated from
   the sources of SuperCollider 3.14.1.
+- The module `catalog`: the 419 UGen classes of the core class library of
+  SuperCollider 3.14.1, with their arguments, their categories, the rules
+  of their `checkInputs`, and the wiring of each rate method that `ugen`
+  can add. See [The catalogue](README.md#the-catalogue).

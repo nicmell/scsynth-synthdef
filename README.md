@@ -45,8 +45,8 @@ the crate refuses what scsynth refuses, and this file lists the difference.
 
 ## Status
 
-The work is in progress. The definition files, the builder and the
-operators are done. The catalogue is not.
+The work is in progress. The definition files, the builder, the operators
+and the catalogue are done. Adding a UGen by its class name is not.
 [The plan](https://github.com/nicmell/scsynth-synthdef/blob/main/docs/plan.md)
 describes version 0.1 and its steps.
 
@@ -121,6 +121,39 @@ assert_eq!(def.children.len(), 3);
 
 A `UGenInput` is a number, an `OutputProxy` or an array of them. An
 `OutputProxy` gives its rate and the index of its output.
+
+## The catalogue
+
+The module `catalog` holds the 419 UGen classes of the core class library
+of SuperCollider 3.14.1. sc3-plugins are not in it. `catalog::lookup` gives
+a class by name, and `catalog::all` gives all of them, sorted by name.
+
+- A `UGenClass` has its superclasses, whether it is pure or width-first,
+  its categories in the help, the rule of its `checkInputs`, and its rate
+  methods. `doc_url` gives its page on doc.sccode.org.
+- A `RateMethod` is `ar`, `kr`, `ir` or `new`. It has its arguments, each
+  with a kind and a default, and an `Addable`.
+- `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
+  holds the rate, the slot of each input, the outputs, the special index,
+  and whether `mul` and `add` apply. `Addable::No` holds the reason.
+
+`generator/catalog.scd` measured each method in sclang. It calls the
+method twice, each time in a build of its own: once with distinct numbers,
+and once with distinct control-rate outputs. Both calls must create
+exactly one instance of the class, with the same wiring. Then the method is
+addable.
+More calls find whether a count or an array sets the number of outputs.
+544 of the 635 methods are addable. The others do more than `UGen:new1`
+does:
+
+- The pseudo-UGens, such as `Changed`, create no instance of the class.
+- If its input is a number or its lag is 0, the Lag family returns the
+  input.
+- The delays at audio rate put a `DC` or a `K2A` before their input.
+- `LocalBuf` adds a `MaxLocalBufs`, and `Poll` an `Impulse`.
+- The control UGens take their special index from the build.
+- `UnaryOpUGen` and `BinaryOpUGen` take the name of an operator. Use
+  `unary_op` and `binary_op` instead.
 
 ## Strictness
 
@@ -202,18 +235,19 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
   golden file holds a graph that `optimizeGraph` rewrites.
 - `~/.bin/sclang` changes the directory, so the paths must be absolute.
 
-`generator/catalog.json` holds the tables of the operators. They come from
-`Opcodes.h` and `initSpecialSelectors` in the sources of SuperCollider, at
-the tag `Version-3.14.1`, and sclang must agree with each special index.
-`generator/catalog.scd` writes the JSON again:
+`generator/catalog.json` holds the catalogue and the tables of the
+operators. The operators come from `Opcodes.h` and `initSpecialSelectors`
+in the sources of SuperCollider, at the tag `Version-3.14.1`, and sclang
+must agree with each special index. `generator/catalog.scd` writes the
+JSON again, in two seconds:
 
 ```sh
 SC_SOURCE=~/Projects/supercollider \
 sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/catalog.scd"
 ```
 
-`tests/render.rs` renders the JSON into `src/operator/generated.rs`, and
-fails if the committed file differs. With `SCSYNTH_SYNTHDEF_BLESS=1` set,
+`tests/render.rs` renders the JSON into `src/operator/generated.rs` and
+`src/catalog/generated.rs`. If a committed file differs, the test fails. With `SCSYNTH_SYNTHDEF_BLESS=1` set,
 it writes the file instead.
 
 ## Features

@@ -58,7 +58,275 @@ fn render_operators(catalog: &Value) -> String {
     rendered
 }
 
+fn text(value: &Value) -> &str {
+    value
+        .as_str()
+        .unwrap_or_else(|| panic!("{value} is not a string"))
+}
+
+fn number(value: &Value) -> usize {
+    let number = value
+        .as_u64()
+        .unwrap_or_else(|| panic!("{value} is not a count"));
+    usize::try_from(number).expect("a count fits usize")
+}
+
+fn rate(value: &Value) -> &'static str {
+    match text(value) {
+        "scalar" => "Rate::Scalar",
+        "control" => "Rate::Control",
+        "audio" => "Rate::Audio",
+        "demand" => "Rate::Demand",
+        other => panic!("{other} is no rate"),
+    }
+}
+
+fn strings(values: &Value) -> String {
+    let items: Vec<String> = values
+        .as_array()
+        .expect("a list of strings")
+        .iter()
+        .map(|value| format!("{:?}", text(value)))
+        .collect();
+    format!("&[{}]", items.join(", "))
+}
+
+fn float(value: &Value) -> String {
+    match value {
+        Value::String(special) => match special.as_str() {
+            "inf" => "f64::INFINITY".to_owned(),
+            "-inf" => "f64::NEG_INFINITY".to_owned(),
+            "nan" => "f64::NAN".to_owned(),
+            other => panic!("{other} is no float"),
+        },
+        _ => format!("{:?}", value.as_f64().expect("a number")),
+    }
+}
+
+fn default(value: &Value) -> String {
+    if value.is_null() {
+        return "None".to_owned();
+    }
+    let (tag, inner) = value
+        .as_object()
+        .and_then(|object| object.iter().next())
+        .expect("a tagged default");
+    let default = match tag.as_str() {
+        "float" => format!("ArgDefault::Float({})", float(inner)),
+        "symbol" => format!("ArgDefault::Symbol({:?})", text(inner)),
+        "bool" => format!("ArgDefault::Bool({})", inner.as_bool().expect("a boolean")),
+        other => panic!("{other} is no kind of default"),
+    };
+    format!("Some({default})")
+}
+
+fn kind(value: &Value) -> &'static str {
+    match text(value) {
+        "signal" => "ArgKind::Signal",
+        "count" => "ArgKind::Count",
+        "array" => "ArgKind::Array",
+        "symbol" => "ArgKind::Symbol",
+        other => panic!("{other} is no kind of argument"),
+    }
+}
+
+fn check_inputs(value: &Value) -> String {
+    match text(&value["rule"]) {
+        "valid" => "CheckInputs::Valid".to_owned(),
+        "same_rate_as_first_input" => "CheckInputs::SameRateAsFirstInput".to_owned(),
+        "same_rate_as_first_input_if_audio" => {
+            "CheckInputs::SameRateAsFirstInputIfAudio".to_owned()
+        }
+        "n_inputs" => format!("CheckInputs::NInputs({})", number(&value["count"])),
+        "audio_at" => format!("CheckInputs::AudioAt({})", number(&value["index"])),
+        "audio_from" => format!("CheckInputs::AudioFrom({})", number(&value["index"])),
+        "abstract_out" => format!(
+            "CheckInputs::AbstractOut {{ fixed: {} }}",
+            number(&value["fixed"])
+        ),
+        "custom" => format!("CheckInputs::Custom({:?})", text(&value["owner"])),
+        other => panic!("{other} is no rule of checkInputs"),
+    }
+}
+
+fn slot(value: &Value) -> String {
+    let (tag, position) = value
+        .as_object()
+        .and_then(|object| object.iter().next())
+        .expect("a tagged slot");
+    let variant = match tag.as_str() {
+        "arg" => "Arg",
+        "array" => "ArgArray",
+        "string" => "ArgString",
+        other => panic!("{other} is no kind of slot"),
+    };
+    format!("InputSlot::{variant}({})", number(position))
+}
+
+fn outputs(value: &Value) -> String {
+    if let Some(rates) = value.get("fixed") {
+        let rates: Vec<&str> = rates
+            .as_array()
+            .expect("a list of rates")
+            .iter()
+            .map(rate)
+            .collect();
+        format!("Outputs::Fixed(&[{}])", rates.join(", "))
+    } else if let Some(arg) = value.get("arg") {
+        format!(
+            "Outputs::Arg {{ arg: {}, rate: {} }}",
+            number(arg),
+            rate(&value["rate"])
+        )
+    } else {
+        format!(
+            "Outputs::ArraySize {{ arg: {}, rate: {} }}",
+            number(&value["array_size"]),
+            rate(&value["rate"])
+        )
+    }
+}
+
+fn render_method(rendered: &mut String, method: &Value) {
+    writeln!(rendered, "            RateMethod {{").unwrap();
+    writeln!(
+        rendered,
+        "                selector: {:?},",
+        text(&method["selector"])
+    )
+    .unwrap();
+    writeln!(rendered, "                args: &[").unwrap();
+    for arg in method["args"].as_array().expect("a list of arguments") {
+        writeln!(
+            rendered,
+            "                    ArgSpec {{ name: {:?}, kind: {}, default: {} }},",
+            text(&arg["name"]),
+            kind(&arg["kind"]),
+            default(&arg["default"])
+        )
+        .unwrap();
+    }
+    writeln!(rendered, "                ],").unwrap();
+    if method["addable"].as_bool().expect("addable is a boolean") {
+        let slots: Vec<String> = method["inputs"]
+            .as_array()
+            .expect("a list of slots")
+            .iter()
+            .map(slot)
+            .collect();
+        writeln!(rendered, "                addable: Addable::Yes(Wiring {{").unwrap();
+        writeln!(
+            rendered,
+            "                    rate: {},",
+            rate(&method["rate"])
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "                    inputs: &[{}],",
+            slots.join(", ")
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "                    outputs: {},",
+            outputs(&method["outputs"])
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "                    special_index: {},",
+            method["special_index"].as_i64().expect("a special index")
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "                    madd: {},",
+            method["madd"].as_bool().expect("madd is a boolean")
+        )
+        .unwrap();
+        writeln!(rendered, "                }}),").unwrap();
+    } else {
+        writeln!(
+            rendered,
+            "                addable: Addable::No({:?}),",
+            text(&method["reason"])
+        )
+        .unwrap();
+    }
+    writeln!(rendered, "            }},").unwrap();
+}
+
+fn render_catalog(catalog: &Value) -> String {
+    let mut classes: Vec<&Value> = catalog["classes"]
+        .as_array()
+        .expect("a list of classes")
+        .iter()
+        .collect();
+    classes.sort_by(|a, b| text(&a["name"]).cmp(text(&b["name"])));
+    let mut rendered = String::from(HEADER);
+    rendered.push_str("#![allow(clippy::unreadable_literal)]\n\n");
+    rendered.push_str(
+        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, CheckInputs, InputSlot, Outputs, RateMethod,\n    UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+    );
+    writeln!(
+        rendered,
+        "pub(super) static CLASSES: [UGenClass; {}] = [",
+        classes.len()
+    )
+    .unwrap();
+    for class in classes {
+        writeln!(rendered, "    UGenClass {{").unwrap();
+        writeln!(rendered, "        name: {:?},", text(&class["name"])).unwrap();
+        writeln!(
+            rendered,
+            "        superclasses: {},",
+            strings(&class["superclasses"])
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "        is_pure: {},",
+            class["pure"].as_bool().expect("pure is a boolean")
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "        is_width_first: {},",
+            class["width_first"]
+                .as_bool()
+                .expect("width_first is a boolean")
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "        categories: {},",
+            strings(&class["categories"])
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "        check_inputs: {},",
+            check_inputs(&class["check_inputs"])
+        )
+        .unwrap();
+        writeln!(rendered, "        methods: &[").unwrap();
+        for method in class["methods"].as_array().expect("a list of methods") {
+            render_method(&mut rendered, method);
+        }
+        writeln!(rendered, "        ],").unwrap();
+        writeln!(rendered, "    }},").unwrap();
+    }
+    rendered.push_str("];\n");
+    rendered
+}
+
 #[test]
 fn the_operator_tables_are_the_rendering_of_catalog_json() {
     check("src/operator/generated.rs", &render_operators(&catalog()));
+}
+
+#[test]
+fn the_catalogue_is_the_rendering_of_catalog_json() {
+    check("src/catalog/generated.rs", &render_catalog(&catalog()));
 }
