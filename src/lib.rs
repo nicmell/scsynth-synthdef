@@ -4,6 +4,7 @@ mod builder;
 mod error;
 mod file;
 mod limits;
+pub mod operator;
 mod rate;
 mod synth_def;
 mod topo;

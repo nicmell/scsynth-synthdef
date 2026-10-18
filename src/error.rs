@@ -341,6 +341,9 @@ pub enum BuildError {
         /// The position of the input.
         input: usize,
     },
+    /// The name is not an operator of the kind that the call adds: unary
+    /// for `unary_op`, binary for `binary_op`.
+    UnknownOperator(String),
     /// Two variants have this full name.
     DuplicateVariant(String),
     /// A variant sets a control that the definition does not have.
@@ -389,6 +392,7 @@ impl fmt::Display for BuildError {
             Self::ForeignOutput { ugen, input } => {
                 write!(f, "input {input} of {ugen} is an output of another build")
             }
+            Self::UnknownOperator(name) => write!(f, "'{name}' is no operator of scsynth"),
             Self::DuplicateVariant(name) => write!(f, "two variants are named '{name}'"),
             Self::UnknownControl { variant, control } => write!(
                 f,

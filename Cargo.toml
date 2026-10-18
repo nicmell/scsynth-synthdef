@@ -10,7 +10,7 @@ repository = "https://github.com/nicmell/scsynth-synthdef"
 readme = "README.md"
 keywords = ["supercollider", "scsynth", "synthdef", "audio", "synthesis"]
 categories = ["multimedia::audio", "encoding", "compilers"]
-include = ["/src", "/tests", "/README.md", "/CHANGELOG.md", "/LICENSE-APACHE", "/LICENSE-MIT"]
+include = ["/src", "/tests", "/generator/catalog.json", "/README.md", "/CHANGELOG.md", "/LICENSE-APACHE", "/LICENSE-MIT"]
 
 [dependencies]
 serde = { version = "1.0.140", features = ["derive"], optional = true }

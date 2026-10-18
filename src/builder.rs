@@ -6,6 +6,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use crate::error::BuildError;
 use crate::file::Version;
 use crate::limits;
+use crate::operator;
 use crate::rate::Rate;
 use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
 use crate::topo;
@@ -326,6 +327,54 @@ impl SynthDefBuilder {
         Ok(self.outputs_of(index))
     }
 
+    /// Adds a `UnaryOpUGen`: the operator `op` on `a`, at the rate of `a`. A
+    /// number is at scalar rate. Unlike sclang, it does not compute the
+    /// operator of a number.
+    ///
+    /// # Errors
+    ///
+    /// A [`BuildError`] for an operator that `UnaryOpUGen` does not know, and
+    /// for an input that [`add`](Self::add) refuses.
+    pub fn unary_op(&mut self, op: &str, a: impl Into<UGenInput>) -> Result<UGenInput, BuildError> {
+        const NAME: &str = "UnaryOpUGen";
+        let a = a.into();
+        let special_index =
+            operator::unary_index(op).ok_or_else(|| BuildError::UnknownOperator(op.to_owned()))?;
+        let rate = rate_of(NAME, 0, &a)?;
+        self.add(
+            NewUGen::new(NAME, rate)
+                .inputs([a])
+                .special_index(special_index),
+        )
+    }
+
+    /// Adds a `BinaryOpUGen`: `a op b`, at the highest rate of its inputs in
+    /// the order demand, audio, control, scalar. A number is at scalar rate.
+    /// Unlike sclang, it does not fold `* 1`, `+ 0` and the like, and it does
+    /// not compute the operator of two numbers.
+    ///
+    /// # Errors
+    ///
+    /// A [`BuildError`] for an operator that `BinaryOpUGen` does not know, and
+    /// for an input that [`add`](Self::add) refuses.
+    pub fn binary_op(
+        &mut self,
+        op: &str,
+        a: impl Into<UGenInput>,
+        b: impl Into<UGenInput>,
+    ) -> Result<UGenInput, BuildError> {
+        const NAME: &str = "BinaryOpUGen";
+        let (a, b) = (a.into(), b.into());
+        let special_index =
+            operator::binary_index(op).ok_or_else(|| BuildError::UnknownOperator(op.to_owned()))?;
+        let rate = rate_of(NAME, 0, &a)?.max(rate_of(NAME, 1, &b)?);
+        self.add(
+            NewUGen::new(NAME, rate)
+                .inputs([a, b])
+                .special_index(special_index),
+        )
+    }
+
     /// Adds a variant: the defaults of the parameters, with the values of
     /// `values` by control name, as the `variants` of `SynthDef.new` give
     /// them. Its name is `<definition>.<name>`.
@@ -543,6 +592,15 @@ impl SynthDefBuilder {
             UGenInput::Array(outputs)
         }
     }
+}
+
+fn rate_of(ugen: &str, input: usize, value: &UGenInput) -> Result<Rate, BuildError> {
+    value
+        .rate()
+        .ok_or_else(|| BuildError::MultichannelExpansion {
+            ugen: ugen.to_owned(),
+            input,
+        })
 }
 
 /// sclang keeps its Floats in 64 bits and writes them with `putFloat`, which
@@ -793,6 +851,71 @@ mod tests {
         assert_eq!(def.variants.len(), 1);
         assert_eq!(def.variants[0].name, "v.low");
         assert_eq!(def.variants[0].values, [220.0, 0.5, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn an_operator_runs_at_the_highest_rate_of_its_inputs() {
+        let mut builder = SynthDefBuilder::new("ops", vec![Arg::new("k", 0.0)]).unwrap();
+        let control = builder.arguments()[0].clone();
+        let audio = builder.add(NewUGen::new("SinOsc", Rate::Audio)).unwrap();
+        let demand = builder.add(NewUGen::new("Dseq", Rate::Demand)).unwrap();
+        let mut rate = |a: UGenInput, b: UGenInput| builder.binary_op("+", a, b).unwrap().rate();
+        assert_eq!(rate(1.0.into(), 2.0.into()), Some(Rate::Scalar));
+        assert_eq!(rate(1.0.into(), control.clone()), Some(Rate::Control));
+        assert_eq!(rate(control.clone(), audio.clone()), Some(Rate::Audio));
+        assert_eq!(rate(audio.clone(), demand.clone()), Some(Rate::Demand));
+        assert_eq!(rate(demand.clone(), control.clone()), Some(Rate::Demand));
+        let negated = builder.unary_op("neg", demand).unwrap();
+        assert_eq!(negated.rate(), Some(Rate::Demand));
+        assert_eq!(
+            builder.unary_op("neg", 1.0).unwrap().rate(),
+            Some(Rate::Scalar)
+        );
+    }
+
+    #[test]
+    fn an_operator_has_its_special_index() {
+        let mut builder = SynthDefBuilder::new("ops", vec![]).unwrap();
+        let sum = builder.binary_op("*", 1.0, 2.0).unwrap();
+        let midicps = builder.unary_op("midicps", sum).unwrap();
+        builder
+            .add(
+                NewUGen::new("Out", Rate::Scalar)
+                    .inputs([0.0.into(), midicps])
+                    .outputs([]),
+            )
+            .unwrap();
+        let def = builder.finish().unwrap();
+        let indices: Vec<(&str, i16)> = def
+            .children
+            .iter()
+            .map(|ugen| (ugen.name.as_str(), ugen.special_index))
+            .collect();
+        assert_eq!(
+            indices,
+            [("BinaryOpUGen", 2), ("UnaryOpUGen", 17), ("Out", 0)]
+        );
+    }
+
+    #[test]
+    fn an_operator_refuses_an_unknown_name_and_an_array() {
+        let mut builder = SynthDefBuilder::new("ops", vec![]).unwrap();
+        assert_eq!(
+            builder.unary_op("+", 1.0),
+            Err(BuildError::UnknownOperator("+".to_owned()))
+        );
+        assert_eq!(
+            builder.binary_op("neg", 1.0, 2.0),
+            Err(BuildError::UnknownOperator("neg".to_owned()))
+        );
+        let array = UGenInput::Array(vec![1.0.into(), 2.0.into()]);
+        assert_eq!(
+            builder.binary_op("+", 1.0, array),
+            Err(BuildError::MultichannelExpansion {
+                ugen: "BinaryOpUGen".to_owned(),
+                input: 1
+            })
+        );
     }
 
     #[test]

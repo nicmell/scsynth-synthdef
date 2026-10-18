@@ -14,3 +14,6 @@
   from the arguments, `add`, variants, the constants and the topological
   sort of sclang. See [Building](README.md#building) and
   [Differences from sclang](README.md#differences-from-sclang).
+- `SynthDefBuilder::unary_op` and `binary_op`, and the module `operator`:
+  the operators of scsynth by name and by special index, generated from
+  the sources of SuperCollider 3.14.1.

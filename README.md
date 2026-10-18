@@ -45,8 +45,8 @@ the crate refuses what scsynth refuses, and this file lists the difference.
 
 ## Status
 
-The work is in progress. The definition files and the builder are done.
-The catalogue and the operators are not.
+The work is in progress. The definition files, the builder and the
+operators are done. The catalogue is not.
 [The plan](https://github.com/nicmell/scsynth-synthdef/blob/main/docs/plan.md)
 describes version 0.1 and its steps.
 
@@ -109,6 +109,12 @@ assert_eq!(def.children.len(), 3);
   inputs in the order of the wire, the rate of each output, its special
   index, and whether it is a `WidthFirstUGen`. Every UGen added after a
   width-first UGen runs after it.
+- `unary_op` and `binary_op` add a `UnaryOpUGen` and a `BinaryOpUGen` by
+  the name of the operator, such as `neg` or `*`. A unary operator runs at
+  the rate of its input. A binary operator runs at the highest rate of its
+  inputs, in the order demand, audio, control and scalar. A number is at
+  scalar rate. The module `operator` gives the special index of each name,
+  and the name of each index.
 - `variant` adds a variant by control name, from the defaults.
 - `finish` collects the constants in the order of creation and of the
   inputs, sorts the UGens as sclang sorts them, and checks the limits.
@@ -173,6 +179,9 @@ byte, and reading checks every definition after it reads it. A
   `a - b.neg`, and removes unused pure UGens.
 - An array input: sclang expands it into several UGens, and the builder
   refuses it.
+- The operators: sclang folds `* 0`, `* 1`, `* -1`, `+ 0`, `- 0`, `0 -`,
+  `/ 1` and `/ -1` before it makes a UGen, and computes the operator of
+  numbers. `unary_op` and `binary_op` always make a UGen.
 
 ## Tests
 
@@ -192,6 +201,20 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 - If `finishBuild` adds, removes or rewires a UGen, the script fails. So no
   golden file holds a graph that `optimizeGraph` rewrites.
 - `~/.bin/sclang` changes the directory, so the paths must be absolute.
+
+`generator/catalog.json` holds the tables of the operators. They come from
+`Opcodes.h` and `initSpecialSelectors` in the sources of SuperCollider, at
+the tag `Version-3.14.1`, and sclang must agree with each special index.
+`generator/catalog.scd` writes the JSON again:
+
+```sh
+SC_SOURCE=~/Projects/supercollider \
+sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/catalog.scd"
+```
+
+`tests/render.rs` renders the JSON into `src/operator/generated.rs`, and
+fails if the committed file differs. With `SCSYNTH_SYNTHDEF_BLESS=1` set,
+it writes the file instead.
 
 ## Features
 

@@ -350,6 +350,51 @@ pub fn operators() -> SynthDef {
     b.finish().unwrap()
 }
 
+/// The `operators` golden graph, with `unary_op` and `binary_op`.
+pub fn operators_by_name() -> SynthDef {
+    let mut b = SynthDefBuilder::new(
+        "operators",
+        vec![Arg::new("freq", 440.0), Arg::new("i_n", 2.0)],
+    )
+    .unwrap();
+    let (freq, i_n) = (arg(&b, "freq"), arg(&b, "i_n"));
+    let a = ugen(
+        &mut b,
+        "SinOsc",
+        Rate::Audio,
+        vec![freq.clone(), 0.0.into()],
+    );
+    let abs = b.unary_op("abs", a.clone()).unwrap();
+    let neg = b.unary_op("neg", a.clone()).unwrap();
+    let power = b.binary_op("pow", neg, 2.0).unwrap();
+    let difference = b.binary_op("-", a.clone(), freq.clone()).unwrap();
+    let max = b.binary_op("max", difference, 0.1).unwrap();
+    let less = b.binary_op("<", a, 0.5).unwrap();
+    out(&mut b, Rate::Audio, vec![0.0.into(), abs, power, max, less]);
+    let midicps = b.unary_op("midicps", freq).unwrap();
+    let doubled = b.binary_op("*", i_n, 2.0).unwrap();
+    let trig = ugen(&mut b, "Impulse", Rate::Control, numbers(&[1.0, 0.0]));
+    let white = ugen(
+        &mut b,
+        "Dwhite",
+        Rate::Demand,
+        numbers(&[f64::INFINITY, 0.0, 1.0]),
+    );
+    let tripled = b.binary_op("*", white, 3.0).unwrap();
+    let demand = ugen(
+        &mut b,
+        "Demand",
+        Rate::Control,
+        vec![trig, 0.0.into(), tripled],
+    );
+    out(
+        &mut b,
+        Rate::Control,
+        vec![0.0.into(), midicps, doubled, demand],
+    );
+    b.finish().unwrap()
+}
+
 pub fn variant() -> SynthDef {
     let mut b = SynthDefBuilder::new(
         "variant",
