@@ -113,6 +113,25 @@ byte, and reading checks every definition after it reads it. A
   `i16::MAX` in version 1. Each count of definitions and of variants fits
   `i16::MAX`.
 
+## Tests
+
+`cargo test --all-features` runs every test. It needs no SuperCollider.
+
+The golden files in `tests/fixtures` are definitions that sclang 3.14.1
+built and wrote. Each one reads, and writes back to its own bytes.
+`generator/fixtures.scd` writes them again:
+
+```sh
+sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
+```
+
+- `generator/sclang_conf.yaml` compiles the core class library of
+  `/Applications/SuperCollider.app` alone, without the Extensions folder and
+  without quarks. For another installation, change its path.
+- If `finishBuild` adds, removes or rewires a UGen, the script fails. So no
+  golden file holds a graph that `optimizeGraph` rewrites.
+- `~/.bin/sclang` changes the directory, so the paths must be absolute.
+
 ## Features
 
 - `serde`: `Serialize` and `Deserialize` for the types of a definition and

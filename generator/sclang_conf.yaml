@@ -1,0 +1,8 @@
+# The core class library of SuperCollider 3.14.1, without the Extensions
+# folder and without quarks: `sclang -l "$PWD/generator/sclang_conf.yaml" <script>`.
+includePaths:
+    -   /Applications/SuperCollider.app/Contents/Resources/SCClassLibrary
+excludePaths:
+    []
+postInlineWarnings: false
+excludeDefaultPaths: true
