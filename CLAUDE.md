@@ -23,6 +23,22 @@ Read it before any work.
   conventions of the repository: the manifest, the lints, CI, cargo-deny and
   the shape of the README.
 
+## Commands
+
+```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-features
+RUSTDOCFLAGS=-Dwarnings cargo doc --no-deps --all-features
+cargo check --all-features --target wasm32-unknown-unknown
+cargo +1.85.0 test --all-features    # the MSRV
+cargo deny check
+```
+
+CI (`.github/workflows/ci.yml`) runs them with `--locked`, and also
+`cargo package`.
+
 ## Conventions
 
 - Edition 2024, MSRV 1.85, clippy pedantic, no unsafe code, docs on every

@@ -156,9 +156,10 @@ Each fact names its source. "Measured" means a run of sclang 3.14.1.
 16. The arguments of the graph function become controls
     (`addControlsFromArgsOfFunc`):
     - The rate is the first match in the order scalar, trigger, audio. An
-      argument matches a rate by its entry in `rates` (`\ir`, `\tr`, `\ar`)
-      or by the prefix of its name (`i_`, `t_`, `a_`). Without a match, the
-      rate is control. So the prefix `i_` wins over an entry `\kr`.
+      argument matches a rate by its entry in `rates`: `\ir`, `\tr` or
+      `\ar`. It also matches by the prefix of its name: `i_`, `t_` or `a_`.
+      Without a match, the rate is control. So the prefix `i_` wins over an
+      entry `\kr`.
     - In `rates`, `\kr` and a number both mean control rate. A number is the
       lag.
     - A nil default becomes 0.0.
@@ -521,8 +522,8 @@ the JSON is the only output of the generator.
 
 ## Steps
 
-1. The skeleton: `Cargo.toml`, the licenses, `deny.toml`, `clippy.toml`, CI,
-   a short README and the CHANGELOG.
+1. Done on 2026-10-18. The skeleton: `Cargo.toml`, the licenses,
+   `deny.toml`, `clippy.toml`, CI, a short README and the CHANGELOG.
 2. `Rate`, the types of `SynthDef`, reading and writing versions 0, 1 and 2,
    the limits, and their unit tests.
 3. `generator/fixtures.scd`, the golden files, and the round trip of each.

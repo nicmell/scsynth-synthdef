@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-Dwarnings"
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: rustfmt
+        run: cargo fmt --check
+      - name: clippy
+        run: cargo clippy --locked --all-targets
+      - name: clippy (all features)
+        run: cargo clippy --locked --all-targets --all-features
+      - name: tests
+        run: cargo test --locked
+      - name: tests (all features)
+        run: cargo test --locked --all-features
+      - name: docs
+        run: cargo doc --locked --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: "-Dwarnings"
+      - name: wasm32
+        run: cargo check --locked --all-features --target wasm32-unknown-unknown
+      - name: package
+        run: cargo package --locked --target-dir "$RUNNER_TEMP/package"
+
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.85.0
+      - uses: Swatinem/rust-cache@v2
+      - name: tests on the oldest supported Rust
+        run: cargo test --locked --all-features
+
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
