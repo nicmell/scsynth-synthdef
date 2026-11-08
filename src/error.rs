@@ -325,13 +325,31 @@ pub enum BuildError {
         /// The position of the input.
         input: usize,
     },
-    /// An input is an array, which needs multichannel expansion.
+    /// An input of [`add`](crate::SynthDefBuilder::add) is an array, which
+    /// needs multichannel expansion.
     #[non_exhaustive]
     MultichannelExpansion {
         /// The class of the UGen.
         ugen: String,
         /// The position of the input.
         input: usize,
+    },
+    /// An argument that expands holds an empty array, at the top or deeper.
+    #[non_exhaustive]
+    EmptyInput {
+        /// The class of the UGen.
+        ugen: String,
+        /// The name of the argument.
+        argument: String,
+    },
+    /// An array argument holds an array, or an argument of a method that
+    /// expands one level holds an array inside an array.
+    #[non_exhaustive]
+    NestedArray {
+        /// The class of the UGen.
+        ugen: String,
+        /// The name of the argument.
+        argument: String,
     },
     /// An input is an output of another build.
     #[non_exhaustive]
@@ -456,6 +474,13 @@ impl fmt::Display for BuildError {
             Self::MultichannelExpansion { ugen, input } => write!(
                 f,
                 "input {input} of {ugen} is an array, which needs multichannel expansion"
+            ),
+            Self::EmptyInput { ugen, argument } => {
+                write!(f, "the argument {argument} of {ugen} holds an empty array")
+            }
+            Self::NestedArray { ugen, argument } => write!(
+                f,
+                "the argument {argument} of {ugen} holds an array inside an array, which does not expand there"
             ),
             Self::ForeignOutput { ugen, input } => {
                 write!(f, "input {input} of {ugen} is an output of another build")
