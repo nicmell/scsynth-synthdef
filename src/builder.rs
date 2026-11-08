@@ -1231,7 +1231,8 @@ mod tests {
 
     #[test]
     fn the_controls_follow_the_groups_of_sclang() {
-        // { |freq = 440, a_in = 0, i_n = 1, t_g = 0, amps = #[1, 2]| }, fact 20.
+        // { |freq = 440, a_in = 0, i_n = 1, t_g = 0, amps = #[1, 2]| }, fact 20 of
+        // the plan of 0.1.
         let builder = SynthDefBuilder::new(
             "groups",
             vec![
@@ -1925,7 +1926,7 @@ mod tests {
 
     #[test]
     fn ugen_checks_the_inputs_as_sclang_does() {
-        // Out.ar(0, 0.5), which sclang refuses, fact 34 of the plan.
+        // Out.ar(0, 0.5), which sclang refuses, fact 34 of the plan of 0.1.
         let mut builder = SynthDefBuilder::new("checked", vec![]).unwrap();
         let error = builder
             .ugen(
