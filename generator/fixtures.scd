@@ -161,6 +161,68 @@ try {
 		Out.kr(0, b)
 	})]);
 
+	// Multichannel expansion. The constants show the order of creation.
+	write.("pair", [build.(\pair, { |freqs = #[220, 331], amp = 0.4|
+		Out.ar(0, SinOsc.ar(freqs) * amp)
+	})]);
+
+	write.("wrap", [build.(\wrap, {
+		Out.ar(0, SinOsc.ar([440, 442, 444]) * [0.1, 0.2])
+	})]);
+
+	// sum starts from 0, which the fold of + drops.
+	write.("voices", [build.(\voices, { |freqs = #[220, 330], places = #[-0.5, 0.5], amp = 0.2|
+		Out.ar(0, Pan2.ar(SinOsc.ar(freqs) * amp, places).sum)
+	})]);
+
+	write.("nested", [build.(\nested, {
+		Out.ar(0, LPF.ar(Pan2.ar(SinOsc.ar([220, 330]), [-0.5, 0.5]), 1000).sum)
+	})]);
+
+	// The bus and the count both expand: an In of one channel, then of two.
+	write.("in_buses", [build.(\in_buses, {
+		Out.ar(0, In.ar([4, 6], [1, 2]).flat)
+	})]);
+
+	// madd, after the expansion.
+	write.("mul", [build.(\mul, { Out.ar(0, SinOsc.ar(440, 0, 0.1)) })]);
+
+	write.("mul_add", [build.(\mul_add, { Out.ar(0, SinOsc.ar(440, 0, 0.1, 0.5)) })]);
+
+	write.("mul_array", [build.(\mul_array, {
+		Out.ar(0, SinOsc.ar([440, 442], 0, [0.1, 0.2, 0.3]))
+	})]);
+
+	write.("mul_expanded", [build.(\mul_expanded, {
+		Out.ar(0, SinOsc.ar([440, 442], 0, 0.5))
+	})]);
+
+	// canBeMulAdd swaps in and mul.
+	write.("mul_swap", [build.(\mul_swap, {
+		Out.ar(0, SinOsc.kr(1, 0, SinOsc.ar(2), 0.5))
+	})]);
+
+	// No order of the inputs can be a MulAdd: a * and a +.
+	write.("mul_ops", [build.(\mul_ops, {
+		Out.ar(0, SinOsc.kr(1, 0, 0.5, SinOsc.ar(2)))
+	})]);
+
+	write.("madd_numbers", [build.(\madd_numbers, {
+		Out.ar(0, MulAdd(2, 3, SinOsc.ar(2)))
+	})]);
+
+	// The folds of BinaryOpUGen:new1 and MulAdd:new1 that keep a UGen.
+	write.("folds", [build.(\folds, {
+		Out.ar(0, [
+			SinOsc.ar(440) * 1,
+			0 - SinOsc.ar(441),
+			SinOsc.ar(442, 0, -1),
+			SinOsc.ar(443) / -1,
+			SinOsc.ar(444) + 0,
+			SinOsc.ar(445) * -1
+		])
+	})]);
+
 	"fixtures.scd: wrote % golden files to %".format(written, fixtures).postln;
 	0.exit;
 } { |error|
