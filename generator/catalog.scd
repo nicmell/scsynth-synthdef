@@ -182,7 +182,8 @@ var checkRules = (
 
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, numberValues, controlValues;
-var same, mapInputs, outputsOf, instanceOf, wiring, describeMethod, describeClass;
+var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, wiring;
+var describeMethod, describeClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
 var classes, addable = 0, methods = 0, helpDir, json;
 
@@ -467,13 +468,64 @@ try {
 		{ instances[0] }
 	};
 
+	// The values of numberValues, with `value` at `position`.
+	valuesAt = { |kinds, position, value|
+		var values = numberValues.(kinds, [], []);
+		{ var arguments = values.value; arguments.put(position, value); arguments }
+	};
+
+	// How the method expands, as associations, or why it does not expand as
+	// multiNewList does. The arguments that expand are those of the wire and
+	// the count. On each of them, an array of two elements must make two
+	// instances and nothing else, instance i with element i. Then an array
+	// that holds an array must make three instances, in order: else the
+	// expansion stops at one level, as the flop of SendReply does.
+	expansionOf = { |class, selector, kinds, slots, dependence|
+		var positions = slots.select { |slot| slot[0] == \arg }.collect { |slot| slot[1] };
+		var failure, nested = true;
+		var matches = { |result, position, elements|
+			var instances = result[1].select { |ugen| ugen.class === class };
+			result[0].isNil
+			and: { result[1].size == elements.size }
+			and: { instances.size == elements.size }
+			and: {
+				instances.every { |instance, i|
+					var arguments = result[2].copy.put(position, elements[i]);
+					mapInputs.(instance.inputs ? [], arguments, kinds) == slots
+					and: { kinds[position] != \count or: { outputsOf.(instance).size == elements[i] } }
+				}
+			}
+		};
+		if (dependence.notEmpty and: { dependence[0][0] == \count }) {
+			positions = positions.add(dependence[0][1]);
+		};
+		positions.asSet.asArray.sort.do { |position|
+			var flat, deep;
+			if (failure.isNil) {
+				flat = if (kinds[position] == \count) { [2, 3] } {
+					[signal.(position), signal.(position) + 0.125]
+				};
+				deep = flat ++ [if (kinds[position] == \count) { 4 } { signal.(position) + 0.375 }];
+				case
+				{ matches.(probe.(class, selector, valuesAt.(kinds, position, flat)), position, flat).not } {
+					failure = "an array on argument % does not make one instance per element"
+						.format(position);
+				}
+				{ matches.(probe.(class, selector, valuesAt.(kinds, position, [flat, deep[2]])), position, deep).not } {
+					nested = false;
+				};
+			};
+		};
+		failure ?? { [\nested_expansion -> nested] }
+	};
+
 	// The wiring of a method, as associations, or the reason why `ugen`
 	// cannot add it.
 	wiring = { |class, selector, kinds|
 		var numbers = probe.(class, selector, numberValues.(kinds, [], []));
 		var controls = probe.(class, selector, controlValues.(kinds));
 		var first = instanceOf.(class, numbers), second = instanceOf.(class, controls);
-		var slots, outputs, dependence = [], failure;
+		var slots, outputs, dependence = [], failure, expansion;
 		case
 		{ first.isString } { first }
 		{ second.isString } { "with control-rate inputs, " ++ second }
@@ -516,6 +568,9 @@ try {
 				{ failure.notNil } { failure }
 				{ dependence.size > 1 } { "the outputs depend on several arguments" }
 				{ outputs.asSet.size > 1 and: { dependence.notEmpty } } { "the outputs have several rates" }
+				{ (expansion = expansionOf.(class, selector, kinds, slots, dependence)).isString } {
+					expansion
+				}
 				{
 					[
 						\rate -> first.rate,
@@ -528,7 +583,7 @@ try {
 							{ [\array_size -> dependence[0][1], \rate -> outputs[0]] },
 						\special_index -> first.specialIndex,
 						\madd -> (kinds.includes(\mul) or: { kinds.includes(\add) })
-					]
+					] ++ expansion
 				}
 			}
 		}

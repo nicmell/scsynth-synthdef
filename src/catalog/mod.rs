@@ -123,6 +123,9 @@ pub struct Wiring {
     pub special_index: i16,
     /// Whether the method applies `madd` with its arguments `mul` and `add`.
     pub madd: bool,
+    /// Whether the expansion goes on into an array inside an array, as
+    /// `multiNewList` does.
+    pub nested_expansion: bool,
 }
 
 /// Where inputs of the wire come from.
@@ -281,6 +284,22 @@ mod tests {
         );
         let envelope = wiring("EnvGen", "kr").inputs;
         assert_eq!(envelope.last(), Some(&InputSlot::ArgArray(0)));
+    }
+
+    #[test]
+    fn send_reply_expands_one_level_and_sin_osc_all_the_way() {
+        // Fact 18 of the plan of 0.2: SendReply expands with flop.
+        assert!(!wiring("SendReply", "kr").nested_expansion);
+        assert!(!wiring("SendReply", "ar").nested_expansion);
+        assert!(wiring("SinOsc", "ar").nested_expansion);
+        let one_level = all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter(
+                |method| matches!(method.addable, Addable::Yes(wiring) if !wiring.nested_expansion),
+            )
+            .count();
+        assert_eq!(one_level, 2);
     }
 
     #[test]
