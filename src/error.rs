@@ -433,7 +433,8 @@ pub enum BuildError {
         /// What the argument takes.
         expected: &'static str,
     },
-    /// `mul` is not 1, or `add` is not 0. The builder does not apply `madd`.
+    /// `mul` is not 1, or `add` is not 0, for a method that applies `madd` to
+    /// a UGen without outputs.
     MaddNotSupported(String),
     /// A count of channels is not a positive integer, or an array that sets
     /// the outputs is empty.
@@ -523,7 +524,7 @@ impl fmt::Display for BuildError {
             } => write!(f, "the argument {argument} of {class} takes {expected}"),
             Self::MaddNotSupported(argument) => write!(
                 f,
-                "the builder does not apply madd, so {argument} must keep its default"
+                "{argument} must keep its default, since the UGen has no output"
             ),
             Self::BadCount { class, argument } => write!(
                 f,
