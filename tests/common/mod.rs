@@ -6,12 +6,12 @@ use std::fs;
 use std::path::Path;
 
 use scsynth_synthdef::{
-    Arg, ArgRate, NewUGen, Rate, SynthDef, SynthDefBuilder, UGenInput, write_def_file,
+    Arg, ArgRate, ArgValue, NewUGen, Rate, SynthDef, SynthDefBuilder, UGenInput, write_def_file,
     write_def_file_old,
 };
 
 /// The golden files that the builder reproduces.
-pub const NAMES: [&str; 14] = [
+pub const NAMES: [&str; 27] = [
     "sine",
     "rates",
     "lags17",
@@ -26,6 +26,19 @@ pub const NAMES: [&str; 14] = [
     "old",
     "envgen",
     "sendreply",
+    "pair",
+    "wrap",
+    "voices",
+    "nested",
+    "in_buses",
+    "mul",
+    "mul_add",
+    "mul_array",
+    "mul_expanded",
+    "mul_swap",
+    "mul_ops",
+    "madd_numbers",
+    "folds",
 ];
 
 /// The bytes of a golden file.
@@ -36,7 +49,8 @@ pub fn golden(name: &str) -> Vec<u8> {
     fs::read(path).expect("the golden file reads")
 }
 
-/// The definitions of a golden file, built with `add`.
+/// The definitions of a golden file: those of 0.1 built with `add`, and
+/// those of 0.2 with `ugen` and the operators.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
     match name {
         "sine" => vec![sine()],
@@ -53,6 +67,29 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "old" => vec![old()],
         "envgen" => vec![envgen()],
         "sendreply" => vec![sendreply()],
+        "pair" => vec![pair()],
+        "wrap" => vec![wrap()],
+        "voices" => vec![voices()],
+        "nested" => vec![nested()],
+        "in_buses" => vec![in_buses()],
+        "mul" => vec![sine_madd("mul", 440.0.into(), 0.1.into(), 0.0.into())],
+        "mul_add" => vec![sine_madd("mul_add", 440.0.into(), 0.1.into(), 0.5.into())],
+        "mul_array" => vec![sine_madd(
+            "mul_array",
+            array(&[440.0, 442.0]),
+            array(&[0.1, 0.2, 0.3]),
+            0.0.into(),
+        )],
+        "mul_expanded" => vec![sine_madd(
+            "mul_expanded",
+            array(&[440.0, 442.0]),
+            0.5.into(),
+            0.0.into(),
+        )],
+        "mul_swap" => vec![mul_swap()],
+        "mul_ops" => vec![mul_ops()],
+        "madd_numbers" => vec![madd_numbers()],
+        "folds" => vec![folds()],
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -128,6 +165,41 @@ pub fn unary(builder: &mut SynthDefBuilder, special_index: i16, a: UGenInput) ->
 
 fn numbers(numbers: &[f64]) -> Vec<UGenInput> {
     numbers.iter().copied().map(UGenInput::from).collect()
+}
+
+/// An array of numbers, as one input.
+fn array(values: &[f64]) -> UGenInput {
+    UGenInput::Array(numbers(values))
+}
+
+/// The elements of a nested array, in order, as `flat` gives them in sclang.
+fn flat(input: UGenInput) -> Vec<UGenInput> {
+    match input {
+        UGenInput::Array(items) => items.into_iter().flat_map(flat).collect(),
+        other => vec![other],
+    }
+}
+
+/// A UGen by its class name, with the arguments by name.
+fn by_name(
+    builder: &mut SynthDefBuilder,
+    class: &str,
+    selector: &str,
+    args: &[(&str, ArgValue)],
+) -> UGenInput {
+    builder
+        .ugen(class, selector, args)
+        .unwrap_or_else(|error| panic!("{class}.{selector}: {error}"))
+}
+
+/// `Out.ar(0, channels)`, by class name.
+fn out_by_name(builder: &mut SynthDefBuilder, channels: UGenInput) {
+    by_name(
+        builder,
+        "Out",
+        "ar",
+        &[("bus", 0.0.into()), ("channelsArray", channels.into())],
+    );
 }
 
 pub fn sine() -> SynthDef {
@@ -464,5 +536,188 @@ pub fn sendreply() -> SynthDef {
             .outputs([]),
     )
     .unwrap();
+    b.finish().unwrap()
+}
+
+pub fn pair() -> SynthDef {
+    let mut b = SynthDefBuilder::new(
+        "pair",
+        vec![Arg::array("freqs", [220.0, 331.0]), Arg::new("amp", 0.4)],
+    )
+    .unwrap();
+    let (freqs, amp) = (arg(&b, "freqs"), arg(&b, "amp"));
+    let sines = by_name(&mut b, "SinOsc", "ar", &[("freq", freqs.into())]);
+    let sound = b.binary_op("*", sines, amp).unwrap();
+    out_by_name(&mut b, sound);
+    b.finish().unwrap()
+}
+
+pub fn wrap() -> SynthDef {
+    let mut b = SynthDefBuilder::new("wrap", vec![]).unwrap();
+    let freqs = array(&[440.0, 442.0, 444.0]);
+    let sines = by_name(&mut b, "SinOsc", "ar", &[("freq", freqs.into())]);
+    let sound = b.binary_op("*", sines, array(&[0.1, 0.2])).unwrap();
+    out_by_name(&mut b, sound);
+    b.finish().unwrap()
+}
+
+pub fn voices() -> SynthDef {
+    let mut b = SynthDefBuilder::new(
+        "voices",
+        vec![
+            Arg::array("freqs", [220.0, 330.0]),
+            Arg::array("places", [-0.5, 0.5]),
+            Arg::new("amp", 0.2),
+        ],
+    )
+    .unwrap();
+    let (freqs, places, amp) = (arg(&b, "freqs"), arg(&b, "places"), arg(&b, "amp"));
+    let sines = by_name(&mut b, "SinOsc", "ar", &[("freq", freqs.into())]);
+    let voices = b.binary_op("*", sines, amp).unwrap();
+    let pans = by_name(
+        &mut b,
+        "Pan2",
+        "ar",
+        &[("in", voices.into()), ("pos", places.into())],
+    );
+    let sum = b
+        .binary_op("+", element(&pans, 0), element(&pans, 1))
+        .unwrap();
+    out_by_name(&mut b, sum);
+    b.finish().unwrap()
+}
+
+pub fn nested() -> SynthDef {
+    let mut b = SynthDefBuilder::new("nested", vec![]).unwrap();
+    let freqs = array(&[220.0, 330.0]);
+    let sines = by_name(&mut b, "SinOsc", "ar", &[("freq", freqs.into())]);
+    let places = array(&[-0.5, 0.5]);
+    let pans = by_name(
+        &mut b,
+        "Pan2",
+        "ar",
+        &[("in", sines.into()), ("pos", places.into())],
+    );
+    let low = by_name(
+        &mut b,
+        "LPF",
+        "ar",
+        &[("in", pans.into()), ("freq", 1000.0.into())],
+    );
+    let sum = b
+        .binary_op("+", element(&low, 0), element(&low, 1))
+        .unwrap();
+    out_by_name(&mut b, sum);
+    b.finish().unwrap()
+}
+
+pub fn in_buses() -> SynthDef {
+    let mut b = SynthDefBuilder::new("in_buses", vec![]).unwrap();
+    let inputs = by_name(
+        &mut b,
+        "In",
+        "ar",
+        &[
+            ("bus", array(&[4.0, 6.0]).into()),
+            ("numChannels", array(&[1.0, 2.0]).into()),
+        ],
+    );
+    out_by_name(&mut b, UGenInput::Array(flat(inputs)));
+    b.finish().unwrap()
+}
+
+/// `Out.ar(0, SinOsc.ar(freq, 0, mul, add))`.
+fn sine_madd(name: &str, freq: UGenInput, mul: UGenInput, add: UGenInput) -> SynthDef {
+    let mut b = SynthDefBuilder::new(name, vec![]).unwrap();
+    let sound = by_name(
+        &mut b,
+        "SinOsc",
+        "ar",
+        &[
+            ("freq", freq.into()),
+            ("mul", mul.into()),
+            ("add", add.into()),
+        ],
+    );
+    out_by_name(&mut b, sound);
+    b.finish().unwrap()
+}
+
+/// `SinOsc.ar(2)`, which sclang evaluates before the method that takes it.
+fn fast(builder: &mut SynthDefBuilder) -> UGenInput {
+    by_name(builder, "SinOsc", "ar", &[("freq", 2.0.into())])
+}
+
+pub fn mul_swap() -> SynthDef {
+    let mut b = SynthDefBuilder::new("mul_swap", vec![]).unwrap();
+    let fast = fast(&mut b);
+    let sound = by_name(
+        &mut b,
+        "SinOsc",
+        "kr",
+        &[
+            ("freq", 1.0.into()),
+            ("mul", fast.into()),
+            ("add", 0.5.into()),
+        ],
+    );
+    out_by_name(&mut b, sound);
+    b.finish().unwrap()
+}
+
+pub fn mul_ops() -> SynthDef {
+    let mut b = SynthDefBuilder::new("mul_ops", vec![]).unwrap();
+    let fast = fast(&mut b);
+    let sound = by_name(
+        &mut b,
+        "SinOsc",
+        "kr",
+        &[
+            ("freq", 1.0.into()),
+            ("mul", 0.5.into()),
+            ("add", fast.into()),
+        ],
+    );
+    out_by_name(&mut b, sound);
+    b.finish().unwrap()
+}
+
+pub fn madd_numbers() -> SynthDef {
+    let mut b = SynthDefBuilder::new("madd_numbers", vec![]).unwrap();
+    let fast = fast(&mut b);
+    let sound = b.madd(2.0, 3.0, fast).unwrap();
+    out_by_name(&mut b, sound);
+    b.finish().unwrap()
+}
+
+pub fn folds() -> SynthDef {
+    let mut b = SynthDefBuilder::new("folds", vec![]).unwrap();
+    let sine =
+        |b: &mut SynthDefBuilder, freq: f64| by_name(b, "SinOsc", "ar", &[("freq", freq.into())]);
+    let s0 = sine(&mut b, 440.0);
+    let times_one = b.binary_op("*", s0, 1.0).unwrap();
+    let s1 = sine(&mut b, 441.0);
+    let zero_minus = b.binary_op("-", 0.0, s1).unwrap();
+    let mul_minus_one = by_name(
+        &mut b,
+        "SinOsc",
+        "ar",
+        &[("freq", 442.0.into()), ("mul", (-1.0).into())],
+    );
+    let s3 = sine(&mut b, 443.0);
+    let over_minus_one = b.binary_op("/", s3, -1.0).unwrap();
+    let s4 = sine(&mut b, 444.0);
+    let plus_zero = b.binary_op("+", s4, 0.0).unwrap();
+    let s5 = sine(&mut b, 445.0);
+    let times_minus_one = b.binary_op("*", s5, -1.0).unwrap();
+    let channels = vec![
+        times_one,
+        zero_minus,
+        mul_minus_one,
+        over_minus_one,
+        plus_zero,
+        times_minus_one,
+    ];
+    out_by_name(&mut b, channels.into());
     b.finish().unwrap()
 }

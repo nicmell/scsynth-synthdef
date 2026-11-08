@@ -163,7 +163,7 @@ fn scsynth_loads_every_golden_graph() {
 #[test]
 #[ignore = "runs scsynth 3.14.1"]
 fn scsynth_reads_a_parameter_name_of_31_bytes_and_not_of_32() {
-    // Fact 8 of the plan.
+    // Fact 8 of the plan of 0.1.
     let short = "p".repeat(31);
     let bytes = definition("parameter", &short, "v").as_bytes().unwrap();
     assert!(!load(std::slice::from_ref(&bytes)).contains(EXCEPTION));
@@ -174,7 +174,7 @@ fn scsynth_reads_a_parameter_name_of_31_bytes_and_not_of_32() {
 #[test]
 #[ignore = "runs scsynth 3.14.1"]
 fn scsynth_reads_a_variant_name_of_31_bytes_and_not_of_32() {
-    // Facts 24 and 38 of the plan: the name holds the definition name.
+    // Facts 24 and 38 of the plan of 0.1: the name holds the definition name.
     let short = format!("v.{}", "w".repeat(29));
     let bytes = definition("v", "x", &short[2..]).as_bytes().unwrap();
     assert!(!load(std::slice::from_ref(&bytes)).contains(EXCEPTION));
@@ -185,7 +185,7 @@ fn scsynth_reads_a_variant_name_of_31_bytes_and_not_of_32() {
 #[test]
 #[ignore = "runs scsynth 3.14.1"]
 fn scsynth_reads_a_ugen_name_of_31_bytes_and_not_of_32() {
-    // Facts 8 and 9 of the plan: a name that fits reaches the lookup of the
+    // Facts 8 and 9 of the plan of 0.1: a name that fits reaches the lookup of the
     // plugin.
     let short = "u".repeat(31);
     let mut builder = SynthDefBuilder::new("ugen", vec![]).unwrap();

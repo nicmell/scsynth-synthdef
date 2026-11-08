@@ -89,29 +89,108 @@ assert_eq!(def.children.len(), 3);
   gives the order of the arguments, their defaults, the wiring and the
   rule of `checkInputs`. An `ArgValue` is an input, or the text of a symbol
   argument such as the command name of `SendReply`. A single input goes
-  where the method takes an array, as `asArray` makes it.
+  where the method takes an array, as `asArray` makes it. An array
+  expands the UGen, and `mul` and `add` go through `madd`.
 - `add` adds a UGen at the level of `UGen:new1`: its class, its rate, its
   inputs in the order of the wire, the rate of each output, its special
   index, and whether it is a `WidthFirstUGen`. Every UGen added after a
   width-first UGen runs after it.
 - `unary_op` and `binary_op` add a `UnaryOpUGen` and a `BinaryOpUGen` by
-  the name of the operator, such as `neg` or `*`. A unary operator runs at
-  the rate of its input. A binary operator runs at the highest rate of its
-  inputs, in the order demand, audio, control and scalar. A number is at
-  scalar rate. The module `operator` gives the special index of each name,
-  and the name of each index.
+  the name of the operator, such as `neg` or `*`, as `UnaryOpUGen.new` and
+  `BinaryOpUGen.new` add them. A unary operator runs at the rate of its
+  input. A binary operator runs at the highest rate of its inputs, in the
+  order demand, audio, control and scalar. A number is at scalar rate.
+  `binary_op` applies the folds of `BinaryOpUGen:new1` first. The module
+  `operator` gives the special index of each name, and the name of each
+  index.
+- `madd` multiplies an input and adds to it, as `MulAdd.new` does.
 - `variant` adds a variant by control name, from the defaults.
 - `finish` collects the constants in the order of creation and of the
   inputs, sorts the UGens as sclang sorts them, and checks the limits.
 
 A `UGenInput` is a number, an `OutputProxy` or an array of them. An
-`OutputProxy` gives its rate and the index of its output.
+`OutputProxy` gives its rate and the index of its output. A call that fails
+leaves the build as it was.
+
+### Multichannel expansion
+
+`ugen`, `unary_op`, `binary_op` and `madd` expand an array as `multiNewList`
+expands it in sclang.
+
+```rust
+use scsynth_synthdef::{Arg, SynthDefBuilder};
+
+// SynthDef(\pair, { |freqs = #[220, 331], amp = 0.4| Out.ar(0, SinOsc.ar(freqs, 0, amp)) })
+let args = vec![Arg::array("freqs", [220.0, 331.0]), Arg::new("amp", 0.4)];
+let mut builder = SynthDefBuilder::new("pair", args)?;
+let (freqs, amp) = (builder.arguments()[0].clone(), builder.arguments()[1].clone());
+let sines = builder.ugen("SinOsc", "ar", &[("freq", freqs.into()), ("mul", amp.into())])?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", sines.into())])?;
+let def = builder.finish()?;
+let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
+assert_eq!(names, ["Control", "SinOsc", "BinaryOpUGen", "SinOsc", "BinaryOpUGen", "Out"]);
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+- An array on an argument that expands makes one UGen for each element of
+  the longest array. Each array gives its element at the index modulo its
+  length, and every other argument stays as it is.
+- An element that is itself an array expands again, depth first.
+  `SendReply` expands one level only, as its `flop` does, and
+  `Wiring::nested_expansion` records it.
+- The result is the array of the results, in order: an output for a UGen
+  with one output, an array for a UGen with several, and an empty array for
+  a UGen with none.
+- For `ugen`, the arguments that expand are those that the method gives
+  `multiNew`: the arguments of the wire, and the count of the outputs. So
+  `In.ar(0, [1, 2])` makes an `In` of one channel and an `In` of two. A
+  symbol argument takes one text, and an array argument flattens into the
+  inputs.
+- `ugen` applies `madd` once, to the whole result, as `Array:madd` does. So
+  `SinOsc.ar([440, 442], 0, [0.1, 0.2, 0.3])` makes two `SinOsc` and three
+  `*`.
+- Each UGen meets the rule of `checkInputs` on its own.
+
+The builder refuses two inputs that sclang takes:
+
+- An empty array where an argument expands, at any depth
+  (`BuildError::EmptyInput`). sclang counts it as an input of its UGen, but
+  writes no input spec for it (`UGen:numInputs`,
+  `Collection:writeInputSpec`). scsynth 3.14.1 refuses that definition with
+  "UGen '' not installed.", and `read_def_file` refuses it too. Next to a
+  full array, the empty one gives a nil input, which sclang refuses.
+- An array inside an array argument, or inside an argument of `SendReply`
+  (`BuildError::NestedArray`). sclang expands these in a way that depends on
+  the class. `Out.ar(0, [[a, b], [c, d]])` makes `Out(0, a, c)` and
+  `Out(0, b, d)`, and `SendReply` takes each inner array of its values
+  whole. Below the first level, sclang writes an inner array of `SendReply`
+  as one input.
+
+### `madd` and the folds
+
+- `madd(input, mul, add)` takes the first case of `MulAdd:new1` that holds,
+  for each instance. `mul` 0 gives `add`. `mul` 1 with `add` 0 gives the
+  input, and `mul` -1 with `add` 0 its `neg`. `add` 0 gives `input * mul`,
+  `mul` -1 gives `add - input`, and `mul` 1 gives `input + add`.
+- Otherwise, if `canBeMulAdd` takes the input as the first input of a
+  `MulAdd`, `madd` makes that `MulAdd`. Else, if `canBeMulAdd` takes `mul`
+  first, `madd` makes a `MulAdd` with `mul` first. If `canBeMulAdd` takes
+  neither, `madd` makes a `*` and a `+`. These operators compute two
+  numbers, so `madd(2.0, 3.0, x)` gives `6 + x`.
+- A `MulAdd` runs at the least rate by the name of its symbol, as
+  `SequenceableCollection:rate` gives it: audio, control, demand, scalar. A
+  `BinaryOpUGen` puts demand first.
+- `binary_op` folds as `BinaryOpUGen:new1` does, in its order. `* 0` gives
+  0. `* 1`, `+ 0`, `- 0` and `/ 1` give the other input. `* -1`, `0 -` and
+  `/ -1` give a `neg`. A fold takes numbers only, and the `neg` of a number
+  is a number.
 
 ### The checks of the inputs
 
 `ugen` checks the inputs as sclang checks them at the end of the build:
 
-- No input is NaN. `add`, `unary_op` and `binary_op` check this too.
+- No input is NaN. `add`, `unary_op`, `binary_op` and `madd` check this
+  too.
 - The rule of `checkInputs` of the class holds. One rule asks for the first
   input at the rate of the UGen. If the UGen runs at audio rate, other
   rules ask for some of its inputs at audio rate. At audio rate,
@@ -136,7 +215,8 @@ a class by name, and `catalog::all` gives all of them, sorted by name.
   with a kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
   holds the rate, the slot of each input, the outputs, the special index,
-  and whether `mul` and `add` apply. `Addable::No` holds the reason.
+  whether `mul` and `add` apply, and whether a nested array expands again.
+  `Addable::No` holds the reason.
 
 `generator/catalog.scd` measured each method in sclang. It calls the
 method twice, each time in a build of its own: once with distinct numbers,
@@ -144,7 +224,9 @@ and once with distinct control-rate outputs. Both calls must create
 exactly one instance of the class, with the same wiring. Then the method is
 addable.
 More calls find whether a count or an array sets the number of outputs.
-531 of the 635 methods are addable. Most of the others do more than
+Then, on each argument that expands, an array of two elements must make
+two instances, instance i with element i. An array inside an array must
+make three. 531 of the 635 methods are addable. Most of the others do more than
 `UGen:new1` does:
 
 - The pseudo-UGens, such as `Changed`, create no instance of the class.
@@ -155,6 +237,7 @@ More calls find whether a count or an array sets the number of outputs.
 - The control UGens take their special index from the build.
 - `UnaryOpUGen` and `BinaryOpUGen` take the name of an operator. Use
   `unary_op` and `binary_op` instead.
+- `MulAdd.new` folds, and orders its inputs. Use `madd` instead.
 
 The catalogue gives the page of each class in the help, and not its
 summary: the help of SuperCollider is GPL-3, and the crate copies none of
@@ -274,31 +357,37 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - The builder does not run `optimizeGraph`. sclang fuses `*` and `+` into
   `MulAdd`, `+` into `Sum3` and `Sum4`, rewrites `a + b.neg` and
   `a - b.neg`, and removes unused pure UGens.
-- An array input: sclang expands it into several UGens, and the builder
-  refuses it.
-- The operators: sclang folds `* 0`, `* 1`, `* -1`, `+ 0`, `- 0`, `0 -`,
-  `/ 1` and `/ -1` before it makes a UGen, and computes the operator of
-  numbers. `unary_op` and `binary_op` always make a UGen.
-- `mul` and `add`: sclang applies `madd`. `ugen` refuses a value other than
-  their defaults, 1 and 0.
-- A 0 channel of `Out.ar`, `XOut.ar` or `LocalOut.ar`: sclang puts a `DC`
-  in its place. `ugen` keeps the 0, and the rule of `AbstractOut` refuses
-  it.
+- An empty array where an argument expands, and a nested array in an array
+  argument or in `SendReply`: the builder refuses them (see Multichannel
+  expansion).
+- An array of symbols: sclang expands a symbol argument too, as the command
+  names of `SendReply`. `ArgValue` holds one text.
+- Two numbers: `unary_op` and `binary_op` make a UGen of them, as
+  `UnaryOpUGen.new` and `BinaryOpUGen.new` do. The operators of sclang
+  compute them instead, as `2 * 3` gives 6. The crate cannot copy that.
+  `2 < 3` is `true`, which no UGen takes. `rand` draws when sclang builds.
+  sclang gives nan for `-2 ** 0.5`, and the `pow` of scsynth keeps the
+  sign.
+- `mul` and `add` on a UGen without outputs, such as `AnalogOut`: sclang
+  multiplies an output that the UGen does not have, and `optimizeGraph`
+  removes the product. `ugen` refuses a value other than 1 and 0.
+- A 0 channel of `Out.ar`, `XOut.ar` or `LocalOut.ar`, such as `binary_op`
+  gives for `* 0`: sclang puts a `DC` in its place. `ugen` keeps the 0, and
+  the rule of `AbstractOut` refuses it.
 
 ## Left out
 
-These are not in version 0.1, in the order of their value for sc-app3:
+These are not in version 0.2, in the order of their value for sc-app3:
 
-1. `mul` and `add`, with the folds of `BinaryOpUGen:new1`
-2. multichannel expansion
-3. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
-4. what rate methods do besides `new1`: the Lag family,
+1. nested arrays in array arguments, as each class expands them
+2. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
+3. what rate methods do besides `new1`: the Lag family,
    `asAudioRateInput`, `LocalBuf`, `Poll` and the zeros of `Out`
-5. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs` and the
+4. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs` and the
    specs of the metadata
-6. `Env`, and the pseudo-UGens such as `Mix`, `Splay` and `SoundIn`
-7. the rules of `checkInputs` that classes define for themselves
-8. sc3-plugins
+5. `Env`, and the pseudo-UGens such as `Mix`, `Splay` and `SoundIn`
+6. the rules of `checkInputs` that classes define for themselves
+7. sc3-plugins
 
 Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
 and the count of interconnect buffers.

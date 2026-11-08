@@ -245,6 +245,14 @@ fn render_method(rendered: &mut String, method: &Value) {
             method["madd"].as_bool().expect("madd is a boolean")
         )
         .unwrap();
+        writeln!(
+            rendered,
+            "                    nested_expansion: {},",
+            method["nested_expansion"]
+                .as_bool()
+                .expect("nested_expansion is a boolean")
+        )
+        .unwrap();
         writeln!(rendered, "                }}),").unwrap();
     } else {
         writeln!(

@@ -44,7 +44,7 @@ mod tests {
 
     #[test]
     fn the_special_indices_are_those_that_sclang_measured() {
-        // Fact 25 of the plan.
+        // Fact 25 of the plan of 0.1.
         assert_eq!(binary_index("+"), Some(0));
         assert_eq!(binary_index("*"), Some(2));
         assert_eq!(unary_index("neg"), Some(0));

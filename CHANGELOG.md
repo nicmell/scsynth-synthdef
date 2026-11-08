@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.2.0 (2026-11-08)
+
+Multichannel expansion, `madd`, and the folds of the operators, as sclang
+3.14.1 applies them.
+
+### Added
+
+- Multichannel expansion in `SynthDefBuilder::ugen`, `unary_op` and
+  `binary_op`, as `multiNewList` expands: the arguments of the wire and the
+  count of the outputs expand, depth first, and the shorter arrays wrap. See
+  [Multichannel expansion](README.md#multichannel-expansion).
+- `SynthDefBuilder::madd`: `MulAdd.new`, with the cases of `MulAdd:new1`.
+  `ugen` applies `mul` and `add` through it, once on the whole expansion.
+  See [`madd` and the folds](README.md#madd-and-the-folds).
+- `BuildError::EmptyInput` and `BuildError::NestedArray`, for the two
+  inputs that the builder refuses.
+- `Wiring::nested_expansion`. `generator/catalog.scd` measures the
+  expansion of every addable method.
+- 13 golden files of the expansion and of `madd`. scsynth loads them in the
+  acceptance test.
+
+### Changed
+
+- `binary_op` folds as `BinaryOpUGen:new1` does, so it can give back a
+  number or one of its inputs instead of a new output. A product with 0
+  then reaches `Out.ar` as the number 0, which the rule of `AbstractOut`
+  refuses. Version 0.1 built a `BinaryOpUGen` there.
+- `ugen`, `unary_op` and `binary_op` expand an array instead of refusing
+  it. Only `add` still gives `BuildError::MultichannelExpansion`.
+- `ugen` applies `mul` and `add` instead of refusing them.
+  `BuildError::MaddNotSupported` now refuses them only on a UGen without
+  outputs.
+
 ## 0.1.0 (2026-10-18)
 
 The first release. It compiles synth definitions as sclang 3.14.1 compiles

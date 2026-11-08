@@ -325,13 +325,31 @@ pub enum BuildError {
         /// The position of the input.
         input: usize,
     },
-    /// An input is an array, which needs multichannel expansion.
+    /// An input of [`add`](crate::SynthDefBuilder::add) is an array, which
+    /// needs multichannel expansion.
     #[non_exhaustive]
     MultichannelExpansion {
         /// The class of the UGen.
         ugen: String,
         /// The position of the input.
         input: usize,
+    },
+    /// An argument that expands holds an empty array, at the top or deeper.
+    #[non_exhaustive]
+    EmptyInput {
+        /// The class of the UGen.
+        ugen: String,
+        /// The name of the argument.
+        argument: String,
+    },
+    /// An array argument holds an array, or an argument of a method that
+    /// expands one level holds an array inside an array.
+    #[non_exhaustive]
+    NestedArray {
+        /// The class of the UGen.
+        ugen: String,
+        /// The name of the argument.
+        argument: String,
     },
     /// An input is an output of another build.
     #[non_exhaustive]
@@ -415,7 +433,8 @@ pub enum BuildError {
         /// What the argument takes.
         expected: &'static str,
     },
-    /// `mul` is not 1, or `add` is not 0. The builder does not apply `madd`.
+    /// `mul` is not 1, or `add` is not 0, for a method that applies `madd` to
+    /// a UGen without outputs.
     MaddNotSupported(String),
     /// A count of channels is not a positive integer, or an array that sets
     /// the outputs is empty.
@@ -456,6 +475,13 @@ impl fmt::Display for BuildError {
             Self::MultichannelExpansion { ugen, input } => write!(
                 f,
                 "input {input} of {ugen} is an array, which needs multichannel expansion"
+            ),
+            Self::EmptyInput { ugen, argument } => {
+                write!(f, "the argument {argument} of {ugen} holds an empty array")
+            }
+            Self::NestedArray { ugen, argument } => write!(
+                f,
+                "the argument {argument} of {ugen} holds an array inside an array, which does not expand there"
             ),
             Self::ForeignOutput { ugen, input } => {
                 write!(f, "input {input} of {ugen} is an output of another build")
@@ -498,7 +524,7 @@ impl fmt::Display for BuildError {
             } => write!(f, "the argument {argument} of {class} takes {expected}"),
             Self::MaddNotSupported(argument) => write!(
                 f,
-                "the builder does not apply madd, so {argument} must keep its default"
+                "{argument} must keep its default, since the UGen has no output"
             ),
             Self::BadCount { class, argument } => write!(
                 f,

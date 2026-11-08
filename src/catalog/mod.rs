@@ -123,6 +123,9 @@ pub struct Wiring {
     pub special_index: i16,
     /// Whether the method applies `madd` with its arguments `mul` and `add`.
     pub madd: bool,
+    /// Whether the expansion goes on into an array inside an array, as
+    /// `multiNewList` does.
+    pub nested_expansion: bool,
 }
 
 /// Where inputs of the wire come from.
@@ -227,7 +230,7 @@ mod tests {
 
     #[test]
     fn the_catalogue_holds_the_core_classes_sorted_by_name() {
-        // Fact 29 of the plan: 419 classes, without sc3-plugins.
+        // Fact 29 of the plan of 0.1: 419 classes, without sc3-plugins.
         assert_eq!(all().len(), 419);
         assert!(all().windows(2).all(|pair| pair[0].name < pair[1].name));
         assert!(lookup("DFM1").is_none());
@@ -269,7 +272,7 @@ mod tests {
 
     #[test]
     fn the_slots_follow_the_wire_of_sclang() {
-        // Fact 27 of the plan.
+        // Fact 27 of the plan of 0.1.
         assert_eq!(
             wiring("SendReply", "kr").inputs,
             [
@@ -284,8 +287,24 @@ mod tests {
     }
 
     #[test]
+    fn send_reply_expands_one_level_and_sin_osc_all_the_way() {
+        // Fact 18 of the plan of 0.2: SendReply expands with flop.
+        assert!(!wiring("SendReply", "kr").nested_expansion);
+        assert!(!wiring("SendReply", "ar").nested_expansion);
+        assert!(wiring("SinOsc", "ar").nested_expansion);
+        let one_level = all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter(
+                |method| matches!(method.addable, Addable::Yes(wiring) if !wiring.nested_expansion),
+            )
+            .count();
+        assert_eq!(one_level, 2);
+    }
+
+    #[test]
     fn a_method_that_does_more_than_new1_is_not_addable() {
-        // Fact 33 of the plan.
+        // Fact 33 of the plan of 0.1.
         assert!(reason("Lag", "kr").contains("no instance"));
         assert!(reason("DelayN", "ar").contains("DC"));
         assert!(reason("LocalBuf", "new").contains("MaxLocalBufs"));

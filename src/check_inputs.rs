@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn an_out_at_audio_rate_takes_only_audio_channels() {
-        // Out.ar(0, 0.5), which sclang refuses, fact 34 of the plan.
+        // Out.ar(0, 0.5), which sclang refuses, fact 34 of the plan of 0.1.
         let rule = CheckInputs::AbstractOut { fixed: 1 };
         assert_eq!(
             check(rule, Rate::Audio, &[0.0.into(), 0.5.into()]),
