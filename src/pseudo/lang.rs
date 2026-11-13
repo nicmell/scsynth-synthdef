@@ -175,6 +175,29 @@ pub(crate) fn moddif(
     }
 }
 
+/// `asAudioRateInput`: a `DC` for a number, a `K2A` for a UGen that does not
+/// run at audio rate, and each element of an array in turn.
+#[allow(clippy::float_cmp)]
+pub(crate) fn as_audio_rate_input(
+    builder: &mut SynthDefBuilder,
+    input: UGenInput,
+) -> Result<UGenInput, BuildError> {
+    match input {
+        UGenInput::Number(number) => {
+            // Any zero, -0.0 too, gives `Silent.ar`: `DC.ar(0)`.
+            let level = if number == 0.0 { 0.0 } else { number };
+            builder.ugen("DC", "ar", &[("in", level.into())])
+        }
+        UGenInput::Output(output) if output.rate() == Rate::Audio => Ok(output.into()),
+        UGenInput::Output(output) => builder.ugen("K2A", "ar", &[("in", output.into())]),
+        UGenInput::Array(items) => items
+            .into_iter()
+            .map(|item| as_audio_rate_input(builder, item))
+            .collect::<Result<_, _>>()
+            .map(UGenInput::Array),
+    }
+}
+
 /// `methodSelectorForRate` of a class that answers `ir`, as `Clip` and
 /// `ModDif` do.
 pub(crate) fn selector_for_rate(rate: Rate) -> &'static str {

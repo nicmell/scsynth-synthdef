@@ -29,6 +29,8 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "dynklank" => dynklank(),
         "dynklang" => dynklang(),
         "unpackfft" => unpackfft(),
+        "delays" => delays(),
+        "linxfade2" => linxfade2(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -919,5 +921,147 @@ fn unpackfft() -> Vec<SynthDef> {
             &[("frombin", input(0.0)), ("tobin", input(2.0))],
         ),
         unpacked("unpackfft_default", 4.0, &[]),
+    ]
+}
+
+/// A delay of `class` at audio rate, with these arguments.
+fn delay(b: &mut SynthDefBuilder, class: &str, args: &[(&str, ArgValue)]) -> UGenInput {
+    by_name(b, class, "ar", args)
+}
+
+/// `class.ar(in, 0.2, 0.1, 1)`, for a comb or an allpass.
+fn comb(b: &mut SynthDefBuilder, class: &str, sound: UGenInput) -> UGenInput {
+    delay(
+        b,
+        class,
+        &[
+            ("in", input(sound)),
+            ("maxdelaytime", input(0.2)),
+            ("delaytime", input(0.1)),
+            ("decaytime", input(1.0)),
+        ],
+    )
+}
+
+fn delays() -> Vec<SynthDef> {
+    vec![
+        def("delayn_kr_input", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            let delayed = delay(
+                b,
+                "DelayN",
+                &[
+                    ("in", input(sound)),
+                    ("maxdelaytime", input(0.2)),
+                    ("delaytime", input(0.1)),
+                ],
+            );
+            out(b, "ar", delayed);
+        }),
+        def("combl_number", vec![], |b| {
+            let delayed = comb(b, "CombL", 0.5.into());
+            out(b, "ar", delayed);
+        }),
+        def("allpassc_zero", vec![], |b| {
+            let delayed = comb(b, "AllpassC", 0.0.into());
+            out(b, "ar", delayed);
+        }),
+        def("bufdelayc_audio", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let delayed = delay(
+                b,
+                "BufDelayC",
+                &[
+                    ("buf", input(0.0)),
+                    ("in", input(sound)),
+                    ("delaytime", input(0.1)),
+                ],
+            );
+            out(b, "ar", delayed);
+        }),
+        def("bufcombn_array", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            let delayed = delay(
+                b,
+                "BufCombN",
+                &[
+                    ("buf", input(0.0)),
+                    ("in", input(vec![sound, 0.25.into()])),
+                    ("delaytime", input(0.1)),
+                    ("decaytime", input(1.0)),
+                ],
+            );
+            out(b, "ar", delayed);
+        }),
+        def("delayn_mul", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let delayed = delay(
+                b,
+                "DelayN",
+                &[
+                    ("in", input(sound)),
+                    ("maxdelaytime", input(0.2)),
+                    ("delaytime", input(0.1)),
+                    ("mul", input(0.5)),
+                ],
+            );
+            out(b, "ar", delayed);
+        }),
+        def("deltapwr", vec![], |b| {
+            let sound = sine(b, "kr", 2.0);
+            let tap = delay(
+                b,
+                "DelTapWr",
+                &[("buffer", input(0.0)), ("in", input(sound))],
+            );
+            let read = by_name(
+                b,
+                "DelTapRd",
+                "ar",
+                &[
+                    ("buffer", input(0.0)),
+                    ("phase", input(tap)),
+                    ("delTime", input(0.1)),
+                ],
+            );
+            out(b, "ar", read);
+        }),
+    ]
+}
+
+/// `LinXFade2` of two `SinOsc`, at the rate of `selector`.
+fn lin_x_fade2(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    pan: f64,
+    level: Option<UGenInput>,
+) -> UGenInput {
+    let (first, second) = (sine(b, selector, 1.0), sine(b, selector, 2.0));
+    let mut args = vec![
+        ("inA", input(first)),
+        ("inB", input(second)),
+        ("pan", input(pan)),
+    ];
+    if let Some(level) = level {
+        args.push(("level", input(level)));
+    }
+    by_name(b, "LinXFade2", selector, &args)
+}
+
+fn linxfade2() -> Vec<SynthDef> {
+    vec![
+        def("linxfade2_level", vec![], |b| {
+            let faded = lin_x_fade2(b, "ar", 0.5, Some(0.5.into()));
+            out(b, "ar", faded);
+        }),
+        def("linxfade2_one", vec![], |b| {
+            let faded = lin_x_fade2(b, "kr", -0.5, None);
+            out(b, "kr", faded);
+        }),
+        def("linxfade2_ugen", vec![Arg::new("level", 0.5)], |b| {
+            let level = arg(b, "level");
+            let faded = lin_x_fade2(b, "ar", 0.0, Some(level));
+            out(b, "ar", faded);
+        }),
     ]
 }

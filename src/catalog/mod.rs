@@ -161,6 +161,12 @@ pub struct Wiring {
     /// Whether the expansion goes on into an array inside an array, as
     /// `multiNewList` does.
     pub nested_expansion: bool,
+    /// The position of the argument that goes through `asAudioRateInput`
+    /// before the expansion, as the input of a delay at audio rate.
+    pub audio_input: Option<usize>,
+    /// Whether the method multiplies the result of the expansion by its
+    /// argument `level`, as `LinXFade2` does.
+    pub level: bool,
 }
 
 /// Where inputs of the wire come from.
@@ -375,11 +381,27 @@ mod tests {
     fn a_method_that_does_more_than_new1_is_not_addable() {
         // Fact 33 of the plan of 0.1.
         assert!(reason("Lag", "kr").contains("no instance"));
-        assert!(reason("DelayN", "ar").contains("DC"));
         assert!(reason("LocalBuf", "new").contains("MaxLocalBufs"));
         assert!(reason("Poll", "kr").contains("Impulse"));
         assert_eq!(wiring("DelayN", "kr").rate, Rate::Control);
         assert!(reason("Duty", "kr").contains("rule of its own"));
+    }
+
+    #[test]
+    fn the_delays_convert_their_input_and_lin_x_fade2_multiplies_its_level() {
+        // Facts 24 and 25 of the plan of 0.3.
+        assert_eq!(wiring("DelayN", "ar").audio_input, Some(0));
+        assert_eq!(wiring("BufCombC", "ar").audio_input, Some(1));
+        assert_eq!(wiring("DelTapWr", "ar").audio_input, Some(1));
+        assert_eq!(wiring("DelayN", "kr").audio_input, None);
+        assert!(wiring("LinXFade2", "kr").level);
+        assert!(!wiring("XFade2", "kr").level);
+        let converted = all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.audio_input.is_some()))
+            .count();
+        assert_eq!(converted, 19);
     }
 
     #[test]

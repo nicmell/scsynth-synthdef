@@ -62,6 +62,8 @@ pub const NAMES: &[&str] = &[
     "dynklank",
     "dynklang",
     "unpackfft",
+    "delays",
+    "linxfade2",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where

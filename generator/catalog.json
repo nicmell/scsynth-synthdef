@@ -390,8 +390,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -528,8 +551,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -666,8 +712,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -3517,8 +3586,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3583,8 +3675,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3649,8 +3764,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3782,8 +3920,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3848,8 +4009,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3913,8 +4097,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3972,8 +4179,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         },
         {
           "selector": "kr",
@@ -4092,8 +4319,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         },
         {
           "selector": "kr",
@@ -4211,8 +4458,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         },
         {
           "selector": "kr",
@@ -5635,8 +5902,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -5773,8 +6063,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -5910,8 +6223,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -8034,8 +8370,25 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true,
+          "audio_input": 1
         },
         {
           "selector": "kr",
@@ -8381,8 +8734,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -8502,8 +8875,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -8622,8 +9015,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -21445,8 +21858,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [BinaryOpUGen]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true,
+          "level": true
         },
         {
           "selector": "kr",
@@ -21478,8 +21911,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [BinaryOpUGen]"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true,
+          "level": true
         }
       ]
     },

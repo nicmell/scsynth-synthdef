@@ -263,6 +263,18 @@ fn render_method(rendered: &mut String, method: &Value) {
                 .expect("nested_expansion is a boolean")
         )
         .unwrap();
+        let audio_input = method
+            .get("audio_input")
+            .map_or("None".to_owned(), |position| {
+                format!("Some({})", number(position))
+            });
+        writeln!(rendered, "                    audio_input: {audio_input},").unwrap();
+        writeln!(
+            rendered,
+            "                    level: {},",
+            method.get("level").is_some_and(|level| level == true)
+        )
+        .unwrap();
         writeln!(rendered, "                }}),").unwrap();
     } else {
         writeln!(

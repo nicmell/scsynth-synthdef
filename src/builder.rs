@@ -442,6 +442,7 @@ impl SynthDefBuilder {
         };
         let mut values = bind_arguments(class, method, args)?;
         let madd = madd_arguments(class, method, wiring, &values)?;
+        let level = level_argument(class, method, wiring, &values)?;
         let positions = expanding(wiring);
         let mut names = Vec::with_capacity(positions.len());
         let mut expanded = Vec::with_capacity(positions.len());
@@ -457,6 +458,12 @@ impl SynthDefBuilder {
             expanded.push(input.clone());
         }
         self.transaction(|builder| {
+            let audio_slot = wiring
+                .audio_input
+                .and_then(|audio| positions.iter().position(|&position| position == audio));
+            if let Some(slot) = audio_slot {
+                expanded[slot] = lang::as_audio_rate_input(builder, expanded[slot].clone())?;
+            }
             let result = builder.expand(
                 class,
                 &names,
@@ -469,6 +476,10 @@ impl SynthDefBuilder {
                     builder.add_instance(class, ugen_class, method, wiring, &values)
                 },
             )?;
+            let result = match level {
+                Some(level) => lang::binary(builder, "*", result, level)?,
+                None => result,
+            };
             match madd {
                 Some([mul, add]) => builder.madd_expanded(class, &[result, mul, add]),
                 None => Ok(result),
@@ -1118,6 +1129,25 @@ fn madd_arguments(
         madd[slot] = input.clone();
     }
     Ok(if no_outputs { None } else { Some(madd) })
+}
+
+/// The `level` that the method multiplies the result of its expansion by, as
+/// `LinXFade2` does, or `None`.
+fn level_argument(
+    class: &str,
+    method: &RateMethod,
+    wiring: Wiring,
+    values: &[ArgValue],
+) -> Result<Option<UGenInput>, BuildError> {
+    let position = method.args.iter().position(|arg| arg.name == "level");
+    match position
+        .filter(|_| wiring.level)
+        .map(|position| (position, &values[position]))
+    {
+        None => Ok(None),
+        Some((_, ArgValue::Input(level))) => Ok(Some(level.clone())),
+        Some((position, _)) => Err(wrong_kind(class, method, position, "a number or an output")),
+    }
 }
 
 fn wrong_kind(

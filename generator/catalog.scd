@@ -192,6 +192,22 @@ var notPseudo = [
 ];
 var census = bodies ++ leftOut.collect(_.first) ++ notPseudo.collect(_.first);
 
+// The arguments that pass through asAudioRateInput before multiNew, by the
+// class that owns the method. The probe gives them audio-rate outputs.
+var audioRateInputs = [
+	[\BufCombN, \ar, \in],
+	[\BufDelayN, \ar, \in],
+	[\CombN, \ar, \in],
+	[\DelTapWr, \ar, \in],
+	[\DelayN, \ar, \in]
+];
+// The arguments that multiply the result of multiNew, as `* level`. The
+// probe gives them 1, which the fold of `*` drops.
+var levelArguments = [
+	[\LinXFade2, \ar, \level],
+	[\LinXFade2, \kr, \level]
+];
+
 // An argument whose name holds one of these words needs an entry above.
 var arrayWords = ["array", "list", "values", "ugens", "envelope", "weights",
 	"magsphases", "spec", "chans", "levels", "times", "numchannels", "numcoeff",
@@ -243,7 +259,7 @@ var checkRules = (
 );
 
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
-var ugenOwner, kindsOf, probe, signal, element, numberValues, controlValues;
+var ugenOwner, kindsOf, probe, signal, element, audio, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, wiring;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
@@ -389,8 +405,15 @@ try {
 			var entry = argumentKinds.detect { |entry|
 				entry[0] == owner.name and: { entry[1] == selector } and: { entry[2] == name }
 			};
+			var named = { |table|
+				table.any { |entry|
+					entry[0] == owner.name and: { entry[1] == selector } and: { entry[2] == name }
+				}
+			};
 			case
 			{ entry.notNil } { entry[3] }
+			{ named.(audioRateInputs) } { \audio }
+			{ named.(levelArguments) } { \level }
 			{ name == \mul } { \mul }
 			{ name == \add } { \add }
 			{ arrayWords.any { |word| name.asString.toLower.contains(word) } } {
@@ -430,6 +453,10 @@ try {
 	// The sentinels: distinct numbers, far from 0, 1 and the counts.
 	signal = { |position| 1000.25 + (17 * position) };
 	element = { |position, index| 2000.25 + (17 * position) + (0.5 * index) };
+	// An audio-rate output, made inside the build of a probe.
+	audio = { |position, index = 0|
+		AudioControl.ar([signal.(position) + (0.125 * index)]).asArray.first
+	};
 	numberValues = { |kinds, counts, sizes|
 		{
 			kinds.collect { |kind, position|
@@ -439,6 +466,8 @@ try {
 				{ \symbol } { '/abcd' }
 				{ \mul } { 1.0 }
 				{ \add } { 0.0 }
+				{ \level } { 1.0 }
+				{ \audio } { audio.(position) }
 				{ signal.(position) }
 			}
 		}
@@ -465,6 +494,8 @@ try {
 				{ \symbol } { '/abcd' }
 				{ \mul } { 1.0 }
 				{ \add } { 0.0 }
+				{ \level } { 1.0 }
+				{ \audio } { audio.(position) }
 			}
 		}
 	};
@@ -482,6 +513,7 @@ try {
 					switch (kinds[position])
 					{ \mul } {}
 					{ \add } {}
+					{ \level } {}
 					{ \symbol } {
 						var codes = value.asString.ascii;
 						if (inputs[i] == codes.size
@@ -534,9 +566,15 @@ try {
 	};
 
 	// The values of numberValues, with `value` at `position`.
+	// The values of numberValues, with `value` at `position`. A function makes
+	// the value inside the build.
 	valuesAt = { |kinds, position, value|
 		var values = numberValues.(kinds, [], []);
-		{ var arguments = values.value; arguments.put(position, value); arguments }
+		{
+			var arguments = values.value;
+			arguments.put(position, if (value.isFunction) { value.value } { value });
+			arguments
+		}
 	};
 
 	// How the method expands, as associations, or why it does not expand as
@@ -548,9 +586,11 @@ try {
 	expansionOf = { |class, selector, kinds, slots, dependence|
 		var positions = slots.select { |slot| slot[0] == \arg }.collect { |slot| slot[1] };
 		var failure, nested = true;
-		var matches = { |result, position, elements|
+		var matches = { |result, position|
 			var instances = result[1].select { |ugen| ugen.class === class };
+			var elements = result[2] !? { result[2][position].flat } ? [];
 			result[0].isNil
+			and: { elements.notEmpty }
 			and: { result[1].size == elements.size }
 			and: { instances.size == elements.size }
 			and: {
@@ -567,16 +607,25 @@ try {
 		positions.asSet.asArray.sort.do { |position|
 			var flat, deep;
 			if (failure.isNil) {
-				flat = if (kinds[position] == \count) { [2, 3] } {
-					[signal.(position), signal.(position) + 0.125]
-				};
-				deep = flat ++ [if (kinds[position] == \count) { 4 } { signal.(position) + 0.375 }];
 				case
-				{ matches.(probe.(class, selector, valuesAt.(kinds, position, flat)), position, flat).not } {
+				{ kinds[position] == \count } {
+					flat = [2, 3];
+					deep = [[2, 3], 4];
+				}
+				{ kinds[position] == \audio } {
+					flat = { [audio.(position, 0), audio.(position, 1)] };
+					deep = { [[audio.(position, 0), audio.(position, 1)], audio.(position, 2)] };
+				}
+				{
+					flat = [signal.(position), signal.(position) + 0.125];
+					deep = [flat, signal.(position) + 0.375];
+				};
+				case
+				{ matches.(probe.(class, selector, valuesAt.(kinds, position, flat)), position).not } {
 					failure = "an array on argument % does not make one instance per element"
 						.format(position);
 				}
-				{ matches.(probe.(class, selector, valuesAt.(kinds, position, [flat, deep[2]])), position, deep).not } {
+				{ matches.(probe.(class, selector, valuesAt.(kinds, position, deep)), position).not } {
 					nested = false;
 				};
 			};
@@ -649,6 +698,8 @@ try {
 						\special_index -> first.specialIndex,
 						\madd -> (kinds.includes(\mul) or: { kinds.includes(\add) })
 					] ++ expansion
+					++ if (kinds.includes(\audio)) { [\audio_input -> kinds.indexOf(\audio)] } { [] }
+					++ if (kinds.includes(\level)) { [\level -> true] } { [] }
 				}
 			}
 		}
@@ -666,7 +717,11 @@ try {
 				var value = defaults[position];
 				[
 					\name -> name,
-					\kind -> if ([\mul, \add].includes(kinds[position])) { \signal } { kinds[position] },
+					\kind -> if ([\mul, \add, \level, \audio].includes(kinds[position])) {
+						\signal
+					} {
+						kinds[position]
+					},
 					\default -> case
 						{ value.isNil } { nil }
 						{ value === true or: { value === false } } { [\bool -> value] }

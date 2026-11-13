@@ -91,6 +91,10 @@ assert_eq!(def.children.len(), 3);
   argument such as the command name of `SendReply`. A single input goes
   where the method takes an array, as `asArray` makes it. An array
   expands the UGen, and `mul` and `add` go through `madd`.
+- At audio rate, a delay passes its input through `asAudioRateInput`
+  before the expansion. A number becomes a `DC`, and an output at another
+  rate a `K2A`. `LinXFade2` multiplies its result by `level`, after the
+  expansion.
 - `add` adds a UGen at the level of `UGen:new1`: its class, its rate, its
   inputs in the order of the wire, the rate of each output, its special
   index, and whether it is a `WidthFirstUGen`. Every UGen added after a
@@ -271,25 +275,26 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
   holds the rate, the slot of each input, the outputs, the special index,
   whether `mul` and `add` apply, and whether a nested array expands again.
-  `Addable::Pseudo` marks a method that a body of the crate builds (see
+  It also holds the argument that goes through `asAudioRateInput`, and
+  whether `level` multiplies the result. `Addable::Pseudo` marks a method that a body of the crate builds (see
   [Pseudo-UGens](#pseudo-ugens)). `Addable::No` holds the reason.
 
 `generator/catalog.scd` measured each method in sclang. It calls the
 method twice, each time in a build of its own: once with distinct numbers,
 and once with distinct control-rate outputs. Both calls must create
 exactly one instance of the class, with the same wiring. Then the method is
-addable.
+addable. The input of a delay at audio rate takes distinct audio-rate
+outputs instead, and `level` of `LinXFade2` takes 1.
 More calls find whether a count or an array sets the number of outputs.
 Then, on each argument that expands, an array of two elements must make
 two instances, instance i with element i. An array inside an array must
-make three. 531 of the 635 methods are addable with a wiring, and the
+make three. 552 of the 635 methods are addable with a wiring, and the
 pseudo-UGens have a body. Most of the others do more than `UGen:new1` does:
 
-- The pseudo-UGens that wait for a later version, such as `Splay`, create
+- The pseudo-UGens that wait for a later version, such as `SplayAz`, create
   no instance of their class.
 - If its input is a number or its lag is 0, the Lag family returns the
   input.
-- The delays at audio rate put a `DC` or a `K2A` before their input.
 - `LocalBuf` adds a `MaxLocalBufs`, and `Poll` an `Impulse`.
 - The control UGens take their special index from the build.
 - `UnaryOpUGen` and `BinaryOpUGen` take the name of an operator. Use
@@ -320,14 +325,8 @@ it.
 - So do `LagControl.ar`, `LagControl.kr`, `LagUD.ar`, `LagUD.kr`,
   `Ramp.ar`, `Ramp.kr`, `Slew.ar`, `Slew.kr`, `VarLag.ar` and `VarLag.kr`.
 - `MulAdd.new` folds and orders its inputs. Use `madd` instead.
-- The delays at audio rate also create a `DC` or a `K2A`: `AllpassC.ar`,
-  `AllpassL.ar`, `AllpassN.ar`, `BufAllpassC.ar`, `BufAllpassL.ar` and
-  `BufAllpassN.ar`.
-- So do `BufCombC.ar`, `BufCombL.ar`, `BufCombN.ar`, `BufDelayC.ar`,
-  `BufDelayL.ar`, `BufDelayN.ar`, `CombC.ar`, `CombL.ar` and `CombN.ar`.
-- So do `DelTapWr.ar`, `DelayC.ar`, `DelayL.ar` and `DelayN.ar`.
-- They also create other UGens: `BeatTrack.kr`, `LinXFade2.ar`,
-  `LinXFade2.kr`, `LocalBuf.new`, `Poll.ar`, `Poll.kr` and `Poll.new`.
+- They also create other UGens: `BeatTrack.kr`, `LocalBuf.new`, `Poll.ar`,
+  `Poll.kr` and `Poll.new`.
 - An input comes from no argument, or the inputs follow a count:
   `DecodeB2.ar`, `DecodeB2.kr`, `Dwrand.new`, `LocalIn.ar` and
   `LocalIn.kr`.
@@ -456,8 +455,8 @@ These are not in version 0.2, in the order of their value for sc-app3:
 
 1. nested arrays in array arguments, as each class expands them
 2. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
-3. what rate methods do besides `new1`: the Lag family,
-   `asAudioRateInput`, `LocalBuf`, `Poll` and the zeros of `Out`
+3. what rate methods do besides `new1`: the Lag family, `LocalBuf`,
+   `LocalIn`, `Poll` and the zeros of `Out`
 4. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs` and the
    specs of the metadata
 5. `Env`, and the pseudo-UGens such as `Mix`, `Splay` and `SoundIn`
