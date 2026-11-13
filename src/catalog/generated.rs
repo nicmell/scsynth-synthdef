@@ -12716,7 +12716,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "in1", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "in2", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the rate depends on the inputs"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -12736,7 +12736,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "in2", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "in3", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the rate depends on the inputs"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -14156,7 +14156,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 9] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 10] = [
     PseudoClass {
         name: "BHiPass4",
         categories: &["UGens>Filters>BEQSuite"],
@@ -14214,6 +14214,33 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 9] = [
                     ArgSpec { name: "srchi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "dstlo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "dsthi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(2.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "Mix",
+        categories: &["UGens>Multichannel"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "new",
+                args: &[
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
                 ],
                 addable: Addable::Pseudo,
             },

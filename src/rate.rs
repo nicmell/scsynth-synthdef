@@ -47,9 +47,21 @@ impl Rate {
     }
 }
 
+/// The least of `rates` by the name of its symbol, as `minItem` takes it in
+/// `SequenceableCollection:rate`: audio, control, demand, scalar. Demand
+/// ranks after control, unlike the order of [`Rate`].
+pub(crate) fn least_by_name(rates: impl IntoIterator<Item = Rate>) -> Option<Rate> {
+    rates.into_iter().min_by_key(|rate| match rate {
+        Rate::Audio => 0,
+        Rate::Control => 1,
+        Rate::Demand => 2,
+        Rate::Scalar => 3,
+    })
+}
+
 #[cfg(test)]
 mod tests {
-    use super::Rate;
+    use super::{Rate, least_by_name};
 
     #[test]
     fn each_rate_has_the_number_of_sclang() {
@@ -58,6 +70,19 @@ mod tests {
             assert_eq!(rate.rate_number(), number);
             assert_eq!(Rate::from_rate_number(number), Some(rate));
         }
+    }
+
+    #[test]
+    fn the_least_rate_by_name_puts_demand_after_control() {
+        assert_eq!(
+            least_by_name([Rate::Scalar, Rate::Demand, Rate::Control]),
+            Some(Rate::Control)
+        );
+        assert_eq!(
+            least_by_name([Rate::Demand, Rate::Scalar]),
+            Some(Rate::Demand)
+        );
+        assert_eq!(least_by_name([]), None);
     }
 
     #[test]

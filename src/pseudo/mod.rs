@@ -2,12 +2,14 @@
 //! `Addable::Pseudo`. A body adds what its method adds in sclang, in the order
 //! in which sclang adds it.
 
+mod basic_ops;
 mod beq_suite;
 mod buf_io;
 mod demand;
 mod filter;
 pub(crate) mod lang;
 mod line;
+mod mix;
 mod osc;
 mod pm_osc;
 mod sound_in;
@@ -109,12 +111,17 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("Dstutter", "new", demand::dstutter),
     ("LinLin", "ar", line::lin_lin_ar),
     ("LinLin", "kr", line::lin_lin_kr),
+    ("Mix", "ar", mix::mix_ar),
+    ("Mix", "kr", mix::mix_kr),
+    ("Mix", "new", mix::mix_new),
     ("PMOsc", "ar", pm_osc::pm_osc),
     ("PMOsc", "kr", pm_osc::pm_osc),
     ("SelectX", "ar", osc::select_x),
     ("SelectX", "kr", osc::select_x),
     ("Silent", "ar", line::silent),
     ("SoundIn", "ar", sound_in::sound_in),
+    ("Sum3", "new", basic_ops::sum3),
+    ("Sum4", "new", basic_ops::sum4),
     ("TChoose", "ar", osc::t_choose),
     ("TChoose", "kr", osc::t_choose),
     ("TWChoose", "ar", osc::tw_choose),

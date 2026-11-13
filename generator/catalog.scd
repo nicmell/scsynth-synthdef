@@ -88,6 +88,9 @@ var argumentKinds = [
 	[\LocalOut, \ar, \channelsArray, \array],
 	[\LocalOut, \kr, \channelsArray, \array],
 	[\MFCC, \kr, \numcoeff, \count],
+	[\Mix, \ar, \array, \array],
+	[\Mix, \kr, \array, \array],
+	[\Mix, \new, \array, \array],
 	[\Out, \ar, \channelsArray, \array],
 	[\Out, \kr, \channelsArray, \array],
 	[\PackFFT, \new, \magsphases, \array],
@@ -141,8 +144,8 @@ var argumentKinds = [
 ];
 // The census of the pseudo-UGens: classes whose rate methods build other
 // UGens. The crate has a body for each rate method of a class of bodies.
-var bodies = [\BHiPass4, \BLowPass4, \Changed, \Dstutter, \LinLin, \PMOsc,
-	\SelectX, \Silent, \SoundIn, \TChoose, \TWChoose, \Tap];
+var bodies = [\BHiPass4, \BLowPass4, \Changed, \Dstutter, \LinLin, \Mix, \PMOsc,
+	\SelectX, \Silent, \SoundIn, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
@@ -154,7 +157,6 @@ var leftOut = [
 	[\HilbertFIR, "step 7 of the plan of 0.3"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
 	[\LinSelectX, "step 7 of the plan of 0.3"],
-	[\Mix, "step 4 of the plan of 0.3"],
 	[\MultiTap, "step 5 of the plan of 0.3"],
 	[\NamedControl, "a control: item 4 of Left out"],
 	[\NumChannels, "step 5 of the plan of 0.3"],

@@ -53,6 +53,8 @@ pub const NAMES: &[&str] = &[
     "selectx",
     "blowpass4",
     "bhipass4",
+    "sum",
+    "mix",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where

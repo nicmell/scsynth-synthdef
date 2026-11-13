@@ -232,8 +232,16 @@ assert_eq!(builder.ugen("LinLin", "kr", &args)?, UGenInput::Number(15.0));
   give a number, in f64, as sclang computes its Floats. An array goes
   element by element. Anything else goes to `binary_op` and `unary_op`.
 - The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `Dstutter`,
-  `LinLin`, `PMOsc`, `SelectX`, `Silent`, `SoundIn`, `TChoose`, `TWChoose`
-  and `Tap`.
+  `LinLin`, `Mix`, `PMOsc`, `SelectX`, `Silent`, `SoundIn`, `TChoose`,
+  `TWChoose` and `Tap`.
+- `Sum3.new` and `Sum4.new` have a body too. An input of 0 folds the UGen
+  into a smaller sum. Then the UGen takes the least rate of its inputs by
+  name. It orders its inputs as the insertion sort of sclang does, which
+  reverses inputs of one rate.
+- `Mix` clumps its array by 4 into `Sum4`, `Sum3` or `+`, and mixes the
+  mixes again. Two numbers give a number, as `Mix([1, 2])` gives 3, but
+  `Mix([1, 2, 3])` gives a `Sum3` at scalar rate. `BuildError::UnsupportedRate`
+  refuses `Mix.ar` and `Mix.kr` of a mix at demand rate.
 - A pseudo-UGen fails as the UGens that it adds fail. A call that fails
   adds no UGen.
 
@@ -325,7 +333,6 @@ it.
   `UnaryOpUGen.new`. Some of these do not exist.
 - They take their special index from the build: `AudioControl.ar`,
   `Control.ir`, `Control.kr`, `TrigControl.ir` and `TrigControl.kr`.
-- They take their rate from their inputs: `Sum3.new` and `Sum4.new`.
 - Their class checks its inputs with a rule of its own: `BufWr.ar`,
   `BufWr.kr`, `Duty.ar`, `Duty.kr`, `Peak.ar`, `Peak.kr` and
   `RunningMax.ar`.
@@ -431,8 +438,8 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - An output in an array of buses of `SoundIn`: sclang builds a `+ 1` for
   its test of consecutive buses, and `optimizeGraph` removes it. `ugen`
   refuses the output.
-- The warning of `Dstutter`: the crate does no I/O, and builds the same
-  `Ddup`.
+- The warnings of `Dstutter` and `Mix.kr`: the crate does no I/O, and
+  builds the same graph.
 
 ## Left out
 

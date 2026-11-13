@@ -5,6 +5,7 @@
 
 use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
+use crate::rate::{Rate, least_by_name};
 use crate::ugen_input::UGenInput;
 
 /// `x op y` in sclang, for an operator of `BinaryOpUGen` by its name.
@@ -52,6 +53,32 @@ pub(crate) fn unary(
             .collect::<Result<_, _>>()
             .map(UGenInput::Array),
         other => builder.unary_op(op, other),
+    }
+}
+
+/// `Collection:sum`: 0, plus each element in order.
+pub(crate) fn sum(
+    builder: &mut SynthDefBuilder,
+    items: Vec<UGenInput>,
+) -> Result<UGenInput, BuildError> {
+    items
+        .into_iter()
+        .try_fold(UGenInput::Number(0.0), |total, item| {
+            binary(builder, "+", total, item)
+        })
+}
+
+/// The rate of a value, as `rate` gives it in sclang. A number runs at scalar
+/// rate. An array of one element has the rate of the element. Another array
+/// has the least rate of its elements by name, and an empty array has none.
+pub(crate) fn rate(value: &UGenInput) -> Option<Rate> {
+    match value {
+        UGenInput::Number(_) => Some(Rate::Scalar),
+        UGenInput::Output(output) => Some(output.rate()),
+        UGenInput::Array(items) if items.len() == 1 => rate(&items[0]),
+        UGenInput::Array(items) => {
+            least_by_name(items.iter().map(|item| rate(item).unwrap_or(Rate::Scalar)))
+        }
     }
 }
 

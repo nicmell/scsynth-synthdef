@@ -33917,8 +33917,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the rate depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -33960,8 +33959,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the rate depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -37976,6 +37974,47 @@
               "default": {
                 "float": 2
               }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Mix",
+      "categories": [
+        "UGens>Multichannel"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
             }
           ],
           "addable": "pseudo"

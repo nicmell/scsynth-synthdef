@@ -12,7 +12,7 @@ use crate::file::Version;
 use crate::limits;
 use crate::operator;
 use crate::pseudo::{self, lang};
-use crate::rate::Rate;
+use crate::rate::{Rate, least_by_name};
 use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
 use crate::topo;
 use crate::ugen_input::{ArgValue, OutputProxy, UGenInput};
@@ -710,7 +710,7 @@ impl SynthDefBuilder {
     /// expand, named by `names` for the errors. `leaf` adds what one
     /// instance adds. Below the top, an array expands again only if
     /// `nested`.
-    fn expand<F>(
+    pub(crate) fn expand<F>(
         &mut self,
         ugen: &str,
         names: &[&str],
@@ -905,7 +905,7 @@ impl SynthDefBuilder {
         b: UGenInput,
         c: UGenInput,
     ) -> Result<UGenInput, BuildError> {
-        let rate = rate_by_name([rate_of(&a), rate_of(&b), rate_of(&c)]);
+        let rate = least_by_name([rate_of(&a), rate_of(&b), rate_of(&c)]).unwrap_or(Rate::Scalar);
         self.add(NewUGen::new(MUL_ADD, rate).inputs([a, b, c]))
     }
 
@@ -979,21 +979,6 @@ fn can_be_mul_add(input: &UGenInput, mul: &UGenInput, add: &UGenInput) -> bool {
         Rate::Control => slow(mul) && slow(add),
         Rate::Scalar | Rate::Demand => false,
     }
-}
-
-/// The rate of a `MulAdd`: `SequenceableCollection:rate` takes the least
-/// symbol, so demand ranks after control, unlike the order of [`Rate`].
-fn rate_by_name(rates: [Rate; 3]) -> Rate {
-    let by_name = |rate: &Rate| match rate {
-        Rate::Audio => 0,
-        Rate::Control => 1,
-        Rate::Demand => 2,
-        Rate::Scalar => 3,
-    };
-    rates
-        .into_iter()
-        .min_by_key(by_name)
-        .unwrap_or(Rate::Scalar)
 }
 
 /// The positions of the arguments that expand: those of the wire, and the

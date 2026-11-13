@@ -1,7 +1,7 @@
 //! What the golden files of the pseudo-UGens do not show: their refusals,
 //! and that a call that fails adds no UGen.
 
-use scsynth_synthdef::{Arg, ArgValue, BuildError, SynthDefBuilder, UGenInput};
+use scsynth_synthdef::{Arg, ArgValue, BuildError, Rate, SynthDefBuilder, UGenInput};
 
 fn builder() -> SynthDefBuilder {
     SynthDefBuilder::new("pseudo", vec![Arg::new("x", 1.0)]).unwrap()
@@ -77,6 +77,21 @@ fn a_pseudo_ugen_that_fails_adds_no_ugen() {
     let def = b.finish().unwrap();
     let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
     assert_eq!(names, ["Control"]);
+}
+
+#[test]
+fn mix_gives_0_for_no_input_and_refuses_a_mix_at_demand_rate() {
+    let mut b = builder();
+    let nothing = b.ugen("Mix", "new", &[("array", input(Vec::new()))]);
+    assert_eq!(nothing, Ok(UGenInput::Number(0.0)));
+    let list = input(vec![1.0.into(), 2.0.into()]);
+    let seq = b.ugen("Dseq", "new", &[("list", list)]).unwrap();
+    let refused = b.ugen("Mix", "ar", &[("array", input(vec![seq.clone(), seq]))]);
+    assert!(
+        matches!(&refused, Err(BuildError::UnsupportedRate { ugen, rate, .. })
+            if ugen == "Mix.ar" && *rate == Rate::Demand),
+        "{refused:?}"
+    );
 }
 
 #[test]

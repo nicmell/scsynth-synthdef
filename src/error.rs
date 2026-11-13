@@ -3,6 +3,8 @@
 
 use std::fmt;
 
+use crate::rate::Rate;
+
 /// Why bytes do not read as a definition file.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReadError {
@@ -455,6 +457,15 @@ pub enum BuildError {
     },
     /// The definition breaks a limit of scsynth.
     Limit(LimitError),
+    /// A pseudo-UGen takes no input at this rate, as `Mix.ar` refuses a mix
+    /// at demand rate.
+    #[non_exhaustive]
+    UnsupportedRate {
+        /// The pseudo-UGen and its method, such as `Mix.ar`.
+        ugen: String,
+        /// The rate.
+        rate: Rate,
+    },
 }
 
 impl fmt::Display for BuildError {
@@ -532,6 +543,9 @@ impl fmt::Display for BuildError {
             ),
             Self::CheckInputs { class, message } => write!(f, "{class}: {message}"),
             Self::Limit(error) => write!(f, "{error}"),
+            Self::UnsupportedRate { ugen, rate } => {
+                write!(f, "{ugen} takes no input at the rate {rate:?}")
+            }
         }
     }
 }

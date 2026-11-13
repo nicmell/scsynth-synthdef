@@ -20,6 +20,8 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "selectx" => selectx(),
         "blowpass4" => blowpass4(),
         "bhipass4" => bhipass4(),
+        "sum" => sum(),
+        "mix" => mix(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -434,4 +436,137 @@ fn bhipass4() -> Vec<SynthDef> {
         let filtered = b_pass4(b, "BHiPass4", 800.0.into(), 0.5.into(), 1.0);
         out(b, "ar", filtered);
     })]
+}
+
+fn sum() -> Vec<SynthDef> {
+    vec![
+        def("sum3_fold", vec![], |b| {
+            let (first, second) = (sine(b, "ar", 1.0), sine(b, "ar", 2.0));
+            let total = by_name(
+                b,
+                "Sum3",
+                "new",
+                &[
+                    ("in0", input(first)),
+                    ("in1", input(second)),
+                    ("in2", input(0.0)),
+                ],
+            );
+            out(b, "ar", total);
+        }),
+        def("sum4_fold", vec![], |b| {
+            let first = sine(b, "ar", 1.0);
+            let third = sine(b, "kr", 2.0);
+            let fourth = sine(b, "ar", 3.0);
+            let total = by_name(
+                b,
+                "Sum4",
+                "new",
+                &[
+                    ("in0", input(first)),
+                    ("in1", input(0.0)),
+                    ("in2", input(third)),
+                    ("in3", input(fourth)),
+                ],
+            );
+            out(b, "ar", total);
+        }),
+        def("sum3_array", vec![], |b| {
+            let pair = sines(b, "ar", &[1.0, 2.0]);
+            let (third, fourth) = (sine(b, "ar", 3.0), sine(b, "ar", 4.0));
+            let total = by_name(
+                b,
+                "Sum3",
+                "new",
+                &[
+                    ("in0", input(pair)),
+                    ("in1", input(third)),
+                    ("in2", input(fourth)),
+                ],
+            );
+            out(b, "ar", total);
+        }),
+    ]
+}
+
+/// `Mix` at the rate of `selector`, of `array`.
+fn mix_of(b: &mut SynthDefBuilder, selector: &str, array: UGenInput) -> UGenInput {
+    by_name(b, "Mix", selector, &[("array", input(array))])
+}
+
+/// `Out.ar(0, Mix(SinOsc.ar(freqs)))`.
+fn mixed_sines(name: &str, freqs: &[f64]) -> SynthDef {
+    def(name, vec![], |b| {
+        let sounds = sine(b, "ar", array(freqs));
+        let mixed = mix_of(b, "new", sounds);
+        out(b, "ar", mixed);
+    })
+}
+
+fn mix() -> Vec<SynthDef> {
+    let nine: Vec<f64> = (1..=9).map(f64::from).collect();
+    vec![
+        def("mix_1", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let mixed = mix_of(b, "new", sound);
+            out(b, "ar", mixed);
+        }),
+        mixed_sines("mix_2", &[1.0, 2.0]),
+        mixed_sines("mix_3", &[1.0, 2.0, 3.0]),
+        mixed_sines("mix_4", &[1.0, 2.0, 3.0, 4.0]),
+        mixed_sines("mix_5", &[1.0, 2.0, 3.0, 4.0, 5.0]),
+        mixed_sines("mix_9", &nine),
+        def("mix_rates3", vec![], |b| {
+            let sounds = vec![sine(b, "kr", 1.0), sine(b, "ar", 2.0), sine(b, "kr", 3.0)];
+            let mixed = mix_of(b, "new", sounds.into());
+            out(b, "ar", mixed);
+        }),
+        def("mix_rates4", vec![], |b| {
+            let sounds = vec![
+                sine(b, "kr", 1.0),
+                sine(b, "ar", 2.0),
+                sine(b, "kr", 3.0),
+                sine(b, "ar", 4.0),
+            ];
+            let mixed = mix_of(b, "new", sounds.into());
+            out(b, "ar", mixed);
+        }),
+        def("mix_numbers", vec![], |b| {
+            let pair = mix_of(b, "new", array(&[1.0, 2.0]));
+            assert_eq!(pair, 3.0.into());
+            let triple = mix_of(b, "new", array(&[1.0, 2.0, 3.0]));
+            let sound = sine(b, "kr", 1.0);
+            let channels = b
+                .binary_op("*", UGenInput::Array(vec![pair, triple]), sound)
+                .unwrap();
+            out(b, "kr", channels);
+        }),
+        def("mix_nested", vec![], |b| {
+            let pairs = vec![
+                sine(b, "ar", array(&[1.0, 2.0])),
+                sine(b, "ar", array(&[3.0, 4.0])),
+                sine(b, "ar", array(&[5.0, 6.0])),
+            ];
+            let mixed = mix_of(b, "new", pairs.into());
+            out(b, "ar", mixed);
+        }),
+        def("mix_ar", vec![], |b| {
+            let sounds = sines(b, "kr", &[1.0, 2.0]);
+            let mixed = mix_of(b, "ar", sounds);
+            out(b, "ar", mixed);
+        }),
+        def("mix_ar_number", vec![], |b| {
+            let mixed = mix_of(b, "ar", array(&[1.0, 2.0]));
+            out(b, "ar", mixed);
+        }),
+        def("mix_kr", vec![], |b| {
+            let sounds = vec![sine(b, "ar", 1.0), sine(b, "kr", 2.0)];
+            let mixed = mix_of(b, "kr", sounds.into());
+            out(b, "kr", mixed);
+        }),
+        def("mix_kr_number", vec![], |b| {
+            let mixed = mix_of(b, "kr", array(&[1.0, 2.0]));
+            out(b, "kr", mixed);
+        }),
+    ]
 }
