@@ -55,6 +55,13 @@ pub const NAMES: &[&str] = &[
     "bhipass4",
     "sum",
     "mix",
+    "numchannels",
+    "selectxfocus",
+    "multitap",
+    "splay",
+    "dynklank",
+    "dynklang",
+    "unpackfft",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where

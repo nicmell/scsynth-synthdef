@@ -4174,7 +4174,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "freqscale", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "freqoffset", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -4183,7 +4183,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "freqscale", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "freqoffset", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -4204,7 +4204,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "freqoffset", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "decayscale", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
-                addable: Addable::No("ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -4215,7 +4215,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "freqoffset", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "decayscale", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
-                addable: Addable::No("ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -12446,7 +12446,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "center", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "levelComp", kind: ArgKind::Signal, default: Some(ArgDefault::Bool(true)) },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -12457,7 +12457,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "center", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "levelComp", kind: ArgKind::Signal, default: Some(ArgDefault::Bool(true)) },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -13534,7 +13534,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "frombin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "tobin", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -14156,7 +14156,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 10] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 13] = [
     PseudoClass {
         name: "BHiPass4",
         categories: &["UGens>Filters>BEQSuite"],
@@ -14247,6 +14247,39 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 10] = [
         ],
     },
     PseudoClass {
+        name: "MultiTap",
+        categories: &["UGens>Buffer", "UGens>Delays>Buffer"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "timesArray", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "levelsArray", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "bufnum", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "NumChannels",
+        categories: &["UGens>Multichannel"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "input", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "numChannels", kind: ArgKind::Count, default: Some(ArgDefault::Float(2.0)) },
+                    ArgSpec { name: "mixdown", kind: ArgKind::Bool, default: Some(ArgDefault::Bool(true)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
         name: "PMOsc",
         categories: &["UGens>Generators>Deterministic"],
         methods: &[
@@ -14295,6 +14328,42 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 10] = [
                     ArgSpec { name: "which", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "array", kind: ArgKind::Array, default: None },
                     ArgSpec { name: "wrap", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "SelectXFocus",
+        categories: &["UGens>Multichannel>Select"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "which", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "focus", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "wrap", kind: ArgKind::Bool, default: Some(ArgDefault::Bool(false)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "which", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "focus", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "wrap", kind: ArgKind::Bool, default: Some(ArgDefault::Bool(false)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "new",
+                args: &[
+                    ArgSpec { name: "which", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "focus", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "wrap", kind: ArgKind::Bool, default: Some(ArgDefault::Bool(false)) },
                 ],
                 addable: Addable::Pseudo,
             },

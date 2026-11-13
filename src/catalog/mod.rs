@@ -114,6 +114,8 @@ pub enum ArgKind {
     Array,
     /// A symbol, such as the command name of `SendReply`.
     Symbol,
+    /// A boolean, such as `wrap` of `SelectXFocus`.
+    Bool,
 }
 
 /// The default value of an argument.

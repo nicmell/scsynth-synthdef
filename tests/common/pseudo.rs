@@ -3,7 +3,7 @@
 
 use scsynth_synthdef::{Arg, ArgValue, SynthDef, SynthDefBuilder, UGenInput};
 
-use super::{arg, array, by_name};
+use super::{arg, array, by_name, flat};
 
 /// The definitions of a golden file of the pseudo-UGens.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
@@ -22,6 +22,13 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "bhipass4" => bhipass4(),
         "sum" => sum(),
         "mix" => mix(),
+        "numchannels" => numchannels(),
+        "selectxfocus" => selectxfocus(),
+        "multitap" => multitap(),
+        "splay" => splay(),
+        "dynklank" => dynklank(),
+        "dynklang" => dynklang(),
+        "unpackfft" => unpackfft(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -568,5 +575,349 @@ fn mix() -> Vec<SynthDef> {
             let mixed = mix_of(b, "kr", array(&[1.0, 2.0]));
             out(b, "kr", mixed);
         }),
+    ]
+}
+
+/// `NumChannels.ar(input, numChannels, mixdown)`.
+fn num_channels(
+    b: &mut SynthDefBuilder,
+    input_value: UGenInput,
+    channels: f64,
+    mixdown: bool,
+) -> UGenInput {
+    by_name(
+        b,
+        "NumChannels",
+        "ar",
+        &[
+            ("input", input(input_value)),
+            ("numChannels", input(channels)),
+            ("mixdown", ArgValue::Bool(mixdown)),
+        ],
+    )
+}
+
+fn numchannels() -> Vec<SynthDef> {
+    vec![
+        def("numchannels_mix", vec![], |b| {
+            let sounds = sine(b, "ar", array(&[1.0, 2.0, 3.0, 4.0]));
+            let channels = num_channels(b, sounds, 2.0, true);
+            out(b, "ar", channels);
+        }),
+        def("numchannels_cut", vec![], |b| {
+            let sounds = sine(b, "ar", array(&[1.0, 2.0, 3.0]));
+            let channels = num_channels(b, sounds, 2.0, false);
+            out(b, "ar", channels);
+        }),
+        def("numchannels_dup", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let channels = num_channels(b, sound, 3.0, true);
+            out(b, "ar", channels);
+        }),
+        def("numchannels_one", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let channels = num_channels(b, vec![sound].into(), 1.0, true);
+            out(b, "ar", channels);
+        }),
+    ]
+}
+
+/// `SelectXFocus` at the rate of `selector`.
+fn select_x_focus(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    which: UGenInput,
+    choices: UGenInput,
+    focus: f64,
+    wrap: bool,
+) -> UGenInput {
+    by_name(
+        b,
+        "SelectXFocus",
+        selector,
+        &[
+            ("which", input(which)),
+            ("array", input(choices)),
+            ("focus", input(focus)),
+            ("wrap", ArgValue::Bool(wrap)),
+        ],
+    )
+}
+
+fn selectxfocus() -> Vec<SynthDef> {
+    vec![
+        def("selectxfocus", vec![Arg::new("which", 0.0)], |b| {
+            let which = arg(b, "which");
+            let choices = sines(b, "ar", &[1.0, 2.0, 3.0]);
+            let mixed = select_x_focus(b, "ar", which, choices, 1.0, false);
+            out(b, "ar", mixed);
+        }),
+        def("selectxfocus_wrap", vec![Arg::new("which", 0.0)], |b| {
+            let which = arg(b, "which");
+            let choices = sines(b, "ar", &[1.0, 2.0, 3.0]);
+            let mixed = select_x_focus(b, "ar", which, choices, 0.5, true);
+            out(b, "ar", mixed);
+        }),
+        def("selectxfocus_number", vec![], |b| {
+            let choices = sines(b, "kr", &[1.0, 2.0, 3.0]);
+            let mixed = select_x_focus(b, "kr", 1.25.into(), choices, 1.0, false);
+            out(b, "kr", mixed);
+        }),
+    ]
+}
+
+/// `MultiTap.ar(times, levels, SinOsc.ar(1), mul, 0, bufnum)`.
+fn multi_tap(
+    b: &mut SynthDefBuilder,
+    times: &[f64],
+    levels: &[f64],
+    mul: f64,
+    bufnum: f64,
+) -> UGenInput {
+    let sound = sine(b, "ar", 1.0);
+    by_name(
+        b,
+        "MultiTap",
+        "ar",
+        &[
+            ("timesArray", input(array(times))),
+            ("levelsArray", input(array(levels))),
+            ("in", input(sound)),
+            ("mul", input(mul)),
+            ("bufnum", input(bufnum)),
+        ],
+    )
+}
+
+fn multitap() -> Vec<SynthDef> {
+    vec![
+        def("multitap", vec![], |b| {
+            let taps = multi_tap(b, &[0.1, 0.2], &[0.5, 0.3], 1.0, 0.0);
+            out(b, "ar", taps);
+        }),
+        def("multitap_levels", vec![], |b| {
+            let taps = multi_tap(b, &[0.1, 0.2, 0.3], &[0.5], 0.5, 1.0);
+            out(b, "ar", taps);
+        }),
+    ]
+}
+
+/// `Splay` at the rate of `selector`, of `inputs`, with these arguments.
+fn splay_of(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    inputs: UGenInput,
+    args: &[(&str, ArgValue)],
+) -> UGenInput {
+    let mut all = vec![("inArray", input(inputs))];
+    all.extend(args.iter().cloned());
+    by_name(b, "Splay", selector, &all)
+}
+
+/// `Out.ar(0, Splay.ar(SinOsc.ar(freqs), args))`.
+fn splayed_sines(name: &str, freqs: &[f64], args: &[(&str, ArgValue)]) -> SynthDef {
+    def(name, vec![], |b| {
+        let sounds = sine(b, "ar", array(freqs));
+        let spread = splay_of(b, "ar", sounds, args);
+        out(b, "ar", spread);
+    })
+}
+
+fn splay() -> Vec<SynthDef> {
+    vec![
+        splayed_sines("splay_2", &[1.0, 2.0], &[]),
+        splayed_sines("splay_3", &[1.0, 2.0, 3.0], &[]),
+        def("splay_mono", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let spread = splay_of(b, "ar", sound, &[]);
+            out(b, "ar", spread);
+        }),
+        def("splay_spread", vec![Arg::new("spread", 1.0)], |b| {
+            let spread = arg(b, "spread");
+            let sounds = sine(b, "ar", array(&[1.0, 2.0, 3.0]));
+            let spread_out = splay_of(b, "ar", sounds, &[("spread", input(spread))]);
+            out(b, "ar", spread_out);
+        }),
+        def("splay_nested", vec![], |b| {
+            let pairs = vec![
+                sine(b, "ar", array(&[1.0, 2.0])),
+                sine(b, "ar", array(&[3.0, 4.0])),
+            ];
+            let spread = splay_of(b, "ar", pairs.into(), &[]);
+            out(b, "ar", UGenInput::Array(flat(spread)));
+        }),
+        def("splay_kr", vec![], |b| {
+            let sounds = sine(b, "kr", array(&[1.0, 2.0, 3.0]));
+            let spread = splay_of(b, "kr", sounds, &[]);
+            out(b, "kr", spread);
+        }),
+        def("splay_level", vec![Arg::new("level", 0.5)], |b| {
+            let level = arg(b, "level");
+            let sounds = sine(b, "ar", array(&[1.0, 2.0]));
+            let spread = splay_of(
+                b,
+                "ar",
+                sounds,
+                &[("spread", input(1.0)), ("level", input(level))],
+            );
+            out(b, "ar", spread);
+        }),
+        splayed_sines(
+            "splay_center",
+            &[1.0, 2.0],
+            &[
+                ("spread", input(0.5)),
+                ("level", input(1.0)),
+                ("center", input(0.25)),
+            ],
+        ),
+        splayed_sines(
+            "splay_levelcomp_false",
+            &[1.0, 2.0],
+            &[("levelComp", ArgValue::Bool(false))],
+        ),
+        splayed_sines(
+            "splay_levelcomp_number",
+            &[1.0, 2.0],
+            &[("levelComp", input(0.5))],
+        ),
+        def("splay_levelcomp_ugen", vec![Arg::new("lc", 0.5)], |b| {
+            let comp = arg(b, "lc");
+            let sounds = sine(b, "ar", array(&[1.0, 2.0]));
+            let spread = splay_of(b, "ar", sounds, &[("levelComp", input(comp))]);
+            out(b, "ar", spread);
+        }),
+    ]
+}
+
+/// A spec of `DynKlank` or `DynKlang`: arrays of numbers.
+fn spec(parts: &[&[f64]]) -> UGenInput {
+    UGenInput::Array(parts.iter().map(|part| array(part)).collect())
+}
+
+/// `DynKlank` at the rate of `selector`, rung by `Impulse` of `freq`.
+fn dyn_klank(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    parts: &[&[f64]],
+    freq: UGenInput,
+    scale: Option<UGenInput>,
+) -> UGenInput {
+    let trigger = by_name(b, "Impulse", selector, &[("freq", input(freq))]);
+    let mut args = vec![
+        ("specificationsArrayRef", input(spec(parts))),
+        ("input", input(trigger)),
+    ];
+    if let Some(scale) = scale {
+        args.push(("freqscale", input(scale)));
+    }
+    by_name(b, "DynKlank", selector, &args)
+}
+
+fn dynklank() -> Vec<SynthDef> {
+    vec![
+        def("dynklank_2", vec![], |b| {
+            let rings = dyn_klank(b, "ar", &[&[800.0, 1071.0]], 2.0.into(), None);
+            out(b, "ar", rings);
+        }),
+        def("dynklank_3", vec![], |b| {
+            let parts: &[&[f64]] = &[&[800.0, 1071.0, 1353.0], &[1.0], &[1.0, 1.0, 1.0]];
+            let rings = dyn_klank(b, "ar", parts, 2.0.into(), None);
+            out(b, "ar", rings);
+        }),
+        def("dynklank_amps", vec![], |b| {
+            let rings = dyn_klank(b, "ar", &[&[800.0, 1071.0], &[0.5, 0.3]], 2.0.into(), None);
+            out(b, "ar", rings);
+        }),
+        def("dynklank_scale", vec![Arg::new("scale", 1.0)], |b| {
+            let scale = arg(b, "scale");
+            let parts: &[&[f64]] = &[&[800.0, 1071.0], &[1.0], &[1.0, 2.0]];
+            let rings = dyn_klank(b, "ar", parts, 2.0.into(), Some(scale));
+            out(b, "ar", rings);
+        }),
+        def("dynklank_kr", vec![], |b| {
+            let rings = dyn_klank(b, "kr", &[&[8.0, 10.0]], 2.0.into(), None);
+            out(b, "kr", rings);
+        }),
+        def("dynklank_expand", vec![], |b| {
+            let rings = dyn_klank(b, "ar", &[&[800.0, 1071.0]], array(&[2.0, 3.0]), None);
+            out(b, "ar", rings);
+        }),
+    ]
+}
+
+/// `DynKlang` at the rate of `selector`.
+fn dyn_klang(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    parts: &[&[f64]],
+    args: &[(&str, ArgValue)],
+) -> UGenInput {
+    let mut all = vec![("specificationsArrayRef", input(spec(parts)))];
+    all.extend(args.iter().cloned());
+    by_name(b, "DynKlang", selector, &all)
+}
+
+fn dynklang() -> Vec<SynthDef> {
+    vec![
+        def("dynklang_2", vec![], |b| {
+            let sines = dyn_klang(b, "ar", &[&[800.0, 1000.0]], &[]);
+            out(b, "ar", sines);
+        }),
+        def("dynklang_amps", vec![], |b| {
+            let pi = std::f64::consts::PI;
+            let parts: &[&[f64]] = &[&[800.0, 1000.0], &[0.3, 0.3], &[pi, pi]];
+            let sines = dyn_klang(b, "ar", parts, &[]);
+            out(b, "ar", sines);
+        }),
+        def("dynklang_kr", vec![], |b| {
+            let parts: &[&[f64]] = &[&[1.0, 2.0], &[1.0], &[0.5, 0.25]];
+            let sines = dyn_klang(
+                b,
+                "kr",
+                parts,
+                &[("freqscale", input(2.0)), ("freqoffset", input(1.0))],
+            );
+            out(b, "kr", sines);
+        }),
+    ]
+}
+
+/// `Demand.kr(Impulse.kr(1), 0, UnpackFFT(FFT(0, SinOsc.ar(1)), bufsize, args))`.
+fn unpacked(name: &str, bufsize: f64, args: &[(&str, ArgValue)]) -> SynthDef {
+    def(name, vec![], |b| {
+        let sound = sine(b, "ar", 1.0);
+        let chain = by_name(
+            b,
+            "FFT",
+            "new",
+            &[("buffer", input(0.0)), ("in", input(sound))],
+        );
+        let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+        let mut all = vec![("chain", input(chain)), ("bufsize", input(bufsize))];
+        all.extend(args.iter().cloned());
+        let bins = by_name(b, "UnpackFFT", "new", &all);
+        let demand = by_name(
+            b,
+            "Demand",
+            "kr",
+            &[
+                ("trig", input(trig)),
+                ("reset", input(0.0)),
+                ("demandUGens", input(bins)),
+            ],
+        );
+        out(b, "kr", demand);
+    })
+}
+
+fn unpackfft() -> Vec<SynthDef> {
+    vec![
+        unpacked(
+            "unpackfft",
+            16.0,
+            &[("frombin", input(0.0)), ("tobin", input(2.0))],
+        ),
+        unpacked("unpackfft_default", 4.0, &[]),
     ]
 }

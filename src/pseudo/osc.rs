@@ -1,5 +1,6 @@
 //! The pseudo-UGens of `Osc.sc`.
 
+use super::mix::mix;
 use super::{Args, lang, number};
 use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
@@ -39,6 +40,33 @@ pub(super) fn select_x(
             ("pan", pan.into()),
         ],
     )
+}
+
+/// `SelectXFocus.new`, `.ar` and `.kr`: each input weighted by
+/// `(1 - distance * focus).max(0)`, where `distance` is `absdif(which, i)`,
+/// or `moddif(which, i, size)` when `wrap`, then `Mix`.
+pub(super) fn select_x_focus(
+    builder: &mut SynthDefBuilder,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let which = args.input("which")?;
+    let array = args.array("array")?;
+    let focus = args.input("focus")?;
+    let wrap = args.boolean("wrap")?;
+    let size = number(array.len());
+    let mut weighted = Vec::with_capacity(array.len());
+    for (index, input) in array.into_iter().enumerate() {
+        let distance = if wrap {
+            lang::moddif(builder, which.clone(), number(index), size.clone())?
+        } else {
+            lang::binary(builder, "absdif", which.clone(), number(index))?
+        };
+        let scaled = lang::binary(builder, "*", distance, focus.clone())?;
+        let weight = lang::binary(builder, "-", 1.0.into(), scaled)?;
+        let clipped = lang::binary(builder, "max", weight, 0.0.into())?;
+        weighted.push(lang::binary(builder, "*", clipped, input)?);
+    }
+    mix(builder, &weighted)
 }
 
 /// `TChoose.ar` and `TChoose.kr`: a `Select` of `array` by a `TIRand` from 0

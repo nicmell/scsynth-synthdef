@@ -95,6 +95,52 @@ fn mix_gives_0_for_no_input_and_refuses_a_mix_at_demand_rate() {
 }
 
 #[test]
+fn the_second_wave_refuses_what_sclang_refuses() {
+    let mut b = builder();
+    let x = b.arguments()[0].clone();
+    let wrap = b.ugen(
+        "SelectXFocus",
+        "kr",
+        &[
+            ("which", input(x.clone())),
+            ("array", input(vec![x.clone(), 2.0.into()])),
+            ("wrap", input(1.0)),
+        ],
+    );
+    assert!(
+        matches!(&wrap, Err(BuildError::WrongKind { argument, .. }) if argument == "wrap"),
+        "{wrap:?}"
+    );
+    let empty = b.ugen("NumChannels", "ar", &[("input", input(Vec::new()))]);
+    assert!(
+        matches!(empty, Err(BuildError::EmptyInput { .. })),
+        "{empty:?}"
+    );
+    let bufsize = b.ugen(
+        "UnpackFFT",
+        "new",
+        &[("chain", input(x.clone())), ("bufsize", input(x.clone()))],
+    );
+    assert!(
+        matches!(&bufsize, Err(BuildError::WrongKind { argument, .. }) if argument == "bufsize"),
+        "{bufsize:?}"
+    );
+    let bufnum = b.ugen(
+        "MultiTap",
+        "ar",
+        &[
+            ("timesArray", input(vec![0.1.into()])),
+            ("levelsArray", input(vec![1.0.into()])),
+            ("in", input(x)),
+        ],
+    );
+    assert!(
+        matches!(&bufnum, Err(BuildError::MissingArgument { argument, .. }) if argument == "bufnum"),
+        "{bufnum:?}"
+    );
+}
+
+#[test]
 fn a_ugen_refuses_a_boolean() {
     let mut b = builder();
     let refused = b.ugen("SinOsc", "ar", &[("freq", ArgValue::Bool(true))]);

@@ -6,13 +6,16 @@ mod basic_ops;
 mod beq_suite;
 mod buf_io;
 mod demand;
+mod fft_unpacking;
 mod filter;
+mod fsin_osc;
 pub(crate) mod lang;
 mod line;
 mod mix;
 mod osc;
 mod pm_osc;
 mod sound_in;
+mod splay;
 
 use crate::builder::{SynthDefBuilder, count_to_usize};
 use crate::catalog::RateMethod;
@@ -49,6 +52,32 @@ impl Args {
         match self.value(name)? {
             ArgValue::Input(input) => Ok(input),
             _ => Err(self.wrong_kind(name, "a number or an output")),
+        }
+    }
+
+    /// The input of the argument `name`, or none for an argument whose
+    /// default is nil.
+    pub(crate) fn optional(&self, name: &str) -> Result<Option<UGenInput>, BuildError> {
+        match self.slot(name)? {
+            None => Ok(None),
+            Some(ArgValue::Input(input)) => Ok(Some(input.clone())),
+            Some(_) => Err(self.wrong_kind(name, "a number or an output")),
+        }
+    }
+
+    /// The number of the argument `name`.
+    pub(crate) fn constant(&self, name: &str) -> Result<f64, BuildError> {
+        match self.value(name)? {
+            ArgValue::Input(UGenInput::Number(number)) => Ok(number),
+            _ => Err(self.wrong_kind(name, "a number")),
+        }
+    }
+
+    /// The boolean of the argument `name`.
+    pub(crate) fn boolean(&self, name: &str) -> Result<bool, BuildError> {
+        match self.value(name)? {
+            ArgValue::Bool(value) => Ok(value),
+            _ => Err(self.wrong_kind(name, "a boolean")),
         }
     }
 
@@ -109,17 +138,28 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("Changed", "ar", filter::changed),
     ("Changed", "kr", filter::changed),
     ("Dstutter", "new", demand::dstutter),
+    ("DynKlang", "ar", fsin_osc::dyn_klang),
+    ("DynKlang", "kr", fsin_osc::dyn_klang),
+    ("DynKlank", "ar", fsin_osc::dyn_klank),
+    ("DynKlank", "kr", fsin_osc::dyn_klank),
     ("LinLin", "ar", line::lin_lin_ar),
     ("LinLin", "kr", line::lin_lin_kr),
     ("Mix", "ar", mix::mix_ar),
     ("Mix", "kr", mix::mix_kr),
     ("Mix", "new", mix::mix_new),
+    ("MultiTap", "ar", pm_osc::multi_tap),
+    ("NumChannels", "ar", mix::num_channels),
     ("PMOsc", "ar", pm_osc::pm_osc),
     ("PMOsc", "kr", pm_osc::pm_osc),
     ("SelectX", "ar", osc::select_x),
     ("SelectX", "kr", osc::select_x),
+    ("SelectXFocus", "ar", osc::select_x_focus),
+    ("SelectXFocus", "kr", osc::select_x_focus),
+    ("SelectXFocus", "new", osc::select_x_focus),
     ("Silent", "ar", line::silent),
     ("SoundIn", "ar", sound_in::sound_in),
+    ("Splay", "ar", splay::splay),
+    ("Splay", "kr", splay::splay),
     ("Sum3", "new", basic_ops::sum3),
     ("Sum4", "new", basic_ops::sum4),
     ("TChoose", "ar", osc::t_choose),
@@ -127,6 +167,7 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("TWChoose", "ar", osc::tw_choose),
     ("TWChoose", "kr", osc::tw_choose),
     ("Tap", "ar", buf_io::tap),
+    ("UnpackFFT", "new", fft_unpacking::unpack_fft),
 ];
 
 /// Runs the body of the method `method` of `class` on its bound arguments.
@@ -153,6 +194,14 @@ pub(crate) fn build(
             values,
         },
     )
+}
+
+/// The elements of an array, or the value itself as an array of one.
+pub(crate) fn elements(value: UGenInput) -> Vec<UGenInput> {
+    match value {
+        UGenInput::Array(items) => items,
+        other => vec![other],
+    }
 }
 
 /// A number of elements as a number of sclang.

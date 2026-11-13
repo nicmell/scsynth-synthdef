@@ -3,7 +3,7 @@
 //! the shorter of two arrays wraps. Anything else goes to `BinaryOpUGen.new`
 //! or `UnaryOpUGen.new`.
 
-use crate::builder::SynthDefBuilder;
+use crate::builder::{NewUGen, SynthDefBuilder};
 use crate::error::BuildError;
 use crate::rate::{Rate, least_by_name};
 use crate::ugen_input::UGenInput;
@@ -79,6 +79,110 @@ pub(crate) fn rate(value: &UGenInput) -> Option<Rate> {
         UGenInput::Array(items) => {
             least_by_name(items.iter().map(|item| rate(item).unwrap_or(Rate::Scalar)))
         }
+    }
+}
+
+/// `x.clip(lo, hi)`: `sc_clip` of a number, a `Clip` at the rate of a UGen,
+/// or `max(lo, min(hi, x))` at demand rate. An array clips element by
+/// element.
+pub(crate) fn clip(
+    builder: &mut SynthDefBuilder,
+    x: UGenInput,
+    lo: f64,
+    hi: f64,
+) -> Result<UGenInput, BuildError> {
+    match x {
+        UGenInput::Number(number) => {
+            let below = if hi < number { hi } else { number };
+            Ok(UGenInput::Number(if below < lo { lo } else { below }))
+        }
+        UGenInput::Array(items) if !items.is_empty() => items
+            .into_iter()
+            .map(|item| clip(builder, item, lo, hi))
+            .collect::<Result<_, _>>()
+            .map(UGenInput::Array),
+        UGenInput::Output(output) if output.rate() == Rate::Demand => {
+            let below = binary(builder, "min", hi.into(), output.into())?;
+            binary(builder, "max", lo.into(), below)
+        }
+        other => {
+            let selector = selector_for_rate(rate(&other).unwrap_or(Rate::Scalar));
+            builder.ugen(
+                "Clip",
+                selector,
+                &[("in", other.into()), ("lo", lo.into()), ("hi", hi.into())],
+            )
+        }
+    }
+}
+
+/// `x.moddif(y, mod)`. For a number, `SimpleNumber:moddif`:
+/// `mod * 0.5 - absdif(absdif(x, y) % mod, mod * 0.5)`. For a UGen, a
+/// `ModDif` at its rate. An array goes element by element, and the shorter
+/// array wraps.
+pub(crate) fn moddif(
+    builder: &mut SynthDefBuilder,
+    x: UGenInput,
+    y: UGenInput,
+    modulus: UGenInput,
+) -> Result<UGenInput, BuildError> {
+    match x {
+        UGenInput::Number(_) => {
+            let distance = binary(builder, "absdif", x, y)?;
+            let reduced = binary(builder, "mod", distance, modulus.clone())?;
+            let half = binary(builder, "*", modulus, 0.5.into())?;
+            let gap = binary(builder, "absdif", reduced, half.clone())?;
+            binary(builder, "-", half, gap)
+        }
+        UGenInput::Array(ref items) if !items.is_empty() => {
+            let size = [&x, &y, &modulus]
+                .iter()
+                .filter_map(|value| match value {
+                    UGenInput::Array(items) => Some(items.len()),
+                    _ => None,
+                })
+                .max()
+                .unwrap_or(1);
+            (0..size)
+                .map(|index| {
+                    let at = |value: &UGenInput| element(value, index);
+                    moddif(builder, at(&x), at(&y), at(&modulus))
+                })
+                .collect::<Result<_, _>>()
+                .map(UGenInput::Array)
+        }
+        UGenInput::Output(output) if output.rate() == Rate::Demand => builder.expand(
+            "ModDif",
+            &["x", "y", "mod"],
+            &[x, y, modulus],
+            true,
+            &mut |builder, instance| {
+                builder.add(NewUGen::new("ModDif", Rate::Demand).inputs(instance.to_vec()))
+            },
+        ),
+        other => {
+            let selector = selector_for_rate(rate(&other).unwrap_or(Rate::Scalar));
+            builder.ugen(
+                "ModDif",
+                selector,
+                &[
+                    ("x", other.into()),
+                    ("y", y.into()),
+                    ("mod", modulus.into()),
+                ],
+            )
+        }
+    }
+}
+
+/// `methodSelectorForRate` of a class that answers `ir`, as `Clip` and
+/// `ModDif` do.
+pub(crate) fn selector_for_rate(rate: Rate) -> &'static str {
+    match rate {
+        Rate::Audio => "ar",
+        Rate::Control => "kr",
+        Rate::Scalar => "ir",
+        Rate::Demand => "new",
     }
 }
 
@@ -202,7 +306,9 @@ fn fold(input: f64, lo: f64, hi: f64) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{number_binary, number_unary};
+    use super::{clip, moddif, number_binary, number_unary};
+    use crate::builder::SynthDefBuilder;
+    use crate::ugen_input::UGenInput;
     use serde_json::Value;
 
     const TABLE: &str = include_str!("../../tests/fixtures/arithmetic.json");
@@ -253,5 +359,33 @@ mod tests {
             );
         }
         assert_eq!(rows(&table, "unary").len(), 54);
+    }
+
+    #[test]
+    fn clip_and_moddif_of_numbers_compute_as_sclang_computes_them() {
+        let table: Value = serde_json::from_str(TABLE).expect("the table is JSON");
+        let mut builder = SynthDefBuilder::new("arithmetic", vec![]).expect("a build");
+        let number = |value: UGenInput| match value {
+            UGenInput::Number(number) => number,
+            other => panic!("{other:?} is not a number"),
+        };
+        for row in rows(&table, "clip") {
+            let [x, lo, hi, expected] = [0, 1, 2, 3].map(|column| float(&row[column]));
+            let computed = number(clip(&mut builder, x.into(), lo, hi).expect("clip computes"));
+            assert!(
+                same("clip", computed, expected),
+                "{x}.clip({lo}, {hi}): {computed}"
+            );
+        }
+        for row in rows(&table, "moddif") {
+            let [x, y, modulus, expected] = [0, 1, 2, 3].map(|column| float(&row[column]));
+            let computed = moddif(&mut builder, x.into(), y.into(), modulus.into());
+            let computed = number(computed.expect("moddif computes"));
+            assert!(
+                same("moddif", computed, expected),
+                "{x}.moddif({y}, {modulus}): {computed}"
+            );
+        }
+        assert_eq!(builder.finish().expect("an empty build").children.len(), 0);
     }
 }

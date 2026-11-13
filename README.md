@@ -232,8 +232,17 @@ assert_eq!(builder.ugen("LinLin", "kr", &args)?, UGenInput::Number(15.0));
   give a number, in f64, as sclang computes its Floats. An array goes
   element by element. Anything else goes to `binary_op` and `unary_op`.
 - The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `Dstutter`,
-  `LinLin`, `Mix`, `PMOsc`, `SelectX`, `Silent`, `SoundIn`, `TChoose`,
-  `TWChoose` and `Tap`.
+  `DynKlang`, `DynKlank`, `LinLin`, `Mix`, `MultiTap`, `NumChannels` and
+  `PMOsc`.
+- It also builds `SelectX`, `SelectXFocus`, `Silent`, `SoundIn`, `Splay`,
+  `TChoose`, `TWChoose`, `Tap` and `UnpackFFT`.
+- `Splay`, `DynKlank` and `DynKlang` expand before their body, as their
+  `multiNew` or `multiNewList` does. `Splay` expands over each element of
+  `inArray` too, so an array of stereo pairs makes one Splay for each
+  channel.
+- The spec of `DynKlank` and `DynKlang` is an array of up to three arrays,
+  as `[freqs, amps, times]`. A missing array takes its default. Where sclang
+  takes nil in the middle, give the default, such as `[1.0]`.
 - `Sum3.new` and `Sum4.new` have a body too. An input of 0 folds the UGen
   into a smaller sum. Then the UGen takes the least rate of its inputs by
   name. It orders its inputs as the insertion sort of sclang does, which
@@ -303,10 +312,8 @@ it.
 `tests/readme.rs` keeps this list equal to the catalogue.
 
 - These pseudo-UGens wait for a later version: `CompanderD.ar`,
-  `Dunique.new`, `DynKlang.ar`, `DynKlang.kr`, `DynKlank.ar`,
-  `DynKlank.kr` and `HilbertFIR.ar`.
-- So do `InBus.ar`, `InBus.kr`, `Splay.ar`, `Splay.kr`, `SplayAz.ar`,
-  `SplayAz.kr` and `UnpackFFT.new`.
+  `Dunique.new`, `HilbertFIR.ar`, `InBus.ar`, `InBus.kr`, `SplayAz.ar` and
+  `SplayAz.kr`.
 - The Lag family returns its input for a number or a lag of 0: `Lag.ar`,
   `Lag.kr`, `Lag2.ar`, `Lag2.kr`, `Lag2UD.ar`, `Lag2UD.kr`, `Lag3.ar`,
   `Lag3.kr`, `Lag3UD.ar` and `Lag3UD.kr`.
@@ -440,6 +447,8 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   refuses the output.
 - The warnings of `Dstutter` and `Mix.kr`: the crate does no I/O, and
   builds the same graph.
+- An array of specs for `DynKlank` and `DynKlang`: sclang expands it, as an
+  array of `Ref`s. `ugen` takes one spec.
 
 ## Left out
 

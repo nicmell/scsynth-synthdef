@@ -11036,8 +11036,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -11062,8 +11061,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"
+          "addable": "pseudo"
         }
       ]
     },
@@ -11117,8 +11115,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -11155,8 +11152,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"
+          "addable": "pseudo"
         }
       ]
     },
@@ -33111,8 +33107,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -33151,8 +33146,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -35975,8 +35969,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -38022,6 +38015,90 @@
       ]
     },
     {
+      "name": "MultiTap",
+      "categories": [
+        "UGens>Buffer",
+        "UGens>Delays>Buffer"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "timesArray",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "levelsArray",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "NumChannels",
+      "categories": [
+        "UGens>Multichannel"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "input",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "numChannels",
+              "kind": "count",
+              "default": {
+                "float": 2
+              }
+            },
+            {
+              "name": "mixdown",
+              "kind": "bool",
+              "default": {
+                "bool": true
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "PMOsc",
       "categories": [
         "UGens>Generators>Deterministic"
@@ -38164,6 +38241,104 @@
               "kind": "signal",
               "default": {
                 "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "SelectXFocus",
+      "categories": [
+        "UGens>Multichannel>Select"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "focus",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "wrap",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "focus",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "wrap",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "focus",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "wrap",
+              "kind": "bool",
+              "default": {
+                "bool": false
               }
             }
           ],

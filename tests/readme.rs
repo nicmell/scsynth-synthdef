@@ -47,5 +47,5 @@ fn the_readme_lists_every_method_that_ugen_refuses() {
         extra.is_empty() && missing.is_empty(),
         "listed but addable: {extra:?}; refused but not listed: {missing:?}"
     );
-    assert_eq!(refused.len(), 98);
+    assert_eq!(refused.len(), 91);
 }

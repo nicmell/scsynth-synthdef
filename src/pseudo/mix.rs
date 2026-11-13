@@ -48,6 +48,45 @@ pub(super) fn mix_kr(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenI
     }
 }
 
+/// `NumChannels.ar`: `input` in `numChannels` clumps, each mixed, or cut to
+/// its first channel when `mixdown` is false. A single input repeats.
+pub(super) fn num_channels(
+    builder: &mut SynthDefBuilder,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let input = args.input("input")?;
+    let channels = args.count("numChannels")?;
+    let mixdown = args.boolean("mixdown")?;
+    let single = match input {
+        UGenInput::Array(items) if items.len() > 1 => {
+            let mut clumps = Vec::new();
+            for clump in items.chunks(items.len().div_ceil(channels)) {
+                clumps.push(if clump.len() > 1 && mixdown {
+                    mix(builder, clump)?
+                } else {
+                    clump[0].clone()
+                });
+            }
+            return Ok(UGenInput::Array(clumps));
+        }
+        UGenInput::Array(items) => {
+            items
+                .into_iter()
+                .next()
+                .ok_or_else(|| BuildError::EmptyInput {
+                    ugen: "NumChannels".to_owned(),
+                    argument: "input".to_owned(),
+                })?
+        }
+        other => other,
+    };
+    Ok(if channels == 1 {
+        single
+    } else {
+        UGenInput::Array(vec![single; channels])
+    })
+}
+
 /// `Mix.new` of an array: a `Sum4`, a `Sum3` or the `sum` of each clump of
 /// 4, and again until fewer than four mixes are left.
 pub(super) fn mix(

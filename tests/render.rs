@@ -126,6 +126,7 @@ fn kind(value: &Value) -> &'static str {
         "count" => "ArgKind::Count",
         "array" => "ArgKind::Array",
         "symbol" => "ArgKind::Symbol",
+        "bool" => "ArgKind::Bool",
         other => panic!("{other} is no kind of argument"),
     }
 }
