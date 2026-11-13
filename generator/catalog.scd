@@ -155,21 +155,18 @@ var argumentKinds = [
 ];
 // The census of the pseudo-UGens: classes whose rate methods build other
 // UGens. The crate has a body for each rate method of a class of bodies.
-var bodies = [\BHiPass4, \BLowPass4, \Changed, \Dstutter, \DynKlang, \DynKlank,
-	\LinLin, \Mix, \MultiTap, \NumChannels, \PMOsc, \SelectX, \SelectXFocus, \Silent,
-	\SoundIn, \Splay, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \UnpackFFT];
+var bodies = [\BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter, \DynKlang,
+	\DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \Mix, \MultiTap, \NumChannels, \PMOsc,
+	\SelectX, \SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz, \Sum3, \Sum4,
+	\TChoose, \TWChoose, \Tap, \UnpackFFT];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
-	[\CompanderD, "step 7 of the plan of 0.3"],
 	[\Dunique, "needs LocalBuf: item 3 of Left out"],
 	[\EnvGate, "needs NamedControl and Env: items 4 and 5 of Left out"],
-	[\HilbertFIR, "step 7 of the plan of 0.3"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
-	[\LinSelectX, "step 7 of the plan of 0.3"],
 	[\NamedControl, "a control: item 4 of Left out"],
 	[\PingPong, "needs LocalIn and the rule of BufWr: items 3 and 6 of Left out"],
-	[\SplayAz, "step 7 of the plan of 0.3"],
 	[\SplayZ, "deprecated since 3.10"],
 	[\XIn, "a helper of InBus"],
 	[\XInFeedback, "a helper of InBus"]

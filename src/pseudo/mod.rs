@@ -5,10 +5,12 @@
 mod basic_ops;
 mod beq_suite;
 mod buf_io;
+mod compander;
 mod demand;
 mod fft_unpacking;
 mod filter;
 mod fsin_osc;
+mod hilbert;
 pub(crate) mod lang;
 mod line;
 mod mix;
@@ -137,13 +139,17 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("BLowPass4", "ar", beq_suite::b_low_pass4),
     ("Changed", "ar", filter::changed),
     ("Changed", "kr", filter::changed),
+    ("CompanderD", "ar", compander::compander_d),
     ("Dstutter", "new", demand::dstutter),
     ("DynKlang", "ar", fsin_osc::dyn_klang),
     ("DynKlang", "kr", fsin_osc::dyn_klang),
     ("DynKlank", "ar", fsin_osc::dyn_klank),
     ("DynKlank", "kr", fsin_osc::dyn_klank),
+    ("HilbertFIR", "ar", hilbert::hilbert_fir),
     ("LinLin", "ar", line::lin_lin_ar),
     ("LinLin", "kr", line::lin_lin_kr),
+    ("LinSelectX", "ar", osc::lin_select_x),
+    ("LinSelectX", "kr", osc::lin_select_x),
     ("Mix", "ar", mix::mix_ar),
     ("Mix", "kr", mix::mix_kr),
     ("Mix", "new", mix::mix_new),
@@ -160,6 +166,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("SoundIn", "ar", sound_in::sound_in),
     ("Splay", "ar", splay::splay),
     ("Splay", "kr", splay::splay),
+    ("SplayAz", "ar", splay::splay_az),
+    ("SplayAz", "kr", splay::splay_az),
     ("Sum3", "new", basic_ops::sum3),
     ("Sum4", "new", basic_ops::sum4),
     ("TChoose", "ar", osc::t_choose),

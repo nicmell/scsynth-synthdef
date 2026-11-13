@@ -72,6 +72,105 @@ fn splay_new1(
     lang::binary(builder, "*", mixed, level)
 }
 
+/// `SplayAz.ar` and `SplayAz.kr`: a `PanAz` for each input, at positions
+/// spread around `center`, then a `Mix` for each of the `numChans`
+/// channels.
+pub(super) fn splay_az(
+    builder: &mut SynthDefBuilder,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let inputs = args.array("inArray")?;
+    let n = inputs.len().max(1);
+    let fraction = lang::binary(builder, "/", number(n - 1), number(n))?;
+    let norm_spread = lang::binary(builder, "*", fraction, args.input("spread")?)?;
+    let center = args.input("center")?;
+    let positions = if n == 1 {
+        center
+    } else {
+        let low = lang::binary(builder, "-", center.clone(), norm_spread.clone())?;
+        let high = lang::binary(builder, "+", center, norm_spread)?;
+        resamp1(builder, &[low, high], n)?
+    };
+    let selector = args.selector();
+    let comp = level_comp_new(builder, &args.value("levelComp")?, selector == "ar", n)?;
+    let level = lang::binary(builder, "*", args.input("level")?, comp)?;
+    let pans = builder.ugen(
+        "PanAz",
+        selector,
+        &[
+            ("numChans", args.value("numChans")?),
+            ("in", UGenInput::Array(inputs).into()),
+            ("pos", positions.into()),
+            ("level", level.into()),
+            ("width", args.value("width")?),
+            ("orientation", args.value("orientation")?),
+        ],
+    )?;
+    let mut channels = Vec::new();
+    for channel in flop(&elements(pans)) {
+        channels.push(mix(builder, &channel)?);
+    }
+    Ok(UGenInput::Array(channels))
+}
+
+/// `resamp1`: `size` values that blend the neighbours of `values` from the
+/// first to the last, as `blendAt` does.
+fn resamp1(
+    builder: &mut SynthDefBuilder,
+    values: &[UGenInput],
+    size: usize,
+) -> Result<UGenInput, BuildError> {
+    let factor = float(values.len() - 1) / float((size - 1).max(1));
+    (0..size)
+        .map(|i| {
+            let index = float(i) * factor;
+            let low = index.ceil() - 1.0;
+            let (a, b) = (clip_at(values, low), clip_at(values, low + 1.0));
+            lang::blend(builder, a, b, (index - low).abs())
+        })
+        .collect::<Result<_, _>>()
+        .map(UGenInput::Array)
+}
+
+/// `clipAt`: the element at `position`, a whole number, within the bounds of
+/// `values`.
+#[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+fn clip_at(values: &[UGenInput], position: f64) -> UGenInput {
+    let index = if position <= 0.0 {
+        0
+    } else {
+        position as usize
+    };
+    values[index.min(values.len() - 1)].clone()
+}
+
+fn float(count: usize) -> f64 {
+    f64::from(u32::try_from(count).unwrap_or(u32::MAX))
+}
+
+/// `flop`: the transpose of an array of arrays, where a value that is not an
+/// array counts as an array of one.
+fn flop(rows: &[UGenInput]) -> Vec<Vec<UGenInput>> {
+    let width = rows
+        .iter()
+        .map(|row| match row {
+            UGenInput::Array(items) => items.len(),
+            _ => 1,
+        })
+        .max()
+        .unwrap_or(0);
+    (0..width)
+        .map(|column| {
+            rows.iter()
+                .map(|row| match row {
+                    UGenInput::Array(items) => items[column % items.len()].clone(),
+                    other => other.clone(),
+                })
+                .collect()
+        })
+        .collect()
+}
+
 /// `LevelComp.new`: the factor of the level of `n` inputs. `true` gives the
 /// equal power of audio rate or the equal amplitude of control rate, `false`
 /// gives 1, and a number or a UGen is the exponent of `n.reciprocal`.

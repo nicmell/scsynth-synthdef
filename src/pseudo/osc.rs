@@ -12,6 +12,23 @@ pub(super) fn select_x(
     builder: &mut SynthDefBuilder,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
+    select_between(builder, args, "XFade2")
+}
+
+/// `LinSelectX.ar` and `LinSelectX.kr`: `SelectX` with a `LinXFade2`.
+pub(super) fn lin_select_x(
+    builder: &mut SynthDefBuilder,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    select_between(builder, args, "LinXFade2")
+}
+
+/// `SelectX:new1`, with `crossfade` as its `crossfadeClass`.
+fn select_between(
+    builder: &mut SynthDefBuilder,
+    args: &Args,
+    crossfade: &str,
+) -> Result<UGenInput, BuildError> {
     let selector = args.selector();
     let which = args.input("which")?;
     let array = args.value("array")?;
@@ -32,7 +49,7 @@ pub(super) fn select_x(
     let centered = lang::binary(builder, "-", doubled, 1.0.into())?;
     let pan = lang::binary(builder, "fold2", centered, 1.0.into())?;
     builder.ugen(
-        "XFade2",
+        crossfade,
         selector,
         &[
             ("inA", first.into()),

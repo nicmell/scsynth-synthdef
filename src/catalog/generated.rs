@@ -2593,7 +2593,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -6252,7 +6252,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "buffer", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -13604,7 +13604,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "orientation", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
                     ArgSpec { name: "levelComp", kind: ArgKind::Signal, default: Some(ArgDefault::Bool(true)) },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -13618,7 +13618,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "orientation", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
                     ArgSpec { name: "levelComp", kind: ArgKind::Signal, default: Some(ArgDefault::Bool(true)) },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -15407,7 +15407,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 13] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 14] = [
     PseudoClass {
         name: "BHiPass4",
         categories: &["UGens>Filters>BEQSuite"],
@@ -15465,6 +15465,30 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 13] = [
                     ArgSpec { name: "srchi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "dstlo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "dsthi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(2.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "LinSelectX",
+        categories: &["UGens>Multichannel>Select"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "which", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "wrap", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "which", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "wrap", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
                 addable: Addable::Pseudo,
             },

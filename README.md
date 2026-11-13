@@ -235,11 +235,11 @@ assert_eq!(builder.ugen("LinLin", "kr", &args)?, UGenInput::Number(15.0));
 - A body computes with its arguments as the language does. Two numbers
   give a number, in f64, as sclang computes its Floats. An array goes
   element by element. Anything else goes to `binary_op` and `unary_op`.
-- The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `Dstutter`,
-  `DynKlang`, `DynKlank`, `LinLin`, `Mix`, `MultiTap`, `NumChannels` and
-  `PMOsc`.
-- It also builds `SelectX`, `SelectXFocus`, `Silent`, `SoundIn`, `Splay`,
-  `TChoose`, `TWChoose`, `Tap` and `UnpackFFT`.
+- The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `CompanderD`,
+  `Dstutter`, `DynKlang`, `DynKlank`, `HilbertFIR`, `LinLin`, `LinSelectX`,
+  `Mix`, `MultiTap` and `NumChannels`.
+- It also builds `PMOsc`, `SelectX`, `SelectXFocus`, `Silent`, `SoundIn`,
+  `Splay`, `SplayAz`, `TChoose`, `TWChoose`, `Tap` and `UnpackFFT`.
 - `Splay`, `DynKlank` and `DynKlang` expand before their body, as their
   `multiNew` or `multiNewList` does. `Splay` expands over each element of
   `inArray` too, so an array of stereo pairs makes one Splay for each
@@ -291,7 +291,7 @@ two instances, instance i with element i. An array inside an array must
 make three. 552 of the 635 methods are addable with a wiring, and the
 pseudo-UGens have a body. Most of the others do more than `UGen:new1` does:
 
-- The pseudo-UGens that wait for a later version, such as `SplayAz`, create
+- The pseudo-UGens without a body, such as `Dunique`, create
   no instance of their class.
 - If its input is a number or its lag is 0, the Lag family returns the
   input.
@@ -316,9 +316,8 @@ it.
 
 `tests/readme.rs` keeps this list equal to the catalogue.
 
-- These pseudo-UGens wait for a later version: `CompanderD.ar`,
-  `Dunique.new`, `HilbertFIR.ar`, `InBus.ar`, `InBus.kr`, `SplayAz.ar` and
-  `SplayAz.kr`.
+- These pseudo-UGens have no body. `Dunique.new` needs `LocalBuf`, and
+  `InBus.ar` and `InBus.kr` read a `Bus` of sclang.
 - The Lag family returns its input for a number or a lag of 0: `Lag.ar`,
   `Lag.kr`, `Lag2.ar`, `Lag2.kr`, `Lag2UD.ar`, `Lag2UD.kr`, `Lag3.ar`,
   `Lag3.kr`, `Lag3UD.ar` and `Lag3UD.kr`.
@@ -448,6 +447,10 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   builds the same graph.
 - An array of specs for `DynKlank` and `DynKlang`: sclang expands it, as an
   array of `Ref`s. `ugen` takes one spec.
+- A `spread` or a `center` of `SplayAz` at scalar rate: the `blend` of its
+  positions builds a `LinXFade2` outside the graph of sclang.
+  `BuildError::UnsupportedRate` refuses it, and a demand rate too, where
+  sclang throws.
 
 ## Left out
 

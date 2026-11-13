@@ -31,6 +31,10 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "unpackfft" => unpackfft(),
         "delays" => delays(),
         "linxfade2" => linxfade2(),
+        "companderd" => companderd(),
+        "hilbertfir" => hilbertfir(),
+        "linselectx" => linselectx(),
+        "splayaz" => splayaz(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1062,6 +1066,123 @@ fn linxfade2() -> Vec<SynthDef> {
             let level = arg(b, "level");
             let faded = lin_x_fade2(b, "ar", 0.0, Some(level));
             out(b, "ar", faded);
+        }),
+    ]
+}
+
+fn companderd() -> Vec<SynthDef> {
+    vec![
+        def("companderd", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let compressed = by_name(b, "CompanderD", "ar", &[("in", input(sound))]);
+            out(b, "ar", compressed);
+        }),
+        def("companderd_number", vec![], |b| {
+            let compressed = by_name(
+                b,
+                "CompanderD",
+                "ar",
+                &[
+                    ("in", input(0.5)),
+                    ("thresh", input(0.4)),
+                    ("slopeBelow", input(1.0)),
+                    ("slopeAbove", input(0.5)),
+                    ("clampTime", input(0.02)),
+                    ("relaxTime", input(0.1)),
+                    ("mul", input(0.5)),
+                ],
+            );
+            out(b, "ar", compressed);
+        }),
+    ]
+}
+
+fn hilbertfir() -> Vec<SynthDef> {
+    vec![def("hilbertfir", vec![], |b| {
+        let sound = sine(b, "ar", 1.0);
+        let pair = by_name(
+            b,
+            "HilbertFIR",
+            "ar",
+            &[("in", input(sound)), ("buffer", input(0.0))],
+        );
+        out(b, "ar", pair);
+    })]
+}
+
+fn linselectx() -> Vec<SynthDef> {
+    vec![
+        def("linselectx_ar", vec![Arg::new("which", 0.0)], |b| {
+            let which = arg(b, "which");
+            let choices = sines(b, "ar", &[1.0, 2.0, 3.0]);
+            let mixed = by_name(
+                b,
+                "LinSelectX",
+                "ar",
+                &[("which", input(which)), ("array", input(choices))],
+            );
+            out(b, "ar", mixed);
+        }),
+        def("linselectx_kr", vec![], |b| {
+            let choices = sines(b, "kr", &[1.0, 2.0]);
+            let mixed = by_name(
+                b,
+                "LinSelectX",
+                "kr",
+                &[("which", input(0.5)), ("array", input(choices))],
+            );
+            out(b, "kr", mixed);
+        }),
+    ]
+}
+
+/// `SplayAz` at the rate of `selector`, with these arguments.
+fn splay_az(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    channels: f64,
+    inputs: UGenInput,
+    args: &[(&str, ArgValue)],
+) -> UGenInput {
+    let mut all = vec![("numChans", input(channels)), ("inArray", input(inputs))];
+    all.extend(args.iter().cloned());
+    by_name(b, "SplayAz", selector, &all)
+}
+
+fn splayaz() -> Vec<SynthDef> {
+    vec![
+        def("splayaz_3", vec![], |b| {
+            let sounds = sine(b, "ar", array(&[1.0, 2.0, 3.0]));
+            let spread = splay_az(b, "ar", 4.0, sounds, &[]);
+            out(b, "ar", spread);
+        }),
+        def("splayaz_mono", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let spread = splay_az(b, "ar", 2.0, sound, &[]);
+            out(b, "ar", spread);
+        }),
+        def("splayaz_kr", vec![], |b| {
+            let sounds = sine(b, "kr", array(&[1.0, 2.0]));
+            let spread = splay_az(b, "kr", 3.0, sounds, &[]);
+            out(b, "kr", spread);
+        }),
+        def("splayaz_spread", vec![], |b| {
+            let sounds = sine(b, "ar", array(&[1.0, 2.0, 3.0]));
+            let wobble = sine(b, "kr", 0.1);
+            let spread = splay_az(b, "ar", 4.0, sounds, &[("spread", input(wobble))]);
+            out(b, "ar", spread);
+        }),
+        def("splayaz_center", vec![Arg::new("c", 0.0)], |b| {
+            let center = arg(b, "c");
+            let sounds = sine(b, "ar", array(&[1.0, 2.0]));
+            let spread = splay_az(b, "ar", 2.0, sounds, &[("center", input(center))]);
+            out(b, "ar", spread);
+        }),
+        def("splayaz_audio_center", vec![], |b| {
+            let sounds = sine(b, "ar", array(&[1.0, 2.0]));
+            let center = sine(b, "ar", 0.1);
+            let spread = splay_az(b, "ar", 2.0, sounds, &[("center", input(center))]);
+            out(b, "ar", spread);
         }),
     ]
 }

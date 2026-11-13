@@ -141,6 +141,35 @@ fn the_second_wave_refuses_what_sclang_refuses() {
 }
 
 #[test]
+fn splay_az_refuses_to_blend_a_spread_at_scalar_or_demand_rate() {
+    // At scalar rate, sclang builds the LinXFade2 of `blend` outside the
+    // graph (fact 10 of the plan of 0.3).
+    let mut b = SynthDefBuilder::new("pseudo", vec![Arg::new("i_spread", 1.0)]).unwrap();
+    let spread = b.arguments()[0].clone();
+    let pair = input(vec![1.0.into(), 2.0.into()]);
+    let scalar = b.ugen(
+        "SplayAz",
+        "kr",
+        &[("inArray", pair.clone()), ("spread", input(spread))],
+    );
+    assert!(
+        matches!(&scalar, Err(BuildError::UnsupportedRate { rate, .. }) if *rate == Rate::Scalar),
+        "{scalar:?}"
+    );
+    let list = input(vec![1.0.into(), 2.0.into()]);
+    let seq = b.ugen("Dseq", "new", &[("list", list)]).unwrap();
+    let demand = b.ugen(
+        "SplayAz",
+        "kr",
+        &[("inArray", pair), ("spread", input(seq))],
+    );
+    assert!(
+        matches!(&demand, Err(BuildError::UnsupportedRate { rate, .. }) if *rate == Rate::Demand),
+        "{demand:?}"
+    );
+}
+
+#[test]
 fn a_ugen_refuses_a_boolean() {
     let mut b = builder();
     let refused = b.ugen("SinOsc", "ar", &[("freq", ArgValue::Bool(true))]);

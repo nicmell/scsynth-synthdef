@@ -198,6 +198,70 @@ pub(crate) fn as_audio_rate_input(
     }
 }
 
+/// `a.blend(b, frac)`: `a + (frac * (b - a))` for a number. For a UGen, an
+/// `XFade2` when one side runs at audio rate, else a `LinXFade2`, with the
+/// pan of `frac`. An array blends element by element.
+pub(crate) fn blend(
+    builder: &mut SynthDefBuilder,
+    a: UGenInput,
+    b: UGenInput,
+    frac: f64,
+) -> Result<UGenInput, BuildError> {
+    match a {
+        UGenInput::Number(_) => {
+            let difference = binary(builder, "-", b, a.clone())?;
+            let scaled = binary(builder, "*", frac.into(), difference)?;
+            binary(builder, "+", a, scaled)
+        }
+        UGenInput::Array(ref items) if !items.is_empty() => {
+            let size = match &b {
+                UGenInput::Array(others) => items.len().max(others.len()),
+                _ => items.len(),
+            };
+            (0..size)
+                .map(|index| blend(builder, element(&a, index), element(&b, index), frac))
+                .collect::<Result<_, _>>()
+                .map(UGenInput::Array)
+        }
+        other => {
+            let (own, that) = (rate(&other), rate(&b));
+            let unsupported = |rate| BuildError::UnsupportedRate {
+                ugen: "UGen:blend".to_owned(),
+                rate,
+            };
+            if own == Some(Rate::Demand) || that == Some(Rate::Demand) {
+                return Err(unsupported(Rate::Demand));
+            }
+            let pan = linlin(frac, 0.0, 1.0, -1.0, 1.0);
+            let (selector, class, a, b, pan) = if own == Some(Rate::Audio) {
+                ("ar", "XFade2", other, b, pan)
+            } else if that == Some(Rate::Audio) {
+                ("ar", "XFade2", b, other, -pan)
+            } else if own == Some(Rate::Control) {
+                ("kr", "LinXFade2", other, b, pan)
+            } else {
+                return Err(unsupported(Rate::Scalar));
+            };
+            builder.ugen(
+                class,
+                selector,
+                &[("inA", a.into()), ("inB", b.into()), ("pan", pan.into())],
+            )
+        }
+    }
+}
+
+/// `SimpleNumber:linlin` with the clip `minmax`.
+pub(crate) fn linlin(x: f64, in_min: f64, in_max: f64, out_min: f64, out_max: f64) -> f64 {
+    if x <= in_min {
+        out_min
+    } else if x >= in_max {
+        out_max
+    } else {
+        (x - in_min) / (in_max - in_min) * (out_max - out_min) + out_min
+    }
+}
+
 /// `methodSelectorForRate` of a class that answers `ir`, as `Clip` and
 /// `ModDif` do.
 pub(crate) fn selector_for_rate(rate: Rate) -> &'static str {
@@ -329,7 +393,7 @@ fn fold(input: f64, lo: f64, hi: f64) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{clip, moddif, number_binary, number_unary};
+    use super::{clip, linlin, moddif, number_binary, number_unary};
     use crate::builder::SynthDefBuilder;
     use crate::ugen_input::UGenInput;
     use serde_json::Value;
@@ -410,5 +474,17 @@ mod tests {
             );
         }
         assert_eq!(builder.finish().expect("an empty build").children.len(), 0);
+    }
+
+    #[test]
+    fn linlin_of_numbers_computes_as_sclang_computes_it() {
+        let table: Value = serde_json::from_str(TABLE).expect("the table is JSON");
+        for row in rows(&table, "linlin") {
+            let [x, in_min, in_max, out_min, out_max, expected] =
+                [0, 1, 2, 3, 4, 5].map(|column| float(&row[column]));
+            let computed = linlin(x, in_min, in_max, out_min, out_max);
+            assert!(same("linlin", computed, expected), "{x}.linlin: {computed}");
+        }
+        assert_eq!(rows(&table, "linlin").len(), 18);
     }
 }

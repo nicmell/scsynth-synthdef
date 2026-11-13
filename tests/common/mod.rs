@@ -64,6 +64,10 @@ pub const NAMES: &[&str] = &[
     "unpackfft",
     "delays",
     "linxfade2",
+    "companderd",
+    "hilbertfir",
+    "linselectx",
+    "splayaz",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where
