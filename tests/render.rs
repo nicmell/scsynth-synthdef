@@ -207,7 +207,16 @@ fn render_method(rendered: &mut String, method: &Value) {
         .unwrap();
     }
     writeln!(rendered, "                ],").unwrap();
-    if method["addable"].as_bool().expect("addable is a boolean") {
+    let wired = match &method["addable"] {
+        Value::Bool(addable) => *addable,
+        Value::String(state) if state == "pseudo" => {
+            writeln!(rendered, "                addable: Addable::Pseudo,").unwrap();
+            writeln!(rendered, "            }},").unwrap();
+            return;
+        }
+        other => panic!("{other} is no addable state"),
+    };
+    if wired {
         let slots: Vec<String> = method["inputs"]
             .as_array()
             .expect("a list of slots")
@@ -275,7 +284,7 @@ fn render_catalog(catalog: &Value) -> String {
     let mut rendered = String::from(HEADER);
     rendered.push_str("#![allow(clippy::unreadable_literal)]\n\n");
     rendered.push_str(
-        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, CheckInputs, InputSlot, Outputs, RateMethod,\n    UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, CheckInputs, InputSlot, Outputs, PseudoClass,\n    RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     writeln!(
         rendered,
@@ -326,7 +335,40 @@ fn render_catalog(catalog: &Value) -> String {
         writeln!(rendered, "    }},").unwrap();
     }
     rendered.push_str("];\n");
+    render_pseudo_classes(&mut rendered, catalog);
     rendered
+}
+
+fn render_pseudo_classes(rendered: &mut String, catalog: &Value) {
+    let mut classes: Vec<&Value> = catalog["pseudo_classes"]
+        .as_array()
+        .expect("a list of pseudo classes")
+        .iter()
+        .collect();
+    classes.sort_by(|a, b| text(&a["name"]).cmp(text(&b["name"])));
+    writeln!(
+        rendered,
+        "\npub(super) static PSEUDO_CLASSES: [PseudoClass; {}] = [",
+        classes.len()
+    )
+    .unwrap();
+    for class in classes {
+        writeln!(rendered, "    PseudoClass {{").unwrap();
+        writeln!(rendered, "        name: {:?},", text(&class["name"])).unwrap();
+        writeln!(
+            rendered,
+            "        categories: {},",
+            strings(&class["categories"])
+        )
+        .unwrap();
+        writeln!(rendered, "        methods: &[").unwrap();
+        for method in class["methods"].as_array().expect("a list of methods") {
+            render_method(rendered, method);
+        }
+        writeln!(rendered, "        ],").unwrap();
+        writeln!(rendered, "    }},").unwrap();
+    }
+    rendered.push_str("];\n");
 }
 
 #[test]

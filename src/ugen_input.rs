@@ -74,15 +74,18 @@ impl OutputProxy {
     }
 }
 
-/// The value of an argument of `SynthDefBuilder::ugen`: an input, or the text
-/// of a symbol argument.
+/// The value of an argument of `SynthDefBuilder::ugen`: an input, the text
+/// of a symbol argument, or a boolean.
 #[derive(Clone, Debug, PartialEq)]
+#[non_exhaustive]
 pub enum ArgValue {
     /// A number, an output, or an array of them.
     Input(UGenInput),
     /// The text of a symbol argument, such as the command name of
     /// `SendReply`.
     Text(String),
+    /// A boolean, such as `levelComp` of `Splay`.
+    Bool(bool),
 }
 
 impl From<UGenInput> for ArgValue {
@@ -124,5 +127,11 @@ impl From<&str> for ArgValue {
 impl From<String> for ArgValue {
     fn from(text: String) -> Self {
         Self::Text(text)
+    }
+}
+
+impl From<bool> for ArgValue {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
     }
 }

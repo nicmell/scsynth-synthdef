@@ -2,6 +2,8 @@
 //! holds the sclang code of each.
 #![allow(dead_code)]
 
+mod pseudo;
+
 use std::fs;
 use std::path::Path;
 
@@ -11,7 +13,7 @@ use scsynth_synthdef::{
 };
 
 /// The golden files that the builder reproduces.
-pub const NAMES: [&str; 27] = [
+pub const NAMES: &[&str] = &[
     "sine",
     "rates",
     "lags17",
@@ -39,13 +41,31 @@ pub const NAMES: [&str; 27] = [
     "mul_ops",
     "madd_numbers",
     "folds",
+    "pmosc",
+    "changed",
+    "silent",
+    "dstutter",
+    "tchoose",
+    "twchoose",
+    "tap",
+    "linlin",
+    "soundin",
+    "selectx",
+    "blowpass4",
+    "bhipass4",
 ];
 
-/// The bytes of a golden file.
+/// The bytes of a golden file: the build without `optimizeGraph`, where
+/// `tests/fixtures/before_optimize` holds one.
 pub fn golden(name: &str) -> Vec<u8> {
-    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures")
-        .join(format!("{name}.scsyndef"));
+    let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
+    let file = format!("{name}.scsyndef");
+    let before_optimize = fixtures.join("before_optimize").join(&file);
+    let path = if before_optimize.exists() {
+        before_optimize
+    } else {
+        fixtures.join(file)
+    };
     fs::read(path).expect("the golden file reads")
 }
 
@@ -90,7 +110,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "mul_ops" => vec![mul_ops()],
         "madd_numbers" => vec![madd_numbers()],
         "folds" => vec![folds()],
-        _ => panic!("no golden graph is named {name}"),
+        _ => pseudo::definitions(name),
     }
 }
 

@@ -2,8 +2,8 @@
 #![allow(clippy::unreadable_literal)]
 
 use super::{
-    Addable, ArgDefault, ArgKind, ArgSpec, CheckInputs, InputSlot, Outputs, RateMethod,
-    UGenClass, Wiring,
+    Addable, ArgDefault, ArgKind, ArgSpec, CheckInputs, InputSlot, Outputs, PseudoClass,
+    RateMethod, UGenClass, Wiring,
 };
 use crate::rate::Rate;
 
@@ -1893,7 +1893,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "input", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "threshold", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -1901,7 +1901,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "input", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "threshold", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -3902,7 +3902,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "n", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -13197,7 +13197,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "numChannels", kind: ArgKind::Count, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "delaytime", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.2)) },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -14151,6 +14151,201 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     madd: false,
                     nested_expansion: true,
                 }),
+            },
+        ],
+    },
+];
+
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 9] = [
+    PseudoClass {
+        name: "BHiPass4",
+        categories: &["UGens>Filters>BEQSuite"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1200.0)) },
+                    ArgSpec { name: "rq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "BLowPass4",
+        categories: &["UGens>Filters>BEQSuite"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1200.0)) },
+                    ArgSpec { name: "rq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "LinLin",
+        categories: &["UGens>Maths"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "srclo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "srchi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "dstlo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "dsthi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(2.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "srclo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "srchi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "dstlo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "dsthi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(2.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "PMOsc",
+        categories: &["UGens>Generators>Deterministic"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "carfreq", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "modfreq", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "pmindex", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "modphase", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "carfreq", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "modfreq", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "pmindex", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "modphase", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "SelectX",
+        categories: &["UGens>Multichannel>Select"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "which", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "wrap", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "which", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "wrap", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "Silent",
+        categories: &["UGens>Generators>Single-value"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "numChannels", kind: ArgKind::Count, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "SoundIn",
+        categories: &["UGens>InOut"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "bus", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "TChoose",
+        categories: &["UGens>Triggers", "UGens>Random"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "trig", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "trig", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "TWChoose",
+        categories: &["UGens>Triggers", "UGens>Random"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "trig", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "weights", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "normalize", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "trig", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "array", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "weights", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "normalize", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
             },
         ],
     },

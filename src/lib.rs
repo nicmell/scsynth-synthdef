@@ -7,6 +7,7 @@ mod error;
 mod file;
 mod limits;
 pub mod operator;
+mod pseudo;
 mod rate;
 mod synth_def;
 mod topo;

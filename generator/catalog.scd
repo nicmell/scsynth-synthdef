@@ -106,6 +106,8 @@ var argumentKinds = [
 	[\ScopeOut2, \kr, \inputArray, \array],
 	[\Select, \ar, \array, \array],
 	[\Select, \kr, \array, \array],
+	[\SelectX, \ar, \array, \array],
+	[\SelectX, \kr, \array, \array],
 	[\SendPeakRMS, \ar, \cmdName, \symbol],
 	[\SendPeakRMS, \kr, \cmdName, \symbol],
 	[\SendReply, \ar, \cmdName, \symbol],
@@ -115,13 +117,20 @@ var argumentKinds = [
 	[\SetBuf, \new, \values, \array],
 	[\SharedIn, \kr, \numChannels, \count],
 	[\SharedOut, \kr, \channelsArray, \array],
+	[\Silent, \ar, \numChannels, \count],
 	[\Splay, \ar, \inArray, \array],
 	[\Splay, \kr, \inArray, \array],
 	[\SplayAz, \ar, \inArray, \array],
 	[\SplayAz, \ar, \numChans, \count],
 	[\SplayAz, \kr, \inArray, \array],
 	[\SplayAz, \kr, \numChans, \count],
+	[\TChoose, \ar, \array, \array],
+	[\TChoose, \kr, \array, \array],
 	[\TGrains, \ar, \numChannels, \count],
+	[\TWChoose, \ar, \array, \array],
+	[\TWChoose, \ar, \weights, \array],
+	[\TWChoose, \kr, \array, \array],
+	[\TWChoose, \kr, \weights, \array],
 	[\TWindex, \ar, \array, \array],
 	[\TWindex, \kr, \array, \array],
 	[\Tap, \ar, \numChannels, \count],
@@ -130,6 +139,52 @@ var argumentKinds = [
 	[\XOut, \ar, \channelsArray, \array],
 	[\XOut, \kr, \channelsArray, \array]
 ];
+// The census of the pseudo-UGens: classes whose rate methods build other
+// UGens. The crate has a body for each rate method of a class of bodies.
+var bodies = [\BHiPass4, \BLowPass4, \Changed, \Dstutter, \LinLin, \PMOsc,
+	\SelectX, \Silent, \SoundIn, \TChoose, \TWChoose, \Tap];
+// The classes of the census that have no body, and why.
+var leftOut = [
+	[\AudioIn, "deprecated since 3.10"],
+	[\CompanderD, "step 7 of the plan of 0.3"],
+	[\Dunique, "needs LocalBuf: item 3 of Left out"],
+	[\DynKlang, "step 5 of the plan of 0.3"],
+	[\DynKlank, "step 5 of the plan of 0.3"],
+	[\EnvGate, "needs NamedControl and Env: items 4 and 5 of Left out"],
+	[\HilbertFIR, "step 7 of the plan of 0.3"],
+	[\InBus, "reads a Bus of sclang, for NodeProxy"],
+	[\LinSelectX, "step 7 of the plan of 0.3"],
+	[\Mix, "step 4 of the plan of 0.3"],
+	[\MultiTap, "step 5 of the plan of 0.3"],
+	[\NamedControl, "a control: item 4 of Left out"],
+	[\NumChannels, "step 5 of the plan of 0.3"],
+	[\PingPong, "needs LocalIn and the rule of BufWr: items 3 and 6 of Left out"],
+	[\SelectXFocus, "step 5 of the plan of 0.3"],
+	[\Splay, "step 5 of the plan of 0.3"],
+	[\SplayAz, "step 7 of the plan of 0.3"],
+	[\SplayZ, "deprecated since 3.10"],
+	[\UnpackFFT, "step 5 of the plan of 0.3"],
+	[\XIn, "a helper of InBus"],
+	[\XInFeedback, "a helper of InBus"]
+];
+// Classes that the census meets but that are no pseudo-UGens, and why.
+var notPseudo = [
+	[\Lag, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Lag2, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Lag2UD, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Lag3, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Lag3UD, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\LagControl, "returns its input for a lag of 0: item 3 of Left out"],
+	[\LagUD, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\LevelComp, "a helper of Splay and SplayAz"],
+	[\MulAdd, "folds: madd of the builder"],
+	[\Ndef, "a proxy of JITLib"],
+	[\Ramp, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Slew, "returns its input for a number: item 3 of Left out"],
+	[\VarLag, "returns its input for a number or a time of 0: item 3 of Left out"]
+];
+var census = bodies ++ leftOut.collect(_.first) ++ notPseudo.collect(_.first);
+
 // An argument whose name holds one of these words needs an entry above.
 var arrayWords = ["array", "list", "values", "ugens", "envelope", "weights",
 	"magsphases", "spec", "chans", "levels", "times", "numchannels", "numcoeff",
@@ -183,9 +238,9 @@ var checkRules = (
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, wiring;
-var describeMethod, describeClass;
+var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
-var classes, addable = 0, methods = 0, helpDir, json;
+var classes, pseudoClasses, addable = 0, methods = 0, pseudo = 0, helpDir, json;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -311,9 +366,12 @@ try {
 		{ fail.("no JSON for %".format(value)) }
 	};
 
+	// The class that owns a class method.
+	methodOwner = { |method| method.ownerClass.name.asString.drop(5).asSymbol.asClass };
+
 	// The UGen class that owns a class method, or nil for Object and the like.
 	ugenOwner = { |method|
-		var owner = method.ownerClass.name.asString.drop(5).asSymbol.asClass;
+		var owner = methodOwner.(method);
 		if (owner.notNil and: { owner == UGen or: { (owner.superclasses ? []).includes(UGen) } }) {
 			owner
 		}
@@ -589,17 +647,13 @@ try {
 		}
 	};
 
-	describeMethod = { |class, selector, method, customCheck|
-		var owner = ugenOwner.(method);
+	// The kinds of the arguments of a method, with the kinds of `owner`, and
+	// the method as associations: its selector and its arguments.
+	describeArgs = { |class, selector, method, owner|
 		var names = (method.argNames ? []).drop(1).asArray;
 		var defaults = (method.prototypeFrame ? []).drop(1);
 		var kinds = kindsOf.(owner, selector, names);
-		var wired = wiring.(class, selector, kinds);
-		if (customCheck.notNil and: { wired.isString.not }) {
-			wired = "the checkInputs of % is a rule of its own".format(customCheck);
-		};
-		methods = methods + 1;
-		[
+		[kinds, [
 			\selector -> selector,
 			\args -> names.collect { |name, position|
 				var value = defaults[position];
@@ -621,12 +675,54 @@ try {
 						{ fail.("%.% % has the default %".format(class, selector, name, value)) }
 				]
 			}
-		] ++ if (wired.isString) {
-			[\addable -> false, \reason -> wired]
+		]]
+	};
+
+	// A method of a UGen class: its body, or its wiring, or why it is not
+	// addable.
+	describeMethod = { |class, selector, method, customCheck|
+		var described = describeArgs.(class, selector, method, ugenOwner.(method));
+		var wired;
+		methods = methods + 1;
+		if (bodies.includes(class.name)) {
+			pseudo = pseudo + 1;
+			described[1] ++ [\addable -> "pseudo"]
 		} {
-			addable = addable + 1;
-			[\addable -> true] ++ wired
+			wired = wiring.(class, selector, described[0]);
+			if (customCheck.notNil and: { wired.isString.not }) {
+				wired = "the checkInputs of % is a rule of its own".format(customCheck);
+			};
+			if (wired.isString and: { wired.contains("creates no instance") }
+				and: { census.includes(class.name).not }) {
+				fail.("%.% creates no instance of its class, and the census does not name it"
+					.format(class.name, selector));
+			};
+			described[1] ++ if (wired.isString) {
+				[\addable -> false, \reason -> wired]
+			} {
+				addable = addable + 1;
+				[\addable -> true] ++ wired
+			}
 		}
+	};
+
+	// A class of bodies outside UGen, with its rate methods but the new of
+	// Object.
+	describePseudoClass = { |class|
+		var doc = SCDoc.documents["Classes/" ++ class.name];
+		[
+			\name -> class.name,
+			\categories -> (doc !? { doc.categories } ? []),
+			\methods -> Array.with(\ar, \kr, \ir, \new).select { |selector|
+				var method = class.class.findRespondingMethodFor(selector);
+				method.notNil and: { method.ownerClass != Meta_Object }
+			}.collect { |selector|
+				var method = class.class.findRespondingMethodFor(selector);
+				pseudo = pseudo + 1;
+				describeArgs.(class, selector, method, methodOwner.(method))[1]
+					++ [\addable -> "pseudo"]
+			}
+		]
 	};
 
 	describeClass = { |class|
@@ -677,18 +773,39 @@ try {
 	SCDoc.helpTargetDir_(helpDir);
 	SCDoc.indexAllDocuments;
 
+	// The census: each class outside UGen that answers ar or kr, and each
+	// class that it names, must exist and be named.
+	census.do { |name|
+		if (name.asClass.isNil) { fail.("the census names %, which is no class".format(name)) };
+	};
+	Class.allClasses.do { |class|
+		if (class.isMetaClass.not
+			and: { class != UGen and: { (class.superclasses ? []).includes(UGen).not } }
+			and: { [\ar, \kr].any { |selector| class.class.findRespondingMethodFor(selector).notNil } }
+			and: { census.includes(class.name).not }) {
+			fail.("% answers ar or kr, and the census does not name it".format(class.name));
+		};
+	};
+
 	classes = UGen.allSubclasses.asArray
 		.sort { |a, b| a.name.asString < b.name.asString }
 		.collect(describeClass);
+	pseudoClasses = bodies.collect(_.asClass)
+		.reject { |class| (class.superclasses ? []).includes(UGen) }
+		.sort { |a, b| a.name.asString < b.name.asString }
+		.collect(describePseudoClass);
 
 	json = toJSON.([
 		\sclang -> Main.version,
 		\operators -> [\unary -> unary, \binary -> binary],
-		\classes -> classes
+		\classes -> classes,
+		\pseudo_classes -> pseudoClasses
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
-	"catalog.scd: % unary and % binary operators, % classes, % of % methods addable"
-		.format(unary.size, binary.size, classes.size, addable, methods).postln;
+	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
+		++ "% pseudo-UGen methods, % classes outside UGen")
+		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
+			pseudoClasses.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;

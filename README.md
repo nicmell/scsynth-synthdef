@@ -202,21 +202,60 @@ scsynth does not check the rate of an input. For `Out.ar(0, 0.5)`, it
 copies a buffer's length of floats from the one float of the constant
 (`IOUGens.cpp:944`). `add` takes the inputs as they come.
 
+### Pseudo-UGens
+
+A pseudo-UGen is a class whose rate method builds other UGens, such as
+`LinLin.kr`. scsynth has no unit of its name. `ugen` adds a pseudo-UGen by
+its class name, as it adds any class of the catalogue. It gives back what
+the method gives in sclang: a number, an output, or an array of them.
+
+```rust
+use scsynth_synthdef::{SynthDefBuilder, UGenInput};
+
+// LinLin.kr(0.5, 0, 1, 10, 20): with numbers, sclang computes the result.
+let mut builder = SynthDefBuilder::new("lin", vec![])?;
+let args = [
+    ("in", 0.5.into()),
+    ("srclo", 0.0.into()),
+    ("srchi", 1.0.into()),
+    ("dstlo", 10.0.into()),
+    ("dsthi", 20.0.into()),
+];
+assert_eq!(builder.ugen("LinLin", "kr", &args)?, UGenInput::Number(15.0));
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+- A body of the crate follows the sclang code of each method. It adds the
+  UGens in the order in which sclang adds them, so the topological sort
+  gives the order of sclang.
+- A body computes with its arguments as the language does. Two numbers
+  give a number, in f64, as sclang computes its Floats. An array goes
+  element by element. Anything else goes to `binary_op` and `unary_op`.
+- The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `Dstutter`,
+  `LinLin`, `PMOsc`, `SelectX`, `Silent`, `SoundIn`, `TChoose`, `TWChoose`
+  and `Tap`.
+- A pseudo-UGen fails as the UGens that it adds fail. A call that fails
+  adds no UGen.
+
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
 of SuperCollider 3.14.1. sc3-plugins are not in it. `catalog::lookup` gives
 a class by name, and `catalog::all` gives all of them, sorted by name.
+`catalog::pseudo_lookup` and `catalog::pseudo_all` give the pseudo-UGen
+classes outside `UGen` that the crate builds, such as `LinLin`.
 
 - A `UGenClass` has its superclasses, whether it is pure or width-first,
   its categories in the help, the rule of its `checkInputs`, and its rate
   methods. `doc_url` gives its page on doc.sccode.org.
+- A `PseudoClass` has its categories in the help and its rate methods.
 - A `RateMethod` is `ar`, `kr`, `ir` or `new`. It has its arguments, each
   with a kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
   holds the rate, the slot of each input, the outputs, the special index,
   whether `mul` and `add` apply, and whether a nested array expands again.
-  `Addable::No` holds the reason.
+  `Addable::Pseudo` marks a method that a body of the crate builds (see
+  [Pseudo-UGens](#pseudo-ugens)). `Addable::No` holds the reason.
 
 `generator/catalog.scd` measured each method in sclang. It calls the
 method twice, each time in a build of its own: once with distinct numbers,
@@ -226,10 +265,11 @@ addable.
 More calls find whether a count or an array sets the number of outputs.
 Then, on each argument that expands, an array of two elements must make
 two instances, instance i with element i. An array inside an array must
-make three. 531 of the 635 methods are addable. Most of the others do more than
-`UGen:new1` does:
+make three. 531 of the 635 methods are addable with a wiring, and the
+pseudo-UGens have a body. Most of the others do more than `UGen:new1` does:
 
-- The pseudo-UGens, such as `Changed`, create no instance of the class.
+- The pseudo-UGens that wait for a later version, such as `Splay`, create
+  no instance of their class.
 - If its input is a number or its lag is 0, the Lag family returns the
   input.
 - The delays at audio rate put a `DC` or a `K2A` before their input.
@@ -239,6 +279,13 @@ make three. 531 of the 635 methods are addable. Most of the others do more than
   `unary_op` and `binary_op` instead.
 - `MulAdd.new` folds, and orders its inputs. Use `madd` instead.
 
+The script also takes a census of the pseudo-UGens. Three tables name each
+class outside `UGen` that answers `ar` or `kr`, and each method that
+creates no instance of its class. The first table names the classes with
+a body, and the second the classes left out, with a reason. The third
+names the classes that are not pseudo-UGens. If a class is in no table,
+the script fails.
+
 The catalogue gives the page of each class in the help, and not its
 summary: the help of SuperCollider is GPL-3, and the crate copies none of
 it.
@@ -247,36 +294,43 @@ it.
 
 `tests/readme.rs` keeps this list equal to the catalogue.
 
-- They create no instance of their class: `Changed.ar`, `Changed.kr`,
-  `CompanderD.ar`, `Dstutter.new`, `Dunique.new`, `HilbertFIR.ar`,
-  `Lag.ar`, `Lag.kr`, `Lag2.ar`, `Lag2.kr`, `Lag2UD.ar`, `Lag2UD.kr`,
-  `Lag3.ar`, `Lag3.kr`, `Lag3UD.ar`, `Lag3UD.kr`, `LagControl.ar`,
-  `LagControl.kr`, `LagUD.ar`, `LagUD.kr`, `MulAdd.new`, `Ramp.ar`,
-  `Ramp.kr`, `Slew.ar`, `Slew.kr`, `Splay.ar`, `Splay.kr`, `SplayAz.ar`,
-  `SplayAz.kr`, `Tap.ar`, `UnpackFFT.new`, `VarLag.ar`, `VarLag.kr`.
-- They also create other UGens: `AllpassC.ar`, `AllpassL.ar`,
-  `AllpassN.ar`, `BeatTrack.kr`, `BufAllpassC.ar`, `BufAllpassL.ar`,
-  `BufAllpassN.ar`, `BufCombC.ar`, `BufCombL.ar`, `BufCombN.ar`,
-  `BufDelayC.ar`, `BufDelayL.ar`, `BufDelayN.ar`, `CombC.ar`, `CombL.ar`,
-  `CombN.ar`, `DelTapWr.ar`, `DelayC.ar`, `DelayL.ar`, `DelayN.ar`,
-  `LinXFade2.ar`, `LinXFade2.kr`, `LocalBuf.new`, `Poll.ar`, `Poll.kr`,
-  `Poll.new`.
+- These pseudo-UGens wait for a later version: `CompanderD.ar`,
+  `Dunique.new`, `DynKlang.ar`, `DynKlang.kr`, `DynKlank.ar`,
+  `DynKlank.kr` and `HilbertFIR.ar`.
+- So do `InBus.ar`, `InBus.kr`, `Splay.ar`, `Splay.kr`, `SplayAz.ar`,
+  `SplayAz.kr` and `UnpackFFT.new`.
+- The Lag family returns its input for a number or a lag of 0: `Lag.ar`,
+  `Lag.kr`, `Lag2.ar`, `Lag2.kr`, `Lag2UD.ar`, `Lag2UD.kr`, `Lag3.ar`,
+  `Lag3.kr`, `Lag3UD.ar` and `Lag3UD.kr`.
+- So do `LagControl.ar`, `LagControl.kr`, `LagUD.ar`, `LagUD.kr`,
+  `Ramp.ar`, `Ramp.kr`, `Slew.ar`, `Slew.kr`, `VarLag.ar` and `VarLag.kr`.
+- `MulAdd.new` folds and orders its inputs. Use `madd` instead.
+- The delays at audio rate also create a `DC` or a `K2A`: `AllpassC.ar`,
+  `AllpassL.ar`, `AllpassN.ar`, `BufAllpassC.ar`, `BufAllpassL.ar` and
+  `BufAllpassN.ar`.
+- So do `BufCombC.ar`, `BufCombL.ar`, `BufCombN.ar`, `BufDelayC.ar`,
+  `BufDelayL.ar`, `BufDelayN.ar`, `CombC.ar`, `CombL.ar` and `CombN.ar`.
+- So do `DelTapWr.ar`, `DelayC.ar`, `DelayL.ar` and `DelayN.ar`.
+- They also create other UGens: `BeatTrack.kr`, `LinXFade2.ar`,
+  `LinXFade2.kr`, `LocalBuf.new`, `Poll.ar`, `Poll.kr` and `Poll.new`.
 - An input comes from no argument, or the inputs follow a count:
-  `DecodeB2.ar`, `DecodeB2.kr`, `Dwrand.new`, `LocalIn.ar`, `LocalIn.kr`,
-  `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`, `SendPeakRMS.kr`,
-  `SetBuf.new`.
+  `DecodeB2.ar`, `DecodeB2.kr`, `Dwrand.new`, `LocalIn.ar` and
+  `LocalIn.kr`.
+- So do `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`,
+  `SendPeakRMS.kr` and `SetBuf.new`.
 - They need arguments that the probe does not make, such as a `Ref`, a
-  `Rect`, a `Bus` or an operator, or they do not exist: `BinaryOpUGen.new`,
-  `DynKlang.ar`, `DynKlang.kr`, `DynKlank.ar`, `DynKlank.kr`, `InBus.ar`,
-  `InBus.kr`, `InRect.ar`, `InRect.kr`, `Klang.ar`, `Klank.ar`,
-  `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new`, `UnaryOpUGen.new`.
+  `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar`, `InRect.kr`,
+  `Klang.ar` and `Klank.ar`.
+- So do `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new` and
+  `UnaryOpUGen.new`. Some of these do not exist.
 - They take their special index from the build: `AudioControl.ar`,
-  `Control.ir`, `Control.kr`, `TrigControl.ir`, `TrigControl.kr`.
-- They take their rate from their inputs: `Sum3.new`, `Sum4.new`.
+  `Control.ir`, `Control.kr`, `TrigControl.ir` and `TrigControl.kr`.
+- They take their rate from their inputs: `Sum3.new` and `Sum4.new`.
 - Their class checks its inputs with a rule of its own: `BufWr.ar`,
-  `BufWr.kr`, `Duty.ar`, `Duty.kr`, `Peak.ar`, `Peak.kr`, `RunningMax.ar`,
-  `RunningMax.kr`, `RunningMin.ar`, `RunningMin.kr`, `T2K.kr`, `TDuty.ar`,
-  `TDuty.kr`.
+  `BufWr.kr`, `Duty.ar`, `Duty.kr`, `Peak.ar`, `Peak.kr` and
+  `RunningMax.ar`.
+- So do `RunningMax.kr`, `RunningMin.ar`, `RunningMin.kr`, `T2K.kr`,
+  `TDuty.ar` and `TDuty.kr`.
 
 ## Strictness
 
@@ -374,6 +428,11 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - A 0 channel of `Out.ar`, `XOut.ar` or `LocalOut.ar`, such as `binary_op`
   gives for `* 0`: sclang puts a `DC` in its place. `ugen` keeps the 0, and
   the rule of `AbstractOut` refuses it.
+- An output in an array of buses of `SoundIn`: sclang builds a `+ 1` for
+  its test of consecutive buses, and `optimizeGraph` removes it. `ugen`
+  refuses the output.
+- The warning of `Dstutter`: the crate does no I/O, and builds the same
+  `Ddup`.
 
 ## Left out
 

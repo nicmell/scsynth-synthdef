@@ -1,6 +1,6 @@
 //! The catalogue of the UGens of the core class library of SuperCollider
-//! 3.14.1: what each class takes and gives, as `generator/catalog.scd`
-//! measured it in sclang.
+//! 3.14.1, and of its pseudo-UGens outside `UGen`: what each class takes and
+//! gives, as `generator/catalog.scd` measured it in sclang.
 
 #[rustfmt::skip]
 mod generated;
@@ -31,6 +31,36 @@ pub struct UGenClass {
 }
 
 impl UGenClass {
+    /// The method with this selector.
+    #[must_use]
+    pub fn method(&self, selector: &str) -> Option<&'static RateMethod> {
+        self.methods
+            .iter()
+            .find(|method| method.selector == selector)
+    }
+
+    /// The page of the class in the help of SuperCollider.
+    #[must_use]
+    pub fn doc_url(&self) -> String {
+        format!("https://doc.sccode.org/Classes/{}.html", self.name)
+    }
+}
+
+/// A pseudo-UGen class outside `UGen`, such as `LinLin`: its rate methods
+/// build other UGens, and scsynth has no unit of its name.
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[non_exhaustive]
+pub struct PseudoClass {
+    /// The name of the class.
+    pub name: &'static str,
+    /// The categories of the class in the help of SuperCollider.
+    pub categories: &'static [&'static str],
+    /// The methods `ar`, `kr`, `ir` and `new` that the class responds to,
+    /// but the `new` of `Object`.
+    pub methods: &'static [RateMethod],
+}
+
+impl PseudoClass {
     /// The method with this selector.
     #[must_use]
     pub fn method(&self, selector: &str) -> Option<&'static RateMethod> {
@@ -107,6 +137,9 @@ pub enum Addable {
     /// It cannot, for this reason: the probe of the generator found a
     /// behavior that the wiring does not describe.
     No(&'static str),
+    /// It can, with a body of the crate that adds what the method adds in
+    /// sclang: the method of a pseudo-UGen.
+    Pseudo,
 }
 
 /// What a rate method gives `UGen:new1`.
@@ -209,22 +242,41 @@ pub fn all() -> &'static [UGenClass] {
     &generated::CLASSES
 }
 
+/// The pseudo-UGen class outside `UGen` with this name.
+#[must_use]
+pub fn pseudo_lookup(name: &str) -> Option<&'static PseudoClass> {
+    let classes = pseudo_all();
+    let position = classes
+        .binary_search_by(|class| class.name.cmp(name))
+        .ok()?;
+    classes.get(position)
+}
+
+/// All the pseudo-UGen classes outside `UGen`, sorted by name.
+#[must_use]
+pub fn pseudo_all() -> &'static [PseudoClass] {
+    &generated::PSEUDO_CLASSES
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{Addable, CheckInputs, InputSlot, Outputs, Wiring, all, lookup};
+    use super::{
+        Addable, CheckInputs, InputSlot, Outputs, Wiring, all, lookup, pseudo_all, pseudo_lookup,
+    };
     use crate::rate::Rate;
 
     fn wiring(class: &str, selector: &str) -> Wiring {
         match lookup(class).unwrap().method(selector).unwrap().addable {
             Addable::Yes(wiring) => wiring,
             Addable::No(reason) => panic!("{class}.{selector}: {reason}"),
+            Addable::Pseudo => panic!("{class}.{selector} is a pseudo-UGen"),
         }
     }
 
     fn reason(class: &str, selector: &str) -> &'static str {
         match lookup(class).unwrap().method(selector).unwrap().addable {
             Addable::No(reason) => reason,
-            Addable::Yes(_) => panic!("{class}.{selector} is addable"),
+            Addable::Yes(_) | Addable::Pseudo => panic!("{class}.{selector} is addable"),
         }
     }
 
@@ -234,6 +286,21 @@ mod tests {
         assert_eq!(all().len(), 419);
         assert!(all().windows(2).all(|pair| pair[0].name < pair[1].name));
         assert!(lookup("DFM1").is_none());
+    }
+
+    #[test]
+    fn the_pseudo_classes_are_apart_and_sorted_by_name() {
+        let classes = pseudo_all();
+        assert!(classes.windows(2).all(|pair| pair[0].name < pair[1].name));
+        assert!(classes.iter().all(|class| lookup(class.name).is_none()));
+        let lin_lin = pseudo_lookup("LinLin").unwrap();
+        assert_eq!(lin_lin.method("kr").unwrap().addable, Addable::Pseudo);
+        assert!(lin_lin.method("new").is_none());
+        assert!(pseudo_lookup("SinOsc").is_none());
+        assert_eq!(
+            lookup("Changed").unwrap().method("kr").unwrap().addable,
+            Addable::Pseudo
+        );
     }
 
     #[test]
