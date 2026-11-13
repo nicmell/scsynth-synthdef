@@ -87,9 +87,10 @@ assert_eq!(def.children.len(), 3);
 - `ugen` adds a UGen by its class name and the selector of a rate method,
   `ar`, `kr`, `ir` or `new`, with the arguments by name. The catalogue
   gives the order of the arguments, their defaults, the wiring and the
-  rule of `checkInputs`. An `ArgValue` is an input, or the text of a symbol
-  argument such as the command name of `SendReply`. A single input goes
-  where the method takes an array, as `asArray` makes it. An array
+  rule of `checkInputs`. An `ArgValue` is an input, a text or a boolean. A
+  text goes to a symbol argument, such as the command name of `SendReply`.
+  A boolean goes to an argument such as `wrap` of `SelectXFocus`. A single
+  input goes where the method takes an array, as `asArray` makes it. An array
   expands the UGen, and `mul` and `add` go through `madd`.
 - At audio rate, a delay passes its input through `asAudioRateInput`
   before the expansion. A number becomes a `DC`, and an output at another
@@ -229,12 +230,36 @@ assert_eq!(builder.ugen("LinLin", "kr", &args)?, UGenInput::Number(15.0));
 # Ok::<(), Box<dyn std::error::Error>>(())
 ```
 
+```rust
+use scsynth_synthdef::{SynthDefBuilder, UGenInput};
+
+// SynthDef(\splay, { Out.ar(0, Splay.ar(SinOsc.ar([220, 330]))) })
+let mut builder = SynthDefBuilder::new("splay", vec![])?;
+let freqs = UGenInput::Array(vec![220.0.into(), 330.0.into()]);
+let voices = builder.ugen("SinOsc", "ar", &[("freq", freqs.into())])?;
+let stereo = builder.ugen("Splay", "ar", &[("inArray", voices.into())])?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", stereo.into())])?;
+let def = builder.finish()?;
+let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
+let ops = ["BinaryOpUGen"; 4];
+assert_eq!(names[..4], ["SinOsc", "Pan2", "SinOsc", "Pan2"]);
+assert_eq!(names[4..8], ops);
+assert_eq!(names[8], "Out");
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+The two `+` sum the channels of the two `Pan2`. The two `*` apply the level
+that `levelComp` gives two inputs at audio rate: the square root of 1/2.
+
 - A body of the crate follows the sclang code of each method. It adds the
   UGens in the order in which sclang adds them, so the topological sort
   gives the order of sclang.
 - A body computes with its arguments as the language does. Two numbers
   give a number, in f64, as sclang computes its Floats. An array goes
   element by element. Anything else goes to `binary_op` and `unary_op`.
+- `tests/fixtures/arithmetic.json` tests each operator against sclang
+  3.14.1 for macOS on arm64. That sclang computes `%` and `fold2` of Floats
+  with one fused multiply-add, and so does the crate.
 - The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `CompanderD`,
   `Dstutter`, `DynKlang`, `DynKlank`, `HilbertFIR`, `LinLin`, `LinSelectX`,
   `Mix`, `MultiTap` and `NumChannels`.
@@ -451,10 +476,14 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   positions builds a `LinXFade2` outside the graph of sclang.
   `BuildError::UnsupportedRate` refuses it, and a demand rate too, where
   sclang throws.
+- The `fill` methods of `Mix`, `Splay` and `SplayAz`, which take a
+  function: build the array, then call `new`, `ar` or `kr`.
+- Numbers are the Floats of sclang. sclang keeps its Integers apart, but
+  gives the same values for the operators of the pseudo-UGens.
 
 ## Left out
 
-These are not in version 0.2, in the order of their value for sc-app3:
+These are not in version 0.3, in the order of their value for sc-app3:
 
 1. nested arrays in array arguments, as each class expands them
 2. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
@@ -462,12 +491,17 @@ These are not in version 0.2, in the order of their value for sc-app3:
    `LocalIn`, `Poll` and the zeros of `Out`
 4. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs` and the
    specs of the metadata
-5. `Env`, and the pseudo-UGens such as `Mix`, `Splay` and `SoundIn`
+5. `Env`, and the pseudo-UGens that wait for items 3 to 6: `Dunique`,
+   `PingPong`, `EnvGate`, and the `pvcalc` methods of `PV_ChainUGen`
 6. the rules of `checkInputs` that classes define for themselves
 7. sc3-plugins
 
 Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
-and the count of interconnect buffers.
+and the count of interconnect buffers. So are the pseudo-UGens `AudioIn`
+and `SplayZ`, deprecated since 3.10, and `InBus`, `XIn` and `XInFeedback`
+of `JITLib`. The methods of `UGen` that build graphs, such as `range` and
+`linlin`, are not pseudo-UGens. `range` needs the `signalRange` of each
+class, which the catalogue does not measure yet.
 
 ## Tests
 

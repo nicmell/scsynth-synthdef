@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.3.0 (2026-11-13)
+
+The pseudo-UGens of SuperCollider 3.14.1, by class name, as sclang builds
+them.
+
+### Added
+
+- `SynthDefBuilder::ugen` adds the pseudo-UGens by class name: `BHiPass4`,
+  `BLowPass4`, `Changed`, `CompanderD`, `Dstutter`, `DynKlang`, `DynKlank`,
+  `HilbertFIR`, `LinLin`, `LinSelectX`, `Mix`, `MultiTap`, `NumChannels`,
+  `PMOsc`, `SelectX`, `SelectXFocus`, `Silent`, `SoundIn`, `Splay`,
+  `SplayAz`, `TChoose`, `TWChoose`, `Tap` and `UnpackFFT`. A body of the
+  crate adds the UGens of each method in the order of sclang, and computes
+  with numbers as sclang does. See [Pseudo-UGens](README.md#pseudo-ugens).
+- `Sum3.new` and `Sum4.new`, with the folds of `new1` and the sort of
+  sclang.
+- The 19 delay methods at audio rate and `LinXFade2` become addable:
+  `Wiring::audio_input` and `Wiring::level`.
+- The module `catalog` gains `PseudoClass`, `pseudo_lookup` and
+  `pseudo_all` for the classes outside `UGen`, `Addable::Pseudo`, and
+  `ArgKind::Bool`.
+- `ArgValue::Bool`, for `levelComp`, `wrap` and `mixdown`.
+- `BuildError::UnsupportedRate`, for `Mix.ar` and `Mix.kr` of a mix at a
+  rate that they do not take, and for the `blend` of `SplayAz` at scalar
+  or demand rate.
+- `generator/catalog.scd` takes a census of the pseudo-UGens.
+  `generator/fixtures.scd` writes 27 golden files of 0.3, six of them also
+  without `optimizeGraph` in `tests/fixtures/before_optimize`, and the
+  operators of sclang on Floats in `tests/fixtures/arithmetic.json`.
+
+### Changed
+
+- `ArgValue` is `non_exhaustive`, and gains `Bool`. A match on it needs a
+  wildcard arm.
+- A bool default binds as an `ArgValue::Bool`, and a real UGen refuses a
+  `Bool` with `WrongKind`.
+- The 21 methods of the delays at audio rate and of `LinXFade2` no longer
+  give `NotAddable`.
+
 ## 0.2.0 (2026-11-08)
 
 Multichannel expansion, `madd`, and the folds of the operators, as sclang
