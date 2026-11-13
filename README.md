@@ -172,11 +172,11 @@ The builder refuses two inputs that sclang takes:
   for each instance. `mul` 0 gives `add`. `mul` 1 with `add` 0 gives the
   input, and `mul` -1 with `add` 0 its `neg`. `add` 0 gives `input * mul`,
   `mul` -1 gives `add - input`, and `mul` 1 gives `input + add`.
-- Otherwise, if `canBeMulAdd` takes the input as the first input of a
-  `MulAdd`, `madd` makes that `MulAdd`. Else, if `canBeMulAdd` takes `mul`
-  first, `madd` makes a `MulAdd` with `mul` first. If `canBeMulAdd` takes
-  neither, `madd` makes a `*` and a `+`. These operators compute two
-  numbers, so `madd(2.0, 3.0, x)` gives `6 + x`.
+- If no case holds and `canBeMulAdd` takes the input first, `madd` makes
+  that `MulAdd`. If `canBeMulAdd` takes only `mul` first, `madd` makes a
+  `MulAdd` with `mul` first. If `canBeMulAdd` takes neither, `madd` makes a
+  `*` and a `+`. These operators compute two numbers, so
+  `madd(2.0, 3.0, x)` gives `6 + x`.
 - A `MulAdd` runs at the least rate by the name of its symbol, as
   `SequenceableCollection:rate` gives it: audio, control, demand, scalar. A
   `BinaryOpUGen` puts demand first.
@@ -365,7 +365,7 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - Two numbers: `unary_op` and `binary_op` make a UGen of them, as
   `UnaryOpUGen.new` and `BinaryOpUGen.new` do. The operators of sclang
   compute them instead, as `2 * 3` gives 6. The crate cannot copy that.
-  `2 < 3` is `true`, which no UGen takes. `rand` draws when sclang builds.
+  `2 < 3` is `true`, which no UGen takes. When sclang builds, `rand` draws.
   sclang gives nan for `-2 ** 0.5`, and the `pow` of scsynth keeps the
   sign.
 - `mul` and `add` on a UGen without outputs, such as `AnalogOut`: sclang
@@ -409,8 +409,13 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 - `generator/sclang_conf.yaml` compiles the core class library of
   `/Applications/SuperCollider.app` alone, without the Extensions folder and
   without quarks. For another installation, change its path.
-- If `finishBuild` adds, removes or rewires a UGen, the script fails. So no
-  golden file holds a graph that `optimizeGraph` rewrites.
+- For a graph of 0.1 or 0.2: if `finishBuild` adds, removes or rewires a
+  UGen, the script fails.
+- For the graphs of 0.3: if `optimizeGraph` rewrites a definition of a file,
+  `tests/fixtures/before_optimize` holds a second file. The script builds it
+  with `finishBuild` without `optimizeGraph`, as the crate builds.
+- `tests/fixtures/arithmetic.json` holds operands and results of the
+  operators that sclang computes on Floats, as the bits of each f64.
 - `~/.bin/sclang` changes the directory, so the paths must be absolute.
 
 `generator/catalog.json` holds the catalogue and the tables of the

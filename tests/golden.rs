@@ -1,5 +1,6 @@
-//! The golden files of `tests/fixtures`, as sclang 3.14.1 wrote them: each
-//! one reads, and writes back to its own bytes.
+//! The golden files of `tests/fixtures` and `tests/fixtures/before_optimize`,
+//! as sclang 3.14.1 wrote them: each one reads, and writes back to its own
+//! bytes.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -7,10 +8,11 @@ use std::path::{Path, PathBuf};
 use scsynth_synthdef::{Version, read_def_file, write_def_file, write_def_file_old};
 
 fn golden_files() -> Vec<PathBuf> {
-    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
-    let mut files: Vec<PathBuf> = fs::read_dir(dir)
-        .expect("tests/fixtures is a directory")
-        .map(|entry| entry.expect("an entry of tests/fixtures").path())
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
+    let mut files: Vec<PathBuf> = [root.clone(), root.join("before_optimize")]
+        .iter()
+        .flat_map(|dir| fs::read_dir(dir).expect("a folder of golden files"))
+        .map(|entry| entry.expect("an entry of a folder of golden files").path())
         .filter(|path| path.extension().is_some_and(|ext| ext == "scsyndef"))
         .collect();
     files.sort();
@@ -20,7 +22,7 @@ fn golden_files() -> Vec<PathBuf> {
 #[test]
 fn every_golden_file_writes_back_to_its_bytes() {
     let files = golden_files();
-    assert_eq!(files.len(), 28, "{files:?}");
+    assert_eq!(files.len(), 61, "{files:?}");
     for path in files {
         let bytes = fs::read(&path).expect("a golden file reads");
         let file = read_def_file(&bytes).unwrap_or_else(|error| panic!("{path:?}: {error}"));
