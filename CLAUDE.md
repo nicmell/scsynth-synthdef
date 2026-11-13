@@ -6,7 +6,7 @@ catalogue of the core UGens. SuperCollider 3.14.1 is the reference. This
 file is the operating manual.
 
 The README is the reference of the crate. [docs/plan.md](docs/plan.md) holds
-what is still open after version 0.2. Read both before any work.
+the plan of version 0.3. Read both before any work.
 
 ## Ground rules
 
