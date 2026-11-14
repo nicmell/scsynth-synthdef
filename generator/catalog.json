@@ -117,6 +117,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -164,6 +165,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -305,6 +307,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -321,6 +324,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -340,6 +344,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -502,6 +507,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -664,6 +670,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -825,6 +832,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -973,6 +981,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1161,6 +1170,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1300,6 +1310,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1399,6 +1410,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1515,6 +1527,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1548,6 +1561,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1627,6 +1641,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1706,6 +1721,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1784,6 +1800,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1803,6 +1820,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1882,6 +1900,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -1971,6 +1990,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2050,6 +2070,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2138,6 +2159,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2280,6 +2302,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2382,6 +2405,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2471,6 +2495,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2613,6 +2638,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2713,6 +2739,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2839,6 +2866,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2971,6 +2999,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -2988,6 +3017,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3025,6 +3055,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3120,6 +3151,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3173,6 +3205,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3298,6 +3331,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "binary_op",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3337,6 +3371,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3457,6 +3492,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3491,6 +3527,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3569,6 +3606,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3659,6 +3697,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3749,6 +3788,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3839,6 +3879,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3907,6 +3948,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -3997,6 +4039,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4086,6 +4129,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4176,6 +4220,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4317,6 +4362,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4457,6 +4503,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4598,6 +4645,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4666,6 +4714,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4733,6 +4782,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4801,6 +4851,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -4869,6 +4920,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5010,6 +5062,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5078,6 +5131,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5145,6 +5199,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5275,6 +5330,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5412,6 +5468,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5466,6 +5523,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5482,6 +5540,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5594,6 +5653,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": null,
       "categories": [
@@ -5637,6 +5697,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5794,6 +5855,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5871,6 +5933,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -5956,6 +6019,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6118,6 +6182,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6279,6 +6344,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6439,6 +6505,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6557,6 +6624,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6637,6 +6705,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6679,6 +6748,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6712,6 +6782,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6744,6 +6815,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6819,6 +6891,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6904,6 +6977,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -6999,6 +7073,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7150,6 +7225,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7251,6 +7327,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7340,6 +7417,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7430,6 +7508,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7501,6 +7580,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7518,6 +7598,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7593,6 +7674,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7659,6 +7741,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7735,6 +7818,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7796,6 +7880,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7848,6 +7933,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -7970,6 +8056,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -8111,6 +8198,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -8198,6 +8286,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -8333,6 +8422,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -8481,6 +8571,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -8568,6 +8659,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -8687,6 +8779,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -8824,6 +8917,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -8966,6 +9060,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -9107,6 +9202,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -9248,6 +9344,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -9347,6 +9444,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -9593,6 +9691,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -9710,6 +9809,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -9843,6 +9943,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -9909,6 +10010,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -9983,6 +10085,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10122,6 +10225,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10221,6 +10325,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10337,6 +10442,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10394,6 +10500,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10449,6 +10556,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10513,6 +10621,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10557,6 +10666,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10630,6 +10740,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10684,6 +10795,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10738,6 +10850,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10793,6 +10906,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10847,6 +10961,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10913,6 +11028,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -10968,6 +11084,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11003,6 +11120,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11055,6 +11173,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11106,6 +11225,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11149,6 +11269,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11248,6 +11369,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11347,6 +11469,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11479,6 +11602,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11544,6 +11668,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11588,6 +11713,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11641,6 +11767,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11708,6 +11835,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11800,6 +11928,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -11969,6 +12098,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -12025,6 +12155,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -12145,6 +12276,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -12264,6 +12396,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -12384,6 +12517,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "buf_frames",
       "categories": [
@@ -12478,6 +12612,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -12542,6 +12677,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -12701,6 +12837,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -12821,6 +12958,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -12838,6 +12976,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -12996,6 +13135,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13112,6 +13252,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13192,6 +13333,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13351,6 +13493,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13401,6 +13544,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13443,6 +13587,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13487,6 +13632,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13574,6 +13720,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13670,6 +13817,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13748,6 +13896,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13897,6 +14046,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -13990,6 +14140,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -14069,6 +14220,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -14147,6 +14299,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -14422,6 +14575,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -14737,6 +14891,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -14993,6 +15148,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -15137,6 +15293,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -15272,6 +15429,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -15385,6 +15543,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -15500,6 +15659,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -15580,6 +15740,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -15702,6 +15863,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -15804,6 +15966,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -15903,6 +16066,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16005,6 +16169,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16105,6 +16270,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16204,6 +16370,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16303,6 +16470,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16360,6 +16528,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16393,6 +16562,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16505,6 +16675,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": null,
       "categories": [
@@ -16657,6 +16828,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16712,6 +16884,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16833,6 +17006,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16916,6 +17090,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -16993,6 +17168,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17043,6 +17219,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17199,6 +17376,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17267,6 +17445,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17319,6 +17498,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17436,6 +17616,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17553,6 +17734,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17668,6 +17850,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17702,6 +17885,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17823,6 +18007,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17867,6 +18052,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -17941,6 +18127,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18003,6 +18190,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18045,6 +18233,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18101,6 +18290,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18202,6 +18392,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18322,6 +18513,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18422,6 +18614,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18522,6 +18715,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18622,6 +18816,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18721,6 +18916,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18872,6 +19068,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -18972,6 +19169,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19072,6 +19270,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19173,6 +19372,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19293,6 +19493,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19433,6 +19634,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19554,6 +19756,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19675,6 +19878,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19796,6 +20000,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19897,6 +20102,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -19998,6 +20204,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -20128,6 +20335,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -20258,6 +20466,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -20408,6 +20617,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -20538,6 +20748,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -20687,6 +20898,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -20746,6 +20958,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -20808,6 +21021,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -20955,6 +21169,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21046,6 +21261,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21139,6 +21355,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21259,6 +21476,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21378,6 +21596,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21498,6 +21717,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21618,6 +21838,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21710,6 +21931,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21776,6 +21998,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21876,6 +22099,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -21975,6 +22199,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22074,6 +22299,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22227,6 +22453,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22337,6 +22564,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22401,6 +22629,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22525,6 +22754,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22684,6 +22914,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22769,6 +23000,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22823,6 +23055,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": null,
       "categories": [
@@ -22862,6 +23095,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22920,6 +23154,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -22987,6 +23222,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23127,6 +23363,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23255,6 +23492,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23318,6 +23556,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23369,6 +23608,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23488,6 +23728,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23513,6 +23754,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23635,6 +23877,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23794,6 +24037,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -23954,6 +24198,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24109,6 +24354,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24200,6 +24446,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24264,6 +24511,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24339,6 +24587,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24413,6 +24662,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24456,6 +24706,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24472,6 +24723,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24591,6 +24843,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24656,6 +24909,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24689,6 +24943,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24754,6 +25009,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24787,6 +25043,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24820,6 +25077,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24853,6 +25111,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24886,6 +25145,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24919,6 +25179,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -24968,6 +25229,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25027,6 +25289,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25149,6 +25412,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25268,6 +25532,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25391,6 +25656,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25527,6 +25793,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25663,6 +25930,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25746,6 +26014,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25785,6 +26054,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -25852,6 +26122,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -25904,6 +26175,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -25978,6 +26250,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26052,6 +26325,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26114,6 +26388,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26167,6 +26442,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26185,6 +26461,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26250,6 +26527,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26295,6 +26573,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26348,6 +26627,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26400,6 +26680,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26455,6 +26736,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26507,6 +26789,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26591,6 +26874,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26696,6 +26980,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26750,6 +27035,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26805,6 +27091,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26860,6 +27147,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26914,6 +27202,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -26976,6 +27265,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27030,6 +27320,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27083,6 +27374,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27127,6 +27419,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27191,6 +27484,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27245,6 +27539,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27290,6 +27585,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27343,6 +27639,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27396,6 +27693,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27448,6 +27746,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27511,6 +27810,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27556,6 +27856,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27600,6 +27901,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27664,6 +27966,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27736,6 +28039,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27810,6 +28114,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "chain",
       "categories": [
@@ -27892,6 +28197,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": "input",
       "categories": [
@@ -27951,6 +28257,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28062,6 +28369,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28197,6 +28505,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28354,6 +28663,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28489,6 +28799,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28601,6 +28912,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28674,6 +28986,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28724,6 +29037,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28766,6 +29080,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28809,6 +29124,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28900,6 +29216,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -28991,6 +29308,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -29144,6 +29462,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -29222,6 +29541,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -29367,6 +29687,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -29466,6 +29787,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -29645,6 +29967,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -29753,6 +30076,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -29854,6 +30178,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -29973,6 +30298,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30064,6 +30390,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30176,6 +30503,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30192,6 +30520,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30210,6 +30539,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30310,6 +30640,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30409,6 +30740,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30510,6 +30842,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30651,6 +30984,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30791,6 +31125,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30826,6 +31161,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -30953,6 +31289,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -31008,6 +31345,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": null,
       "categories": [
@@ -31081,6 +31419,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": null,
       "categories": [
@@ -31210,6 +31549,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -31441,6 +31781,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -31526,6 +31867,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -31667,6 +32009,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -31807,6 +32150,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -31915,6 +32259,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32007,6 +32352,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32098,6 +32444,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32188,6 +32535,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32388,6 +32736,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32421,6 +32770,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32453,6 +32803,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32544,6 +32895,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32644,6 +32996,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32800,6 +33153,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -32890,6 +33244,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33017,6 +33372,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33103,6 +33459,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33201,6 +33558,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33326,6 +33684,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33434,6 +33793,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": null,
       "categories": [
@@ -33476,6 +33836,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33569,6 +33930,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33686,6 +34048,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33737,6 +34100,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33788,6 +34152,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -33908,6 +34273,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34030,6 +34396,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34179,6 +34546,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34280,6 +34648,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34322,6 +34691,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34364,6 +34734,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34436,6 +34807,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34531,6 +34903,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34668,6 +35041,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34782,6 +35156,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34871,6 +35246,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -34959,6 +35335,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35127,6 +35504,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35232,6 +35610,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35264,6 +35643,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35302,6 +35682,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35345,6 +35726,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35437,6 +35819,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35558,6 +35941,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35615,6 +35999,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35660,6 +36045,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35793,6 +36179,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -35886,6 +36273,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36037,6 +36425,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36150,6 +36539,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36269,6 +36659,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36381,6 +36772,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36493,6 +36885,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36599,6 +36992,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36644,6 +37038,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36715,6 +37110,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36787,6 +37183,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36878,6 +37275,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -36971,6 +37369,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37015,6 +37414,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37157,6 +37557,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37297,6 +37698,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37331,6 +37733,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37401,6 +37804,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37448,6 +37852,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37526,6 +37931,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37662,6 +38068,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37819,6 +38226,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -37945,6 +38353,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -38085,6 +38494,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -38319,6 +38729,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -38454,6 +38865,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -38531,6 +38943,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": true,
       "fft_size": null,
       "categories": [
@@ -38548,6 +38961,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -38706,6 +39120,7 @@
         "UGen"
       ],
       "pure": true,
+      "optimize": "dead_code",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -38821,6 +39236,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -38949,6 +39365,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -39109,6 +39526,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [
@@ -39208,6 +39626,7 @@
         "UGen"
       ],
       "pure": false,
+      "optimize": "nothing",
       "width_first": false,
       "fft_size": null,
       "categories": [

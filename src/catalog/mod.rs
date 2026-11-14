@@ -15,9 +15,10 @@ pub struct UGenClass {
     pub name: &'static str,
     /// The superclasses, from the parent up to `UGen`.
     pub superclasses: &'static [&'static str],
-    /// Whether the class is a `PureUGen` or a `PureMultiOutUGen`. The
-    /// `optimizeGraph` of sclang removes such a UGen when nothing reads it.
+    /// Whether the class is a `PureUGen` or a `PureMultiOutUGen`.
     pub is_pure: bool,
+    /// What `optimizeGraph` of sclang does with a UGen of the class.
+    pub optimize: Optimize,
     /// Whether the class is a `WidthFirstUGen`.
     pub is_width_first: bool,
     /// How `fftSize` finds the size of the FFT of a PV chain of the class.
@@ -288,6 +289,21 @@ pub enum CheckInputs {
     Custom(&'static str),
 }
 
+/// What `optimizeGraph` of sclang does with a UGen, by the class that owns
+/// the method.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum Optimize {
+    /// Nothing, as `UGen` and `DetectSilence` do.
+    Nothing,
+    /// It removes the UGen when nothing reads it, as `PureUGen`,
+    /// `PureMultiOutUGen` and `UnaryOpUGen` do.
+    DeadCode,
+    /// It removes the UGen when nothing reads it, and else fuses a `+` or a
+    /// `-` with its inputs, as `BinaryOpUGen` does.
+    BinaryOp,
+}
+
 /// How `fftSize` of a PV chain finds the size of its FFT, which a copy of
 /// `addCopiesIfNeeded` gives its `LocalBuf`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -336,8 +352,8 @@ pub fn pseudo_all() -> &'static [PseudoClass] {
 #[cfg(test)]
 mod tests {
     use super::{
-        Addable, ArrayExpansion, CheckInputs, FftSize, InputSlot, Outputs, Wiring, all, lookup,
-        pseudo_all, pseudo_lookup,
+        Addable, ArrayExpansion, CheckInputs, FftSize, InputSlot, Optimize, Outputs, Wiring, all,
+        lookup, pseudo_all, pseudo_lookup,
     };
     use crate::rate::Rate;
 
@@ -579,6 +595,31 @@ mod tests {
             all()
                 .iter()
                 .all(|class| !matches!(class.check_inputs, CheckInputs::Custom(_)))
+        );
+    }
+
+    #[test]
+    fn each_class_optimizes_as_its_optimize_graph_does() {
+        // Fact 6 of the plan of 0.7.
+        assert_eq!(lookup("SinOsc").unwrap().optimize, Optimize::DeadCode);
+        assert_eq!(lookup("DC").unwrap().optimize, Optimize::DeadCode);
+        assert_eq!(lookup("UnaryOpUGen").unwrap().optimize, Optimize::DeadCode);
+        assert_eq!(lookup("BinaryOpUGen").unwrap().optimize, Optimize::BinaryOp);
+        assert_eq!(lookup("DetectSilence").unwrap().optimize, Optimize::Nothing);
+        assert_eq!(lookup("Out").unwrap().optimize, Optimize::Nothing);
+        let count = |optimize| {
+            all()
+                .iter()
+                .filter(|class| class.optimize == optimize)
+                .count()
+        };
+        assert_eq!(
+            [
+                count(Optimize::Nothing),
+                count(Optimize::DeadCode),
+                count(Optimize::BinaryOp)
+            ],
+            [319, 99, 1]
         );
     }
 

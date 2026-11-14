@@ -1,10 +1,12 @@
 //! The rewrites of `finishBuild` before the sort (`SynthDef.sc:279`), on the
-//! UGens of a build: the copies of PV chains of `addCopiesIfNeeded`.
+//! UGens of a build: the copies of PV chains of `addCopiesIfNeeded`, then
+//! `optimizeGraph`.
 
-use crate::builder::{Node, Source};
-use crate::catalog::{self, FftSize};
+use crate::builder::{Node, Source, can_be_mul_add};
+use crate::catalog::{self, FftSize, Optimize};
 use crate::error::BuildError;
-use crate::rate::Rate;
+use crate::operator;
+use crate::rate::{Rate, least_by_name, sort_by_rate};
 
 /// The UGens of a build while `finishBuild` rewrites them. The nodes are an
 /// arena, and `children` holds the `children` of sclang as indices into it.
@@ -17,7 +19,79 @@ pub(crate) struct Graph {
     children: Vec<Option<usize>>,
     /// The `widthFirstUGens` of sclang.
     width_first_order: Vec<usize>,
+    /// The `synthIndex` of each node during `optimizeGraph`: its slot in
+    /// `children`.
+    slots: Vec<usize>,
+    /// The `descendants` of each node during `optimizeGraph`, as an index
+    /// into `arrays`. A replacement shares the array of the UGen that it
+    /// replaces.
+    readers: Vec<Option<usize>>,
+    arrays: Vec<Readers>,
 }
+
+/// An Array of sclang that holds the readers of a UGen.
+struct Readers {
+    items: Vec<usize>,
+    /// The size up to which `add` grows this Array. Beyond it, `add` gives
+    /// back a new Array, which nobody keeps.
+    room: usize,
+}
+
+impl Readers {
+    /// `Set:asArray.sort` of these readers, with the room that sclang 3.14.1
+    /// gives it (measured).
+    fn new(items: Vec<usize>) -> Self {
+        let room = if items.is_empty() {
+            2
+        } else {
+            items.len().next_power_of_two().max(4)
+        };
+        Self { items, room }
+    }
+
+    /// `remove`: the first match goes.
+    fn remove(&mut self, item: usize) {
+        if let Some(at) = self.items.iter().position(|&found| found == item) {
+            self.items.remove(at);
+        }
+    }
+}
+
+/// A UGen that a rewrite of `optimizeGraph` fuses into the UGen that reads
+/// it.
+#[derive(Clone, Copy)]
+enum Fused {
+    Plus,
+    Times,
+    Neg,
+    Sum3,
+}
+
+impl Fused {
+    fn matches(self, node: &Node) -> bool {
+        let binary = |op| {
+            node.name == BINARY_OP
+                && operator::binary_index(op) == Some(node.special_index)
+                && node.inputs.len() == 2
+        };
+        match self {
+            Self::Plus => binary("+"),
+            Self::Times => binary("*"),
+            Self::Neg => {
+                node.name == UNARY_OP
+                    && operator::unary_index("neg") == Some(node.special_index)
+                    && node.inputs.len() == 1
+            }
+            Self::Sum3 => node.name == SUM3 && node.inputs.len() == 3,
+        }
+    }
+}
+
+const BINARY_OP: &str = "BinaryOpUGen";
+const UNARY_OP: &str = "UnaryOpUGen";
+const SUM3: &str = "Sum3";
+const SUM4: &str = "Sum4";
+const MUL_ADD: &str = "MulAdd";
 
 /// The UGens after the rewrites, in the order of the children of sclang.
 /// Each input and each width-first antecedent is a position in this order.
@@ -32,6 +106,8 @@ const PACK_FFT: &str = "its chain needs a copy, and addCopiesIfNeeded of sclang 
      the FFT size of a PackFFT";
 const NO_FFT_SIZE: &str =
     "its chain needs a copy, and addCopiesIfNeeded of sclang 3.14.1 finds no FFT size for it";
+const FOLDED: &str = "optimizeGraph of sclang 3.14.1 folds its rewrite into a number or an \
+     input, then throws or writes a UGen twice";
 
 impl Graph {
     /// The UGens of a build, with its width-first UGens in the order of
@@ -48,8 +124,11 @@ impl Graph {
                 .collect(),
             width_first: is_width_first,
             children: (0..nodes.len()).map(Some).collect(),
+            slots: vec![usize::MAX; nodes.len()],
+            readers: vec![None; nodes.len()],
             nodes,
             width_first_order: width_first.to_vec(),
+            arrays: Vec::new(),
         }
     }
 
@@ -86,6 +165,401 @@ impl Graph {
         Ok(copies)
     }
 
+    /// `optimizeGraph`: each child, in order, removes itself when nothing
+    /// reads it, and a `+` or a `-` fuses with its inputs. A graph that
+    /// sclang 3.14.1 breaks or throws on refuses.
+    pub(crate) fn optimize_graph(&mut self) -> Result<(), BuildError> {
+        self.init_readers();
+        let visits: Vec<usize> = self.children.iter().flatten().copied().collect();
+        for node in visits {
+            self.optimize(node)?;
+        }
+        self.check_reads()
+    }
+
+    /// The `descendants` of `initTopoSort`: the readers of the outputs of
+    /// each child and the UGens that wait for it as a width-first
+    /// antecedent, once each, in the order of the children.
+    fn init_readers(&mut self) {
+        let count = self.nodes.len();
+        self.slots = vec![usize::MAX; count];
+        for (slot, &child) in self.children.iter().enumerate() {
+            if let Some(child) = child {
+                self.slots[child] = slot;
+            }
+        }
+        let mut readers = vec![Vec::new(); count];
+        for &child in self.children.iter().flatten() {
+            let sources = self.nodes[child]
+                .inputs
+                .iter()
+                .filter_map(|input| match *input {
+                    Source::Output { ugen, .. } => Some(ugen),
+                    Source::Number(_) => None,
+                });
+            for source in sources.chain(self.antecedents[child].iter().copied()) {
+                readers[source].push(child);
+            }
+        }
+        self.readers = vec![None; count];
+        self.arrays = Vec::with_capacity(count);
+        for &child in self.children.iter().flatten() {
+            let mut items = std::mem::take(&mut readers[child]);
+            items.sort_by_key(|&reader| self.slots[reader]);
+            items.dedup();
+            self.readers[child] = Some(self.arrays.len());
+            self.arrays.push(Readers::new(items));
+        }
+    }
+
+    /// `optimizeGraph` of one UGen, by its class.
+    fn optimize(&mut self, node: usize) -> Result<(), BuildError> {
+        match optimize_of(&self.nodes[node].name) {
+            Optimize::Nothing => Ok(()),
+            Optimize::DeadCode => self.dead_code(node).map(drop),
+            Optimize::BinaryOp => {
+                if self.dead_code(node)? {
+                    Ok(())
+                } else if Fused::Plus.matches(&self.nodes[node]) {
+                    self.optimize_add(node)
+                } else if self.is_minus(node) {
+                    self.optimize_sub(node)
+                } else {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    /// `performDeadCodeElimination`: a UGen that nothing reads leaves the
+    /// readers of each direct input, in order, and the input gets another
+    /// visit. An output of a `MultiOutUGen` comes through an `OutputProxy`,
+    /// which has no readers, so the visit stops there (fact 7 of the plan of
+    /// 0.7).
+    fn dead_code(&mut self, node: usize) -> Result<bool, BuildError> {
+        if self.reader_count(node) > 0 {
+            return Ok(false);
+        }
+        let mut input = 0;
+        while let Some(&source) = self.nodes[node].inputs.get(input) {
+            input += 1;
+            if let Source::Output { ugen, .. } = source {
+                if !is_multi_out(&self.nodes[ugen].name) {
+                    if let Some(array) = self.readers[ugen] {
+                        self.arrays[array].remove(node);
+                    }
+                    self.optimize(ugen)?;
+                }
+            }
+        }
+        self.remove_ugen(node);
+        Ok(true)
+    }
+
+    /// `optimizeAdd`: a `+` becomes a `Sum3`, a `Sum4`, a `MulAdd` or a
+    /// `-`, the first that holds.
+    fn optimize_add(&mut self, this: usize) -> Result<(), BuildError> {
+        let mut replacement = self.fuse_sum3(this)?;
+        if replacement.is_none() {
+            replacement = self.fuse_sum4(this)?;
+        }
+        if replacement.is_none() {
+            replacement = self.fuse_mul_add(this)?;
+        }
+        if replacement.is_none() {
+            replacement = self.add_neg(this)?;
+        }
+        if let Some(replacement) = replacement {
+            self.replace_ugen(this, replacement);
+            self.optimize(replacement)?;
+        }
+        Ok(())
+    }
+
+    /// `optimizeToSum3`: a `+` that only this `+` reads becomes a `Sum3`
+    /// with the other input, or a `Sum4` when it is both inputs.
+    fn fuse_sum3(&mut self, this: usize) -> Result<Option<usize>, BuildError> {
+        let Some((a, b)) = self.pair(this) else {
+            return Ok(None);
+        };
+        if self.rate(a) == Rate::Demand || self.rate(b) == Rate::Demand {
+            return Ok(None);
+        }
+        for (sum, other) in [(a, b), (b, a)] {
+            if let Some(plus) = self.fusable(sum, Fused::Plus) {
+                self.remove_ugen(plus);
+                let (x, y) = (self.nodes[plus].inputs[0], self.nodes[plus].inputs[1]);
+                let replacement = if a == b {
+                    self.sum(this, SUM4, vec![x, x, y, y])?
+                } else {
+                    self.sum(this, SUM3, vec![x, y, other])?
+                };
+                self.adopt(this, replacement, plus);
+                return Ok(Some(replacement));
+            }
+        }
+        Ok(None)
+    }
+
+    /// `optimizeToSum4`: a `Sum3` that only this `+` reads becomes a `Sum4`
+    /// with the other input.
+    fn fuse_sum4(&mut self, this: usize) -> Result<Option<usize>, BuildError> {
+        let Some((a, b)) = self.pair(this) else {
+            return Ok(None);
+        };
+        if a == b || self.rate(a) == Rate::Demand || self.rate(b) == Rate::Demand {
+            return Ok(None);
+        }
+        for (sum, other) in [(a, b), (b, a)] {
+            if let Some(sum3) = self.fusable(sum, Fused::Sum3) {
+                self.remove_ugen(sum3);
+                let mut inputs = self.nodes[sum3].inputs.clone();
+                inputs.push(other);
+                let replacement = self.sum(this, SUM4, inputs)?;
+                self.adopt(this, replacement, sum3);
+                return Ok(Some(replacement));
+            }
+        }
+        Ok(None)
+    }
+
+    /// `optimizeToMulAdd`: a `*` that only this `+` reads becomes a `MulAdd`
+    /// with the other input, if `canBeMulAdd` takes its inputs in one order.
+    fn fuse_mul_add(&mut self, this: usize) -> Result<Option<usize>, BuildError> {
+        let Some((a, b)) = self.pair(this) else {
+            return Ok(None);
+        };
+        if a == b {
+            return Ok(None);
+        }
+        for (product, other) in [(a, b), (b, a)] {
+            let Some(times) = self.fusable(product, Fused::Times) else {
+                continue;
+            };
+            let (x, y) = (self.nodes[times].inputs[0], self.nodes[times].inputs[1]);
+            for (input, mul) in [(x, y), (y, x)] {
+                if can_be_mul_add(self.rate(input), self.rate(mul), self.rate(other)) {
+                    self.remove_ugen(times);
+                    let replacement = self.mul_add(this, input, mul, other)?;
+                    self.adopt(this, replacement, times);
+                    return Ok(Some(replacement));
+                }
+            }
+        }
+        Ok(None)
+    }
+
+    /// `optimizeAddNeg`: `a + b.neg` becomes `a - b`, and `a.neg + b`
+    /// becomes `b - a`, for a `neg` that only this `+` reads.
+    fn add_neg(&mut self, this: usize) -> Result<Option<usize>, BuildError> {
+        let Some((a, b)) = self.pair(this) else {
+            return Ok(None);
+        };
+        if a == b {
+            return Ok(None);
+        }
+        for (other, negated) in [(a, b), (b, a)] {
+            if let Some(neg) = self.fusable(negated, Fused::Neg) {
+                self.remove_ugen(neg);
+                let inner = self.nodes[neg].inputs[0];
+                let replacement = self.binary(this, "-", other, inner, true)?;
+                self.adopt(this, replacement, neg);
+                return Ok(Some(replacement));
+            }
+        }
+        Ok(None)
+    }
+
+    /// `optimizeSub`: `a - b.neg` becomes `a + b`, for a `neg` that only
+    /// this `-` reads, and the `+` gets a visit at once.
+    fn optimize_sub(&mut self, this: usize) -> Result<(), BuildError> {
+        let Some((a, b)) = self.pair(this) else {
+            return Ok(());
+        };
+        if let Some(neg) = self.fusable(b, Fused::Neg) {
+            self.remove_ugen(neg);
+            let inner = self.nodes[neg].inputs[0];
+            let replacement = self.binary(this, "+", a, inner, false)?;
+            self.adopt(this, replacement, neg);
+            self.replace_ugen(this, replacement);
+            self.optimize(replacement)?;
+        }
+        Ok(())
+    }
+
+    /// `Sum3.new1` or `Sum4.new1` of a rewrite: a new node, outside the
+    /// children. An input of 0 folds, which refuses.
+    fn sum(
+        &mut self,
+        this: usize,
+        class: &str,
+        mut inputs: Vec<Source>,
+    ) -> Result<usize, BuildError> {
+        if inputs.iter().any(|&input| is_number(input, 0.0)) {
+            return Err(finish_build(&self.nodes[this].name, FOLDED));
+        }
+        let rate =
+            least_by_name(inputs.iter().map(|&input| self.rate(input))).unwrap_or(Rate::Scalar);
+        sort_by_rate(&mut inputs, |&input| self.rate(input));
+        Ok(self.push(ugen(class, rate, inputs), Vec::new(), false))
+    }
+
+    /// `MulAdd.new1` of a rewrite: a new node, outside the children. A `mul`
+    /// of 0, 1 or -1 and an `add` of 0 fold, which refuses.
+    fn mul_add(
+        &mut self,
+        this: usize,
+        input: Source,
+        mul: Source,
+        add: Source,
+    ) -> Result<usize, BuildError> {
+        let folds = [-1.0, 0.0, 1.0].iter().any(|&value| is_number(mul, value));
+        let rates = [self.rate(input), self.rate(mul), self.rate(add)];
+        let inputs = if folds || is_number(add, 0.0) {
+            None
+        } else if can_be_mul_add(rates[0], rates[1], rates[2]) {
+            Some(vec![input, mul, add])
+        } else if can_be_mul_add(rates[1], rates[0], rates[2]) {
+            Some(vec![mul, input, add])
+        } else {
+            None
+        };
+        let Some(inputs) = inputs else {
+            return Err(finish_build(&self.nodes[this].name, FOLDED));
+        };
+        let rate = least_by_name(rates).unwrap_or(Rate::Scalar);
+        Ok(self.push(ugen(MUL_ADD, rate, inputs), Vec::new(), false))
+    }
+
+    /// The operator `-` of sclang, or `BinaryOpUGen.new` of `+`, in a
+    /// rewrite: a new node, outside the children. The folds of
+    /// `BinaryOpUGen:new1` refuse, and so does the operator on two numbers,
+    /// which sclang computes.
+    fn binary(
+        &mut self,
+        this: usize,
+        op: &str,
+        a: Source,
+        b: Source,
+        computes: bool,
+    ) -> Result<usize, BuildError> {
+        let numbers = matches!((a, b), (Source::Number(_), Source::Number(_)));
+        if is_number(a, 0.0) || is_number(b, 0.0) || (computes && numbers) {
+            return Err(finish_build(&self.nodes[this].name, FOLDED));
+        }
+        let special_index =
+            operator::binary_index(op).ok_or_else(|| BuildError::UnknownOperator(op.to_owned()))?;
+        let mut node = ugen(BINARY_OP, self.rate(a).max(self.rate(b)), vec![a, b]);
+        node.special_index = special_index;
+        Ok(self.push(node, Vec::new(), false))
+    }
+
+    /// The replacement takes the readers of `this`. Then
+    /// `optimizeUpdateDescendants` updates the readers of each of its
+    /// inputs: the replacement in place of `this`, and without `deleted`. A
+    /// full array loses the replacement (fact 7 of the plan of 0.7).
+    fn adopt(&mut self, this: usize, replacement: usize, deleted: usize) {
+        self.readers[replacement] = self.readers[this];
+        for input in self.nodes[replacement].inputs.clone() {
+            let Source::Output { ugen, .. } = input else {
+                continue;
+            };
+            let Some(array) = self.readers[ugen] else {
+                continue;
+            };
+            let readers = &mut self.arrays[array];
+            if readers.items.len() < readers.room {
+                readers.items.push(replacement);
+                readers.remove(this);
+            }
+            readers.remove(deleted);
+        }
+    }
+
+    /// `replaceUGen`: `b` takes the slot, the width-first antecedents and the
+    /// readers of `a`, and each child that reads `a` reads `b`.
+    fn replace_ugen(&mut self, a: usize, b: usize) {
+        self.antecedents[b] = self.antecedents[a].clone();
+        self.readers[b] = self.readers[a];
+        self.slots[b] = self.slots[a];
+        if let Some(slot) = self.children.get_mut(self.slots[a]) {
+            *slot = Some(b);
+        }
+        for &child in self.children.iter().flatten() {
+            for input in &mut self.nodes[child].inputs {
+                if reads(*input, a) {
+                    *input = output(b);
+                }
+            }
+        }
+    }
+
+    /// `removeUGen`: the slot of the UGen empties.
+    fn remove_ugen(&mut self, node: usize) {
+        if let Some(slot) = self.children.get_mut(self.slots[node]) {
+            *slot = None;
+        }
+    }
+
+    /// A kept UGen that reads a removed UGen refuses: sclang 3.14.1 then
+    /// drops UGens from the definition (fact 7 of the plan of 0.7).
+    fn check_reads(&self) -> Result<(), BuildError> {
+        let mut kept = vec![false; self.nodes.len()];
+        for &child in self.children.iter().flatten() {
+            kept[child] = true;
+        }
+        for &child in self.children.iter().flatten() {
+            for input in &self.nodes[child].inputs {
+                if let Source::Output { ugen, .. } = *input {
+                    if !kept[ugen] {
+                        let message = format!(
+                            "optimizeGraph of sclang 3.14.1 removes it while {} reads it, so \
+                             sclang drops UGens",
+                            self.nodes[child].name
+                        );
+                        return Err(finish_build(&self.nodes[ugen].name, &message));
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// The UGen of `source` when it is of the kind `fused` and only one UGen
+    /// reads it.
+    fn fusable(&self, source: Source, fused: Fused) -> Option<usize> {
+        let Source::Output { ugen, .. } = source else {
+            return None;
+        };
+        (fused.matches(&self.nodes[ugen]) && self.reader_count(ugen) == 1).then_some(ugen)
+    }
+
+    fn is_minus(&self, node: usize) -> bool {
+        operator::binary_index("-") == Some(self.nodes[node].special_index)
+    }
+
+    fn pair(&self, node: usize) -> Option<(Source, Source)> {
+        match self.nodes[node].inputs[..] {
+            [a, b] => Some((a, b)),
+            _ => None,
+        }
+    }
+
+    fn reader_count(&self, node: usize) -> usize {
+        self.readers[node].map_or(0, |array| self.arrays[array].items.len())
+    }
+
+    fn rate(&self, source: Source) -> Rate {
+        match source {
+            Source::Number(_) => Rate::Scalar,
+            Source::Output { ugen, output } => usize::try_from(output)
+                .ok()
+                .and_then(|output| self.nodes[ugen].outputs.get(output))
+                .copied()
+                .unwrap_or(self.nodes[ugen].rate),
+        }
+    }
+
     /// The UGens in the order of the children, without the removed ones.
     pub(crate) fn into_rewritten(self) -> Rewritten {
         let order: Vec<usize> = self.children.iter().flatten().copied().collect();
@@ -107,6 +581,7 @@ impl Graph {
                     self.antecedents[node]
                         .iter()
                         .map(|&antecedent| position[antecedent])
+                        .filter(|&at| at != usize::MAX)
                         .collect()
                 })
                 .collect(),
@@ -185,11 +660,30 @@ impl Graph {
         self.nodes.push(node);
         self.antecedents.push(antecedents);
         self.width_first.push(width_first);
+        self.readers.push(None);
+        self.slots.push(usize::MAX);
         if width_first {
             self.width_first_order.push(id);
         }
         id
     }
+}
+
+fn optimize_of(name: &str) -> Optimize {
+    catalog::lookup(name).map_or(Optimize::Nothing, |class| class.optimize)
+}
+
+fn is_multi_out(name: &str) -> bool {
+    catalog::lookup(name).is_some_and(|class| {
+        class.name == "MultiOutUGen" || class.superclasses.contains(&"MultiOutUGen")
+    })
+}
+
+/// Whether `source` is the number `number`, as `==` compares them in
+/// sclang.
+#[allow(clippy::float_cmp)]
+fn is_number(source: Source, number: f64) -> bool {
+    matches!(source, Source::Number(value) if value == number)
 }
 
 /// A UGen with one output at its rate, as `multiNew` of these classes
@@ -228,6 +722,7 @@ fn finish_build(ugen: &str, message: &str) -> BuildError {
 
 #[cfg(test)]
 mod tests {
+    use super::Readers;
     use crate::{ArgValue, BuildError, NewUGen, Rate, SynthDefBuilder, UGenInput};
 
     fn input(value: impl Into<UGenInput>) -> ArgValue {
@@ -353,5 +848,73 @@ mod tests {
             "FFTTrigger: its chain needs a copy, and addCopiesIfNeeded of sclang 3.14.1 finds \
              no FFT size for it"
         );
+    }
+
+    fn sine(b: &mut SynthDefBuilder, freq: f64) -> UGenInput {
+        by_name(b, "SinOsc", "ar", &[("freq", input(freq))])
+    }
+
+    fn out(b: &mut SynthDefBuilder, channels: UGenInput) {
+        by_name(
+            b,
+            "Out",
+            "ar",
+            &[("bus", input(0.0)), ("channelsArray", input(channels))],
+        );
+    }
+
+    #[test]
+    fn an_array_of_readers_has_the_room_of_sclang() {
+        // Measured in sclang 3.14.1: fact 7 of the plan of 0.7.
+        let room = |count| Readers::new(vec![0; count]).room;
+        assert_eq!([0, 1, 4, 5, 8, 65].map(room), [2, 4, 4, 8, 8, 128]);
+    }
+
+    #[test]
+    fn a_full_array_of_readers_loses_a_ugen_that_a_mul_add_reads() {
+        // refused_readers of generator/fixtures.scd: x has four readers.
+        let message = refusal(|b| {
+            let x = sine(b, 1.0);
+            let product = b.binary_op("*", x.clone(), 2.0).unwrap();
+            let sum = b.binary_op("+", product, 1.0).unwrap();
+            for factor in [3.0, 4.0, 5.0] {
+                b.binary_op("*", x.clone(), factor).unwrap();
+            }
+            out(b, sum);
+        });
+        assert_eq!(
+            message,
+            "SinOsc: optimizeGraph of sclang 3.14.1 removes it while MulAdd reads it, so sclang \
+             drops UGens"
+        );
+    }
+
+    #[test]
+    fn a_rewrite_that_folds_into_an_input_is_refused() {
+        // refused_neg_zero of generator/fixtures.scd: x + neg(0) becomes x - 0.
+        let message = refusal(|b| {
+            let x = sine(b, 440.0);
+            let zero = b.unary_op("neg", 0.0).unwrap();
+            let sum = b.binary_op("+", x, zero).unwrap();
+            out(b, sum);
+        });
+        assert_eq!(
+            message,
+            "BinaryOpUGen: optimizeGraph of sclang 3.14.1 folds its rewrite into a number or an \
+             input, then throws or writes a UGen twice"
+        );
+    }
+
+    #[test]
+    fn a_rewrite_that_folds_into_a_number_is_refused() {
+        // refused_neg_numbers of generator/fixtures.scd: 2 + neg(3) becomes 2 - 3.
+        let message = refusal(|b| {
+            let x = sine(b, 440.0);
+            let three = b.unary_op("neg", 3.0).unwrap();
+            let sum = b.binary_op("+", 2.0, three).unwrap();
+            let product = b.binary_op("*", x, sum).unwrap();
+            out(b, product);
+        });
+        assert!(message.starts_with("BinaryOpUGen: optimizeGraph of sclang 3.14.1 folds"));
     }
 }

@@ -154,6 +154,15 @@ fn check_inputs(value: &Value) -> String {
     }
 }
 
+fn optimize(value: &Value) -> &'static str {
+    match text(value) {
+        "nothing" => "Optimize::Nothing",
+        "dead_code" => "Optimize::DeadCode",
+        "binary_op" => "Optimize::BinaryOp",
+        other => panic!("{other} is no rule of optimizeGraph"),
+    }
+}
+
 fn fft_size(value: &Value) -> &'static str {
     match value.as_str() {
         None if value.is_null() => "None",
@@ -346,7 +355,7 @@ fn render_catalog(catalog: &Value) -> String {
     let mut rendered = String::from(HEADER);
     rendered.push_str("#![allow(clippy::unreadable_literal)]\n\n");
     rendered.push_str(
-        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,\n    Outputs, Passthrough, PseudoClass, RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,\n    Optimize, Outputs, Passthrough, PseudoClass, RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     writeln!(
         rendered,
@@ -367,6 +376,12 @@ fn render_catalog(catalog: &Value) -> String {
             rendered,
             "        is_pure: {},",
             class["pure"].as_bool().expect("pure is a boolean")
+        )
+        .unwrap();
+        writeln!(
+            rendered,
+            "        optimize: {},",
+            optimize(&class["optimize"])
         )
         .unwrap();
         writeln!(

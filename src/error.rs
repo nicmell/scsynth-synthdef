@@ -468,7 +468,9 @@ pub enum BuildError {
         rate: Rate,
     },
     /// `finishBuild` of sclang 3.14.1 throws for the graph, or writes a
-    /// broken definition: `addCopiesIfNeeded` cannot copy a PV chain.
+    /// broken definition: `addCopiesIfNeeded` cannot copy a PV chain, or
+    /// `optimizeGraph` folds a rewrite or removes a UGen that the graph
+    /// reads.
     #[non_exhaustive]
     FinishBuild {
         /// The class of the UGen.
