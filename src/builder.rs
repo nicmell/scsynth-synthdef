@@ -190,6 +190,15 @@ pub struct SynthDefBuilder {
     children: Vec<Node>,
     width_first: Vec<usize>,
     variants: Vec<Variant>,
+    max_local_bufs: Option<MaxLocalBufs>,
+}
+
+/// The `MaxLocalBufs` of a build: its node, and the number of `LocalBuf`s
+/// that take it, which `finish` writes into its input.
+#[derive(Clone, Copy, Debug)]
+struct MaxLocalBufs {
+    node: usize,
+    count: u32,
 }
 
 #[derive(Clone, Debug)]
@@ -242,6 +251,7 @@ impl SynthDefBuilder {
             children: Vec::new(),
             width_first: Vec::new(),
             variants: Vec::new(),
+            max_local_bufs: None,
         };
         let mut arguments = vec![UGenInput::Array(Vec::new()); args.len()];
         let mut indices = vec![0; args.len()];
@@ -586,7 +596,10 @@ impl SynthDefBuilder {
     /// # Errors
     ///
     /// A [`BuildError`] when the definition breaks a limit of scsynth.
-    pub fn finish(self) -> Result<SynthDef, BuildError> {
+    pub fn finish(mut self) -> Result<SynthDef, BuildError> {
+        if let Some(max) = self.max_local_bufs {
+            self.children[max.node].inputs[0] = Source::Number(f64::from(max.count));
+        }
         let mut constants = Vec::new();
         let mut constant_index = BTreeMap::new();
         for node in &self.children {
@@ -722,12 +735,42 @@ impl SynthDefBuilder {
         build: impl FnOnce(&mut Self) -> Result<T, BuildError>,
     ) -> Result<T, BuildError> {
         let (children, width_first) = (self.children.len(), self.width_first.len());
+        let max_local_bufs = self.max_local_bufs;
         let result = build(self);
         if result.is_err() {
             self.children.truncate(children);
             self.width_first.truncate(width_first);
+            self.max_local_bufs = max_local_bufs;
         }
         result
+    }
+
+    /// The output of the `MaxLocalBufs` of the build, which counts one more
+    /// `LocalBuf`. The first call adds it, as `LocalBuf:new1` does.
+    pub(crate) fn max_local_bufs(&mut self) -> Result<UGenInput, BuildError> {
+        let (node, count) = if let Some(max) = self.max_local_bufs {
+            (max.node, max.count)
+        } else {
+            let node = self.children.len();
+            self.add(NewUGen::new("MaxLocalBufs", Rate::Scalar).inputs([0.0.into()]))?;
+            (node, 0)
+        };
+        self.max_local_bufs = Some(MaxLocalBufs {
+            node,
+            count: count + 1,
+        });
+        Ok(self.outputs_of(node))
+    }
+
+    /// The class of the UGen of `input`, for an output of this build.
+    pub(crate) fn class_of(&self, input: &UGenInput) -> Option<&str> {
+        match input {
+            UGenInput::Output(output) if output.build == self.build => self
+                .children
+                .get(output.ugen)
+                .map(|node| node.name.as_str()),
+            _ => None,
+        }
     }
 
     /// The expansion of `multiNewList` over `values`, the arguments that

@@ -37,6 +37,8 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "splayaz" => splayaz(),
         "lag" => [lag(), lag_folds()].concat(),
         "outzeros" => outzeros(),
+        "localbuf" => localbuf(),
+        "beattrack" => beattrack(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1377,5 +1379,94 @@ fn outzeros() -> Vec<SynthDef> {
             );
         }),
         def("outzeros_kr", vec![], |b| out(b, "kr", 0.0.into())),
+    ]
+}
+
+/// `LocalBuf(frames, channels)`.
+fn local_buf(b: &mut SynthDefBuilder, frames: impl Into<UGenInput>, channels: f64) -> UGenInput {
+    by_name(
+        b,
+        "LocalBuf",
+        "new",
+        &[
+            ("numFrames", input(frames)),
+            ("numChannels", input(channels)),
+        ],
+    )
+}
+
+/// `FFT(buffer, sound)`.
+fn fft(b: &mut SynthDefBuilder, buffer: UGenInput, sound: UGenInput) -> UGenInput {
+    by_name(
+        b,
+        "FFT",
+        "new",
+        &[("buffer", input(buffer)), ("in", input(sound))],
+    )
+}
+
+/// `IFFT(chain)`.
+fn ifft(b: &mut SynthDefBuilder, chain: UGenInput) -> UGenInput {
+    by_name(b, "IFFT", "new", &[("buffer", input(chain))])
+}
+
+fn localbuf() -> Vec<SynthDef> {
+    vec![
+        def("localbuf_fft", vec![], |b| {
+            let buffer = local_buf(b, 2048.0, 1.0);
+            let sound = sine(b, "ar", 1.0);
+            let chain = fft(b, buffer, sound);
+            let back = ifft(b, chain);
+            out(b, "ar", back);
+        }),
+        def("localbuf_two", vec![], |b| {
+            let buffer = local_buf(b, 1024.0, 1.0);
+            let sound = sine(b, "ar", 1.0);
+            let a = fft(b, buffer, sound);
+            let buffer = local_buf(b, 2048.0, 1.0);
+            let sound = sine(b, "ar", 2.0);
+            let c = fft(b, buffer, sound);
+            let backs = UGenInput::Array(vec![ifft(b, a), ifft(b, c)]);
+            out(b, "ar", backs);
+        }),
+        def("localbuf_array", vec![], |b| {
+            let buffers = local_buf(b, array(&[512.0, 1024.0]), 1.0);
+            let sound = sine(b, "ar", 1.0);
+            let chains = fft(b, buffers, sound);
+            let backs = ifft(b, chains);
+            out(b, "ar", backs);
+        }),
+        def("localbuf_channels", vec![], |b| {
+            let buffer = local_buf(b, 1024.0, 2.0);
+            let sound = by_name(
+                b,
+                "PlayBuf",
+                "ar",
+                &[("numChannels", input(2.0)), ("bufnum", input(buffer))],
+            );
+            out(b, "ar", sound);
+        }),
+    ]
+}
+
+fn beattrack() -> Vec<SynthDef> {
+    vec![
+        def("beattrack_auto", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let beats = by_name(b, "BeatTrack", "kr", &[("chain", input(sound))]);
+            out(b, "kr", beats);
+        }),
+        def("beattrack_chain", vec![], |b| {
+            let buffer = local_buf(b, 1024.0, 1.0);
+            let sound = sine(b, "ar", 1.0);
+            let chain = fft(b, buffer, sound);
+            let beats = by_name(
+                b,
+                "BeatTrack",
+                "kr",
+                &[("chain", input(chain)), ("lock", input(0.5))],
+            );
+            out(b, "kr", beats);
+        }),
     ]
 }

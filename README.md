@@ -341,13 +341,12 @@ it.
 
 `tests/readme.rs` keeps this list equal to the catalogue.
 
-- These pseudo-UGens have no body. `Dunique.new` needs `LocalBuf`, and
-  `InBus.ar` and `InBus.kr` read a `Bus` of sclang.
+- These pseudo-UGens have no body. `Dunique.new` builds its reader at each
+  use as an input, and `InBus.ar` and `InBus.kr` read a `Bus` of sclang.
 - `VarLag.ar` and `VarLag.kr` build an `Env` with their default warp.
   `LagControl.ar` and `LagControl.kr` are controls.
 - `MulAdd.new` folds and orders its inputs. Use `madd` instead.
-- They also create other UGens: `BeatTrack.kr`, `LocalBuf.new`, `Poll.ar`,
-  `Poll.kr` and `Poll.new`.
+- They also create other UGens: `Poll.ar`, `Poll.kr` and `Poll.new`.
 - An input comes from no argument, or the inputs follow a count:
   `DecodeB2.ar`, `DecodeB2.kr`, `Dwrand.new`, `LocalIn.ar` and
   `LocalIn.kr`.

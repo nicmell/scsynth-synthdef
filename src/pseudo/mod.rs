@@ -13,6 +13,7 @@ mod fsin_osc;
 mod hilbert;
 pub(crate) mod lang;
 mod line;
+mod machine_listening;
 mod mix;
 mod osc;
 mod pm_osc;
@@ -137,6 +138,7 @@ type Body = fn(&mut SynthDefBuilder, &Args) -> Result<UGenInput, BuildError>;
 static BODIES: &[(&str, &str, Body)] = &[
     ("BHiPass4", "ar", beq_suite::b_hi_pass4),
     ("BLowPass4", "ar", beq_suite::b_low_pass4),
+    ("BeatTrack", "kr", machine_listening::beat_track),
     ("Changed", "ar", filter::changed),
     ("Changed", "kr", filter::changed),
     ("CompanderD", "ar", compander::compander_d),
@@ -150,6 +152,7 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("LinLin", "kr", line::lin_lin_kr),
     ("LinSelectX", "ar", osc::lin_select_x),
     ("LinSelectX", "kr", osc::lin_select_x),
+    ("LocalBuf", "new", buf_io::local_buf),
     ("Mix", "ar", mix::mix_ar),
     ("Mix", "kr", mix::mix_kr),
     ("Mix", "new", mix::mix_new),

@@ -1199,7 +1199,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "chain", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "lock", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("the method also creates [SampleRate, BinaryOpUGen, BinaryOpUGen, BinaryOpUGen, MaxLocalBufs, LocalBuf, FFT]"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -9505,10 +9505,10 @@ pub(super) static CLASSES: [UGenClass; 419] = [
             RateMethod {
                 selector: "new",
                 args: &[
-                    ArgSpec { name: "numFrames", kind: ArgKind::Count, default: Some(ArgDefault::Float(1.0)) },
-                    ArgSpec { name: "numChannels", kind: ArgKind::Count, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "numFrames", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "numChannels", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
-                addable: Addable::No("the method also creates [MaxLocalBufs]"),
+                addable: Addable::Pseudo,
             },
         ],
     },

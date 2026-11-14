@@ -1,7 +1,7 @@
 //! What the golden files of the pseudo-UGens do not show: their refusals,
 //! and that a call that fails adds no UGen.
 
-use scsynth_synthdef::{Arg, ArgValue, BuildError, Rate, SynthDefBuilder, UGenInput};
+use scsynth_synthdef::{Arg, ArgValue, BuildError, InputSpec, Rate, SynthDefBuilder, UGenInput};
 
 fn builder() -> SynthDefBuilder {
     SynthDefBuilder::new("pseudo", vec![Arg::new("x", 1.0)]).unwrap()
@@ -99,6 +99,33 @@ fn a_lag_of_a_control_and_a_number_breaks_check_inputs_as_in_sclang() {
     let def = b.finish().unwrap();
     let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
     assert_eq!(names, ["Control"]);
+}
+
+#[test]
+fn a_call_that_fails_leaves_the_max_local_bufs_as_it_was() {
+    let mut b = builder();
+    let nan = |frames: f64| input(UGenInput::Array(vec![frames.into(), f64::NAN.into()]));
+    // The first call adds the MaxLocalBufs, then fails: neither stays.
+    let first = b.ugen("LocalBuf", "new", &[("numFrames", nan(256.0))]);
+    assert!(
+        matches!(first, Err(BuildError::NotANumber { .. })),
+        "{first:?}"
+    );
+    b.ugen("LocalBuf", "new", &[("numFrames", input(1024.0))])
+        .unwrap();
+    // A later call counts one more buffer, then fails: the count stays 1.
+    let later = b.ugen("LocalBuf", "new", &[("numFrames", nan(512.0))]);
+    assert!(
+        matches!(later, Err(BuildError::NotANumber { .. })),
+        "{later:?}"
+    );
+    let def = b.finish().unwrap();
+    let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
+    assert_eq!(names, ["Control", "MaxLocalBufs", "LocalBuf"]);
+    let InputSpec::Constant(count) = def.children[1].inputs[0] else {
+        panic!("the count of MaxLocalBufs is a constant");
+    };
+    assert_eq!(def.constants[count as usize].to_bits(), 1.0_f32.to_bits());
 }
 
 #[test]

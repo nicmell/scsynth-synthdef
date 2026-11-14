@@ -83,8 +83,8 @@ var argumentKinds = [
 	[\LagControl, \kr, \values, \array],
 	[\LagIn, \kr, \numChannels, \count],
 	[\ListDUGen, \new, \list, \array],
-	[\LocalBuf, \new, \numChannels, \count],
-	[\LocalBuf, \new, \numFrames, \count],
+	[\LocalBuf, \new, \numChannels, \signal],
+	[\LocalBuf, \new, \numFrames, \signal],
 	[\LocalIn, \ar, \numChannels, \count],
 	[\LocalIn, \kr, \numChannels, \count],
 	[\LocalOut, \ar, \channelsArray, \array],
@@ -155,16 +155,17 @@ var argumentKinds = [
 	[\XOut, \ar, \channelsArray, \array],
 	[\XOut, \kr, \channelsArray, \array]
 ];
-// The census of the pseudo-UGens: classes whose rate methods build other
-// UGens. The crate has a body for each rate method of a class of bodies.
-var bodies = [\BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter, \DynKlang,
-	\DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \Mix, \MultiTap, \NumChannels, \PMOsc,
-	\SelectX, \SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz, \Sum3, \Sum4,
-	\TChoose, \TWChoose, \Tap, \UnpackFFT];
+// The census of the classes whose rate methods do more than new1: the
+// pseudo-UGens, whose rate methods build other UGens, and the classes of 0.4.
+// The crate has a body for each rate method of a class of bodies.
+var bodies = [\BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter,
+	\DynKlang, \DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \LocalBuf, \Mix, \MultiTap,
+	\NumChannels, \PMOsc, \SelectX, \SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz,
+	\Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \UnpackFFT];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
-	[\Dunique, "needs LocalBuf: item 3 of Left out"],
+	[\Dunique, "builds its reader in asUGenInput, at each use as an input"],
 	[\EnvGate, "needs NamedControl and Env: items 4 and 5 of Left out"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
 	[\NamedControl, "a control: item 4 of Left out"],

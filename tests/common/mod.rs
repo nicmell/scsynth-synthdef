@@ -70,6 +70,8 @@ pub const NAMES: &[&str] = &[
     "splayaz",
     "lag",
     "outzeros",
+    "localbuf",
+    "beattrack",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where
