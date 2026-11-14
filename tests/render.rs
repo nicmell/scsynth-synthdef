@@ -218,64 +218,7 @@ fn render_method(rendered: &mut String, method: &Value) {
         other => panic!("{other} is no addable state"),
     };
     if wired {
-        let slots: Vec<String> = method["inputs"]
-            .as_array()
-            .expect("a list of slots")
-            .iter()
-            .map(slot)
-            .collect();
-        writeln!(rendered, "                addable: Addable::Yes(Wiring {{").unwrap();
-        writeln!(
-            rendered,
-            "                    rate: {},",
-            rate(&method["rate"])
-        )
-        .unwrap();
-        writeln!(
-            rendered,
-            "                    inputs: &[{}],",
-            slots.join(", ")
-        )
-        .unwrap();
-        writeln!(
-            rendered,
-            "                    outputs: {},",
-            outputs(&method["outputs"])
-        )
-        .unwrap();
-        writeln!(
-            rendered,
-            "                    special_index: {},",
-            method["special_index"].as_i64().expect("a special index")
-        )
-        .unwrap();
-        writeln!(
-            rendered,
-            "                    madd: {},",
-            method["madd"].as_bool().expect("madd is a boolean")
-        )
-        .unwrap();
-        writeln!(
-            rendered,
-            "                    nested_expansion: {},",
-            method["nested_expansion"]
-                .as_bool()
-                .expect("nested_expansion is a boolean")
-        )
-        .unwrap();
-        let audio_input = method
-            .get("audio_input")
-            .map_or("None".to_owned(), |position| {
-                format!("Some({})", number(position))
-            });
-        writeln!(rendered, "                    audio_input: {audio_input},").unwrap();
-        writeln!(
-            rendered,
-            "                    level: {},",
-            method.get("level").is_some_and(|level| level == true)
-        )
-        .unwrap();
-        writeln!(rendered, "                }}),").unwrap();
+        render_wiring(rendered, method);
     } else {
         writeln!(
             rendered,
@@ -285,6 +228,84 @@ fn render_method(rendered: &mut String, method: &Value) {
         .unwrap();
     }
     writeln!(rendered, "            }},").unwrap();
+}
+
+fn render_wiring(rendered: &mut String, method: &Value) {
+    let slots: Vec<String> = method["inputs"]
+        .as_array()
+        .expect("a list of slots")
+        .iter()
+        .map(slot)
+        .collect();
+    writeln!(rendered, "                addable: Addable::Yes(Wiring {{").unwrap();
+    writeln!(
+        rendered,
+        "                    rate: {},",
+        rate(&method["rate"])
+    )
+    .unwrap();
+    writeln!(
+        rendered,
+        "                    inputs: &[{}],",
+        slots.join(", ")
+    )
+    .unwrap();
+    writeln!(
+        rendered,
+        "                    outputs: {},",
+        outputs(&method["outputs"])
+    )
+    .unwrap();
+    writeln!(
+        rendered,
+        "                    special_index: {},",
+        method["special_index"].as_i64().expect("a special index")
+    )
+    .unwrap();
+    writeln!(
+        rendered,
+        "                    madd: {},",
+        method["madd"].as_bool().expect("madd is a boolean")
+    )
+    .unwrap();
+    writeln!(
+        rendered,
+        "                    nested_expansion: {},",
+        method["nested_expansion"]
+            .as_bool()
+            .expect("nested_expansion is a boolean")
+    )
+    .unwrap();
+    let audio_input = method
+        .get("audio_input")
+        .map_or("None".to_owned(), |position| {
+            format!("Some({})", number(position))
+        });
+    writeln!(rendered, "                    audio_input: {audio_input},").unwrap();
+    writeln!(
+        rendered,
+        "                    level: {},",
+        method.get("level").is_some_and(|level| level == true)
+    )
+    .unwrap();
+    let passthrough = method
+        .get("passthrough")
+        .map_or("None".to_owned(), |through| {
+            let zero = match &through["zero"] {
+                Value::Null => "None".to_owned(),
+                position => format!("Some({})", number(position)),
+            };
+            format!(
+                "Some(Passthrough {{ input: {}, zero: {zero} }})",
+                number(&through["input"])
+            )
+        });
+    writeln!(rendered, "                    passthrough: {passthrough},").unwrap();
+    let silence = method.get("silence").map_or("None".to_owned(), |position| {
+        format!("Some({})", number(position))
+    });
+    writeln!(rendered, "                    silence: {silence},").unwrap();
+    writeln!(rendered, "                }}),").unwrap();
 }
 
 fn render_catalog(catalog: &Value) -> String {
@@ -297,7 +318,7 @@ fn render_catalog(catalog: &Value) -> String {
     let mut rendered = String::from(HEADER);
     rendered.push_str("#![allow(clippy::unreadable_literal)]\n\n");
     rendered.push_str(
-        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, CheckInputs, InputSlot, Outputs, PseudoClass,\n    RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, CheckInputs, InputSlot, Outputs, Passthrough,\n    PseudoClass, RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     writeln!(
         rendered,

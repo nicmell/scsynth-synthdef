@@ -1,9 +1,43 @@
-//! The pseudo-UGens of `BufIO.sc`.
+//! The bodies of `BufIO.sc`.
 
 use super::{Args, lang};
-use crate::builder::SynthDefBuilder;
+use crate::builder::{NewUGen, SynthDefBuilder};
+use crate::catalog;
 use crate::error::BuildError;
+use crate::rate::Rate;
 use crate::ugen_input::UGenInput;
+
+/// `LocalBuf.new`: a `LocalBuf` for each instance of `numChannels` and
+/// `numFrames`, as `multiNew` expands them.
+pub(super) fn local_buf(
+    builder: &mut SynthDefBuilder,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let values = [args.input("numChannels")?, args.input("numFrames")?];
+    builder.expand(
+        "LocalBuf",
+        &["numChannels", "numFrames"],
+        &values,
+        true,
+        &mut |builder, instance| new_local_buf(builder, instance[0].clone(), instance[1].clone()),
+    )
+}
+
+/// `LocalBuf:new1`: the `MaxLocalBufs` of the build counts one more buffer,
+/// and the `LocalBuf` takes it as its last input.
+pub(super) fn new_local_buf(
+    builder: &mut SynthDefBuilder,
+    channels: UGenInput,
+    frames: UGenInput,
+) -> Result<UGenInput, BuildError> {
+    let max = builder.max_local_bufs()?;
+    let width_first = catalog::lookup("LocalBuf").is_some_and(|class| class.is_width_first);
+    builder.add(
+        NewUGen::new("LocalBuf", Rate::Scalar)
+            .inputs([channels, frames, max])
+            .width_first(width_first),
+    )
+}
 
 /// `Tap.ar`: a `PlayBuf` that starts `delaytime` seconds back in the buffer.
 pub(super) fn tap(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {

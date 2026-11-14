@@ -14,9 +14,11 @@
 var root = thisProcess.nowExecutingPath.dirname.dirname;
 var source = "SC_SOURCE".getenv ? "~/Projects/supercollider".standardizePath;
 var library = Platform.classLibraryDir;
+// sclang 3.14.1 runs the code after 1.exit (measured), so the throw stops it.
 var fail = { |message|
 	("catalog.scd: " ++ message).postln;
 	1.exit;
+	Error(message).throw;
 };
 var core = { |item| item.filenameSymbol.asString.beginsWith(library) };
 var show = { |path|
@@ -81,9 +83,11 @@ var argumentKinds = [
 	[\LagControl, \kr, \values, \array],
 	[\LagIn, \kr, \numChannels, \count],
 	[\ListDUGen, \new, \list, \array],
-	[\LocalBuf, \new, \numChannels, \count],
-	[\LocalBuf, \new, \numFrames, \count],
+	[\LocalBuf, \new, \numChannels, \signal],
+	[\LocalBuf, \new, \numFrames, \signal],
+	[\LocalIn, \ar, \default, \array],
 	[\LocalIn, \ar, \numChannels, \count],
+	[\LocalIn, \kr, \default, \array],
 	[\LocalIn, \kr, \numChannels, \count],
 	[\LocalOut, \ar, \channelsArray, \array],
 	[\LocalOut, \kr, \channelsArray, \array],
@@ -153,39 +157,32 @@ var argumentKinds = [
 	[\XOut, \ar, \channelsArray, \array],
 	[\XOut, \kr, \channelsArray, \array]
 ];
-// The census of the pseudo-UGens: classes whose rate methods build other
-// UGens. The crate has a body for each rate method of a class of bodies.
-var bodies = [\BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter, \DynKlang,
-	\DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \Mix, \MultiTap, \NumChannels, \PMOsc,
-	\SelectX, \SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz, \Sum3, \Sum4,
-	\TChoose, \TWChoose, \Tap, \UnpackFFT];
+// The census of the classes whose rate methods do more than new1: the
+// pseudo-UGens, whose rate methods build other UGens, and the classes of 0.4.
+// The crate has a body for each rate method of a class of bodies.
+var bodies = [\BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter,
+	\DynKlang, \DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix,
+	\MultiTap, \NumChannels, \PMOsc, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
+	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \UnpackFFT];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
-	[\Dunique, "needs LocalBuf: item 3 of Left out"],
+	[\Dunique, "builds its reader in asUGenInput, at each use as an input"],
 	[\EnvGate, "needs NamedControl and Env: items 4 and 5 of Left out"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
 	[\NamedControl, "a control: item 4 of Left out"],
-	[\PingPong, "needs LocalIn and the rule of BufWr: items 3 and 6 of Left out"],
+	[\PingPong, "needs the rule of checkInputs of BufWr"],
 	[\SplayZ, "deprecated since 3.10"],
 	[\XIn, "a helper of InBus"],
 	[\XInFeedback, "a helper of InBus"]
 ];
 // Classes that the census meets but that are no pseudo-UGens, and why.
 var notPseudo = [
-	[\Lag, "returns its input for a number or a lag of 0: item 3 of Left out"],
-	[\Lag2, "returns its input for a number or a lag of 0: item 3 of Left out"],
-	[\Lag2UD, "returns its input for a number or a lag of 0: item 3 of Left out"],
-	[\Lag3, "returns its input for a number or a lag of 0: item 3 of Left out"],
-	[\Lag3UD, "returns its input for a number or a lag of 0: item 3 of Left out"],
-	[\LagControl, "returns its input for a lag of 0: item 3 of Left out"],
-	[\LagUD, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\LagControl, "a control, which waits for NamedControl"],
 	[\LevelComp, "a helper of Splay and SplayAz"],
 	[\MulAdd, "folds: madd of the builder"],
 	[\Ndef, "a proxy of JITLib"],
-	[\Ramp, "returns its input for a number or a lag of 0: item 3 of Left out"],
-	[\Slew, "returns its input for a number: item 3 of Left out"],
-	[\VarLag, "returns its input for a number or a time of 0: item 3 of Left out"]
+	[\VarLag, "builds an Env with its default warp, which waits for Env"]
 ];
 var census = bodies ++ leftOut.collect(_.first) ++ notPseudo.collect(_.first);
 
@@ -203,6 +200,26 @@ var audioRateInputs = [
 var levelArguments = [
 	[\LinXFade2, \ar, \level],
 	[\LinXFade2, \kr, \level]
+];
+// The methods that return `in.madd(mul, add)` in place of an instance, by
+// the class that owns the method: the input, and the argument whose 0 also
+// returns it, or nil. The probe gives the input a control output, and
+// testPassthrough tests each entry.
+var passthroughs = [
+	[\Lag, \ar, \in, \lagTime],
+	[\Lag, \kr, \in, \lagTime],
+	[\LagUD, \ar, \in, nil],
+	[\LagUD, \kr, \in, nil],
+	[\Slew, \ar, \in, nil],
+	[\Slew, \kr, \in, nil]
+];
+// The arguments whose zeros become the channels of a Silent.ar before
+// multiNewList, through replaceZeroesWithSilence, by the class that owns the
+// method. testSilence tests each entry.
+var silentZeros = [
+	[\Out, \ar, \channelsArray],
+	[\LocalOut, \ar, \channelsArray],
+	[\XOut, \ar, \channelsArray]
 ];
 
 // An argument whose name holds one of these words needs an entry above.
@@ -256,8 +273,9 @@ var checkRules = (
 );
 
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
-var ugenOwner, kindsOf, probe, signal, element, audio, numberValues, controlValues;
-var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, wiring;
+var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
+var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, wiring, testPassthrough;
+var testSilence;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
 var classes, pseudoClasses, addable = 0, methods = 0, pseudo = 0, helpDir, json;
@@ -411,6 +429,7 @@ try {
 			{ entry.notNil } { entry[3] }
 			{ named.(audioRateInputs) } { \audio }
 			{ named.(levelArguments) } { \level }
+			{ named.(passthroughs) } { \through }
 			{ name == \mul } { \mul }
 			{ name == \add } { \add }
 			{ arrayWords.any { |word| name.asString.toLower.contains(word) } } {
@@ -454,6 +473,10 @@ try {
 	audio = { |position, index = 0|
 		AudioControl.ar([signal.(position) + (0.125 * index)]).asArray.first
 	};
+	// A control-rate output, made inside the build of a probe.
+	control = { |position, index = 0|
+		Control.kr([signal.(position) + (0.125 * index)]).asArray.first
+	};
 	numberValues = { |kinds, counts, sizes|
 		{
 			kinds.collect { |kind, position|
@@ -465,6 +488,7 @@ try {
 				{ \add } { 0.0 }
 				{ \level } { 1.0 }
 				{ \audio } { audio.(position) }
+				{ \through } { control.(position) }
 				{ signal.(position) }
 			}
 		}
@@ -493,6 +517,7 @@ try {
 				{ \add } { 0.0 }
 				{ \level } { 1.0 }
 				{ \audio } { audio.(position) }
+				{ \through } { control.(position) }
 			}
 		}
 	};
@@ -613,6 +638,10 @@ try {
 					flat = { [audio.(position, 0), audio.(position, 1)] };
 					deep = { [[audio.(position, 0), audio.(position, 1)], audio.(position, 2)] };
 				}
+				{ kinds[position] == \through } {
+					flat = { [control.(position, 0), control.(position, 1)] };
+					deep = { [[control.(position, 0), control.(position, 1)], control.(position, 2)] };
+				}
 				{
 					flat = [signal.(position), signal.(position) + 0.125];
 					deep = [flat, signal.(position) + 0.375];
@@ -702,6 +731,51 @@ try {
 		}
 	};
 
+	// Fails unless the entry of passthroughs holds: a number input makes no
+	// UGen. With a zero argument, a control input and 0 there make no UGen.
+	// Without one, a control input and 0 in each other signal make one
+	// instance.
+	testPassthrough = { |class, selector, kinds, input, zero|
+		var none = { |values|
+			var result = probe.(class, selector, values);
+			result[0].isNil and: { result[1].isEmpty }
+		};
+		var holds = none.(valuesAt.(kinds, input, signal.(input))) and: {
+			if (zero.notNil) {
+				none.(valuesAt.(kinds, zero, 0))
+			} {
+				instanceOf.(class, probe.(class, selector, {
+					var arguments = numberValues.(kinds, [], []).value;
+					kinds.do { |kind, position|
+						if (kind == \signal) { arguments.put(position, 0) };
+					};
+					arguments
+				})).isString.not
+			}
+		};
+		if (holds.not) {
+			fail.("the passthrough of %.% does not hold".format(class.name, selector));
+		};
+	};
+
+	// Fails unless the entry of silentZeros holds: a 0 in the array makes one
+	// DC at audio rate before the instance, which takes its output.
+	testSilence = { |class, selector, kinds, position|
+		var created = probe.(class, selector,
+			valuesAt.(kinds, position, [element.(position, 0), 0]))[1];
+		var holds = created.size == 2
+			and: { created[0].class === DC and: { created[0].rate == \audio } }
+			and: { created[1].class === class }
+			and: {
+				created[1].inputs.any { |input|
+					input.isKindOf(OutputProxy) and: { input.source === created[0] }
+				}
+			};
+		if (holds.not) {
+			fail.("the silence of %.% does not hold".format(class.name, selector));
+		};
+	};
+
 	// The kinds of the arguments of a method, with the kinds of `owner`, and
 	// the method as associations: its selector and its arguments.
 	describeArgs = { |class, selector, method, owner|
@@ -714,7 +788,7 @@ try {
 				var value = defaults[position];
 				[
 					\name -> name,
-					\kind -> if ([\mul, \add, \level, \audio].includes(kinds[position])) {
+					\kind -> if ([\mul, \add, \level, \audio, \through].includes(kinds[position])) {
 						\signal
 					} {
 						kinds[position]
@@ -740,8 +814,12 @@ try {
 	// A method of a UGen class: its body, or its wiring, or why it is not
 	// addable.
 	describeMethod = { |class, selector, method, customCheck|
-		var described = describeArgs.(class, selector, method, ugenOwner.(method));
-		var wired;
+		var owner = ugenOwner.(method);
+		var described = describeArgs.(class, selector, method, owner);
+		var names = (method.argNames ? []).drop(1).asArray;
+		var through = passthroughs.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
+		var silent = silentZeros.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
+		var wired, input, zero, position;
 		methods = methods + 1;
 		if (bodies.includes(class.name)) {
 			pseudo = pseudo + 1;
@@ -750,6 +828,17 @@ try {
 			wired = wiring.(class, selector, described[0]);
 			if (customCheck.notNil and: { wired.isString.not }) {
 				wired = "the checkInputs of % is a rule of its own".format(customCheck);
+			};
+			if (through.notNil and: { wired.isString.not }) {
+				input = names.indexOf(through[2]);
+				zero = through[3] !? { |name| names.indexOf(name) };
+				testPassthrough.(class, selector, described[0], input, zero);
+				wired = wired ++ [\passthrough -> [\input -> input, \zero -> zero]];
+			};
+			if (silent.notNil and: { wired.isString.not }) {
+				position = names.indexOf(silent[2]);
+				testSilence.(class, selector, described[0], position);
+				wired = wired ++ [\silence -> position];
 			};
 			if (wired.isString and: { wired.contains("creates no instance") }
 				and: { census.includes(class.name).not }) {
@@ -836,6 +925,9 @@ try {
 	// class that it names, must exist and be named.
 	census.do { |name|
 		if (name.asClass.isNil) { fail.("the census names %, which is no class".format(name)) };
+	};
+	(passthroughs ++ silentZeros).do { |entry|
+		if (entry[0].asClass.isNil) { fail.("a table names %, which is no class".format(entry[0])) };
 	};
 	Class.allClasses.do { |class|
 		if (class.isMetaClass.not

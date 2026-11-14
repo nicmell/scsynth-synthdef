@@ -3,7 +3,7 @@
 
 use scsynth_synthdef::{Arg, ArgValue, SynthDef, SynthDefBuilder, UGenInput};
 
-use super::{arg, array, by_name, flat};
+use super::{arg, array, by_name, element, flat};
 
 /// The definitions of a golden file of the pseudo-UGens.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
@@ -35,6 +35,13 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "hilbertfir" => hilbertfir(),
         "linselectx" => linselectx(),
         "splayaz" => splayaz(),
+        "lag" => [lag(), lag_folds()].concat(),
+        "outzeros" => outzeros(),
+        "localbuf" => localbuf(),
+        "beattrack" => beattrack(),
+        "localin" => localin(),
+        "poll" => poll(),
+        "symbols" => symbols(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1185,4 +1192,413 @@ fn splayaz() -> Vec<SynthDef> {
             out(b, "ar", spread);
         }),
     ]
+}
+
+/// `class.selector(args)` into `Out` at the rate of `selector`.
+fn lag_out(b: &mut SynthDefBuilder, class: &str, selector: &str, args: &[(&str, ArgValue)]) {
+    let lagged = by_name(b, class, selector, args);
+    out(b, selector, lagged);
+}
+
+/// A definition of `class.selector` on the argument `name`, at 440, with
+/// these other arguments.
+fn lag_of(
+    def_name: &str,
+    name: &str,
+    class: &'static str,
+    selector: &'static str,
+    args: &'static [(&str, f64)],
+) -> SynthDef {
+    def(def_name, vec![Arg::new(name, 440.0)], |b| {
+        let mut all = vec![("in", input(arg(b, name)))];
+        all.extend(args.iter().map(|&(name, value)| (name, input(value))));
+        lag_out(b, class, selector, &all);
+    })
+}
+
+/// A definition of `class.selector` on a `SinOsc.ar(1)`, with these other
+/// arguments.
+fn lag_of_sine(def_name: &str, class: &'static str, args: &'static [(&str, f64)]) -> SynthDef {
+    def(def_name, vec![], |b| {
+        let sound = sine(b, "ar", 1.0);
+        let mut all = vec![("in", input(sound))];
+        all.extend(args.iter().map(|&(name, value)| (name, input(value))));
+        lag_out(b, class, "ar", &all);
+    })
+}
+
+fn lag() -> Vec<SynthDef> {
+    vec![
+        lag_of("lag_kr", "freq", "Lag", "kr", &[("lagTime", 0.1)]),
+        lag_of_sine("lag_ar", "Lag", &[("lagTime", 0.01)]),
+        lag_of("lag2_kr", "freq", "Lag2", "kr", &[("lagTime", 0.1)]),
+        lag_of_sine("lag3_ar", "Lag3", &[("lagTime", 0.01)]),
+        lag_of("ramp_kr", "freq", "Ramp", "kr", &[("lagTime", 0.1)]),
+        lag_of(
+            "lagud_kr",
+            "freq",
+            "LagUD",
+            "kr",
+            &[("lagTimeU", 0.1), ("lagTimeD", 0.2)],
+        ),
+        lag_of_sine(
+            "lag2ud_ar",
+            "Lag2UD",
+            &[("lagTimeU", 0.01), ("lagTimeD", 0.02)],
+        ),
+        lag_of(
+            "lag3ud_kr",
+            "freq",
+            "Lag3UD",
+            "kr",
+            &[("lagTimeU", 0.1), ("lagTimeD", 0.2)],
+        ),
+        lag_of_sine("slew_ar", "Slew", &[("up", 100.0), ("dn", 200.0)]),
+        lag_of("slew_kr", "freq", "Slew", "kr", &[]),
+    ]
+}
+
+/// The cases of `lag` that give back their input, or that do not although
+/// a lag is 0.
+fn lag_folds() -> Vec<SynthDef> {
+    vec![
+        def("lag_number", vec![], |b| {
+            lag_out(
+                b,
+                "Lag",
+                "kr",
+                &[("in", input(440.0)), ("lagTime", input(0.1))],
+            );
+        }),
+        lag_of("lag_zero", "freq", "Lag", "kr", &[("lagTime", 0.0)]),
+        lag_of("lag_scalar", "i_freq", "Lag", "kr", &[("lagTime", 0.1)]),
+        lag_of(
+            "lagud_zero",
+            "freq",
+            "LagUD",
+            "kr",
+            &[("lagTimeU", 0.0), ("lagTimeD", 0.0)],
+        ),
+        lag_of("slew_scalar", "i_freq", "Slew", "kr", &[]),
+        def("lag_madd_number", vec![], |b| {
+            lag_out(
+                b,
+                "Lag",
+                "kr",
+                &[
+                    ("in", input(2.0)),
+                    ("lagTime", input(0.1)),
+                    ("mul", input(3.0)),
+                    ("add", input(4.0)),
+                ],
+            );
+        }),
+        def("lag_madd_scalar", vec![Arg::new("i_x", 1.0)], |b| {
+            let x = arg(b, "i_x");
+            lag_out(
+                b,
+                "Lag",
+                "kr",
+                &[
+                    ("in", input(x)),
+                    ("lagTime", input(0.1)),
+                    ("mul", input(2.0)),
+                    ("add", input(3.0)),
+                ],
+            );
+        }),
+        lag_of(
+            "lag_madd",
+            "freq",
+            "Lag",
+            "kr",
+            &[("lagTime", 0.1), ("mul", 2.0), ("add", 3.0)],
+        ),
+        def(
+            "lag_array",
+            vec![Arg::new("a", 1.0), Arg::new("b", 2.0)],
+            |b| {
+                let pair = UGenInput::Array(vec![arg(b, "a"), arg(b, "b")]);
+                lag_out(
+                    b,
+                    "Lag",
+                    "kr",
+                    &[("in", input(pair)), ("lagTime", input(0.1))],
+                );
+            },
+        ),
+        def("lag_array_scalar", vec![], |b| {
+            lag_out(
+                b,
+                "Lag",
+                "kr",
+                &[
+                    ("in", input(array(&[1.0, 2.0]))),
+                    ("lagTime", input(0.1)),
+                    ("mul", input(2.0)),
+                ],
+            );
+        }),
+    ]
+}
+
+/// `class.ar` with a bus of 0 and these other arguments.
+fn out_ar(b: &mut SynthDefBuilder, class: &str, args: &[(&str, ArgValue)]) {
+    let mut all = vec![("bus", input(0.0))];
+    all.extend(args.iter().cloned());
+    by_name(b, class, "ar", &all);
+}
+
+fn outzeros() -> Vec<SynthDef> {
+    vec![
+        def("outzeros_one", vec![], |b| out(b, "ar", 0.0.into())),
+        def("outzeros_two", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            out(
+                b,
+                "ar",
+                UGenInput::Array(vec![sound, 0.0.into(), 0.0.into()]),
+            );
+        }),
+        def("outzeros_negative", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            out(b, "ar", UGenInput::Array(vec![(-0.0).into(), sound]));
+        }),
+        def("outzeros_replace", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let channels = UGenInput::Array(vec![0.0.into(), sound]);
+            out_ar(b, "ReplaceOut", &[("channelsArray", input(channels))]);
+        }),
+        def("outzeros_offset", vec![], |b| {
+            out_ar(b, "OffsetOut", &[("channelsArray", input(0.0))]);
+        }),
+        def("outzeros_x", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let channels = UGenInput::Array(vec![sound, 0.0.into()]);
+            out_ar(
+                b,
+                "XOut",
+                &[("xfade", input(0.5)), ("channelsArray", input(channels))],
+            );
+        }),
+        def("outzeros_kr", vec![], |b| out(b, "kr", 0.0.into())),
+    ]
+}
+
+/// `LocalBuf(frames, channels)`.
+fn local_buf(b: &mut SynthDefBuilder, frames: impl Into<UGenInput>, channels: f64) -> UGenInput {
+    by_name(
+        b,
+        "LocalBuf",
+        "new",
+        &[
+            ("numFrames", input(frames)),
+            ("numChannels", input(channels)),
+        ],
+    )
+}
+
+/// `FFT(buffer, sound)`.
+fn fft(b: &mut SynthDefBuilder, buffer: UGenInput, sound: UGenInput) -> UGenInput {
+    by_name(
+        b,
+        "FFT",
+        "new",
+        &[("buffer", input(buffer)), ("in", input(sound))],
+    )
+}
+
+/// `IFFT(chain)`.
+fn ifft(b: &mut SynthDefBuilder, chain: UGenInput) -> UGenInput {
+    by_name(b, "IFFT", "new", &[("buffer", input(chain))])
+}
+
+fn localbuf() -> Vec<SynthDef> {
+    vec![
+        def("localbuf_fft", vec![], |b| {
+            let buffer = local_buf(b, 2048.0, 1.0);
+            let sound = sine(b, "ar", 1.0);
+            let chain = fft(b, buffer, sound);
+            let back = ifft(b, chain);
+            out(b, "ar", back);
+        }),
+        def("localbuf_two", vec![], |b| {
+            let buffer = local_buf(b, 1024.0, 1.0);
+            let sound = sine(b, "ar", 1.0);
+            let a = fft(b, buffer, sound);
+            let buffer = local_buf(b, 2048.0, 1.0);
+            let sound = sine(b, "ar", 2.0);
+            let c = fft(b, buffer, sound);
+            let backs = UGenInput::Array(vec![ifft(b, a), ifft(b, c)]);
+            out(b, "ar", backs);
+        }),
+        def("localbuf_array", vec![], |b| {
+            let buffers = local_buf(b, array(&[512.0, 1024.0]), 1.0);
+            let sound = sine(b, "ar", 1.0);
+            let chains = fft(b, buffers, sound);
+            let backs = ifft(b, chains);
+            out(b, "ar", backs);
+        }),
+        def("localbuf_channels", vec![], |b| {
+            let buffer = local_buf(b, 1024.0, 2.0);
+            let sound = by_name(
+                b,
+                "PlayBuf",
+                "ar",
+                &[("numChannels", input(2.0)), ("bufnum", input(buffer))],
+            );
+            out(b, "ar", sound);
+        }),
+    ]
+}
+
+fn beattrack() -> Vec<SynthDef> {
+    vec![
+        def("beattrack_auto", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let beats = by_name(b, "BeatTrack", "kr", &[("chain", input(sound))]);
+            out(b, "kr", beats);
+        }),
+        def("beattrack_chain", vec![], |b| {
+            let buffer = local_buf(b, 1024.0, 1.0);
+            let sound = sine(b, "ar", 1.0);
+            let chain = fft(b, buffer, sound);
+            let beats = by_name(
+                b,
+                "BeatTrack",
+                "kr",
+                &[("chain", input(chain)), ("lock", input(0.5))],
+            );
+            out(b, "kr", beats);
+        }),
+    ]
+}
+
+/// `LocalIn.selector(channels, default)`.
+fn local_in(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    channels: f64,
+    default: Option<UGenInput>,
+) -> UGenInput {
+    let mut args = vec![("numChannels", input(channels))];
+    args.extend(default.map(|default| ("default", input(default))));
+    by_name(b, "LocalIn", selector, &args)
+}
+
+/// `LocalOut.selector(channels)`.
+fn local_out(b: &mut SynthDefBuilder, selector: &str, channels: UGenInput) {
+    by_name(
+        b,
+        "LocalOut",
+        selector,
+        &[("channelsArray", input(channels))],
+    );
+}
+
+fn localin() -> Vec<SynthDef> {
+    vec![
+        def("localin_ar", vec![], |b| {
+            let back = local_in(b, "ar", 2.0, None);
+            let half = b.binary_op("*", back.clone(), 0.5).unwrap();
+            local_out(b, "ar", half);
+            out(b, "ar", back);
+        }),
+        def("localin_default", vec![], |b| {
+            let back = local_in(b, "ar", 3.0, Some(array(&[0.1, 0.2])));
+            local_out(b, "ar", back.clone());
+            out(b, "ar", back);
+        }),
+        def("localin_kr", vec![], |b| {
+            let back = local_in(b, "kr", 1.0, Some(0.5.into()));
+            let more = b.binary_op("+", back.clone(), 1.0).unwrap();
+            local_out(b, "kr", more);
+            out(b, "kr", back);
+        }),
+        def("localin_zero", vec![], |b| {
+            let back = local_in(b, "ar", 2.0, None);
+            let channels = UGenInput::Array(vec![element(&back, 0), 0.0.into()]);
+            local_out(b, "ar", channels);
+            out(b, "ar", back);
+        }),
+    ]
+}
+
+/// `Poll.selector(trig, sound)`, with these other arguments.
+fn poll_of(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    trig: UGenInput,
+    sound: UGenInput,
+    args: &[(&str, ArgValue)],
+) -> UGenInput {
+    let mut all = vec![("trig", input(trig)), ("in", input(sound))];
+    all.extend(args.iter().cloned());
+    by_name(b, "Poll", selector, &all)
+}
+
+fn poll() -> Vec<SynthDef> {
+    let text = |label: &str| ArgValue::Text(label.to_owned());
+    vec![
+        def("poll_kr", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            poll_of(b, "kr", 10.0.into(), sound, &[]);
+        }),
+        def("poll_label", vec![], |b| {
+            let trig = by_name(b, "Impulse", "ar", &[("freq", input(2.0))]);
+            let sound = sine(b, "ar", 1.0);
+            let args = [("label", text("freq")), ("trigid", input(7.0))];
+            poll_of(b, "ar", trig, sound, &args);
+        }),
+        def("poll_symbol", vec![], |b| {
+            let trig = by_name(b, "Impulse", "kr", &[("freq", input(2.0))]);
+            let sound = sine(b, "kr", 1.0);
+            poll_of(b, "kr", trig, sound, &[("label", text("amp"))]);
+        }),
+        def("poll_proxy", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            let pair = by_name(b, "Pan2", "kr", &[("in", input(sound))]);
+            poll_of(b, "kr", 10.0.into(), pair, &[]);
+        }),
+        def("poll_integer", vec![], |b| {
+            poll_of(b, "kr", 10.0.into(), 440.0.into(), &[]);
+        }),
+        def("poll_float", vec![], |b| {
+            poll_of(b, "kr", 10.0.into(), 0.5.into(), &[]);
+        }),
+        def("poll_new", vec![Arg::new("freq", 440.0)], |b| {
+            let freq = arg(b, "freq");
+            poll_of(b, "new", 10.0.into(), freq, &[]);
+        }),
+        def("poll_new_scalar", vec![Arg::new("i_x", 1.0)], |b| {
+            let x = arg(b, "i_x");
+            poll_of(b, "new", 10.0.into(), x, &[]);
+        }),
+        def("poll_out", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let polled = poll_of(b, "ar", 10.0.into(), sound, &[]);
+            out(b, "ar", polled);
+        }),
+        def("poll_bytes", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            poll_of(b, "kr", 10.0.into(), sound, &[("label", text("é"))]);
+        }),
+    ]
+}
+
+fn symbols() -> Vec<SynthDef> {
+    vec![def("sendreply_bytes", vec![], |b| {
+        let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+        let sound = sine(b, "kr", 1.0);
+        by_name(
+            b,
+            "SendReply",
+            "kr",
+            &[
+                ("trig", input(trig)),
+                ("cmdName", ArgValue::Text("/é".to_owned())),
+                ("values", input(sound)),
+            ],
+        );
+    })]
 }

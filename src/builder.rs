@@ -4,7 +4,8 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::catalog::{
-    self, Addable, ArgDefault, ArgKind, InputSlot, Outputs, RateMethod, UGenClass, Wiring,
+    self, Addable, ArgDefault, ArgKind, InputSlot, Outputs, Passthrough, RateMethod, UGenClass,
+    Wiring,
 };
 use crate::check_inputs;
 use crate::error::BuildError;
@@ -189,6 +190,15 @@ pub struct SynthDefBuilder {
     children: Vec<Node>,
     width_first: Vec<usize>,
     variants: Vec<Variant>,
+    max_local_bufs: Option<MaxLocalBufs>,
+}
+
+/// The `MaxLocalBufs` of a build: its node, and the number of `LocalBuf`s
+/// that take it, which `finish` writes into its input.
+#[derive(Clone, Copy, Debug)]
+struct MaxLocalBufs {
+    node: usize,
+    count: u32,
 }
 
 #[derive(Clone, Debug)]
@@ -241,6 +251,7 @@ impl SynthDefBuilder {
             children: Vec::new(),
             width_first: Vec::new(),
             variants: Vec::new(),
+            max_local_bufs: None,
         };
         let mut arguments = vec![UGenInput::Array(Vec::new()); args.len()];
         let mut indices = vec![0; args.len()];
@@ -442,6 +453,11 @@ impl SynthDefBuilder {
         };
         let mut values = bind_arguments(class, method, args)?;
         let madd = madd_arguments(class, method, wiring, &values)?;
+        if let Some(through) = wiring.passthrough {
+            if let Some(input) = passed_through(through, &values) {
+                return self.transaction(|builder| builder.madd_input(class, input, madd));
+            }
+        }
         let level = level_argument(class, method, wiring, &values)?;
         let positions = expanding(wiring);
         let mut names = Vec::with_capacity(positions.len());
@@ -458,6 +474,13 @@ impl SynthDefBuilder {
             expanded.push(input.clone());
         }
         self.transaction(|builder| {
+            if let Some(position) = wiring.silence {
+                if let ArgValue::Input(channels) = &values[position] {
+                    let channels = pseudo::elements(channels.clone());
+                    let channels = lang::replace_zeroes_with_silence(builder, channels)?;
+                    values[position] = ArgValue::Input(UGenInput::Array(channels));
+                }
+            }
             let audio_slot = wiring
                 .audio_input
                 .and_then(|audio| positions.iter().position(|&position| position == audio));
@@ -573,7 +596,10 @@ impl SynthDefBuilder {
     /// # Errors
     ///
     /// A [`BuildError`] when the definition breaks a limit of scsynth.
-    pub fn finish(self) -> Result<SynthDef, BuildError> {
+    pub fn finish(mut self) -> Result<SynthDef, BuildError> {
+        if let Some(max) = self.max_local_bufs {
+            self.children[max.node].inputs[0] = Source::Number(f64::from(max.count));
+        }
         let mut constants = Vec::new();
         let mut constant_index = BTreeMap::new();
         for node in &self.children {
@@ -709,12 +735,42 @@ impl SynthDefBuilder {
         build: impl FnOnce(&mut Self) -> Result<T, BuildError>,
     ) -> Result<T, BuildError> {
         let (children, width_first) = (self.children.len(), self.width_first.len());
+        let max_local_bufs = self.max_local_bufs;
         let result = build(self);
         if result.is_err() {
             self.children.truncate(children);
             self.width_first.truncate(width_first);
+            self.max_local_bufs = max_local_bufs;
         }
         result
+    }
+
+    /// The output of the `MaxLocalBufs` of the build, which counts one more
+    /// `LocalBuf`. The first call adds it, as `LocalBuf:new1` does.
+    pub(crate) fn max_local_bufs(&mut self) -> Result<UGenInput, BuildError> {
+        let (node, count) = if let Some(max) = self.max_local_bufs {
+            (max.node, max.count)
+        } else {
+            let node = self.children.len();
+            self.add(NewUGen::new("MaxLocalBufs", Rate::Scalar).inputs([0.0.into()]))?;
+            (node, 0)
+        };
+        self.max_local_bufs = Some(MaxLocalBufs {
+            node,
+            count: count + 1,
+        });
+        Ok(self.outputs_of(node))
+    }
+
+    /// The class of the UGen of `input`, for an output of this build.
+    pub(crate) fn class_of(&self, input: &UGenInput) -> Option<&str> {
+        match input {
+            UGenInput::Output(output) if output.build == self.build => self
+                .children
+                .get(output.ugen)
+                .map(|node| node.name.as_str()),
+            _ => None,
+        }
     }
 
     /// The expansion of `multiNewList` over `values`, the arguments that
@@ -850,6 +906,22 @@ impl SynthDefBuilder {
         let special_index = operator::unary_index("neg")
             .ok_or_else(|| BuildError::UnknownOperator("neg".to_owned()))?;
         self.unary_leaf(special_index, input)
+    }
+
+    /// `input.madd(mul, add)` in sclang: `(input * mul) + add` for a number,
+    /// as `SimpleNumber:madd` computes it, and else `MulAdd.new`.
+    fn madd_input(
+        &mut self,
+        class: &str,
+        input: UGenInput,
+        madd: Option<[UGenInput; 2]>,
+    ) -> Result<UGenInput, BuildError> {
+        let [mul, add] = madd.unwrap_or([UGenInput::Number(1.0), UGenInput::Number(0.0)]);
+        if let UGenInput::Number(_) = input {
+            let product = lang::binary(self, "*", input, mul)?;
+            return lang::binary(self, "+", product, add);
+        }
+        self.madd_expanded(class, &[input, mul, add])
     }
 
     /// `MulAdd.new` over `values`: the input, `mul` and `add`, with the class
@@ -994,6 +1066,19 @@ fn can_be_mul_add(input: &UGenInput, mul: &UGenInput, add: &UGenInput) -> bool {
 
 /// The positions of the arguments that expand: those of the wire, and the
 /// count of the outputs, as the method gives them `multiNew`.
+/// The input that a method of `through` gives back in place of an instance:
+/// an input at scalar rate, or any input with the number 0 in the zero
+/// argument.
+fn passed_through(through: Passthrough, values: &[ArgValue]) -> Option<UGenInput> {
+    let ArgValue::Input(input) = &values[through.input] else {
+        return None;
+    };
+    let zero = through.zero.is_some_and(|position| {
+        matches!(values[position], ArgValue::Input(UGenInput::Number(number)) if number == 0.0)
+    });
+    (zero || lang::rate(input) == Some(Rate::Scalar)).then(|| input.clone())
+}
+
 fn expanding(wiring: Wiring) -> Vec<usize> {
     let mut positions: Vec<usize> = wiring
         .inputs
@@ -1209,10 +1294,7 @@ fn wire_inputs(
                 }
             },
             InputSlot::ArgString(position) => match &values[position] {
-                ArgValue::Text(text) => {
-                    inputs.push(UGenInput::from(f64::from(to_u32(text.len()))));
-                    inputs.extend(text.bytes().map(|byte| UGenInput::from(f64::from(byte))));
-                }
+                ArgValue::Text(text) => inputs.extend(symbol_codes(text)),
                 ArgValue::Input(_) | ArgValue::Bool(_) => {
                     return Err(wrong_kind(class, method, position, "a symbol"));
                 }
@@ -1249,6 +1331,17 @@ fn wire_outputs(
             ArgValue::Input(_) => Ok(vec![rate]),
         },
     }
+}
+
+/// The inputs of a symbol, as sclang writes them: its size, then each byte
+/// as `Char:ascii` gives it, from -128 to 127.
+pub(crate) fn symbol_codes(text: &str) -> Vec<UGenInput> {
+    let mut codes = vec![UGenInput::from(f64::from(to_u32(text.len())))];
+    codes.extend(
+        text.bytes()
+            .map(|byte| UGenInput::from(f64::from(i8::from_ne_bytes([byte])))),
+    );
+    codes
 }
 
 /// A whole number from 1 to `u16::MAX`, as a count of outputs.
@@ -1935,7 +2028,7 @@ mod tests {
             BuildError::UnknownMethod { .. }
         ));
         assert!(matches!(
-            refuse("Lag", "kr", &[]),
+            refuse("VarLag", "kr", &[]),
             BuildError::NotAddable { .. }
         ));
         assert!(matches!(

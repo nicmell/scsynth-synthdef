@@ -167,6 +167,25 @@ pub struct Wiring {
     /// Whether the method multiplies the result of the expansion by its
     /// argument `level`, as `LinXFade2` does.
     pub level: bool,
+    /// When the method gives back its input in place of an instance, as the
+    /// Lag family does for a number or a lag of 0.
+    pub passthrough: Option<Passthrough>,
+    /// The position of the argument whose zeros become silence before the
+    /// expansion, through `replaceZeroesWithSilence`, as the channels of
+    /// `Out.ar`.
+    pub silence: Option<usize>,
+}
+
+/// When a method gives back `in.madd(mul, add)` in place of an instance: for
+/// an input at scalar rate, or for the number 0 in its zero argument.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[non_exhaustive]
+pub struct Passthrough {
+    /// The position of the input.
+    pub input: usize,
+    /// The position of the argument whose 0 also gives back the input, as
+    /// `lagTime` of `Lag.kr`.
+    pub zero: Option<usize>,
 }
 
 /// Where inputs of the wire come from.
@@ -380,9 +399,8 @@ mod tests {
     #[test]
     fn a_method_that_does_more_than_new1_is_not_addable() {
         // Fact 33 of the plan of 0.1.
-        assert!(reason("Lag", "kr").contains("no instance"));
-        assert!(reason("LocalBuf", "new").contains("MaxLocalBufs"));
-        assert!(reason("Poll", "kr").contains("Impulse"));
+        assert!(reason("VarLag", "kr").contains("no instance"));
+        assert!(reason("MaxLocalBufs", "new").contains("no argument"));
         assert_eq!(wiring("DelayN", "kr").rate, Rate::Control);
         assert!(reason("Duty", "kr").contains("rule of its own"));
     }
@@ -402,6 +420,41 @@ mod tests {
             .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.audio_input.is_some()))
             .count();
         assert_eq!(converted, 19);
+    }
+
+    #[test]
+    fn the_lag_family_gives_back_its_input_for_a_scalar_or_a_lag_of_0() {
+        // Facts 1 and 2 of the plan of 0.4.
+        let lag = wiring("Lag", "kr").passthrough.unwrap();
+        assert_eq!((lag.input, lag.zero), (0, Some(1)));
+        assert_eq!(wiring("Ramp", "ar").passthrough, Some(lag));
+        assert_eq!(wiring("Lag3UD", "kr").passthrough.unwrap().zero, None);
+        assert_eq!(wiring("Slew", "ar").passthrough.unwrap().zero, None);
+        assert_eq!(wiring("LPF", "ar").passthrough, None);
+        let passthroughs = all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.passthrough.is_some()))
+            .count();
+        assert_eq!(passthroughs, 16);
+    }
+
+    #[test]
+    fn the_zeros_of_the_outputs_at_audio_rate_become_silence() {
+        // Fact 7 of the plan of 0.4.
+        assert_eq!(wiring("Out", "ar").silence, Some(1));
+        assert_eq!(wiring("OffsetOut", "ar").silence, Some(1));
+        assert_eq!(wiring("LocalOut", "ar").silence, Some(0));
+        assert_eq!(wiring("XOut", "ar").silence, Some(2));
+        assert_eq!(wiring("Out", "kr").silence, None);
+        let silenced = all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter(
+                |method| matches!(method.addable, Addable::Yes(wiring) if wiring.silence.is_some()),
+            )
+            .count();
+        assert_eq!(silenced, 5);
     }
 
     #[test]

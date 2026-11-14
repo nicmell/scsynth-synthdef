@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.4.0 (2026-11-14)
+
+The rate methods of SuperCollider 3.14.1 that do more than `new1`, as
+sclang builds them.
+
+### Added
+
+- The Lag family gives back its input in place of a UGen, as sclang does.
+  `Lag`, `Lag2`, `Lag3` and `Ramp` do it for an input at scalar rate or a
+  `lagTime` of 0. `LagUD`, `Lag2UD`, `Lag3UD` and `Slew` do it for an input
+  at scalar rate. Their 16 methods become addable.
+- `Out.ar`, `ReplaceOut.ar`, `OffsetOut.ar`, `LocalOut.ar` and `XOut.ar` put
+  silence in place of a 0 channel, as `replaceZeroesWithSilence` does.
+- `LocalBuf.new` adds the `MaxLocalBufs` of the build, and counts its
+  buffers in it. `BeatTrack.kr`, `LocalIn.ar`, `LocalIn.kr`, `Poll.ar`,
+  `Poll.kr` and `Poll.new` have a body. See
+  [Methods that do more than `new1`](README.md#methods-that-do-more-than-new1).
+- `Wiring::passthrough`, a `Passthrough`, and `Wiring::silence`.
+- `generator/catalog.scd` takes the tables `passthroughs` and
+  `silentZeros`, and probes test each entry. `generator/fixtures.scd`
+  writes the golden files of 0.4: `lag`, `outzeros`, `localbuf`,
+  `beattrack`, `localin`, `poll` and `symbols`.
+
+### Changed
+
+- The codes of a symbol argument, such as the name of `SendReply`, are its
+  bytes as `Char:ascii` gives them in sclang, from -128 to 127. They were
+  the bytes from 0 to 255.
+- `LocalBuf.new` takes signals for `numFrames` and `numChannels`, and
+  `LocalIn` takes an array for `default`.
+- The 23 methods above no longer give `NotAddable`. `ugen` refuses 43
+  methods, from 66.
+
+### Fixed
+
+- `fail` of both generators throws after `1.exit`. sclang 3.14.1 runs the
+  code after `1.exit`, so a failed test went on, and the script ended
+  with 0.
+
 ## 0.3.0 (2026-11-13)
 
 The pseudo-UGens of SuperCollider 3.14.1, by class name, as sclang builds

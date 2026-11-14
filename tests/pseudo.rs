@@ -1,7 +1,7 @@
 //! What the golden files of the pseudo-UGens do not show: their refusals,
 //! and that a call that fails adds no UGen.
 
-use scsynth_synthdef::{Arg, ArgValue, BuildError, Rate, SynthDefBuilder, UGenInput};
+use scsynth_synthdef::{Arg, ArgValue, BuildError, InputSpec, Rate, SynthDefBuilder, UGenInput};
 
 fn builder() -> SynthDefBuilder {
     SynthDefBuilder::new("pseudo", vec![Arg::new("x", 1.0)]).unwrap()
@@ -77,6 +77,82 @@ fn a_pseudo_ugen_that_fails_adds_no_ugen() {
     let def = b.finish().unwrap();
     let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
     assert_eq!(names, ["Control"]);
+}
+
+#[test]
+fn a_lag_of_a_control_and_a_number_breaks_check_inputs_as_in_sclang() {
+    // The control makes the array run at control rate, so nothing passes
+    // through, and Lag.kr(2) breaks checkSameRateAsFirstInput.
+    let mut b = builder();
+    let x = b.arguments()[0].clone();
+    let pair = UGenInput::Array(vec![x.clone(), 2.0.into()]);
+    let mixed = b.ugen("Lag", "kr", &[("in", input(pair)), ("lagTime", input(0.1))]);
+    assert!(
+        matches!(&mixed, Err(BuildError::CheckInputs { class, .. }) if class == "Lag"),
+        "{mixed:?}"
+    );
+    let audio = b.ugen("Lag", "ar", &[("in", input(x))]);
+    assert!(
+        matches!(&audio, Err(BuildError::CheckInputs { class, .. }) if class == "Lag"),
+        "{audio:?}"
+    );
+    let def = b.finish().unwrap();
+    let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
+    assert_eq!(names, ["Control"]);
+}
+
+#[test]
+fn a_call_that_fails_leaves_the_max_local_bufs_as_it_was() {
+    let mut b = builder();
+    let nan = |frames: f64| input(UGenInput::Array(vec![frames.into(), f64::NAN.into()]));
+    // The first call adds the MaxLocalBufs, then fails: neither stays.
+    let first = b.ugen("LocalBuf", "new", &[("numFrames", nan(256.0))]);
+    assert!(
+        matches!(first, Err(BuildError::NotANumber { .. })),
+        "{first:?}"
+    );
+    b.ugen("LocalBuf", "new", &[("numFrames", input(1024.0))])
+        .unwrap();
+    // A later call counts one more buffer, then fails: the count stays 1.
+    let later = b.ugen("LocalBuf", "new", &[("numFrames", nan(512.0))]);
+    assert!(
+        matches!(later, Err(BuildError::NotANumber { .. })),
+        "{later:?}"
+    );
+    let def = b.finish().unwrap();
+    let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
+    assert_eq!(names, ["Control", "MaxLocalBufs", "LocalBuf"]);
+    let InputSpec::Constant(count) = def.children[1].inputs[0] else {
+        panic!("the count of MaxLocalBufs is a constant");
+    };
+    assert_eq!(def.constants[count as usize].to_bits(), 1.0_f32.to_bits());
+}
+
+#[test]
+fn local_in_and_poll_refuse_what_sclang_refuses() {
+    let mut b = builder();
+    let x = b.arguments()[0].clone();
+    let none = b.ugen("LocalIn", "ar", &[("numChannels", input(0.0))]);
+    assert!(
+        matches!(&none, Err(BuildError::BadCount { class, .. }) if class == "LocalIn"),
+        "{none:?}"
+    );
+    let empty = b.ugen(
+        "LocalIn",
+        "ar",
+        &[("numChannels", input(2.0)), ("default", input(Vec::new()))],
+    );
+    assert!(
+        matches!(empty, Err(BuildError::EmptyInput { .. })),
+        "{empty:?}"
+    );
+    // The rule of Poll is checkSameRateAsFirstInput: its trigger.
+    let trig = b.ugen("Impulse", "ar", &[("freq", input(1.0))]).unwrap();
+    let audio = b.ugen("Poll", "kr", &[("trig", input(trig)), ("in", input(x))]);
+    assert!(
+        matches!(&audio, Err(BuildError::CheckInputs { class, .. }) if class == "Poll"),
+        "{audio:?}"
+    );
 }
 
 #[test]
