@@ -153,6 +153,18 @@ assert_eq!(names, ["Control", "SinOsc", "BinaryOpUGen", "SinOsc", "BinaryOpUGen"
   `In.ar(0, [1, 2])` makes an `In` of one channel and an `In` of two. A
   symbol argument takes one text, and an array argument flattens into the
   inputs.
+- An array among the elements of an array argument expands as its class
+  expands it, and `Wiring::array_expansion` records how:
+  - `Elements`: the method hands each element to `multiNewList`, so an
+    element that is an array expands the UGen with the other arguments.
+    `Out.ar(0, [[a, b], c])` makes `Out(0, a, c)` and `Out(0, b, c)`, and so
+    do the methods of `BufWr`, `Select`, `Demand` and `Dseq`, for example.
+  - `Flop`: with an array among the values of `SendReply`, each element
+    gives the values of one instance, one level down.
+  - `Refs`: if the first element of the envelope of `EnvGen` is an array,
+    each element is one envelope.
+  - `IEnvGen` keeps the arrays of its envelope among its inputs, which the
+    builder refuses.
 - `ugen` applies `madd` once, to the whole result, as `Array:madd` does. So
   `SinOsc.ar([440, 442], 0, [0.1, 0.2, 0.3])` makes two `SinOsc` and three
   `*`.
@@ -166,12 +178,13 @@ The builder refuses two inputs that sclang takes:
   `Collection:writeInputSpec`). scsynth 3.14.1 refuses that definition with
   "UGen '' not installed.", and `read_def_file` refuses it too. Next to a
   full array, the empty one gives a nil input, which sclang refuses.
-- An array inside an array argument, or inside an argument of `SendReply`
-  (`BuildError::NestedArray`). sclang expands these in a way that depends on
-  the class. `Out.ar(0, [[a, b], [c, d]])` makes `Out(0, a, c)` and
-  `Out(0, b, d)`, and `SendReply` takes each inner array of its values
-  whole. Below the first level, sclang writes an inner array of `SendReply`
-  as one input.
+- An array that stays among the inputs of a UGen
+  (`BuildError::NestedArray`). `Array:isValidUGenInput` answers true, so
+  sclang counts such an array as one input. Then it writes an input spec for
+  each of its elements, and scsynth misreads the file. Such an array comes
+  from two levels down in the values of `SendReply`, or in an argument of
+  it. The envelope of `EnvGen` keeps one after a first element that is not
+  an array. The envelope of `IEnvGen` keeps every array inside.
 
 ### `madd` and the folds
 
@@ -343,7 +356,8 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
   whether `mul` and `add` apply, and whether a nested array expands again.
   It also holds the argument that goes through `asAudioRateInput`, and
   whether `level` multiplies the result. It holds the `Passthrough` of the
-  Lag family, and the argument whose zeros become silence.
+  Lag family, the argument whose zeros become silence, and the
+  `ArrayExpansion` of the array argument.
   `Addable::Pseudo` marks a method that a body of the crate builds (see
   [Pseudo-UGens](#pseudo-ugens) and
   [Methods that do more than `new1`](#methods-that-do-more-than-new1)).
@@ -359,8 +373,11 @@ family takes a control-rate output, so that the method makes an instance.
 More calls find whether a count or an array sets the number of outputs.
 Then, on each argument that expands, an array of two elements must make
 two instances, instance i with element i. An array inside an array must
-make three. 581 of the 635 methods are addable with a wiring, and 51 have
-a body. Most of the others do more than `UGen:new1` does:
+make three. Last, the array argument takes `[[e0, e1], e2]`, then
+`[e2, [e0, e1]]`. The instances that they make give its `ArrayExpansion`.
+If one instance keeps the array among its inputs, the method has none.
+581 of the 635 methods are addable with a wiring, and 51 have a body. Most
+of the others do more than `UGen:new1` does:
 
 - The pseudo-UGens without a body, such as `Dunique`, create
   no instance of their class.
@@ -482,8 +499,8 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - The builder does not run `optimizeGraph`. sclang fuses `*` and `+` into
   `MulAdd`, `+` into `Sum3` and `Sum4`, rewrites `a + b.neg` and
   `a - b.neg`, and removes unused pure UGens.
-- An empty array where an argument expands, and a nested array in an array
-  argument or in `SendReply`: the builder refuses them (see Multichannel
+- An empty array where an argument expands, and an array that stays among
+  the inputs of a UGen: the builder refuses them (see Multichannel
   expansion).
 - An array of symbols: sclang expands a symbol argument too, as the command
   names of `SendReply` or the labels of `Poll`. `ArgValue` holds one text.
@@ -505,8 +522,8 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   refuses the output.
 - The warnings of `Dstutter` and `Mix.kr`: the crate does no I/O, and
   builds the same graph.
-- An array of specs for `DynKlank` and `DynKlang`: sclang expands it, as an
-  array of `Ref`s. `ugen` takes one spec.
+- An array of specs for `DynKlank`, `DynKlang`, `Klank` and `Klang`: sclang
+  expands it, as an array of `Ref`s. `ugen` takes one spec.
 - A `spread` or a `center` of `SplayAz` at scalar rate: the `blend` of its
   positions builds a `LinXFade2` outside the graph of sclang.
   `BuildError::UnsupportedRate` refuses it, and a demand rate too, where
@@ -518,23 +535,23 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-These are not in version 0.5, in the order of their value for sc-app3:
+These are not in version 0.6, in the order of their value for sc-app3:
 
-1. nested arrays in array arguments, as each class expands them
-2. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
-3. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs`, the
+1. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
+2. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs`, the
    specs of the metadata, and `LagControl`
-4. `Env`, `VarLag`, and the pseudo-UGens that wait for items 3 and 4:
+3. `Env`, `VarLag`, and the pseudo-UGens that wait for items 2 and 3:
    `EnvGate`, and the `pvcalc` methods of `PV_ChainUGen`
-5. sc3-plugins
+4. sc3-plugins
 
 Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
 and the count of interconnect buffers. So are the pseudo-UGens `AudioIn`
 and `SplayZ`, deprecated since 3.10, and `InBus`, `XIn` and `XInFeedback`
 of `JITLib`. `Dunique` builds a reader at each use as an input, and the
-crate adds the UGens of a method at its call. The methods of `UGen` that build graphs, such as `range` and
-`linlin`, are not pseudo-UGens. `range` needs the `signalRange` of each
-class, which the catalogue does not measure yet.
+crate adds the UGens of a method at its call. The methods of `UGen` that
+build graphs, such as `range` and `linlin`, are not pseudo-UGens. `range`
+needs the `signalRange` of each class, which the catalogue does not measure
+yet.
 
 ## Tests
 
