@@ -346,10 +346,8 @@ it.
 - `VarLag.ar` and `VarLag.kr` build an `Env` with their default warp.
   `LagControl.ar` and `LagControl.kr` are controls.
 - `MulAdd.new` folds and orders its inputs. Use `madd` instead.
-- They also create other UGens: `Poll.ar`, `Poll.kr` and `Poll.new`.
 - An input comes from no argument, or the inputs follow a count:
-  `DecodeB2.ar`, `DecodeB2.kr`, `Dwrand.new`, `LocalIn.ar` and
-  `LocalIn.kr`.
+  `DecodeB2.ar`, `DecodeB2.kr` and `Dwrand.new`.
 - So do `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`,
   `SendPeakRMS.kr` and `SetBuf.new`.
 - They need arguments that the probe does not make, such as a `Ref`, a

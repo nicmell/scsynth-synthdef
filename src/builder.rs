@@ -1294,10 +1294,7 @@ fn wire_inputs(
                 }
             },
             InputSlot::ArgString(position) => match &values[position] {
-                ArgValue::Text(text) => {
-                    inputs.push(UGenInput::from(f64::from(to_u32(text.len()))));
-                    inputs.extend(text.bytes().map(|byte| UGenInput::from(f64::from(byte))));
-                }
+                ArgValue::Text(text) => inputs.extend(symbol_codes(text)),
                 ArgValue::Input(_) | ArgValue::Bool(_) => {
                     return Err(wrong_kind(class, method, position, "a symbol"));
                 }
@@ -1334,6 +1331,17 @@ fn wire_outputs(
             ArgValue::Input(_) => Ok(vec![rate]),
         },
     }
+}
+
+/// The inputs of a symbol, as sclang writes them: its size, then each byte
+/// as `Char:ascii` gives it, from -128 to 127.
+pub(crate) fn symbol_codes(text: &str) -> Vec<UGenInput> {
+    let mut codes = vec![UGenInput::from(f64::from(to_u32(text.len())))];
+    codes.extend(
+        text.bytes()
+            .map(|byte| UGenInput::from(f64::from(i8::from_ne_bytes([byte])))),
+    );
+    codes
 }
 
 /// A whole number from 1 to `u16::MAX`, as a count of outputs.

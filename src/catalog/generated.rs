@@ -9524,17 +9524,17 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                 selector: "ar",
                 args: &[
                     ArgSpec { name: "numChannels", kind: ArgKind::Count, default: Some(ArgDefault::Float(1.0)) },
-                    ArgSpec { name: "default", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "default", kind: ArgKind::Array, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("the inputs depend on argument 0"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
                 args: &[
                     ArgSpec { name: "numChannels", kind: ArgKind::Count, default: Some(ArgDefault::Float(1.0)) },
-                    ArgSpec { name: "default", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "default", kind: ArgKind::Array, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("the inputs depend on argument 0"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -12675,7 +12675,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "label", kind: ArgKind::Symbol, default: None },
                     ArgSpec { name: "trigid", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-1.0)) },
                 ],
-                addable: Addable::No("the method also creates [Impulse]"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -12685,7 +12685,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "label", kind: ArgKind::Symbol, default: None },
                     ArgSpec { name: "trigid", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-1.0)) },
                 ],
-                addable: Addable::No("the method also creates [Impulse]"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "new",
@@ -12695,7 +12695,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "label", kind: ArgKind::Symbol, default: None },
                     ArgSpec { name: "trigid", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-1.0)) },
                 ],
-                addable: Addable::No("the method also creates [Impulse]"),
+                addable: Addable::Pseudo,
             },
         ],
     },

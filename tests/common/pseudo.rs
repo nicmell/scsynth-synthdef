@@ -3,7 +3,7 @@
 
 use scsynth_synthdef::{Arg, ArgValue, SynthDef, SynthDefBuilder, UGenInput};
 
-use super::{arg, array, by_name, flat};
+use super::{arg, array, by_name, element, flat};
 
 /// The definitions of a golden file of the pseudo-UGens.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
@@ -39,6 +39,9 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "outzeros" => outzeros(),
         "localbuf" => localbuf(),
         "beattrack" => beattrack(),
+        "localin" => localin(),
+        "poll" => poll(),
+        "symbols" => symbols(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1469,4 +1472,133 @@ fn beattrack() -> Vec<SynthDef> {
             out(b, "kr", beats);
         }),
     ]
+}
+
+/// `LocalIn.selector(channels, default)`.
+fn local_in(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    channels: f64,
+    default: Option<UGenInput>,
+) -> UGenInput {
+    let mut args = vec![("numChannels", input(channels))];
+    args.extend(default.map(|default| ("default", input(default))));
+    by_name(b, "LocalIn", selector, &args)
+}
+
+/// `LocalOut.selector(channels)`.
+fn local_out(b: &mut SynthDefBuilder, selector: &str, channels: UGenInput) {
+    by_name(
+        b,
+        "LocalOut",
+        selector,
+        &[("channelsArray", input(channels))],
+    );
+}
+
+fn localin() -> Vec<SynthDef> {
+    vec![
+        def("localin_ar", vec![], |b| {
+            let back = local_in(b, "ar", 2.0, None);
+            let half = b.binary_op("*", back.clone(), 0.5).unwrap();
+            local_out(b, "ar", half);
+            out(b, "ar", back);
+        }),
+        def("localin_default", vec![], |b| {
+            let back = local_in(b, "ar", 3.0, Some(array(&[0.1, 0.2])));
+            local_out(b, "ar", back.clone());
+            out(b, "ar", back);
+        }),
+        def("localin_kr", vec![], |b| {
+            let back = local_in(b, "kr", 1.0, Some(0.5.into()));
+            let more = b.binary_op("+", back.clone(), 1.0).unwrap();
+            local_out(b, "kr", more);
+            out(b, "kr", back);
+        }),
+        def("localin_zero", vec![], |b| {
+            let back = local_in(b, "ar", 2.0, None);
+            let channels = UGenInput::Array(vec![element(&back, 0), 0.0.into()]);
+            local_out(b, "ar", channels);
+            out(b, "ar", back);
+        }),
+    ]
+}
+
+/// `Poll.selector(trig, sound)`, with these other arguments.
+fn poll_of(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    trig: UGenInput,
+    sound: UGenInput,
+    args: &[(&str, ArgValue)],
+) -> UGenInput {
+    let mut all = vec![("trig", input(trig)), ("in", input(sound))];
+    all.extend(args.iter().cloned());
+    by_name(b, "Poll", selector, &all)
+}
+
+fn poll() -> Vec<SynthDef> {
+    let text = |label: &str| ArgValue::Text(label.to_owned());
+    vec![
+        def("poll_kr", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            poll_of(b, "kr", 10.0.into(), sound, &[]);
+        }),
+        def("poll_label", vec![], |b| {
+            let trig = by_name(b, "Impulse", "ar", &[("freq", input(2.0))]);
+            let sound = sine(b, "ar", 1.0);
+            let args = [("label", text("freq")), ("trigid", input(7.0))];
+            poll_of(b, "ar", trig, sound, &args);
+        }),
+        def("poll_symbol", vec![], |b| {
+            let trig = by_name(b, "Impulse", "kr", &[("freq", input(2.0))]);
+            let sound = sine(b, "kr", 1.0);
+            poll_of(b, "kr", trig, sound, &[("label", text("amp"))]);
+        }),
+        def("poll_proxy", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            let pair = by_name(b, "Pan2", "kr", &[("in", input(sound))]);
+            poll_of(b, "kr", 10.0.into(), pair, &[]);
+        }),
+        def("poll_integer", vec![], |b| {
+            poll_of(b, "kr", 10.0.into(), 440.0.into(), &[]);
+        }),
+        def("poll_float", vec![], |b| {
+            poll_of(b, "kr", 10.0.into(), 0.5.into(), &[]);
+        }),
+        def("poll_new", vec![Arg::new("freq", 440.0)], |b| {
+            let freq = arg(b, "freq");
+            poll_of(b, "new", 10.0.into(), freq, &[]);
+        }),
+        def("poll_new_scalar", vec![Arg::new("i_x", 1.0)], |b| {
+            let x = arg(b, "i_x");
+            poll_of(b, "new", 10.0.into(), x, &[]);
+        }),
+        def("poll_out", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let polled = poll_of(b, "ar", 10.0.into(), sound, &[]);
+            out(b, "ar", polled);
+        }),
+        def("poll_bytes", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            poll_of(b, "kr", 10.0.into(), sound, &[("label", text("é"))]);
+        }),
+    ]
+}
+
+fn symbols() -> Vec<SynthDef> {
+    vec![def("sendreply_bytes", vec![], |b| {
+        let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+        let sound = sine(b, "kr", 1.0);
+        by_name(
+            b,
+            "SendReply",
+            "kr",
+            &[
+                ("trig", input(trig)),
+                ("cmdName", ArgValue::Text("/é".to_owned())),
+                ("values", input(sound)),
+            ],
+        );
+    })]
 }

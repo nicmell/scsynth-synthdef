@@ -11,12 +11,14 @@ mod fft_unpacking;
 mod filter;
 mod fsin_osc;
 mod hilbert;
+mod in_out;
 pub(crate) mod lang;
 mod line;
 mod machine_listening;
 mod mix;
 mod osc;
 mod pm_osc;
+mod poll;
 mod sound_in;
 mod splay;
 
@@ -94,18 +96,41 @@ impl Args {
         }
     }
 
+    /// The text of the argument `name`, or none for an argument whose default
+    /// is nil.
+    pub(crate) fn text(&self, name: &str) -> Result<Option<String>, BuildError> {
+        match self.slot(name)? {
+            None => Ok(None),
+            Some(ArgValue::Text(text)) => Ok(Some(text.clone())),
+            Some(_) => Err(self.wrong_kind(name, "a symbol")),
+        }
+    }
+
     /// The count of the argument `name`: a whole number from 1.
     pub(crate) fn count(&self, name: &str) -> Result<usize, BuildError> {
         match self.value(name)? {
-            ArgValue::Input(UGenInput::Number(count))
+            ArgValue::Input(input) => self.count_of(name, &input),
+            _ => Err(self.bad_count(name)),
+        }
+    }
+
+    /// `value` as a count of the argument `name`, as an instance of the
+    /// expansion takes it: a whole number from 1.
+    pub(crate) fn count_of(&self, name: &str, value: &UGenInput) -> Result<usize, BuildError> {
+        match *value {
+            UGenInput::Number(count)
                 if count >= 1.0 && count.fract() == 0.0 && count <= f64::from(u16::MAX) =>
             {
                 Ok(count_to_usize(count))
             }
-            _ => Err(BuildError::BadCount {
-                class: self.class.to_owned(),
-                argument: name.to_owned(),
-            }),
+            _ => Err(self.bad_count(name)),
+        }
+    }
+
+    fn bad_count(&self, name: &str) -> BuildError {
+        BuildError::BadCount {
+            class: self.class.to_owned(),
+            argument: name.to_owned(),
         }
     }
 
@@ -153,6 +178,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("LinSelectX", "ar", osc::lin_select_x),
     ("LinSelectX", "kr", osc::lin_select_x),
     ("LocalBuf", "new", buf_io::local_buf),
+    ("LocalIn", "ar", in_out::local_in),
+    ("LocalIn", "kr", in_out::local_in),
     ("Mix", "ar", mix::mix_ar),
     ("Mix", "kr", mix::mix_kr),
     ("Mix", "new", mix::mix_new),
@@ -160,6 +187,9 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("NumChannels", "ar", mix::num_channels),
     ("PMOsc", "ar", pm_osc::pm_osc),
     ("PMOsc", "kr", pm_osc::pm_osc),
+    ("Poll", "ar", poll::poll),
+    ("Poll", "kr", poll::poll),
+    ("Poll", "new", poll::poll),
     ("SelectX", "ar", osc::select_x),
     ("SelectX", "kr", osc::select_x),
     ("SelectXFocus", "ar", osc::select_x_focus),

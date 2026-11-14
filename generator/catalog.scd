@@ -85,7 +85,9 @@ var argumentKinds = [
 	[\ListDUGen, \new, \list, \array],
 	[\LocalBuf, \new, \numChannels, \signal],
 	[\LocalBuf, \new, \numFrames, \signal],
+	[\LocalIn, \ar, \default, \array],
 	[\LocalIn, \ar, \numChannels, \count],
+	[\LocalIn, \kr, \default, \array],
 	[\LocalIn, \kr, \numChannels, \count],
 	[\LocalOut, \ar, \channelsArray, \array],
 	[\LocalOut, \kr, \channelsArray, \array],
@@ -159,9 +161,9 @@ var argumentKinds = [
 // pseudo-UGens, whose rate methods build other UGens, and the classes of 0.4.
 // The crate has a body for each rate method of a class of bodies.
 var bodies = [\BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter,
-	\DynKlang, \DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \LocalBuf, \Mix, \MultiTap,
-	\NumChannels, \PMOsc, \SelectX, \SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz,
-	\Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \UnpackFFT];
+	\DynKlang, \DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix,
+	\MultiTap, \NumChannels, \PMOsc, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
+	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \UnpackFFT];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
@@ -169,7 +171,7 @@ var leftOut = [
 	[\EnvGate, "needs NamedControl and Env: items 4 and 5 of Left out"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
 	[\NamedControl, "a control: item 4 of Left out"],
-	[\PingPong, "needs LocalIn and the rule of BufWr: items 3 and 6 of Left out"],
+	[\PingPong, "needs the rule of checkInputs of BufWr"],
 	[\SplayZ, "deprecated since 3.10"],
 	[\XIn, "a helper of InBus"],
 	[\XInFeedback, "a helper of InBus"]

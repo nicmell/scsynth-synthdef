@@ -129,6 +129,33 @@ fn a_call_that_fails_leaves_the_max_local_bufs_as_it_was() {
 }
 
 #[test]
+fn local_in_and_poll_refuse_what_sclang_refuses() {
+    let mut b = builder();
+    let x = b.arguments()[0].clone();
+    let none = b.ugen("LocalIn", "ar", &[("numChannels", input(0.0))]);
+    assert!(
+        matches!(&none, Err(BuildError::BadCount { class, .. }) if class == "LocalIn"),
+        "{none:?}"
+    );
+    let empty = b.ugen(
+        "LocalIn",
+        "ar",
+        &[("numChannels", input(2.0)), ("default", input(Vec::new()))],
+    );
+    assert!(
+        matches!(empty, Err(BuildError::EmptyInput { .. })),
+        "{empty:?}"
+    );
+    // The rule of Poll is checkSameRateAsFirstInput: its trigger.
+    let trig = b.ugen("Impulse", "ar", &[("freq", input(1.0))]).unwrap();
+    let audio = b.ugen("Poll", "kr", &[("trig", input(trig)), ("in", input(x))]);
+    assert!(
+        matches!(&audio, Err(BuildError::CheckInputs { class, .. }) if class == "Poll"),
+        "{audio:?}"
+    );
+}
+
+#[test]
 fn mix_gives_0_for_no_input_and_refuses_a_mix_at_demand_rate() {
     let mut b = builder();
     let nothing = b.ugen("Mix", "new", &[("array", input(Vec::new()))]);
