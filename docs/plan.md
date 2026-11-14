@@ -98,7 +98,9 @@ All of them come from the sources.
    - `LocalOut.ar(delayedSignals)`
    - `BufWr.ar((inputs + feedbackChannels).rotate(rotate) <! delayedSignals.asArray.first, bufnum, phase, 1)`
 
-   A single UGen as `inputs` has a size of 0 in sclang.
+   A single UGen as `inputs` has a size of 0 in sclang. Measured: sclang
+   then throws "a LocalIn: numChannels must be a nonzero positive integer,
+   but received (0)".
 8. `UGen:wrap(lo, hi)` adds a `Wrap` at the rate of the UGen
    (`UGen.sc:104-110`). `round` with no argument rounds to 1.0. `<!` is the
    binary operator `firstArg` (`AbstractFunction.sc:153`).
@@ -133,11 +135,6 @@ All of them come from the sources.
   empty, while another is not, is refused.
 - `src/pseudo/delay_wr.rs`: `PingPong.ar` follows fact 7, line by line. It
   refuses a single input, and a `rotate` that is not a whole number.
-
-## Differences from sclang that remain
-
-- `PingPong` with a single UGen as `inputs`: sclang builds with 0 channels,
-  and the crate refuses it.
 
 ## Tests
 

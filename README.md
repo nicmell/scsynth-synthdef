@@ -552,7 +552,7 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
   without quarks. For another installation, change its path.
 - For a graph of 0.1 or 0.2: if `finishBuild` adds, removes or rewires a
   UGen, the script fails.
-- For the graphs of 0.3 and 0.4: if `optimizeGraph` rewrites a definition
+- For the graphs of 0.3 to 0.5: if `optimizeGraph` rewrites a definition
   of a file, `tests/fixtures/before_optimize` holds a second file. The script
   builds it with `finishBuild` without `optimizeGraph`, as the crate builds.
 - `tests/fixtures/arithmetic.json` holds operands and results of the
