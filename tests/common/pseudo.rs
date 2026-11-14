@@ -48,6 +48,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "t2k" => t2k(),
         "klank" => klank(),
         "klang" => klang(),
+        "pingpong" => pingpong(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1860,6 +1861,75 @@ fn klang() -> Vec<SynthDef> {
                 ],
             );
             klang_out(b, &[&[800.0, 1000.0]], &[("freqscale", input(scale))]);
+        }),
+    ]
+}
+
+/// `PingPong.ar(bufnum, inputs, args)` into `Out.ar`.
+fn ping_pong_out(
+    b: &mut SynthDefBuilder,
+    bufnum: UGenInput,
+    inputs: UGenInput,
+    args: &[(&str, ArgValue)],
+) {
+    let mut all = vec![("bufnum", input(bufnum)), ("inputs", input(inputs))];
+    all.extend(args.iter().cloned());
+    let delayed = by_name(b, "PingPong", "ar", &all);
+    out(b, "ar", delayed);
+}
+
+/// `[SinOsc.ar(1), SinOsc.ar(2)]`.
+fn two_sines(b: &mut SynthDefBuilder) -> UGenInput {
+    UGenInput::Array(vec![sine(b, "ar", 1.0), sine(b, "ar", 2.0)])
+}
+
+fn pingpong() -> Vec<SynthDef> {
+    vec![
+        def("pingpong", vec![], |b| {
+            let buffer = local_buf(b, 44100.0, 2.0);
+            let sounds = two_sines(b);
+            ping_pong_out(b, buffer, sounds, &[("delayTime", input(0.25))]);
+        }),
+        def("pingpong_rotate", vec![], |b| {
+            let buffer = local_buf(b, 44100.0, 2.0);
+            let sounds = two_sines(b);
+            let args = [
+                ("delayTime", input(0.25)),
+                ("feedback", input(0.5)),
+                ("rotate", input(0.0)),
+            ];
+            ping_pong_out(b, buffer, sounds, &args);
+        }),
+        def("pingpong_negative", vec![], |b| {
+            let buffer = local_buf(b, 44100.0, 3.0);
+            let sounds = sine(b, "ar", array(&[1.0, 2.0, 3.0]));
+            let args = [
+                ("delayTime", input(0.25)),
+                ("feedback", input(0.7)),
+                ("rotate", input(-1.0)),
+            ];
+            ping_pong_out(b, buffer, sounds, &args);
+        }),
+        def("pingpong_ugens", vec![Arg::new("fb", 0.5)], |b| {
+            let fb = arg(b, "fb");
+            let buffer = local_buf(b, 44100.0, 2.0);
+            let sounds = two_sines(b);
+            let delay = by_name(
+                b,
+                "SinOsc",
+                "kr",
+                &[
+                    ("freq", input(0.1)),
+                    ("mul", input(0.1)),
+                    ("add", input(0.2)),
+                ],
+            );
+            let args = [("delayTime", input(delay)), ("feedback", input(fb))];
+            ping_pong_out(b, buffer, sounds, &args);
+        }),
+        def("pingpong_bufnum", vec![], |b| {
+            let sounds = two_sines(b);
+            ping_pong_out(b, 0.0.into(), sounds, &[("delayTime", input(0.25))]);
         }),
     ]
 }

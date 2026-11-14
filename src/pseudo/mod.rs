@@ -6,6 +6,7 @@ mod basic_ops;
 mod beq_suite;
 mod buf_io;
 mod compander;
+mod delay_wr;
 mod demand;
 mod fft_unpacking;
 mod filter;
@@ -189,6 +190,7 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("NumChannels", "ar", mix::num_channels),
     ("PMOsc", "ar", pm_osc::pm_osc),
     ("PMOsc", "kr", pm_osc::pm_osc),
+    ("PingPong", "ar", delay_wr::ping_pong),
     ("Poll", "ar", poll::poll),
     ("Poll", "kr", poll::poll),
     ("Poll", "new", poll::poll),

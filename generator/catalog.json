@@ -39278,6 +39278,51 @@
       ]
     },
     {
+      "name": "PingPong",
+      "categories": [
+        "UGens>Delays>Buffer"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "inputs",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "delayTime",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "feedback",
+              "kind": "signal",
+              "default": {
+                "float": 0.69999999999999996
+              }
+            },
+            {
+              "name": "rotate",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "SelectX",
       "categories": [
         "UGens>Multichannel>Select"

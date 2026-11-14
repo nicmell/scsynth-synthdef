@@ -156,6 +156,39 @@ fn local_in_and_poll_refuse_what_sclang_refuses() {
 }
 
 #[test]
+fn ping_pong_refuses_a_single_input_and_a_rotate_that_is_not_whole() {
+    // sclang counts the channels of a single UGen as 0, and LocalIn throws
+    // for 0 (measured). Array:rotate takes an Integer.
+    let mut b = builder();
+    let x = b.arguments()[0].clone();
+    let single = b.ugen(
+        "PingPong",
+        "ar",
+        &[("inputs", input(x.clone())), ("delayTime", input(0.25))],
+    );
+    assert!(
+        matches!(&single, Err(BuildError::WrongKind { argument, .. }) if argument == "inputs"),
+        "{single:?}"
+    );
+    let pair = UGenInput::Array(vec![x.clone(), x]);
+    let half = b.ugen(
+        "PingPong",
+        "ar",
+        &[
+            ("inputs", input(pair)),
+            ("delayTime", input(0.25)),
+            ("rotate", input(0.5)),
+        ],
+    );
+    assert!(
+        matches!(&half, Err(BuildError::WrongKind { argument, .. }) if argument == "rotate"),
+        "{half:?}"
+    );
+    let def = b.finish().unwrap();
+    assert_eq!(def.children.len(), 1);
+}
+
+#[test]
 fn klank_refuses_an_empty_part_beside_a_full_one() {
     // flop would read past the end of the empty part.
     let mut b = builder();

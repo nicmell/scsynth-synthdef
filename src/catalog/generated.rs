@@ -16830,7 +16830,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 14] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 15] = [
     PseudoClass {
         name: "BHiPass4",
         categories: &["UGens>Filters>BEQSuite"],
@@ -17002,6 +17002,23 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 14] = [
                     ArgSpec { name: "modphase", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "PingPong",
+        categories: &["UGens>Delays>Buffer"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "bufnum", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "inputs", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "delayTime", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "feedback", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.7)) },
+                    ArgSpec { name: "rotate", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
                 addable: Addable::Pseudo,
             },
