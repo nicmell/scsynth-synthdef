@@ -479,7 +479,7 @@ impl Graph {
     /// `replaceUGen`: `b` takes the slot, the width-first antecedents and the
     /// readers of `a`, and each child that reads `a` reads `b`.
     fn replace_ugen(&mut self, a: usize, b: usize) {
-        self.antecedents[b] = self.antecedents[a].clone();
+        self.antecedents[b] = std::mem::take(&mut self.antecedents[a]);
         self.readers[b] = self.readers[a];
         self.slots[b] = self.slots[a];
         if let Some(slot) = self.children.get_mut(self.slots[a]) {

@@ -26,7 +26,7 @@ cargo clippy --all-targets -- -D warnings
 cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all-features
 RUSTDOCFLAGS=-Dwarnings cargo doc --no-deps --all-features
-cargo check --all-features --target wasm32-unknown-unknown
+cargo clippy --all-features --target wasm32-unknown-unknown -- -D warnings
 cargo +1.85.0 test --all-features    # the MSRV
 cargo deny check
 ```
