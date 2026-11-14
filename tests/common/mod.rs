@@ -75,6 +75,13 @@ pub const NAMES: &[&str] = &[
     "localin",
     "poll",
     "symbols",
+    "bufwr",
+    "duty",
+    "peak",
+    "t2k",
+    "klank",
+    "klang",
+    "pingpong",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where

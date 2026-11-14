@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.5.0 (2026-11-14)
+
+The rules of `checkInputs` that classes define for themselves, `Klank`,
+`Klang` and `PingPong`.
+
+### Added
+
+- `CheckInputs::BufWr`, `Duty`, `Peak` and `T2K`: the rules of these
+  classes, which their subclasses inherit. The 13 methods of `BufWr`,
+  `Duty`, `TDuty`, `Peak`, `RunningMax`, `RunningMin` and `T2K` become
+  addable.
+- `Klank.ar` and `Klang.ar` have a body, with the spec of `DynKlank`: the
+  triplets of the spec end the inputs of the UGen.
+- `PingPong.ar` has a body. It is a pseudo-UGen of the catalogue now.
+- `generator/fixtures.scd` writes the golden files of 0.5: `bufwr`, `duty`,
+  `peak`, `t2k`, `klank`, `klang` and `pingpong`.
+
+### Changed
+
+- The 15 methods above no longer give `NotAddable`. `ugen` refuses 28
+  methods, from 43. No class of the catalogue has `CheckInputs::Custom`.
+- `PingPong.inputs` is an array.
+
 ## 0.4.0 (2026-11-14)
 
 The rate methods of SuperCollider 3.14.1 that do more than `new1`, as

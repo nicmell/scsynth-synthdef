@@ -594,6 +594,70 @@ try {
 		[\sendreply_bytes, { SendReply.kr(Impulse.kr(1), '/é', SinOsc.kr(1)) }]
 	]);
 
+	// The rules of their own, Klank, Klang and PingPong, of 0.5.
+	writePseudo.("bufwr", [
+		[\bufwr_ar, {
+			var buf = LocalBuf(1024, 2);
+			BufWr.ar(SinOsc.ar([1, 2]), buf, Phasor.ar(0, 1, 0, 1024))
+		}],
+		[\bufwr_kr, {
+			var buf = LocalBuf(64);
+			BufWr.kr(SinOsc.kr(1), buf, Phasor.kr(0, 1, 0, 64), 0)
+		}]
+	]);
+	writePseudo.("duty", [
+		[\duty_kr, { Out.kr(0, Duty.kr(Dseq([0.1, 0.2], inf), 0, Dseq([1, 2, 3], inf))) }],
+		[\duty_ar, { Out.ar(0, Duty.ar(Dseq([0.1, 0.2], inf), Impulse.ar(1), Dseq([1, 2], inf))) }],
+		[\duty_demand_reset, {
+			Out.kr(0, Duty.kr(Dseq([0.1], inf), Dseq([1, 0], inf), Dwhite(0, 1)))
+		}],
+		[\duty_number, { Out.kr(0, Duty.kr(0.5, 0, Dseq([1, 2], inf))) }],
+		[\tduty_ar, { Out.ar(0, TDuty.ar(Dseq([0.1, 0.2], inf), 0, 1, 0, 1)) }]
+	]);
+	writePseudo.("peak", [
+		[\peak_kr_audio, { Out.kr(0, Peak.kr(SinOsc.ar(1), Impulse.kr(1))) }],
+		[\peak_ar, { Out.ar(0, Peak.ar(SinOsc.ar(1), Impulse.ar(2))) }],
+		[\runningmax_kr, { Out.kr(0, RunningMax.kr(SinOsc.kr(1))) }],
+		[\runningmin_ar, { Out.ar(0, RunningMin.ar(SinOsc.ar(1))) }]
+	]);
+	writePseudo.("t2k", [
+		[\t2k, { Out.kr(0, T2K.kr(Impulse.ar(10))) }]
+	]);
+	writePseudo.("klank", [
+		[\klank_3, {
+			Out.ar(0, Klank.ar(`[[800, 1071, 1353], [0.3, 0.2, 0.1], [1, 1, 1]], Impulse.ar(2)))
+		}],
+		[\klank_amps, { Out.ar(0, Klank.ar(`[[800, 1071], [0.5, 0.3]], Impulse.ar(2))) }],
+		[\klank_times, { Out.ar(0, Klank.ar(`[[800, 1071], nil, [1, 2]], Impulse.ar(2))) }],
+		[\klank_wrap, { Out.ar(0, Klank.ar(`[[800, 1071, 1353], [0.5, 0.3]], Impulse.ar(2))) }],
+		[\klank_scale, { |scale = 1| Out.ar(0, Klank.ar(`[[800, 1071]], Impulse.ar(2), scale)) }],
+		[\klank_expand, { Out.ar(0, Klank.ar(`[[800, 1071]], Impulse.ar([2, 3]))) }]
+	]);
+	writePseudo.("klang", [
+		[\klang_3, { Out.ar(0, Klang.ar(`[[800, 1000], [0.3, 0.3], [pi, pi]])) }],
+		[\klang_default, { Out.ar(0, Klang.ar(`[[800, 1000, 1200]])) }],
+		[\klang_scale, { Out.ar(0, Klang.ar(`[[800, 1000]], SinOsc.kr(0.1, 0, 0.1, 1))) }]
+	]);
+	writePseudo.("pingpong", [
+		[\pingpong, {
+			var buf = LocalBuf(44100, 2);
+			Out.ar(0, PingPong.ar(buf, [SinOsc.ar(1), SinOsc.ar(2)], 0.25))
+		}],
+		[\pingpong_rotate, {
+			var buf = LocalBuf(44100, 2);
+			Out.ar(0, PingPong.ar(buf, [SinOsc.ar(1), SinOsc.ar(2)], 0.25, 0.5, 0))
+		}],
+		[\pingpong_negative, {
+			var buf = LocalBuf(44100, 3);
+			Out.ar(0, PingPong.ar(buf, SinOsc.ar([1, 2, 3]), 0.25, 0.7, -1))
+		}],
+		[\pingpong_ugens, { |fb = 0.5|
+			var buf = LocalBuf(44100, 2);
+			Out.ar(0, PingPong.ar(buf, [SinOsc.ar(1), SinOsc.ar(2)], SinOsc.kr(0.1, 0, 0.1, 0.2), fb))
+		}],
+		[\pingpong_bufnum, { Out.ar(0, PingPong.ar(0, [SinOsc.ar(1), SinOsc.ar(2)], 0.25)) }]
+	]);
+
 	writeArithmetic.();
 
 	"fixtures.scd: before_optimize holds %".format(rewritten).postln;

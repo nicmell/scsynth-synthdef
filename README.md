@@ -202,8 +202,12 @@ The builder refuses two inputs that sclang takes:
   input at the rate of the UGen. If the UGen runs at audio rate, other
   rules ask for some of its inputs at audio rate. At audio rate,
   `AbstractOut` asks for audio-rate channels.
-- A class with a rule of its own is not addable: `T2K`, `Duty`, `TDuty`,
-  `BufWr`, `Peak`, `RunningMax` and `RunningMin`.
+- Four classes have a rule of their own, and their subclasses inherit it.
+  At audio rate, `BufWr` asks for its phase and its channels at audio
+  rate. After a `dur` at demand rate, `Duty` and `TDuty` ask for a `reset`
+  at demand rate, at scalar rate or at their own rate.
+- At control rate, `Peak`, `RunningMax` and `RunningMin` also take an input
+  at audio rate. `T2K` asks for an input at audio rate.
 
 scsynth does not check the rate of an input. For `Out.ar(0, 0.5)`, it
 copies a buffer's length of floats from the one float of the constant
@@ -265,15 +269,20 @@ that `levelComp` gives two inputs at audio rate: the square root of 1/2.
 - The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `CompanderD`,
   `Dstutter`, `DynKlang`, `DynKlank`, `HilbertFIR`, `LinLin`, `LinSelectX`,
   `Mix`, `MultiTap` and `NumChannels`.
-- It also builds `PMOsc`, `SelectX`, `SelectXFocus`, `Silent`, `SoundIn`,
-  `Splay`, `SplayAz`, `TChoose`, `TWChoose`, `Tap` and `UnpackFFT`.
+- It also builds `PingPong`, `PMOsc`, `SelectX`, `SelectXFocus`, `Silent`,
+  `SoundIn`, `Splay`, `SplayAz`, `TChoose`, `TWChoose`, `Tap` and
+  `UnpackFFT`.
 - `Splay`, `DynKlank` and `DynKlang` expand before their body, as their
   `multiNew` or `multiNewList` does. `Splay` expands over each element of
   `inArray` too, so an array of stereo pairs makes one Splay for each
   channel.
-- The spec of `DynKlank` and `DynKlang` is an array of up to three arrays,
-  as `[freqs, amps, times]`. A missing array takes its default. Where sclang
-  takes nil in the middle, give the default, such as `[1.0]`.
+- The spec of `DynKlank`, `DynKlang`, `Klank` and `Klang` is an array of up
+  to three arrays, as `[freqs, amps, times]`. A missing array takes its
+  default. Where sclang takes nil in the middle, give the default, such as
+  `[1.0]`. `Klank` and `Klang` are real UGens: the triplets of the spec,
+  with their parts wrapped to the longest, end their inputs.
+- `PingPong` takes an array of channels and a whole `rotate`, as sclang
+  does. It gives back the delayed channels.
 - `Sum3.new` and `Sum4.new` have a body too. An input of 0 folds the UGen
   into a smaller sum. Then the UGen takes the least rate of its inputs by
   name. It orders its inputs as the insertion sort of sclang does, which
@@ -350,7 +359,7 @@ family takes a control-rate output, so that the method makes an instance.
 More calls find whether a count or an array sets the number of outputs.
 Then, on each argument that expands, an array of two elements must make
 two instances, instance i with element i. An array inside an array must
-make three. 568 of the 635 methods are addable with a wiring, and 48 have
+make three. 581 of the 635 methods are addable with a wiring, and 51 have
 a body. Most of the others do more than `UGen:new1` does:
 
 - The pseudo-UGens without a body, such as `Dunique`, create
@@ -388,17 +397,11 @@ it.
 - So do `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`,
   `SendPeakRMS.kr` and `SetBuf.new`.
 - They need arguments that the probe does not make, such as a `Ref`, a
-  `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar`, `InRect.kr`,
-  `Klang.ar` and `Klank.ar`.
+  `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar` and `InRect.kr`.
 - So do `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new` and
   `UnaryOpUGen.new`. Some of these do not exist.
 - They take their special index from the build: `AudioControl.ar`,
   `Control.ir`, `Control.kr`, `TrigControl.ir` and `TrigControl.kr`.
-- Their class checks its inputs with a rule of its own: `BufWr.ar`,
-  `BufWr.kr`, `Duty.ar`, `Duty.kr`, `Peak.ar`, `Peak.kr` and
-  `RunningMax.ar`.
-- So do `RunningMax.kr`, `RunningMin.ar`, `RunningMin.kr`, `T2K.kr`,
-  `TDuty.ar` and `TDuty.kr`.
 
 ## Strictness
 
@@ -486,6 +489,8 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   names of `SendReply` or the labels of `Poll`. `ArgValue` holds one text.
 - The default label of `Poll` for a whole number names `Integer`. sclang
   names `Float` for a Float such as 440.0.
+- A whole Float as `rotate` of `PingPong`, such as 2.0: `Array:rotate` of
+  sclang takes only an Integer, and the crate takes it.
 - Two numbers: `unary_op` and `binary_op` make a UGen of them, as
   `UnaryOpUGen.new` and `BinaryOpUGen.new` do. The operators of sclang
   compute them instead, as `2 * 3` gives 6. The crate cannot copy that.
@@ -513,7 +518,7 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-These are not in version 0.4, in the order of their value for sc-app3:
+These are not in version 0.5, in the order of their value for sc-app3:
 
 1. nested arrays in array arguments, as each class expands them
 2. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
@@ -521,9 +526,7 @@ These are not in version 0.4, in the order of their value for sc-app3:
    specs of the metadata, and `LagControl`
 4. `Env`, `VarLag`, and the pseudo-UGens that wait for items 3 and 4:
    `EnvGate`, and the `pvcalc` methods of `PV_ChainUGen`
-5. the rules of `checkInputs` that classes define for themselves, and
-   `PingPong`, which needs the rule of `BufWr`
-6. sc3-plugins
+5. sc3-plugins
 
 Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
 and the count of interconnect buffers. So are the pseudo-UGens `AudioIn`
@@ -552,7 +555,7 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
   without quarks. For another installation, change its path.
 - For a graph of 0.1 or 0.2: if `finishBuild` adds, removes or rewires a
   UGen, the script fails.
-- For the graphs of 0.3 and 0.4: if `optimizeGraph` rewrites a definition
+- For the graphs of 0.3 to 0.5: if `optimizeGraph` rewrites a definition
   of a file, `tests/fixtures/before_optimize` holds a second file. The script
   builds it with `finishBuild` without `optimizeGraph`, as the crate builds.
 - `tests/fixtures/arithmetic.json` holds operands and results of the

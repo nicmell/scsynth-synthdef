@@ -6,6 +6,7 @@ mod basic_ops;
 mod beq_suite;
 mod buf_io;
 mod compander;
+mod delay_wr;
 mod demand;
 mod fft_unpacking;
 mod filter;
@@ -173,6 +174,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("DynKlank", "ar", fsin_osc::dyn_klank),
     ("DynKlank", "kr", fsin_osc::dyn_klank),
     ("HilbertFIR", "ar", hilbert::hilbert_fir),
+    ("Klang", "ar", fsin_osc::klang),
+    ("Klank", "ar", fsin_osc::klank),
     ("LinLin", "ar", line::lin_lin_ar),
     ("LinLin", "kr", line::lin_lin_kr),
     ("LinSelectX", "ar", osc::lin_select_x),
@@ -187,6 +190,7 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("NumChannels", "ar", mix::num_channels),
     ("PMOsc", "ar", pm_osc::pm_osc),
     ("PMOsc", "kr", pm_osc::pm_osc),
+    ("PingPong", "ar", delay_wr::ping_pong),
     ("Poll", "ar", poll::poll),
     ("Poll", "kr", poll::poll),
     ("Poll", "new", poll::poll),

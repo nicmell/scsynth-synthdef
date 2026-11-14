@@ -269,3 +269,44 @@ fn sendreply() {
     );
     assert_golden(&b.finish().unwrap(), "sendreply");
 }
+
+#[test]
+fn the_rules_of_their_own_refuse_what_sclang_refuses() {
+    // Facts 1 to 4 of the plan of 0.5, through the wiring of each method.
+    let mut b = SynthDefBuilder::new("rules", vec![Arg::new("x", 1.0)]).unwrap();
+    let control = arg(&b, "x");
+    let audio = ugen(&mut b, "SinOsc", "ar", &[]);
+    let demand = ugen(&mut b, "Dseq", "new", &[("list", numbers(&[1.0]))]);
+    let refused = [
+        (
+            "BufWr",
+            "ar",
+            vec![
+                ("inputArray", audio.clone().into()),
+                ("phase", control.clone().into()),
+            ],
+        ),
+        (
+            "BufWr",
+            "ar",
+            vec![
+                ("inputArray", control.clone().into()),
+                ("phase", audio.clone().into()),
+            ],
+        ),
+        (
+            "Duty",
+            "kr",
+            vec![("dur", demand.into()), ("reset", audio.clone().into())],
+        ),
+        ("Peak", "ar", vec![("in", control.clone().into())]),
+        ("T2K", "kr", vec![("in", control.into())]),
+    ];
+    for (class, selector, args) in refused {
+        let result = b.ugen(class, selector, &args);
+        assert!(
+            matches!(&result, Err(scsynth_synthdef::BuildError::CheckInputs { class: name, .. }) if name == class),
+            "{class}.{selector}: {result:?}"
+        );
+    }
+}

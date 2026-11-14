@@ -2032,10 +2032,6 @@ mod tests {
             BuildError::NotAddable { .. }
         ));
         assert!(matches!(
-            refuse("Duty", "kr", &[]),
-            BuildError::NotAddable { .. }
-        ));
-        assert!(matches!(
             refuse("SinOsc", "ar", &[("pitch", 1.0.into())]),
             BuildError::UnknownArgument { .. }
         ));

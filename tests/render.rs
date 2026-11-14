@@ -145,6 +145,10 @@ fn check_inputs(value: &Value) -> String {
             "CheckInputs::AbstractOut {{ fixed: {} }}",
             number(&value["fixed"])
         ),
+        "buf_wr" => "CheckInputs::BufWr".to_owned(),
+        "duty" => "CheckInputs::Duty".to_owned(),
+        "peak" => "CheckInputs::Peak".to_owned(),
+        "t2k" => "CheckInputs::T2K".to_owned(),
         "custom" => format!("CheckInputs::Custom({:?})", text(&value["owner"])),
         other => panic!("{other} is no rule of checkInputs"),
     }
