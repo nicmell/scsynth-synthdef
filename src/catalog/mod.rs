@@ -249,7 +249,20 @@ pub enum CheckInputs {
         /// The number of fixed inputs, such as the bus.
         fixed: usize,
     },
-    /// A rule of its own, defined in the class with this name.
+    /// The rule of `BufWr`. At audio rate, the phase, input 1, and the
+    /// channels, from input 3 on, are at audio rate.
+    BufWr,
+    /// The rule of `Duty`. When the first input, `dur`, runs at demand rate,
+    /// the second, `reset`, runs at demand rate, at scalar rate, or at the
+    /// rate of the UGen.
+    Duty,
+    /// The rule of `Peak`. The first input has the rate of the UGen, or runs
+    /// at audio rate for a UGen at control rate.
+    Peak,
+    /// The rule of `T2K`: the first input is at audio rate.
+    T2K,
+    /// A rule of its own, defined in the class with this name, which the
+    /// crate does not have.
     Custom(&'static str),
 }
 
@@ -402,7 +415,6 @@ mod tests {
         assert!(reason("VarLag", "kr").contains("no instance"));
         assert!(reason("MaxLocalBufs", "new").contains("no argument"));
         assert_eq!(wiring("DelayN", "kr").rate, Rate::Control);
-        assert!(reason("Duty", "kr").contains("rule of its own"));
     }
 
     #[test]
@@ -475,9 +487,18 @@ mod tests {
             lookup("Pan2").unwrap().check_inputs,
             CheckInputs::NInputs(1)
         );
+        assert_eq!(lookup("Duty").unwrap().check_inputs, CheckInputs::Duty);
+        // The rules of their own, which subclasses inherit: facts 1 to 4 of
+        // the plan of 0.5.
+        assert_eq!(lookup("TDuty").unwrap().check_inputs, CheckInputs::Duty);
         assert_eq!(
-            lookup("Duty").unwrap().check_inputs,
-            CheckInputs::Custom("Duty")
+            lookup("RunningMin").unwrap().check_inputs,
+            CheckInputs::Peak
+        );
+        assert!(
+            all()
+                .iter()
+                .all(|class| !matches!(class.check_inputs, CheckInputs::Custom(_)))
         );
     }
 }

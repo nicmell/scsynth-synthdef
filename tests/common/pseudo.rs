@@ -42,6 +42,10 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "localin" => localin(),
         "poll" => poll(),
         "symbols" => symbols(),
+        "bufwr" => bufwr(),
+        "duty" => duty(),
+        "peak" => peak(),
+        "t2k" => t2k(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1600,5 +1604,175 @@ fn symbols() -> Vec<SynthDef> {
                 ("values", input(sound)),
             ],
         );
+    })]
+}
+
+/// `Phasor.selector(0, 1, 0, end)`.
+fn phasor(b: &mut SynthDefBuilder, selector: &str, end: f64) -> UGenInput {
+    by_name(
+        b,
+        "Phasor",
+        selector,
+        &[
+            ("trig", input(0.0)),
+            ("rate", input(1.0)),
+            ("start", input(0.0)),
+            ("end", input(end)),
+        ],
+    )
+}
+
+fn bufwr() -> Vec<SynthDef> {
+    vec![
+        def("bufwr_ar", vec![], |b| {
+            let buffer = local_buf(b, 1024.0, 2.0);
+            let sounds = sine(b, "ar", array(&[1.0, 2.0]));
+            let phase = phasor(b, "ar", 1024.0);
+            by_name(
+                b,
+                "BufWr",
+                "ar",
+                &[
+                    ("inputArray", input(sounds)),
+                    ("bufnum", input(buffer)),
+                    ("phase", input(phase)),
+                ],
+            );
+        }),
+        def("bufwr_kr", vec![], |b| {
+            let buffer = local_buf(b, 64.0, 1.0);
+            let sound = sine(b, "kr", 1.0);
+            let phase = phasor(b, "kr", 64.0);
+            by_name(
+                b,
+                "BufWr",
+                "kr",
+                &[
+                    ("inputArray", input(sound)),
+                    ("bufnum", input(buffer)),
+                    ("phase", input(phase)),
+                    ("loop", input(0.0)),
+                ],
+            );
+        }),
+    ]
+}
+
+/// `Dseq(list, inf)`.
+fn dseq(b: &mut SynthDefBuilder, list: &[f64]) -> UGenInput {
+    by_name(
+        b,
+        "Dseq",
+        "new",
+        &[
+            ("list", input(array(list))),
+            ("repeats", input(f64::INFINITY)),
+        ],
+    )
+}
+
+/// `class.selector(dur, reset, level)`, with these other arguments.
+fn duty_of(
+    b: &mut SynthDefBuilder,
+    class: &str,
+    selector: &str,
+    dur: UGenInput,
+    reset: UGenInput,
+    level: UGenInput,
+    args: &[(&str, ArgValue)],
+) -> UGenInput {
+    let mut all = vec![
+        ("dur", input(dur)),
+        ("reset", input(reset)),
+        ("level", input(level)),
+    ];
+    all.extend(args.iter().cloned());
+    by_name(b, class, selector, &all)
+}
+
+fn duty() -> Vec<SynthDef> {
+    vec![
+        def("duty_kr", vec![], |b| {
+            let dur = dseq(b, &[0.1, 0.2]);
+            let level = dseq(b, &[1.0, 2.0, 3.0]);
+            let duty = duty_of(b, "Duty", "kr", dur, 0.0.into(), level, &[]);
+            out(b, "kr", duty);
+        }),
+        def("duty_ar", vec![], |b| {
+            let dur = dseq(b, &[0.1, 0.2]);
+            let reset = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let level = dseq(b, &[1.0, 2.0]);
+            let duty = duty_of(b, "Duty", "ar", dur, reset, level, &[]);
+            out(b, "ar", duty);
+        }),
+        def("duty_demand_reset", vec![], |b| {
+            let dur = dseq(b, &[0.1]);
+            let reset = dseq(b, &[1.0, 0.0]);
+            let level = by_name(
+                b,
+                "Dwhite",
+                "new",
+                &[("lo", input(0.0)), ("hi", input(1.0))],
+            );
+            let duty = duty_of(b, "Duty", "kr", dur, reset, level, &[]);
+            out(b, "kr", duty);
+        }),
+        def("duty_number", vec![], |b| {
+            let level = dseq(b, &[1.0, 2.0]);
+            let duty = duty_of(b, "Duty", "kr", 0.5.into(), 0.0.into(), level, &[]);
+            out(b, "kr", duty);
+        }),
+        def("tduty_ar", vec![], |b| {
+            let dur = dseq(b, &[0.1, 0.2]);
+            let args = [("doneAction", input(0.0)), ("gapFirst", input(1.0))];
+            let duty = duty_of(b, "TDuty", "ar", dur, 0.0.into(), 1.0.into(), &args);
+            out(b, "ar", duty);
+        }),
+    ]
+}
+
+/// `class.selector(args)` into `Out` at the rate of `selector`.
+fn rule_out(b: &mut SynthDefBuilder, class: &str, selector: &str, args: &[(&str, ArgValue)]) {
+    let result = by_name(b, class, selector, args);
+    out(b, selector, result);
+}
+
+fn peak() -> Vec<SynthDef> {
+    vec![
+        def("peak_kr_audio", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            rule_out(
+                b,
+                "Peak",
+                "kr",
+                &[("in", input(sound)), ("trig", input(trig))],
+            );
+        }),
+        def("peak_ar", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let trig = by_name(b, "Impulse", "ar", &[("freq", input(2.0))]);
+            rule_out(
+                b,
+                "Peak",
+                "ar",
+                &[("in", input(sound)), ("trig", input(trig))],
+            );
+        }),
+        def("runningmax_kr", vec![], |b| {
+            let sound = sine(b, "kr", 1.0);
+            rule_out(b, "RunningMax", "kr", &[("in", input(sound))]);
+        }),
+        def("runningmin_ar", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            rule_out(b, "RunningMin", "ar", &[("in", input(sound))]);
+        }),
+    ]
+}
+
+fn t2k() -> Vec<SynthDef> {
+    vec![def("t2k", vec![], |b| {
+        let trig = by_name(b, "Impulse", "ar", &[("freq", input(10.0))]);
+        rule_out(b, "T2K", "kr", &[("in", input(trig))]);
     })]
 }

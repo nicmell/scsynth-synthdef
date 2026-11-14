@@ -266,10 +266,10 @@ var checkRules = (
 	DiskOut: [\audio_from, 1],
 	Select: [\audio_from, 1],
 	AbstractOut: [\abstract_out],
-	BufWr: [\custom],
-	Duty: [\custom],
-	Peak: [\custom],
-	T2K: [\custom]
+	BufWr: [\buf_wr],
+	Duty: [\duty],
+	Peak: [\peak],
+	T2K: [\t2k]
 );
 
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;

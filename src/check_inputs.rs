@@ -16,25 +16,41 @@ pub(crate) fn check(rule: CheckInputs, rate: Rate, inputs: &[UGenInput]) -> Resu
             Err(format!("input {input} is not at audio rate"))
         }
     };
-    match rule {
-        CheckInputs::SameRateAsFirstInput => {
-            if rate_of(0) == Some(rate) {
-                Ok(())
-            } else {
-                Err(format!("the first input is not at the rate {rate:?}"))
-            }
+    let same_rate_as_first = || {
+        if rate_of(0) == Some(rate) {
+            Ok(())
+        } else {
+            Err(format!("the first input is not at the rate {rate:?}"))
         }
+    };
+    match rule {
+        CheckInputs::Peak if rate == Rate::Control && rate_of(0) == Some(Rate::Audio) => Ok(()),
+        CheckInputs::SameRateAsFirstInput | CheckInputs::Peak => same_rate_as_first(),
         CheckInputs::SameRateAsFirstInputIfAudio if rate == Rate::Audio => audio(0),
         CheckInputs::AudioAt(input) if rate == Rate::Audio => audio(input),
         CheckInputs::NInputs(count) if rate == Rate::Audio => (0..count).try_for_each(audio),
         CheckInputs::AudioFrom(first) if rate == Rate::Audio => {
             (first..inputs.len()).try_for_each(audio)
         }
+        CheckInputs::BufWr if rate == Rate::Audio => {
+            audio(1)?;
+            (3..inputs.len()).try_for_each(audio)
+        }
+        CheckInputs::Duty if rate_of(0) == Some(Rate::Demand) => match rate_of(1) {
+            Some(Rate::Demand | Rate::Scalar) => Ok(()),
+            reset if reset == Some(rate) => Ok(()),
+            _ => Err(format!(
+                "the reset is not at demand rate, at scalar rate or at the rate {rate:?}"
+            )),
+        },
+        CheckInputs::T2K => audio(0),
         CheckInputs::Valid
         | CheckInputs::SameRateAsFirstInputIfAudio
         | CheckInputs::AudioAt(_)
         | CheckInputs::NInputs(_)
-        | CheckInputs::AudioFrom(_) => Ok(()),
+        | CheckInputs::AudioFrom(_)
+        | CheckInputs::BufWr
+        | CheckInputs::Duty => Ok(()),
         CheckInputs::AbstractOut { fixed } => {
             if rate == Rate::Audio {
                 (fixed..inputs.len()).try_for_each(audio)
@@ -117,6 +133,61 @@ mod tests {
             Ok(())
         );
         assert!(check(rule, Rate::Control, &[0.0.into()]).is_err());
+    }
+
+    #[test]
+    fn buf_wr_takes_an_audio_phase_and_audio_channels_at_audio_rate() {
+        // Fact 1 of the plan of 0.5.
+        let inputs =
+            |phase: Rate, channel: Rate| [0.0.into(), output(phase), 1.0.into(), output(channel)];
+        let rule = CheckInputs::BufWr;
+        assert_eq!(
+            check(rule, Rate::Audio, &inputs(Rate::Audio, Rate::Audio)),
+            Ok(())
+        );
+        assert_eq!(
+            check(rule, Rate::Audio, &inputs(Rate::Control, Rate::Audio)),
+            Err("input 1 is not at audio rate".to_owned())
+        );
+        assert_eq!(
+            check(rule, Rate::Audio, &inputs(Rate::Audio, Rate::Control)),
+            Err("input 3 is not at audio rate".to_owned())
+        );
+        assert_eq!(
+            check(rule, Rate::Control, &inputs(Rate::Control, Rate::Control)),
+            Ok(())
+        );
+    }
+
+    #[test]
+    fn duty_takes_a_reset_at_demand_scalar_or_its_rate_after_a_demand_dur() {
+        // Fact 2 of the plan of 0.5.
+        let duty = |rate: Rate, reset: UGenInput| {
+            check(CheckInputs::Duty, rate, &[output(Rate::Demand), reset])
+        };
+        assert_eq!(duty(Rate::Control, output(Rate::Demand)), Ok(()));
+        assert_eq!(duty(Rate::Control, 0.0.into()), Ok(()));
+        assert_eq!(duty(Rate::Control, output(Rate::Control)), Ok(()));
+        assert!(duty(Rate::Control, output(Rate::Audio)).is_err());
+        assert!(duty(Rate::Audio, output(Rate::Control)).is_err());
+        let number = [0.5.into(), output(Rate::Audio)];
+        assert_eq!(check(CheckInputs::Duty, Rate::Control, &number), Ok(()));
+    }
+
+    #[test]
+    fn peak_at_control_rate_takes_an_audio_input_and_t2k_takes_only_one() {
+        // Facts 3 and 4 of the plan of 0.5.
+        let peak = |rate: Rate, input: Rate| check(CheckInputs::Peak, rate, &[output(input)]);
+        assert_eq!(peak(Rate::Control, Rate::Audio), Ok(()));
+        assert_eq!(peak(Rate::Control, Rate::Control), Ok(()));
+        assert_eq!(peak(Rate::Audio, Rate::Audio), Ok(()));
+        assert!(peak(Rate::Audio, Rate::Control).is_err());
+        let t2k = |input: Rate| check(CheckInputs::T2K, Rate::Control, &[output(input)]);
+        assert_eq!(t2k(Rate::Audio), Ok(()));
+        assert_eq!(
+            t2k(Rate::Control),
+            Err("input 0 is not at audio rate".to_owned())
+        );
     }
 
     #[test]

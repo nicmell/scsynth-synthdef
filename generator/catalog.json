@@ -5095,8 +5095,7 @@
         "UGens>Buffer"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "BufWr"
+        "rule": "buf_wr"
       },
       "methods": [
         {
@@ -5129,8 +5128,30 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of BufWr is a rule of its own"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            },
+            {
+              "array": 0
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         },
         {
           "selector": "kr",
@@ -5162,8 +5183,30 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of BufWr is a rule of its own"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            },
+            {
+              "array": 0
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         }
       ]
     },
@@ -11175,8 +11218,7 @@
         "UGens>Demand"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "Duty"
+        "rule": "duty"
       },
       "methods": [
         {
@@ -11211,8 +11253,30 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Duty is a rule of its own"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 3
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         },
         {
           "selector": "kr",
@@ -11246,8 +11310,30 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Duty is a rule of its own"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 3
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         }
       ]
     },
@@ -28394,8 +28480,7 @@
         "UGens>Analysis>Amplitude"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "Peak"
+        "rule": "peak"
       },
       "methods": [
         {
@@ -28416,8 +28501,24 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Peak is a rule of its own"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         },
         {
           "selector": "kr",
@@ -28437,8 +28538,24 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Peak is a rule of its own"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         }
       ]
     },
@@ -31436,8 +31553,7 @@
         "UGens>Maths"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "Peak"
+        "rule": "peak"
       },
       "methods": [
         {
@@ -31458,8 +31574,24 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Peak is a rule of its own"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         },
         {
           "selector": "kr",
@@ -31479,8 +31611,24 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Peak is a rule of its own"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         }
       ]
     },
@@ -31496,8 +31644,7 @@
         "UGens>Maths"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "Peak"
+        "rule": "peak"
       },
       "methods": [
         {
@@ -31518,8 +31665,24 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Peak is a rule of its own"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         },
         {
           "selector": "kr",
@@ -31539,8 +31702,24 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Peak is a rule of its own"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         }
       ]
     },
@@ -35026,8 +35205,7 @@
         "UGens>Triggers"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "T2K"
+        "rule": "t2k"
       },
       "methods": [
         {
@@ -35041,8 +35219,21 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of T2K is a rule of its own"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         }
       ]
     },
@@ -35281,8 +35472,7 @@
         "UGens>Demand"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "Duty"
+        "rule": "duty"
       },
       "methods": [
         {
@@ -35324,8 +35514,33 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Duty is a rule of its own"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 3
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 4
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         },
         {
           "selector": "kr",
@@ -35366,8 +35581,33 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the checkInputs of Duty is a rule of its own"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 3
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 4
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true
         }
       ]
     },

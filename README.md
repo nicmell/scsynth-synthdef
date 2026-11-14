@@ -202,8 +202,12 @@ The builder refuses two inputs that sclang takes:
   input at the rate of the UGen. If the UGen runs at audio rate, other
   rules ask for some of its inputs at audio rate. At audio rate,
   `AbstractOut` asks for audio-rate channels.
-- A class with a rule of its own is not addable: `T2K`, `Duty`, `TDuty`,
-  `BufWr`, `Peak`, `RunningMax` and `RunningMin`.
+- Four classes have a rule of their own, and their subclasses inherit it.
+  At audio rate, `BufWr` asks for its phase and its channels at audio
+  rate. After a `dur` at demand rate, `Duty` and `TDuty` ask for a `reset`
+  at demand rate, at scalar rate or at their own rate.
+- At control rate, `Peak`, `RunningMax` and `RunningMin` also take an input
+  at audio rate. `T2K` asks for an input at audio rate.
 
 scsynth does not check the rate of an input. For `Out.ar(0, 0.5)`, it
 copies a buffer's length of floats from the one float of the constant
@@ -394,11 +398,6 @@ it.
   `UnaryOpUGen.new`. Some of these do not exist.
 - They take their special index from the build: `AudioControl.ar`,
   `Control.ir`, `Control.kr`, `TrigControl.ir` and `TrigControl.kr`.
-- Their class checks its inputs with a rule of its own: `BufWr.ar`,
-  `BufWr.kr`, `Duty.ar`, `Duty.kr`, `Peak.ar`, `Peak.kr` and
-  `RunningMax.ar`.
-- So do `RunningMax.kr`, `RunningMin.ar`, `RunningMin.kr`, `T2K.kr`,
-  `TDuty.ar` and `TDuty.kr`.
 
 ## Strictness
 
