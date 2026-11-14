@@ -118,6 +118,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Conversion"
       ],
@@ -164,6 +165,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Undocumented"
@@ -304,6 +306,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -319,6 +322,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -337,6 +341,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -498,6 +503,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -659,6 +665,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -819,6 +826,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -966,6 +974,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -1153,6 +1162,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -1291,6 +1301,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Bela"
       ],
@@ -1389,6 +1400,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Bela"
       ],
@@ -1504,6 +1516,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -1536,6 +1549,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1614,6 +1628,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1692,6 +1707,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1769,6 +1785,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1787,6 +1804,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1865,6 +1883,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1953,6 +1972,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2031,6 +2051,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2118,6 +2139,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2259,6 +2281,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2360,6 +2383,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2448,6 +2472,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2589,6 +2614,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2688,6 +2714,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -2813,6 +2840,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -2944,6 +2972,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -2960,6 +2989,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis",
         "UGens>FFT"
@@ -2996,6 +3026,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis",
         "UGens>FFT"
@@ -3090,6 +3121,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Bela"
       ],
@@ -3142,6 +3174,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -3266,6 +3299,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -3304,6 +3338,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -3423,6 +3458,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -3456,6 +3492,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -3533,6 +3570,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3622,6 +3660,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3711,6 +3750,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3800,6 +3840,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -3867,6 +3908,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3956,6 +3998,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4044,6 +4087,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4133,6 +4177,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4273,6 +4318,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4412,6 +4458,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4552,6 +4599,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4619,6 +4667,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4685,6 +4734,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Base"
       ],
@@ -4752,6 +4802,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4819,6 +4870,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -4959,6 +5011,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -5026,6 +5079,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -5092,6 +5146,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -5221,6 +5276,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -5357,6 +5413,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers",
         "UGens>Filters>Linear"
@@ -5410,6 +5467,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -5425,6 +5483,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -5536,6 +5595,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": null,
       "categories": [
         "Undocumented classes"
       ],
@@ -5578,6 +5638,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -5734,6 +5795,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -5810,6 +5872,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -5894,6 +5957,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -6055,6 +6119,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -6215,6 +6280,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -6374,6 +6440,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Dynamics"
       ],
@@ -6491,6 +6558,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Dynamics"
       ],
@@ -6570,6 +6638,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control"
       ],
@@ -6611,6 +6680,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -6643,6 +6713,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -6674,6 +6745,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -6748,6 +6820,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -6832,6 +6905,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -6926,6 +7000,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Convolution"
       ],
@@ -7076,6 +7151,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -7176,6 +7252,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -7264,6 +7341,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -7353,6 +7431,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Single-value"
       ],
@@ -7423,6 +7502,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "Undocumented classes"
       ],
@@ -7439,6 +7519,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -7513,6 +7594,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Demand"
@@ -7578,6 +7660,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Demand"
@@ -7653,6 +7736,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -7713,6 +7797,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -7764,6 +7849,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Envelopes"
@@ -7885,6 +7971,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Envelopes"
@@ -8025,6 +8112,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -8111,6 +8199,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Conversion"
       ],
@@ -8245,6 +8334,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Delays"
@@ -8392,6 +8482,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Delays"
@@ -8478,6 +8569,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -8596,6 +8688,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -8732,6 +8825,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -8873,6 +8967,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -9013,6 +9108,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -9153,6 +9249,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -9251,6 +9348,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand",
         "UGens>Envelopes"
@@ -9496,6 +9594,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -9612,6 +9711,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control",
         "UGens>Analysis>Amplitude"
@@ -9744,6 +9844,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -9809,6 +9910,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -9882,6 +9984,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Bela"
       ],
@@ -10020,6 +10123,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Bela"
       ],
@@ -10118,6 +10222,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Bela"
       ],
@@ -10233,6 +10338,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -10289,6 +10395,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -10343,6 +10450,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10406,6 +10514,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control",
         "Server>Nodes"
@@ -10449,6 +10558,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand",
         "UGens>Info"
@@ -10521,6 +10631,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10574,6 +10685,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10627,6 +10739,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10681,6 +10794,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10734,6 +10848,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10799,6 +10914,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand",
         "UGens>Random"
@@ -10853,6 +10969,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10887,6 +11004,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10938,6 +11056,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -10988,6 +11107,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -11030,6 +11150,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -11128,6 +11249,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -11226,6 +11348,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -11357,6 +11480,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -11421,6 +11545,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand",
         "UGens>Random"
@@ -11464,6 +11589,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -11516,6 +11642,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -11582,6 +11709,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Filters>Linear"
@@ -11673,6 +11801,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -11841,6 +11970,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random"
       ],
@@ -11896,6 +12026,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12015,6 +12146,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12133,6 +12265,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12252,6 +12385,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "buf_frames",
       "categories": [
         "UGens>FFT"
       ],
@@ -12345,6 +12479,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -12408,6 +12543,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -12566,6 +12702,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -12685,6 +12822,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters"
       ],
@@ -12701,6 +12839,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -12858,6 +12997,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -12973,6 +13113,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -13052,6 +13193,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -13210,6 +13352,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control"
       ],
@@ -13259,6 +13402,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control"
       ],
@@ -13300,6 +13444,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control"
       ],
@@ -13343,6 +13488,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Reverbs"
       ],
@@ -13429,6 +13575,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Reverbs"
       ],
@@ -13524,6 +13671,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Filters>Pitch"
@@ -13601,6 +13749,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Reverbs"
       ],
@@ -13749,6 +13898,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -13841,6 +13991,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -13919,6 +14070,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -13996,6 +14148,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -14270,6 +14423,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -14584,6 +14738,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -14839,6 +14994,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -14982,6 +15138,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15116,6 +15273,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15228,6 +15386,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15342,6 +15501,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -15421,6 +15581,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -15542,6 +15703,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -15643,6 +15805,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -15741,6 +15904,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Random"
@@ -15842,6 +16006,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -15941,6 +16106,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -16039,6 +16205,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -16137,6 +16304,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -16193,6 +16361,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -16225,6 +16394,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -16336,6 +16506,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": null,
       "categories": [
         "UGens>FFT"
       ],
@@ -16487,6 +16658,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random"
       ],
@@ -16541,6 +16713,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -16661,6 +16834,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -16743,6 +16917,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -16819,6 +16994,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -16868,6 +17044,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -17023,6 +17200,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -17090,6 +17268,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut",
         "UGens>Triggers"
@@ -17141,6 +17320,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -17257,6 +17437,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -17373,6 +17554,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -17487,6 +17669,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Base"
       ],
@@ -17520,6 +17703,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Maths"
@@ -17640,6 +17824,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Conversion"
       ],
@@ -17683,6 +17868,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>User interaction"
       ],
@@ -17756,6 +17942,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Pitch"
       ],
@@ -17817,6 +18004,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -17858,6 +18046,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Filters>Linear"
@@ -17913,6 +18102,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18013,6 +18203,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -18132,6 +18323,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18231,6 +18423,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18330,6 +18523,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18429,6 +18623,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18527,6 +18722,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -18677,6 +18873,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18776,6 +18973,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18875,6 +19073,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18975,6 +19174,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19094,6 +19294,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19233,6 +19434,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19353,6 +19555,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19473,6 +19676,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -19593,6 +19797,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -19693,6 +19898,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -19793,6 +19999,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -19922,6 +20129,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20051,6 +20259,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters"
       ],
@@ -20200,6 +20409,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20329,6 +20539,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters"
       ],
@@ -20477,6 +20688,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control"
       ],
@@ -20535,6 +20747,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -20596,6 +20809,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters"
       ],
@@ -20742,6 +20956,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -20832,6 +21047,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -20924,6 +21140,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21043,6 +21260,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21161,6 +21379,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21280,6 +21499,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -21399,6 +21619,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -21490,6 +21711,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Dynamics"
       ],
@@ -21555,6 +21777,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21654,6 +21877,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21752,6 +21976,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21850,6 +22075,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -22002,6 +22228,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -22111,6 +22338,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random"
       ],
@@ -22174,6 +22402,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -22297,6 +22526,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -22455,6 +22685,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -22539,6 +22770,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "Undocumented classes"
       ],
@@ -22592,6 +22824,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -22630,6 +22863,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -22687,6 +22921,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -22753,6 +22988,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22892,6 +23128,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -23019,6 +23256,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -23081,6 +23319,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis"
       ],
@@ -23131,6 +23370,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -23249,6 +23489,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -23273,6 +23514,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -23394,6 +23636,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -23552,6 +23795,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -23711,6 +23955,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters"
       ],
@@ -23865,6 +24110,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -23955,6 +24201,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>User interaction"
       ],
@@ -24018,6 +24265,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>User interaction"
       ],
@@ -24092,6 +24340,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>User interaction"
       ],
@@ -24165,6 +24414,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -24207,6 +24457,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Base"
       ],
@@ -24222,6 +24473,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Bela"
       ],
@@ -24340,6 +24592,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random"
       ],
@@ -24404,6 +24657,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -24436,6 +24690,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Dynamics"
       ],
@@ -24500,6 +24755,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -24532,6 +24788,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -24564,6 +24821,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -24596,6 +24854,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -24628,6 +24887,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -24660,6 +24920,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -24708,6 +24969,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -24766,6 +25028,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -24887,6 +25150,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -25005,6 +25269,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis"
       ],
@@ -25127,6 +25392,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -25262,6 +25528,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -25397,6 +25664,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -25479,6 +25747,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Base"
       ],
@@ -25517,6 +25786,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -25583,6 +25853,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -25634,6 +25905,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -25707,6 +25979,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -25780,6 +26053,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -25841,6 +26115,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -25893,6 +26168,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -25910,6 +26186,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -25974,6 +26251,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26018,6 +26296,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26070,6 +26349,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26121,6 +26401,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26175,6 +26456,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26226,6 +26508,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26309,6 +26592,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26413,6 +26697,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26466,6 +26751,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26520,6 +26806,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26574,6 +26861,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26627,6 +26915,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26688,6 +26977,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26741,6 +27031,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26793,6 +27084,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26836,6 +27128,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26899,6 +27192,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26952,6 +27246,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -26996,6 +27291,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27048,6 +27344,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27100,6 +27397,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27151,6 +27449,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27213,6 +27512,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27257,6 +27557,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27300,6 +27601,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27363,6 +27665,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27434,6 +27737,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27507,6 +27811,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "chain",
       "categories": [
         "UGens>FFT"
       ],
@@ -27588,6 +27893,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": "input",
       "categories": [
         "UGens>FFT"
       ],
@@ -27646,6 +27952,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -27756,6 +28063,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -27890,6 +28198,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -28046,6 +28355,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -28180,6 +28490,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -28291,6 +28602,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -28363,6 +28675,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control"
       ],
@@ -28412,6 +28725,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control"
       ],
@@ -28453,6 +28767,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control",
         "UGens>Undocumented"
@@ -28495,6 +28810,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -28585,6 +28901,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -28675,6 +28992,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers",
         "UGens>Buffer"
@@ -28827,6 +29145,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -28904,6 +29223,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Pitch"
       ],
@@ -29048,6 +29368,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Pitch"
       ],
@@ -29146,6 +29467,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -29324,6 +29646,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Delays"
       ],
@@ -29431,6 +29754,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -29531,6 +29855,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -29649,6 +29974,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -29739,6 +30065,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -29850,6 +30177,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "Undocumented classes"
       ],
@@ -29865,6 +30193,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens"
       ],
@@ -29882,6 +30211,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -29981,6 +30311,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -30079,6 +30410,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -30179,6 +30511,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -30319,6 +30652,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -30458,6 +30792,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -30492,6 +30827,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -30618,6 +30954,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random"
       ],
@@ -30672,6 +31009,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic",
         "UGens>Random"
@@ -30744,6 +31082,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic",
         "UGens>Random"
@@ -30872,6 +31211,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -31102,6 +31442,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -31186,6 +31527,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -31326,6 +31668,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -31465,6 +31808,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Ambisonics",
         "UGens>Multichannel>Panners"
@@ -31572,6 +31916,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -31663,6 +32008,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -31753,6 +32099,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis",
         "UGens>Maths"
@@ -31842,6 +32189,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -32041,6 +32389,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -32073,6 +32422,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -32104,6 +32454,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -32194,6 +32545,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -32293,6 +32645,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -32448,6 +32801,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Undocumented"
@@ -32537,6 +32891,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -32663,6 +33018,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -32748,6 +33104,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -32845,6 +33202,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -32969,6 +33327,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -33076,6 +33435,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": null,
       "categories": [
         "Undocumented classes"
       ],
@@ -33117,6 +33477,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -33209,6 +33570,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -33325,6 +33687,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -33375,6 +33738,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -33425,6 +33789,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -33544,6 +33909,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Generators>Chaotic"
@@ -33665,6 +34031,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -33813,6 +34180,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis",
         "UGens>Filters>Linear",
@@ -33913,6 +34281,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT"
       ],
@@ -33954,6 +34323,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT"
       ],
@@ -33995,6 +34365,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT"
       ],
@@ -34066,6 +34437,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -34160,6 +34532,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -34296,6 +34669,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -34409,6 +34783,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -34497,6 +34872,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -34584,6 +34960,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -34751,6 +35128,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -34855,6 +35233,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Info"
       ],
@@ -34886,6 +35265,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -34923,6 +35303,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -34965,6 +35346,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -35056,6 +35438,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -35176,6 +35559,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Conversion",
         "UGens>Triggers"
@@ -35232,6 +35616,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Conversion",
         "UGens>Triggers"
@@ -35276,6 +35661,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -35408,6 +35794,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers",
         "UGens>Delays"
@@ -35500,6 +35887,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Demand"
       ],
@@ -35650,6 +36038,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -35762,6 +36151,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -35880,6 +36270,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -35991,6 +36382,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -36102,6 +36494,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -36207,6 +36600,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Delays>Buffer"
@@ -36251,6 +36645,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -36321,6 +36716,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -36392,6 +36788,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -36482,6 +36879,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Triggers"
       ],
@@ -36574,6 +36972,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Synth control",
         "UGens>Undocumented"
@@ -36617,6 +37016,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -36758,6 +37158,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -36897,6 +37298,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -36930,6 +37332,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT",
         "UGens>Demand"
@@ -36999,6 +37402,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>FFT",
         "UGens>Demand"
@@ -37045,6 +37449,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -37122,6 +37527,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -37257,6 +37663,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -37413,6 +37820,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -37538,6 +37946,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -37677,6 +38086,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Generators>Stochastic",
@@ -37910,6 +38320,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -38044,6 +38455,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -38120,6 +38532,7 @@
       ],
       "pure": false,
       "width_first": true,
+      "fft_size": null,
       "categories": [
         "Undocumented classes"
       ],
@@ -38136,6 +38549,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Maths"
       ],
@@ -38293,6 +38707,7 @@
       ],
       "pure": true,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Buffer"
       ],
@@ -38407,6 +38822,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -38534,6 +38950,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -38693,6 +39110,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>InOut"
       ],
@@ -38791,6 +39209,7 @@
       ],
       "pure": false,
       "width_first": false,
+      "fft_size": null,
       "categories": [
         "UGens>Analysis>Pitch"
       ],

@@ -12,6 +12,7 @@ use crate::error::BuildError;
 use crate::file::Version;
 use crate::limits;
 use crate::operator;
+use crate::optimize::{self, Rewritten};
 use crate::pseudo::{self, lang};
 use crate::rate::{Rate, least_by_name};
 use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
@@ -202,17 +203,17 @@ struct MaxLocalBufs {
 }
 
 #[derive(Clone, Debug)]
-struct Node {
-    name: String,
-    rate: Rate,
-    inputs: Vec<Source>,
-    outputs: Vec<Rate>,
-    special_index: i16,
-    width_first_before: usize,
+pub(crate) struct Node {
+    pub(crate) name: String,
+    pub(crate) rate: Rate,
+    pub(crate) inputs: Vec<Source>,
+    pub(crate) outputs: Vec<Rate>,
+    pub(crate) special_index: i16,
+    pub(crate) width_first_before: usize,
 }
 
 #[derive(Clone, Copy, Debug)]
-enum Source {
+pub(crate) enum Source {
     Number(f64),
     Output { ugen: usize, output: u32 },
 }
@@ -601,19 +602,26 @@ impl SynthDefBuilder {
         Ok(())
     }
 
-    /// Ends the build, as `finishBuild` does without `optimizeGraph`: it
+    /// Ends the build, as `finishBuild` does without `optimizeGraph`. It
+    /// copies a PV chain for its readers, as `addCopiesIfNeeded` does, then
     /// collects the constants, sorts the UGens and indexes them.
     ///
     /// # Errors
     ///
-    /// A [`BuildError`] when the definition breaks a limit of scsynth.
-    pub fn finish(mut self) -> Result<SynthDef, BuildError> {
+    /// A [`BuildError`] when the definition breaks a limit of scsynth, and
+    /// [`BuildError::FinishBuild`] where `finishBuild` of sclang 3.14.1
+    /// throws or writes a broken definition.
+    pub fn finish(self) -> Result<SynthDef, BuildError> {
+        let mut graph = optimize::Graph::new(self.children, &self.width_first);
+        let copies = graph.add_copies(self.max_local_bufs.map(|max| max.node))?;
         if let Some(max) = self.max_local_bufs {
-            self.children[max.node].inputs[0] = Source::Number(f64::from(max.count));
+            let count = Source::Number(f64::from(max.count + copies));
+            graph.set_input(max.node, 0, count);
         }
+        let Rewritten { nodes, width_first } = graph.into_rewritten();
         let mut constants = Vec::new();
         let mut constant_index = BTreeMap::new();
-        for node in &self.children {
+        for node in &nodes {
             for source in &node.inputs {
                 if let Source::Number(number) = *source {
                     constant_index.entry(number.to_bits()).or_insert_with(|| {
@@ -623,17 +631,17 @@ impl SynthDefBuilder {
                 }
             }
         }
-        let antecedents: Vec<Vec<usize>> = self
-            .children
+        let antecedents: Vec<Vec<usize>> = nodes
             .iter()
-            .map(|node| {
+            .zip(&width_first)
+            .map(|(node, width_first)| {
                 node.inputs
                     .iter()
                     .filter_map(|source| match *source {
                         Source::Output { ugen, .. } => Some(ugen),
                         Source::Number(_) => None,
                     })
-                    .chain(self.width_first[..node.width_first_before].iter().copied())
+                    .chain(width_first.iter().copied())
                     .collect()
             })
             .collect();
@@ -645,7 +653,7 @@ impl SynthDefBuilder {
         let children = order
             .iter()
             .map(|&ugen| {
-                let node = &self.children[ugen];
+                let node = &nodes[ugen];
                 UGen {
                     name: node.name.clone(),
                     rate: node.rate,

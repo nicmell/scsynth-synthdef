@@ -59,14 +59,22 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
 }
 
 /// A definition with these arguments, which `build` fills.
-fn def(name: &str, args: Vec<Arg>, build: impl FnOnce(&mut SynthDefBuilder)) -> SynthDef {
+pub(super) fn def(
+    name: &str,
+    args: Vec<Arg>,
+    build: impl FnOnce(&mut SynthDefBuilder),
+) -> SynthDef {
     let mut builder = SynthDefBuilder::new(name, args).unwrap();
     build(&mut builder);
     builder.finish().unwrap()
 }
 
 /// `SinOsc` at the rate of `selector`, of `freq`.
-fn sine(builder: &mut SynthDefBuilder, selector: &str, freq: impl Into<UGenInput>) -> UGenInput {
+pub(super) fn sine(
+    builder: &mut SynthDefBuilder,
+    selector: &str,
+    freq: impl Into<UGenInput>,
+) -> UGenInput {
     by_name(builder, "SinOsc", selector, &[("freq", freq.into().into())])
 }
 
@@ -81,7 +89,7 @@ fn sines(builder: &mut SynthDefBuilder, selector: &str, freqs: &[f64]) -> UGenIn
 }
 
 /// `Out.ar(0, channels)` or `Out.kr(0, channels)`.
-fn out(builder: &mut SynthDefBuilder, selector: &str, channels: UGenInput) {
+pub(super) fn out(builder: &mut SynthDefBuilder, selector: &str, channels: UGenInput) {
     by_name(
         builder,
         "Out",
@@ -90,7 +98,7 @@ fn out(builder: &mut SynthDefBuilder, selector: &str, channels: UGenInput) {
     );
 }
 
-fn input(value: impl Into<UGenInput>) -> ArgValue {
+pub(super) fn input(value: impl Into<UGenInput>) -> ArgValue {
     ArgValue::Input(value.into())
 }
 

@@ -20,6 +20,9 @@ pub struct UGenClass {
     pub is_pure: bool,
     /// Whether the class is a `WidthFirstUGen`.
     pub is_width_first: bool,
+    /// How `fftSize` finds the size of the FFT of a PV chain of the class.
+    /// `None` for a class without `fftSize`.
+    pub fft_size: Option<FftSize>,
     /// The categories of the class in the help of SuperCollider, such as
     /// `UGens>Generators>Deterministic`.
     pub categories: &'static [&'static str],
@@ -285,6 +288,19 @@ pub enum CheckInputs {
     Custom(&'static str),
 }
 
+/// How `fftSize` of a PV chain finds the size of its FFT, which a copy of
+/// `addCopiesIfNeeded` gives its `LocalBuf`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum FftSize {
+    /// A new `BufFrames.ir` of input 0, the buffer of an `FFT`.
+    BufFrames,
+    /// Input 1, the `bufsize` of a `PackFFT`.
+    Input,
+    /// The size of the chain of input 0, as `PV_ChainUGen` finds it.
+    Chain,
+}
+
 /// The class with this name.
 #[must_use]
 pub fn lookup(name: &str) -> Option<&'static UGenClass> {
@@ -320,8 +336,8 @@ pub fn pseudo_all() -> &'static [PseudoClass] {
 #[cfg(test)]
 mod tests {
     use super::{
-        Addable, ArrayExpansion, CheckInputs, InputSlot, Outputs, Wiring, all, lookup, pseudo_all,
-        pseudo_lookup,
+        Addable, ArrayExpansion, CheckInputs, FftSize, InputSlot, Outputs, Wiring, all, lookup,
+        pseudo_all, pseudo_lookup,
     };
     use crate::rate::Rate;
 
@@ -563,6 +579,27 @@ mod tests {
             all()
                 .iter()
                 .all(|class| !matches!(class.check_inputs, CheckInputs::Custom(_)))
+        );
+    }
+
+    #[test]
+    fn each_pv_chain_finds_its_fft_size_as_its_class_does() {
+        // Fact 3 of the plan of 0.7.
+        assert_eq!(lookup("FFT").unwrap().fft_size, Some(FftSize::BufFrames));
+        assert_eq!(lookup("PackFFT").unwrap().fft_size, Some(FftSize::Input));
+        assert_eq!(
+            lookup("PV_MagAbove").unwrap().fft_size,
+            Some(FftSize::Chain)
+        );
+        assert_eq!(lookup("IFFT").unwrap().fft_size, None);
+        let count = |size| all().iter().filter(|class| class.fft_size == size).count();
+        assert_eq!(
+            [
+                count(Some(FftSize::BufFrames)),
+                count(Some(FftSize::Input)),
+                count(Some(FftSize::Chain))
+            ],
+            [1, 1, 36]
         );
     }
 }

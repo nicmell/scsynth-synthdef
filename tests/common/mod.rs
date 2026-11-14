@@ -2,6 +2,7 @@
 //! holds the sclang code of each.
 #![allow(dead_code)]
 
+mod optimize;
 mod pseudo;
 
 use std::fs;
@@ -87,6 +88,7 @@ pub const NAMES: &[&str] = &[
     "nestedreply",
     "nestedenv",
     "nestedpseudo",
+    "pvcopy",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where
@@ -144,6 +146,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "mul_ops" => vec![mul_ops()],
         "madd_numbers" => vec![madd_numbers()],
         "folds" => vec![folds()],
+        "pvcopy" => optimize::definitions(name),
         _ => pseudo::definitions(name),
     }
 }
