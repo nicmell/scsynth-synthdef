@@ -392,8 +392,7 @@ it.
 - So do `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`,
   `SendPeakRMS.kr` and `SetBuf.new`.
 - They need arguments that the probe does not make, such as a `Ref`, a
-  `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar`, `InRect.kr`,
-  `Klang.ar` and `Klank.ar`.
+  `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar` and `InRect.kr`.
 - So do `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new` and
   `UnaryOpUGen.new`. Some of these do not exist.
 - They take their special index from the build: `AudioControl.ar`,

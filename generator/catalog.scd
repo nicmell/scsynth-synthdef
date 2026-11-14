@@ -161,9 +161,10 @@ var argumentKinds = [
 // pseudo-UGens, whose rate methods build other UGens, and the classes of 0.4.
 // The crate has a body for each rate method of a class of bodies.
 var bodies = [\BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter,
-	\DynKlang, \DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix,
-	\MultiTap, \NumChannels, \PMOsc, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
-	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \UnpackFFT];
+	\DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LinLin, \LinSelectX, \LocalBuf,
+	\LocalIn, \Mix, \MultiTap, \NumChannels, \PMOsc, \Poll, \SelectX, \SelectXFocus,
+	\Silent, \SoundIn, \Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap,
+	\UnpackFFT];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],

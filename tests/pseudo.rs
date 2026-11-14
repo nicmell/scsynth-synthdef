@@ -156,6 +156,24 @@ fn local_in_and_poll_refuse_what_sclang_refuses() {
 }
 
 #[test]
+fn klank_refuses_an_empty_part_beside_a_full_one() {
+    // flop would read past the end of the empty part.
+    let mut b = builder();
+    let x = b.arguments()[0].clone();
+    let freqs = UGenInput::Array(vec![800.0.into(), 1071.0.into()]);
+    let spec = UGenInput::Array(vec![freqs, UGenInput::Array(Vec::new())]);
+    let empty = b.ugen(
+        "Klank",
+        "ar",
+        &[("specificationsArrayRef", input(spec)), ("input", input(x))],
+    );
+    assert!(
+        matches!(&empty, Err(BuildError::EmptyInput { ugen, .. }) if ugen == "Klank"),
+        "{empty:?}"
+    );
+}
+
+#[test]
 fn mix_gives_0_for_no_input_and_refuses_a_mix_at_demand_rate() {
     let mut b = builder();
     let nothing = b.ugen("Mix", "new", &[("array", input(Vec::new()))]);

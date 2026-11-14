@@ -173,6 +173,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("DynKlank", "ar", fsin_osc::dyn_klank),
     ("DynKlank", "kr", fsin_osc::dyn_klank),
     ("HilbertFIR", "ar", hilbert::hilbert_fir),
+    ("Klang", "ar", fsin_osc::klang),
+    ("Klank", "ar", fsin_osc::klank),
     ("LinLin", "ar", line::lin_lin_ar),
     ("LinLin", "kr", line::lin_lin_kr),
     ("LinSelectX", "ar", osc::lin_select_x),

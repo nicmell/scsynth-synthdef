@@ -46,6 +46,8 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "duty" => duty(),
         "peak" => peak(),
         "t2k" => t2k(),
+        "klank" => klank(),
+        "klang" => klang(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1775,4 +1777,89 @@ fn t2k() -> Vec<SynthDef> {
         let trig = by_name(b, "Impulse", "ar", &[("freq", input(10.0))]);
         rule_out(b, "T2K", "kr", &[("in", input(trig))]);
     })]
+}
+
+/// A spec of `Klank` or `Klang`: its parts as arrays of numbers.
+fn spec_of(parts: &[&[f64]]) -> UGenInput {
+    UGenInput::Array(parts.iter().map(|part| array(part)).collect())
+}
+
+/// `Klank.ar(spec, input)`, with these other arguments, into `Out.ar`.
+fn klank_out(
+    b: &mut SynthDefBuilder,
+    parts: &[&[f64]],
+    impulses: UGenInput,
+    args: &[(&str, ArgValue)],
+) {
+    let trig = by_name(b, "Impulse", "ar", &[("freq", input(impulses))]);
+    let mut all = vec![
+        ("specificationsArrayRef", input(spec_of(parts))),
+        ("input", input(trig)),
+    ];
+    all.extend(args.iter().cloned());
+    let rings = by_name(b, "Klank", "ar", &all);
+    out(b, "ar", rings);
+}
+
+fn klank() -> Vec<SynthDef> {
+    vec![
+        def("klank_3", vec![], |b| {
+            let parts: &[&[f64]] = &[&[800.0, 1071.0, 1353.0], &[0.3, 0.2, 0.1], &[1.0, 1.0, 1.0]];
+            klank_out(b, parts, 2.0.into(), &[]);
+        }),
+        def("klank_amps", vec![], |b| {
+            klank_out(b, &[&[800.0, 1071.0], &[0.5, 0.3]], 2.0.into(), &[]);
+        }),
+        def("klank_times", vec![], |b| {
+            let parts: &[&[f64]] = &[&[800.0, 1071.0], &[1.0], &[1.0, 2.0]];
+            klank_out(b, parts, 2.0.into(), &[]);
+        }),
+        def("klank_wrap", vec![], |b| {
+            let parts: &[&[f64]] = &[&[800.0, 1071.0, 1353.0], &[0.5, 0.3]];
+            klank_out(b, parts, 2.0.into(), &[]);
+        }),
+        def("klank_scale", vec![Arg::new("scale", 1.0)], |b| {
+            let scale = arg(b, "scale");
+            klank_out(
+                b,
+                &[&[800.0, 1071.0]],
+                2.0.into(),
+                &[("freqscale", input(scale))],
+            );
+        }),
+        def("klank_expand", vec![], |b| {
+            klank_out(b, &[&[800.0, 1071.0]], array(&[2.0, 3.0]), &[]);
+        }),
+    ]
+}
+
+fn klang() -> Vec<SynthDef> {
+    let klang_out = |b: &mut SynthDefBuilder, parts: &[&[f64]], args: &[(&str, ArgValue)]| {
+        let mut all = vec![("specificationsArrayRef", input(spec_of(parts)))];
+        all.extend(args.iter().cloned());
+        let sines = by_name(b, "Klang", "ar", &all);
+        out(b, "ar", sines);
+    };
+    vec![
+        def("klang_3", vec![], |b| {
+            let pi = std::f64::consts::PI;
+            klang_out(b, &[&[800.0, 1000.0], &[0.3, 0.3], &[pi, pi]], &[]);
+        }),
+        def("klang_default", vec![], |b| {
+            klang_out(b, &[&[800.0, 1000.0, 1200.0]], &[]);
+        }),
+        def("klang_scale", vec![], |b| {
+            let scale = by_name(
+                b,
+                "SinOsc",
+                "kr",
+                &[
+                    ("freq", input(0.1)),
+                    ("mul", input(0.1)),
+                    ("add", input(1.0)),
+                ],
+            );
+            klang_out(b, &[&[800.0, 1000.0]], &[("freqscale", input(scale))]);
+        }),
+    ]
 }

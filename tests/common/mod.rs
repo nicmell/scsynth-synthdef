@@ -79,6 +79,8 @@ pub const NAMES: &[&str] = &[
     "duty",
     "peak",
     "t2k",
+    "klank",
+    "klang",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where
