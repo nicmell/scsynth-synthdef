@@ -344,8 +344,9 @@ pub enum BuildError {
         /// The name of the argument.
         argument: String,
     },
-    /// An array argument holds an array, or an argument of a method that
-    /// expands one level holds an array inside an array.
+    /// An array would stay among the inputs of a UGen: an array argument
+    /// holds one where its class does not expand it, or an argument of a
+    /// method that expands one level holds an array inside an array.
     #[non_exhaustive]
     NestedArray {
         /// The class of the UGen.

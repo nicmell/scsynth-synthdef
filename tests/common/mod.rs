@@ -82,6 +82,10 @@ pub const NAMES: &[&str] = &[
     "klank",
     "klang",
     "pingpong",
+    "nestedout",
+    "nestedwire",
+    "nestedreply",
+    "nestedenv",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where

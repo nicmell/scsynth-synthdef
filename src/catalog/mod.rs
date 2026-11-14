@@ -174,6 +174,25 @@ pub struct Wiring {
     /// expansion, through `replaceZeroesWithSilence`, as the channels of
     /// `Out.ar`.
     pub silence: Option<usize>,
+    /// How the array argument takes an array among its elements. `None` for
+    /// a method without an array argument, and for one whose array stays
+    /// among the inputs of the UGen, as in `IEnvGen`.
+    pub array_expansion: Option<ArrayExpansion>,
+}
+
+/// How the array argument of a method takes an array among its elements.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum ArrayExpansion {
+    /// Each element is an argument of `multiNewList`, as `Out.ar` hands it
+    /// `channelsArray`: an element that is an array expands the UGen.
+    Elements,
+    /// With an array among the elements, each element is the array of one
+    /// instance, as the `flop` of `SendReply.kr` makes it.
+    Flop,
+    /// With an array as the first element, each element is the array of one
+    /// instance, as the `Ref`s of `EnvGen:convertEnv` make it.
+    Refs,
 }
 
 /// When a method gives back `in.madd(mul, add)` in place of an instance: for
@@ -301,7 +320,8 @@ pub fn pseudo_all() -> &'static [PseudoClass] {
 #[cfg(test)]
 mod tests {
     use super::{
-        Addable, CheckInputs, InputSlot, Outputs, Wiring, all, lookup, pseudo_all, pseudo_lookup,
+        Addable, ArrayExpansion, CheckInputs, InputSlot, Outputs, Wiring, all, lookup, pseudo_all,
+        pseudo_lookup,
     };
     use crate::rate::Rate;
 
@@ -467,6 +487,50 @@ mod tests {
             )
             .count();
         assert_eq!(silenced, 5);
+    }
+
+    #[test]
+    fn each_array_argument_takes_an_array_as_its_class_does() {
+        // Facts 2 to 5 of the plan of 0.6.
+        assert_eq!(
+            wiring("Out", "ar").array_expansion,
+            Some(ArrayExpansion::Elements)
+        );
+        assert_eq!(
+            wiring("SendReply", "kr").array_expansion,
+            Some(ArrayExpansion::Flop)
+        );
+        assert_eq!(
+            wiring("EnvGen", "kr").array_expansion,
+            Some(ArrayExpansion::Refs)
+        );
+        assert_eq!(wiring("IEnvGen", "kr").array_expansion, None);
+        assert_eq!(wiring("SinOsc", "ar").array_expansion, None);
+        let arrays: Vec<Option<ArrayExpansion>> = all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter_map(|method| match method.addable {
+                Addable::Yes(wiring)
+                    if wiring
+                        .inputs
+                        .iter()
+                        .any(|slot| matches!(slot, InputSlot::ArgArray(_))) =>
+                {
+                    Some(wiring.array_expansion)
+                }
+                _ => None,
+            })
+            .collect();
+        let count = |expansion| arrays.iter().filter(|&&found| found == expansion).count();
+        assert_eq!(
+            [
+                count(Some(ArrayExpansion::Elements)),
+                count(Some(ArrayExpansion::Flop)),
+                count(Some(ArrayExpansion::Refs)),
+                count(None)
+            ],
+            [34, 2, 2, 2]
+        );
     }
 
     #[test]

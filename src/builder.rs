@@ -4,8 +4,8 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::catalog::{
-    self, Addable, ArgDefault, ArgKind, InputSlot, Outputs, Passthrough, RateMethod, UGenClass,
-    Wiring,
+    self, Addable, ArgDefault, ArgKind, ArrayExpansion, InputSlot, Outputs, Passthrough,
+    RateMethod, UGenClass, Wiring,
 };
 use crate::check_inputs;
 use crate::error::BuildError;
@@ -487,6 +487,14 @@ impl SynthDefBuilder {
             if let Some(slot) = audio_slot {
                 expanded[slot] = lang::as_audio_rate_input(builder, expanded[slot].clone())?;
             }
+            let array = array_part(wiring, &values);
+            if let Some((position, part)) = &array {
+                for value in part.values() {
+                    names.push(method.args[*position].name);
+                    expanded.push(value);
+                }
+            }
+            let fixed = positions.len();
             let result = builder.expand(
                 class,
                 &names,
@@ -495,6 +503,9 @@ impl SynthDefBuilder {
                 &mut |builder, instance| {
                     for (&position, value) in positions.iter().zip(instance) {
                         values[position] = ArgValue::Input(value.clone());
+                    }
+                    if let Some((position, part)) = &array {
+                        values[*position] = ArgValue::Input(part.array(&instance[fixed..]));
                     }
                     builder.add_instance(class, ugen_class, method, wiring, &values)
                 },
@@ -1064,8 +1075,6 @@ fn can_be_mul_add(input: &UGenInput, mul: &UGenInput, add: &UGenInput) -> bool {
     }
 }
 
-/// The positions of the arguments that expand: those of the wire, and the
-/// count of the outputs, as the method gives them `multiNew`.
 /// The input that a method of `through` gives back in place of an instance:
 /// an input at scalar rate, or any input with the number 0 in the zero
 /// argument.
@@ -1079,6 +1088,8 @@ fn passed_through(through: Passthrough, values: &[ArgValue]) -> Option<UGenInput
     (zero || lang::rate(input) == Some(Rate::Scalar)).then(|| input.clone())
 }
 
+/// The positions of the arguments that expand: those of the wire, and the
+/// count of the outputs, as the method gives them `multiNew`.
 fn expanding(wiring: Wiring) -> Vec<usize> {
     let mut positions: Vec<usize> = wiring
         .inputs
@@ -1094,6 +1105,62 @@ fn expanding(wiring: Wiring) -> Vec<usize> {
     positions.sort_unstable();
     positions.dedup();
     positions
+}
+
+/// What the array argument of a method adds to the expansion of `ugen`.
+enum ArrayPart {
+    /// Its elements, which expand as the arguments do.
+    Elements(Vec<UGenInput>),
+    /// The array of each instance, which the expansion takes by its index.
+    Instances(Vec<UGenInput>),
+}
+
+impl ArrayPart {
+    /// The values that the part adds to the expansion.
+    fn values(&self) -> Vec<UGenInput> {
+        match self {
+            Self::Elements(elements) => elements.clone(),
+            Self::Instances(arrays) => vec![UGenInput::Array(
+                (0..arrays.len()).map(pseudo::number).collect(),
+            )],
+        }
+    }
+
+    /// The array argument of one instance, from what the expansion gives the
+    /// part.
+    fn array(&self, values: &[UGenInput]) -> UGenInput {
+        match (self, values) {
+            (Self::Instances(arrays), &[UGenInput::Number(index)]) => {
+                arrays[count_to_usize(index)].clone()
+            }
+            _ => UGenInput::Array(values.to_vec()),
+        }
+    }
+}
+
+/// The position of the array argument of `wiring`, and what it adds to the
+/// expansion, as its `ArrayExpansion` takes an array among its elements.
+/// `None` where the array goes whole to each instance.
+fn array_part(wiring: Wiring, values: &[ArgValue]) -> Option<(usize, ArrayPart)> {
+    let position = wiring.inputs.iter().find_map(|slot| match *slot {
+        InputSlot::ArgArray(position) => Some(position),
+        _ => None,
+    })?;
+    let ArgValue::Input(array) = &values[position] else {
+        return None;
+    };
+    let is_array = |item: &UGenInput| matches!(item, UGenInput::Array(_));
+    let part = match (wiring.array_expansion?, array) {
+        (ArrayExpansion::Elements, _) => ArrayPart::Elements(pseudo::elements(array.clone())),
+        (ArrayExpansion::Flop, UGenInput::Array(items)) if items.iter().any(is_array) => {
+            ArrayPart::Instances(items.clone())
+        }
+        (ArrayExpansion::Refs, UGenInput::Array(items)) if items.first().is_some_and(is_array) => {
+            ArrayPart::Instances(items.clone())
+        }
+        _ => return None,
+    };
+    Some((position, part))
 }
 
 /// sclang keeps its Floats in 64 bits and writes them with `putFloat`, which
@@ -1360,7 +1427,7 @@ fn to_usize(value: u32) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::{Arg, ArgRate, NewUGen, SynthDefBuilder};
+    use super::{Arg, ArgRate, NewUGen, Source, SynthDefBuilder};
     use crate::error::BuildError;
     use crate::rate::Rate;
     use crate::synth_def::{ControlName, InputSpec};
@@ -1754,24 +1821,177 @@ mod tests {
         );
     }
 
+    /// The inputs of each UGen of `class` in the build, as `shape` writes
+    /// them.
+    fn wires(builder: &SynthDefBuilder, class: &str) -> Vec<String> {
+        builder
+            .children
+            .iter()
+            .filter(|node| node.name == class)
+            .map(|node| {
+                let inputs: Vec<String> = node
+                    .inputs
+                    .iter()
+                    .map(|source| match *source {
+                        Source::Number(number) => number.to_string(),
+                        Source::Output { ugen, output } => format!("u{ugen}.{output}"),
+                    })
+                    .collect();
+                format!("[{}]", inputs.join(", "))
+            })
+            .collect()
+    }
+
     #[test]
-    fn an_array_inside_an_array_argument_is_refused() {
+    fn an_array_among_the_channels_expands_out() {
+        // Fact 2 of the plan of 0.6: Out.ar(0, [[a, b], c]) makes Out(0, a, c)
+        // and Out(0, b, c).
         let mut builder = SynthDefBuilder::new("nested", vec![]).unwrap();
-        let sine = builder.ugen("SinOsc", "ar", &[]).unwrap();
+        let sines = builder
+            .ugen(
+                "SinOsc",
+                "ar",
+                &[("freq", numbers(&[1.0, 2.0, 3.0]).into())],
+            )
+            .unwrap();
+        let UGenInput::Array(sines) = sines else {
+            panic!("three sines give an array");
+        };
         let channels = UGenInput::Array(vec![
-            UGenInput::Array(vec![sine.clone(), sine.clone()]),
-            sine,
+            UGenInput::Array(vec![sines[0].clone(), sines[1].clone()]),
+            sines[2].clone(),
         ]);
+        let outs = builder
+            .ugen(
+                "Out",
+                "ar",
+                &[("bus", 0.0.into()), ("channelsArray", channels.into())],
+            )
+            .unwrap();
+        assert_eq!(shape(&outs), "[[], []]");
         assert_eq!(
+            wires(&builder, "Out"),
+            ["[0, u0.0, u2.0]", "[0, u1.0, u2.0]"]
+        );
+    }
+
+    #[test]
+    fn a_zero_inside_the_channels_stays_without_a_zero_at_the_top() {
+        // Fact 6 of the plan of 0.6: sclang fails on Out.ar(0, [[0, a], b]).
+        let mut builder = SynthDefBuilder::new("zeros", vec![]).unwrap();
+        let sine = builder.ugen("SinOsc", "ar", &[]).unwrap();
+        let channels =
+            UGenInput::Array(vec![UGenInput::Array(vec![0.0.into(), sine.clone()]), sine]);
+        assert!(matches!(
             builder.ugen(
                 "Out",
                 "ar",
                 &[("bus", 0.0.into()), ("channelsArray", channels.into())]
             ),
+            Err(BuildError::CheckInputs { .. })
+        ));
+    }
+
+    #[test]
+    fn send_reply_flops_an_array_among_its_values() {
+        // Fact 3 of the plan of 0.6.
+        let mut builder = SynthDefBuilder::new("flop", vec![]).unwrap();
+        let trig = builder.ugen("Impulse", "kr", &[]).unwrap();
+        let mut reply = |values: UGenInput| {
+            builder
+                .ugen(
+                    "SendReply",
+                    "kr",
+                    &[
+                        ("trig", trig.clone().into()),
+                        ("cmdName", "/a".into()),
+                        ("values", values.into()),
+                    ],
+                )
+                .map(|replies| shape(&replies))
+        };
+        let pair_first = UGenInput::Array(vec![numbers(&[2.0, 3.0]), 4.0.into()]);
+        assert_eq!(reply(pair_first), Ok("[[], []]".to_owned()));
+        let pair_last = UGenInput::Array(vec![4.0.into(), numbers(&[2.0, 3.0])]);
+        assert_eq!(reply(pair_last), Ok("[[], []]".to_owned()));
+        assert_eq!(
+            wires(&builder, "SendReply"),
+            [
+                "[u0.0, -1, 2, 47, 97, 2, 3]",
+                "[u0.0, -1, 2, 47, 97, 4]",
+                "[u0.0, -1, 2, 47, 97, 4]",
+                "[u0.0, -1, 2, 47, 97, 2, 3]"
+            ]
+        );
+    }
+
+    #[test]
+    fn env_gen_takes_each_array_of_its_envelope_whole() {
+        // Fact 4 of the plan of 0.6: three gates wrap two envelopes.
+        let mut builder = SynthDefBuilder::new("refs", vec![]).unwrap();
+        let envelopes = UGenInput::Array(vec![
+            numbers(&[0.0, 1.0, -99.0, -99.0, 1.0, 0.5, 1.0, 0.0]),
+            numbers(&[0.0, 1.0, -99.0, -99.0, 1.0, 0.25, 1.0, 0.0]),
+        ]);
+        let gens = builder
+            .ugen(
+                "EnvGen",
+                "kr",
+                &[
+                    ("envelope", envelopes.into()),
+                    ("gate", numbers(&[1.0, 0.5, 0.25]).into()),
+                ],
+            )
+            .unwrap();
+        assert_eq!(shape(&gens), "[u0.0, u1.0, u2.0]");
+        assert_eq!(
+            wires(&builder, "EnvGen")[2],
+            "[0.25, 1, 0, 1, 0, 0, 1, -99, -99, 1, 0.5, 1, 0]"
+        );
+    }
+
+    #[test]
+    fn an_array_that_stays_among_the_inputs_is_refused() {
+        // Fact 5 of the plan of 0.6: sclang writes a file that scsynth
+        // misreads.
+        let mut builder = SynthDefBuilder::new("kept", vec![]).unwrap();
+        let refused = |ugen: &str, argument: &str| {
             Err(BuildError::NestedArray {
-                ugen: "Out".to_owned(),
-                argument: "channelsArray".to_owned()
+                ugen: ugen.to_owned(),
+                argument: argument.to_owned(),
             })
+        };
+        let late = UGenInput::Array(vec![
+            0.0.into(),
+            numbers(&[1.0, 2.0]),
+            (-99.0).into(),
+            (-99.0).into(),
+        ]);
+        assert_eq!(
+            builder.ugen("EnvGen", "kr", &[("envelope", late.into())]),
+            refused("EnvGen", "envelope")
+        );
+        let nested = UGenInput::Array(vec![numbers(&[0.0, 1.0]), 2.0.into()]);
+        assert_eq!(
+            builder.ugen(
+                "IEnvGen",
+                "kr",
+                &[("envelope", nested.into()), ("index", 0.5.into())]
+            ),
+            refused("IEnvGen", "envelope")
+        );
+        let trig = builder.ugen("Impulse", "kr", &[]).unwrap();
+        let deep = UGenInput::Array(vec![UGenInput::Array(vec![
+            numbers(&[1.0, 2.0]),
+            3.0.into(),
+        ])]);
+        assert_eq!(
+            builder.ugen(
+                "SendReply",
+                "kr",
+                &[("trig", trig.into()), ("values", deep.into())]
+            ),
+            refused("SendReply", "values")
         );
     }
 

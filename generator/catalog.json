@@ -3129,7 +3129,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -5151,7 +5152,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         },
         {
           "selector": "kr",
@@ -5206,7 +5208,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -9195,7 +9198,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         },
         {
           "selector": "kr",
@@ -9235,7 +9239,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -10324,7 +10329,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -10555,7 +10561,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -10660,7 +10667,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -10713,7 +10721,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -10831,7 +10840,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -10915,7 +10925,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -10965,7 +10976,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -11492,7 +11504,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -11740,7 +11753,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "refs"
         },
         {
           "selector": "kr",
@@ -11815,7 +11829,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "refs"
         }
       ]
     },
@@ -22564,7 +22579,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -22701,6 +22717,7 @@
           "special_index": 0,
           "madd": false,
           "nested_expansion": true,
+          "array_expansion": "elements",
           "silence": 0
         },
         {
@@ -22724,7 +22741,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -24728,6 +24746,7 @@
           "special_index": 0,
           "madd": false,
           "nested_expansion": true,
+          "array_expansion": "elements",
           "silence": 1
         },
         {
@@ -25416,6 +25435,7 @@
           "special_index": 0,
           "madd": false,
           "nested_expansion": true,
+          "array_expansion": "elements",
           "silence": 1
         },
         {
@@ -25447,7 +25467,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -30961,7 +30982,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         },
         {
           "selector": "kr",
@@ -31066,7 +31088,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -31117,6 +31140,7 @@
           "special_index": 0,
           "madd": false,
           "nested_expansion": true,
+          "array_expansion": "elements",
           "silence": 1
         },
         {
@@ -31148,7 +31172,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -32464,7 +32489,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         },
         {
           "selector": "kr",
@@ -32499,7 +32525,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -32569,7 +32596,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         },
         {
           "selector": "kr",
@@ -32622,7 +32650,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -32673,7 +32702,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         },
         {
           "selector": "kr",
@@ -32706,7 +32736,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -32872,7 +32903,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": false
+          "nested_expansion": false,
+          "array_expansion": "flop"
         },
         {
           "selector": "kr",
@@ -32925,7 +32957,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": false
+          "nested_expansion": false,
+          "array_expansion": "flop"
         }
       ]
     },
@@ -33379,7 +33412,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -36117,7 +36151,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         },
         {
           "selector": "kr",
@@ -36160,7 +36195,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },
@@ -38703,6 +38739,7 @@
           "special_index": 0,
           "madd": false,
           "nested_expansion": true,
+          "array_expansion": "elements",
           "silence": 2
         },
         {
@@ -38742,7 +38779,8 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "array_expansion": "elements"
         }
       ]
     },

@@ -275,8 +275,8 @@ var checkRules = (
 
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
-var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, wiring, testPassthrough;
-var testSilence;
+var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansionOf, wiring;
+var testPassthrough, testSilence;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
 var classes, pseudoClasses, addable = 0, methods = 0, pseudo = 0, helpDir, json;
@@ -588,7 +588,6 @@ try {
 		{ instances[0] }
 	};
 
-	// The values of numberValues, with `value` at `position`.
 	// The values of numberValues, with `value` at `position`. A function makes
 	// the value inside the build.
 	valuesAt = { |kinds, position, value|
@@ -660,6 +659,56 @@ try {
 		failure ?? { [\nested_expansion -> nested] }
 	};
 
+	// How the array argument of a method takes an array among its elements,
+	// as associations: none without an array argument, or when the array
+	// stays among the inputs of the one instance. Each call must make the
+	// instances and nothing else, each with the array of its own.
+	arrayExpansionOf = { |class, selector, kinds, slots|
+		var position = slots.detect { |slot| slot[0] == \array } !? { |slot| slot[1] };
+		var e = { |index| element.(position, index) };
+		var instancesFor = { |value|
+			var result = probe.(class, selector, valuesAt.(kinds, position, value));
+			var instances = result[1].select { |ugen| ugen.class === class };
+			if (result[0].isNil and: { instances.size == result[1].size }) {
+				[instances, result[2]]
+			}
+		};
+		var holds = { |found, arrays|
+			found.notNil and: { found[0].size == arrays.size } and: {
+				found[0].every { |instance, i|
+					var arguments = found[1].copy.put(position, arrays[i]);
+					mapInputs.(instance.inputs ? [], arguments, kinds) == slots
+				}
+			}
+		};
+		var keeps = { |found|
+			found.notNil and: { found[0].size == 1 }
+			and: { found[0][0].inputs.any { |input| input.class == Array } }
+		};
+		var first, second;
+		if (position.isNil) { [] } {
+			first = instancesFor.([[e.(0), e.(1)], e.(2)]);
+			second = instancesFor.([e.(2), [e.(0), e.(1)]]);
+			case
+			{
+				holds.(first, [[e.(0), e.(2)], [e.(1), e.(2)]])
+				and: { holds.(second, [[e.(2), e.(0)], [e.(2), e.(1)]]) }
+				and: {
+					holds.(instancesFor.([[[e.(0), e.(1)], e.(2)], e.(3)]),
+						[[e.(0), e.(3)], [e.(1), e.(3)], [e.(2), e.(3)]])
+				}
+			} { [\array_expansion -> \elements] }
+			{ holds.(first, [[e.(0), e.(1)], [e.(2)]]) and: { holds.(second, [[e.(2)], [e.(0), e.(1)]]) } } {
+				[\array_expansion -> \flop]
+			}
+			{ holds.(first, [[e.(0), e.(1)], [e.(2)]]) and: { keeps.(second) } } {
+				[\array_expansion -> \refs]
+			}
+			{ keeps.(first) and: { keeps.(second) } } { [] }
+			{ fail.("the array of %.% takes an array in no known way".format(class.name, selector)) }
+		}
+	};
+
 	// The wiring of a method, as associations, or the reason why `ugen`
 	// cannot add it.
 	wiring = { |class, selector, kinds|
@@ -725,6 +774,7 @@ try {
 						\special_index -> first.specialIndex,
 						\madd -> (kinds.includes(\mul) or: { kinds.includes(\add) })
 					] ++ expansion
+					++ arrayExpansionOf.(class, selector, kinds, slots)
 					++ if (kinds.includes(\audio)) { [\audio_input -> kinds.indexOf(\audio)] } { [] }
 					++ if (kinds.includes(\level)) { [\level -> true] } { [] }
 				}
