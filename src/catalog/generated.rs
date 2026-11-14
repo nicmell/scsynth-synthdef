@@ -2,8 +2,8 @@
 #![allow(clippy::unreadable_literal)]
 
 use super::{
-    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, InputSlot, Outputs,
-    Passthrough, PseudoClass, RateMethod, UGenClass, Wiring,
+    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,
+    Optimize, Outputs, Passthrough, PseudoClass, RateMethod, UGenClass, Wiring,
 };
 use crate::rate::Rate;
 
@@ -12,7 +12,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "A2K",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -41,7 +43,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "APF",
         superclasses: &["TwoPole", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear", "UGens>Undocumented"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -97,7 +101,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AbstractIn",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -107,7 +113,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AbstractOut",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 0 },
         methods: &[
@@ -117,7 +125,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AllpassC",
         superclasses: &["CombN", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -175,7 +185,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AllpassL",
         superclasses: &["CombN", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -233,7 +245,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AllpassN",
         superclasses: &["CombN", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -291,7 +305,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AmpComp",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -364,7 +380,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AmpCompA",
         superclasses: &["AmpComp", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -440,7 +458,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Amplitude",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -496,7 +516,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AnalogIn",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -548,7 +570,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AnalogOut",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -602,7 +626,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "AudioControl",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -619,7 +645,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BAllPass",
         superclasses: &["BEQSuite", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -652,7 +680,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BBandPass",
         superclasses: &["BEQSuite", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -685,7 +715,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BBandStop",
         superclasses: &["BEQSuite", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -718,7 +750,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BEQSuite",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -728,7 +762,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BHiPass",
         superclasses: &["BEQSuite", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -761,7 +797,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BHiShelf",
         superclasses: &["BEQSuite", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -795,7 +833,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BLowPass",
         superclasses: &["BEQSuite", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -828,7 +868,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BLowShelf",
         superclasses: &["BEQSuite", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -862,7 +904,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BPF",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -918,7 +962,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BPZ2",
         superclasses: &["LPZ2", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -970,7 +1016,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BPeakEQ",
         superclasses: &["BEQSuite", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -1004,7 +1052,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BRF",
         superclasses: &["BPF", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -1060,7 +1110,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BRZ2",
         superclasses: &["LPZ2", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -1112,7 +1164,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Balance2",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -1166,7 +1220,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Ball",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1220,7 +1276,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BasicOpUGen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1230,7 +1288,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BeatTrack",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis", "UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1248,7 +1308,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BeatTrack2",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis", "UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1282,7 +1344,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BelaScopeOut",
         superclasses: &["AbstractOut", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -1312,7 +1376,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BiPanB2",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -1366,7 +1432,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BinaryOpUGen",
         superclasses: &["BasicOpUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::BinaryOp,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1385,7 +1453,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Blip",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1439,7 +1509,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BlockSize",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1467,7 +1539,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BrownNoise",
         superclasses: &["WhiteNoise", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1517,7 +1591,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufAllpassC",
         superclasses: &["BufCombN", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1551,7 +1627,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufAllpassL",
         superclasses: &["BufCombN", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1585,7 +1663,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufAllpassN",
         superclasses: &["BufCombN", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1619,7 +1699,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufChannels",
         superclasses: &["BufInfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1667,7 +1749,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufCombC",
         superclasses: &["BufCombN", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1701,7 +1785,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufCombL",
         superclasses: &["BufCombN", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1735,7 +1821,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufCombN",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1769,7 +1857,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufDelayC",
         superclasses: &["BufDelayN", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1825,7 +1915,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufDelayL",
         superclasses: &["BufDelayN", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1881,7 +1973,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufDelayN",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1937,7 +2031,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufDur",
         superclasses: &["BufInfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1985,7 +2081,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufFrames",
         superclasses: &["BufInfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2033,7 +2131,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufInfoUGenBase",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2081,7 +2181,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufRateScale",
         superclasses: &["BufInfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2129,7 +2231,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufRd",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::AudioAt(1),
         methods: &[
@@ -2185,7 +2289,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufSampleRate",
         superclasses: &["BufInfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2233,7 +2339,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufSamples",
         superclasses: &["BufInfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2281,7 +2389,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "BufWr",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::BufWr,
         methods: &[
@@ -2335,7 +2445,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "COsc",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2391,7 +2503,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Changed",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -2417,7 +2531,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ChaosGen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2427,7 +2543,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "CheckBadValues",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -2479,7 +2597,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ClearBuf",
         superclasses: &["WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: None,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2508,7 +2628,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Clip",
         superclasses: &["InRange", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -2581,7 +2703,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ClipNoise",
         superclasses: &["WhiteNoise", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2631,7 +2755,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "CoinGate",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2681,7 +2807,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "CombC",
         superclasses: &["CombN", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2739,7 +2867,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "CombL",
         superclasses: &["CombN", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2797,7 +2927,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "CombN",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2855,7 +2987,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Compander",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2892,7 +3026,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "CompanderD",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2916,7 +3052,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Control",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2940,7 +3078,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ControlDur",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2968,7 +3108,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ControlRate",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2996,7 +3138,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Convolution",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3029,7 +3173,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Convolution2",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3063,7 +3209,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Convolution2L",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3098,7 +3246,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Convolution3",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3156,7 +3306,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Crackle",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3208,7 +3360,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "CuspL",
         superclasses: &["CuspN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3242,7 +3396,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "CuspN",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3276,7 +3432,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DC",
         superclasses: &["PureMultiOutUGen", "MultiOutUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Single-value"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3324,7 +3482,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DUGen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3334,7 +3494,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dbrown",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3366,7 +3528,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dbufrd",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3397,7 +3561,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dbufwr",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3429,7 +3595,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dconst",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3460,7 +3628,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Ddup",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3490,7 +3660,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Decay",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear", "UGens>Envelopes"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -3544,7 +3716,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Decay2",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear", "UGens>Envelopes"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -3600,7 +3774,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DecodeB2",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(3),
         methods: &[
@@ -3632,7 +3808,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DegreeToKey",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3688,7 +3866,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DelTapRd",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3746,7 +3926,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DelTapWr",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3796,7 +3978,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Delay1",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -3850,7 +4034,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Delay2",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -3906,7 +4092,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DelayC",
         superclasses: &["DelayN", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3962,7 +4150,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DelayL",
         superclasses: &["DelayN", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4018,7 +4208,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DelayN",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4074,7 +4266,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Demand",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -4126,7 +4320,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DemandEnvGen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand", "UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4192,7 +4388,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DetectIndex",
         superclasses: &["Index", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4246,7 +4444,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DetectSilence",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control", "UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -4300,7 +4500,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dgeom",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4331,7 +4533,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dibrown",
         superclasses: &["Dbrown", "DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4363,7 +4567,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DigitalIO",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4419,7 +4625,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DigitalIn",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4471,7 +4679,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DigitalOut",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4525,7 +4735,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DiskIn",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4556,7 +4768,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DiskOut",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::AudioFrom(1),
         methods: &[
@@ -4586,7 +4800,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Diwhite",
         superclasses: &["Dwhite", "DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4617,7 +4833,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Done",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control", "Server>Nodes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4646,7 +4864,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dpoll",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand", "UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4678,7 +4898,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Drand",
         superclasses: &["ListDUGen", "DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4708,7 +4930,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dreset",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4738,7 +4962,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dseq",
         superclasses: &["ListDUGen", "DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4768,7 +4994,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dser",
         superclasses: &["ListDUGen", "DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4798,7 +5026,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dseries",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4829,7 +5059,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dshuf",
         superclasses: &["ListDUGen", "DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4859,7 +5091,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dstutter",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4877,7 +5111,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dswitch",
         superclasses: &["Dswitch1", "DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4907,7 +5143,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dswitch1",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4937,7 +5175,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dunique",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4956,7 +5196,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dust",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5008,7 +5250,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dust2",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5060,7 +5304,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Duty",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Duty,
         methods: &[
@@ -5114,7 +5360,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dwhite",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5145,7 +5393,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dwrand",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5164,7 +5414,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Dxrand",
         superclasses: &["ListDUGen", "DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5194,7 +5446,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DynKlang",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5222,7 +5476,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "DynKlank",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5254,7 +5510,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "EnvGen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5312,7 +5570,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ExpRand",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5342,7 +5602,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FBSineC",
         superclasses: &["FBSineN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5379,7 +5641,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FBSineL",
         superclasses: &["FBSineN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5416,7 +5680,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FBSineN",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5453,7 +5719,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FFT",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::BufFrames),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5487,7 +5755,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FFTTrigger",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5518,7 +5788,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FOS",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -5576,7 +5848,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FSinOsc",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5630,7 +5904,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Filter",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -5640,7 +5916,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Fold",
         superclasses: &["InRange", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -5713,7 +5991,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FoldIndex",
         superclasses: &["Index", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5767,7 +6047,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Formant",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5800,7 +6082,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Formlet",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -5858,7 +6142,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Free",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5888,7 +6174,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FreeSelf",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5917,7 +6205,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FreeSelfWhenDone",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5946,7 +6236,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FreeVerb",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -5980,7 +6272,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FreeVerb2",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -6015,7 +6309,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "FreqShift",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear", "UGens>Filters>Pitch"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6048,7 +6344,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "GVerb",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -6088,7 +6386,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Gate",
         superclasses: &["Latch", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6138,7 +6438,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "GbmanL",
         superclasses: &["GbmanN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6171,7 +6473,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "GbmanN",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6204,7 +6508,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Gendy1",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6274,7 +6580,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Gendy2",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6348,7 +6656,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Gendy3",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6416,7 +6726,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "GrainBuf",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6456,7 +6768,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "GrainFM",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6495,7 +6809,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "GrainIn",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6532,7 +6848,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "GrainSin",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6569,7 +6887,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "GrayNoise",
         superclasses: &["WhiteNoise", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6619,7 +6939,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "HPF",
         superclasses: &["LPF", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -6673,7 +6995,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "HPZ1",
         superclasses: &["LPZ1", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -6725,7 +7049,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "HPZ2",
         superclasses: &["LPZ2", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -6777,7 +7103,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Hasher",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear", "UGens>Random"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -6829,7 +7157,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "HenonC",
         superclasses: &["HenonN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6864,7 +7194,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "HenonL",
         superclasses: &["HenonN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6899,7 +7231,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "HenonN",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6934,7 +7268,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Hilbert",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6965,7 +7301,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "HilbertFIR",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6983,7 +7321,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "IEnvGen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7037,7 +7377,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "IFFT",
         superclasses: &["WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: None,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7110,7 +7452,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "IRand",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7140,7 +7484,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Impulse",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7194,7 +7540,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "In",
         superclasses: &["AbstractIn", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7244,7 +7592,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "InBus",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7274,7 +7624,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "InFeedback",
         superclasses: &["AbstractIn", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7304,7 +7656,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "InRange",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -7377,7 +7731,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "InRect",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -7405,7 +7761,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "InTrig",
         superclasses: &["AbstractIn", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7435,7 +7793,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Index",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7489,7 +7849,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "IndexInBetween",
         superclasses: &["Index", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7543,7 +7905,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "IndexL",
         superclasses: &["Index", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7597,7 +7961,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "InfoUGenBase",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7625,7 +7991,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Integrator",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear", "UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -7679,7 +8047,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "K2A",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7708,7 +8078,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "KeyState",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7740,7 +8112,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "KeyTrack",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7771,7 +8145,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Klang",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7790,7 +8166,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Klank",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7811,7 +8189,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFClipNoise",
         superclasses: &["LFNoise0", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7863,7 +8243,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFCub",
         superclasses: &["LFSaw", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7917,7 +8299,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFDClipNoise",
         superclasses: &["LFNoise0", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7969,7 +8353,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFDNoise0",
         superclasses: &["LFNoise0", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8021,7 +8407,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFDNoise1",
         superclasses: &["LFNoise0", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8073,7 +8461,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFDNoise3",
         superclasses: &["LFNoise0", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8125,7 +8515,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFGauss",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8181,7 +8573,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFNoise0",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8233,7 +8627,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFNoise1",
         superclasses: &["LFNoise0", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8285,7 +8681,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFNoise2",
         superclasses: &["LFNoise0", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8337,7 +8735,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFPar",
         superclasses: &["LFSaw", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8391,7 +8791,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFPulse",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8447,7 +8849,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFSaw",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8501,7 +8905,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LFTri",
         superclasses: &["LFSaw", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8555,7 +8961,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LPF",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8609,7 +9017,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LPZ1",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8661,7 +9071,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LPZ2",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8713,7 +9125,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Lag",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8767,7 +9181,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Lag2",
         superclasses: &["Lag", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8821,7 +9237,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Lag2UD",
         superclasses: &["LagUD", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8877,7 +9295,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Lag3",
         superclasses: &["Lag", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8931,7 +9351,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Lag3UD",
         superclasses: &["LagUD", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8987,7 +9409,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LagControl",
         superclasses: &["Control", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9019,7 +9443,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LagIn",
         superclasses: &["AbstractIn", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9050,7 +9476,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LagUD",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9106,7 +9534,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LastValue",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9156,7 +9586,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Latch",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9206,7 +9638,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LatoocarfianC",
         superclasses: &["LatoocarfianN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9243,7 +9677,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LatoocarfianL",
         superclasses: &["LatoocarfianN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9280,7 +9716,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LatoocarfianN",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9317,7 +9755,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LeakDC",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9371,7 +9811,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LeastChange",
         superclasses: &["MostChange", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9421,7 +9863,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Limiter",
         superclasses: &["Normalizer", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9452,7 +9896,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LinCongC",
         superclasses: &["LinCongN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9487,7 +9933,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LinCongL",
         superclasses: &["LinCongN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9522,7 +9970,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LinCongN",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9557,7 +10007,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LinExp",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9613,7 +10065,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LinPan2",
         superclasses: &["Pan2", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -9665,7 +10119,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LinRand",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9696,7 +10152,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LinXFade2",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -9750,7 +10208,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Line",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9808,7 +10268,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Linen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9841,7 +10303,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ListDUGen",
         superclasses: &["DUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9871,7 +10335,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LocalBuf",
         superclasses: &["WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9889,7 +10355,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LocalIn",
         superclasses: &["AbstractIn", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9915,7 +10383,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LocalOut",
         superclasses: &["AbstractOut", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 0 },
         methods: &[
@@ -9963,7 +10433,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Logistic",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10019,7 +10491,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "LorenzL",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10057,7 +10531,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Loudness",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10088,7 +10564,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MFCC",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10118,7 +10596,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MantissaMask",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10172,7 +10652,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MaxLocalBufs",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10188,7 +10670,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Median",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::AudioAt(1),
         methods: &[
@@ -10242,7 +10726,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MidEQ",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -10300,7 +10786,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ModDif",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10373,7 +10861,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MoogFF",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -10431,7 +10921,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MostChange",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10481,7 +10973,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MouseButton",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10512,7 +11006,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MouseX",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10544,7 +11040,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MouseY",
         superclasses: &["MouseX", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10576,7 +11074,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MulAdd",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10595,7 +11095,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MultiOutUGen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10605,7 +11107,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "MultiplexAnalogIn",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10659,7 +11163,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "NRand",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10690,7 +11196,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "NodeID",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10718,7 +11226,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Normalizer",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10749,7 +11259,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "NumAudioBuses",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10777,7 +11289,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "NumBuffers",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10805,7 +11319,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "NumControlBuses",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10833,7 +11349,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "NumInputBuses",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10861,7 +11379,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "NumOutputBuses",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10889,7 +11409,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "NumRunningSynths",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10935,7 +11457,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "OffsetOut",
         superclasses: &["Out", "AbstractOut", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -10971,7 +11495,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "OnePole",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -11025,7 +11551,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "OneZero",
         superclasses: &["OnePole", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -11079,7 +11607,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Onsets",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11116,7 +11646,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Osc",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11172,7 +11704,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "OscN",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11228,7 +11762,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Out",
         superclasses: &["AbstractOut", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -11278,7 +11814,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "OutputProxy",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11297,7 +11835,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PSinGrain",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11328,7 +11868,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_Add",
         superclasses: &["PV_MagMul", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11358,7 +11900,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_BinScramble",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11390,7 +11934,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_BinShift",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11422,7 +11968,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_BinWipe",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11453,7 +12001,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_BrickWall",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11483,7 +12033,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_ChainUGen",
         superclasses: &["WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11493,7 +12045,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_ConformalMap",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11524,7 +12078,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_Conj",
         superclasses: &["PV_MagSquared", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11553,7 +12109,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_Copy",
         superclasses: &["PV_MagMul", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11583,7 +12141,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_CopyPhase",
         superclasses: &["PV_MagMul", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11613,7 +12173,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_Diffuser",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11643,7 +12205,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_Div",
         superclasses: &["PV_MagMul", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11673,7 +12237,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_HainsworthFoote",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11706,7 +12272,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_JensenAndersen",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11741,7 +12309,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_LocalMax",
         superclasses: &["PV_MagAbove", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11771,7 +12341,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagAbove",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11801,7 +12373,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagBelow",
         superclasses: &["PV_MagAbove", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11831,7 +12405,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagClip",
         superclasses: &["PV_MagAbove", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11861,7 +12437,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagDiv",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11892,7 +12470,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagFreeze",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11922,7 +12502,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagMul",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11952,7 +12534,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagNoise",
         superclasses: &["PV_MagSquared", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11981,7 +12565,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagShift",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12012,7 +12598,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagSmear",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12042,7 +12630,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_MagSquared",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12071,7 +12661,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_Max",
         superclasses: &["PV_MagMul", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12101,7 +12693,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_Min",
         superclasses: &["PV_MagMul", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12131,7 +12725,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_Mul",
         superclasses: &["PV_MagMul", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12161,7 +12757,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_PhaseShift",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12192,7 +12790,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_PhaseShift270",
         superclasses: &["PV_MagSquared", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12221,7 +12821,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_PhaseShift90",
         superclasses: &["PV_MagSquared", "PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12250,7 +12852,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_RandComb",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12281,7 +12885,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_RandWipe",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12313,7 +12919,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_RectComb",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12345,7 +12953,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PV_RectComb2",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Chain),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12378,7 +12988,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PackFFT",
         superclasses: &["PV_ChainUGen", "WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: Some(FftSize::Input),
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12400,7 +13012,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Pan2",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -12452,7 +13066,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Pan4",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -12506,7 +13122,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PanAz",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -12564,7 +13182,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PanB",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -12618,7 +13238,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PanB2",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -12670,7 +13292,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PartConv",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12703,7 +13327,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Pause",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12733,7 +13359,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PauseSelf",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12762,7 +13390,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PauseSelfWhenDone",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12791,7 +13421,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Peak",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Peak,
         methods: &[
@@ -12841,7 +13473,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PeakFollower",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12891,7 +13525,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Phasor",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12947,7 +13583,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PinkNoise",
         superclasses: &["WhiteNoise", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12997,7 +13635,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Pitch",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13036,7 +13676,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PitchShift",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Pitch"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -13071,7 +13713,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PlayBuf",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13131,7 +13775,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Pluck",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13167,7 +13813,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Poll",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -13207,7 +13855,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Pulse",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13261,7 +13911,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PulseCount",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -13311,7 +13963,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PulseDivider",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13363,7 +14017,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PureMultiOutUGen",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13373,7 +14029,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "PureUGen",
         superclasses: &["UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13383,7 +14041,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "QuadC",
         superclasses: &["QuadN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13418,7 +14078,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "QuadL",
         superclasses: &["QuadN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13453,7 +14115,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "QuadN",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13488,7 +14152,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RHPF",
         superclasses: &["RLPF", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -13544,7 +14210,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RLPF",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -13600,7 +14268,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RadiansPerSample",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13628,7 +14298,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Ramp",
         superclasses: &["Lag", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -13682,7 +14354,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Rand",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13712,7 +14386,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RandID",
         superclasses: &["WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13760,7 +14436,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RandSeed",
         superclasses: &["WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13830,7 +14508,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RecordBuf",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13894,7 +14574,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ReplaceOut",
         superclasses: &["Out", "AbstractOut", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -13944,7 +14626,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Resonz",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14000,7 +14684,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Ringz",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14056,7 +14742,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Rotate2",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Ambisonics", "UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -14108,7 +14796,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RunningMax",
         superclasses: &["Peak", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Peak,
         methods: &[
@@ -14158,7 +14848,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RunningMin",
         superclasses: &["Peak", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Peak,
         methods: &[
@@ -14208,7 +14900,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "RunningSum",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis", "UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14258,7 +14952,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SOS",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14320,7 +15016,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SampleDur",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14348,7 +15046,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SampleRate",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14376,7 +15076,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Sanitize",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -14426,7 +15128,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Saw",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14478,7 +15182,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Schmidt",
         superclasses: &["InRange", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -14551,7 +15257,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ScopeOut",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14601,7 +15309,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ScopeOut2",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14655,7 +15365,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Select",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::AudioFrom(1),
         methods: &[
@@ -14705,7 +15417,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SendPeakRMS",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14737,7 +15451,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SendReply",
         superclasses: &["SendTrig", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14791,7 +15507,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SendTrig",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14843,7 +15561,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SetBuf",
         superclasses: &["WidthFirstUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: None,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14862,7 +15582,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SetResetFF",
         superclasses: &["PulseCount", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14912,7 +15634,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Shaper",
         superclasses: &["Index", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14966,7 +15690,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SharedIn",
         superclasses: &["AbstractIn", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14996,7 +15722,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SharedOut",
         superclasses: &["AbstractOut", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -15026,7 +15754,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SinOsc",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15080,7 +15810,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SinOscFB",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic", "UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15134,7 +15866,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Slew",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15190,7 +15924,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Slope",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis", "UGens>Filters>Linear", "UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15242,7 +15978,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SpecCentroid",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15271,7 +16009,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SpecFlatness",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15300,7 +16040,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SpecPcile",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15332,7 +16074,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Splay",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15364,7 +16108,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SplayAz",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15402,7 +16148,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Spring",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15454,7 +16202,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "StandardL",
         superclasses: &["StandardN", "ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15488,7 +16238,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "StandardN",
         superclasses: &["ChaosGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15522,7 +16274,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Stepper",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15580,7 +16334,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "StereoConvolution2L",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15616,7 +16372,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SubsampleOffset",
         superclasses: &["InfoUGenBase", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15644,7 +16402,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Sum3",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15663,7 +16423,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Sum4",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15683,7 +16445,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Sweep",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15733,7 +16497,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "SyncSaw",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15787,7 +16553,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "T2A",
         superclasses: &["K2A", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Conversion", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15817,7 +16585,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "T2K",
         superclasses: &["A2K", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Conversion", "UGens>Triggers"],
         check_inputs: CheckInputs::T2K,
         methods: &[
@@ -15846,7 +16616,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TBall",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15900,7 +16672,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TDelay",
         superclasses: &["Trig1", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers", "UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15950,7 +16724,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TDuty",
         superclasses: &["Duty", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Duty,
         methods: &[
@@ -16006,7 +16782,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TExpRand",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16058,7 +16836,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TGrains",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16095,7 +16875,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TIRand",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16147,7 +16929,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TRand",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16199,7 +16983,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TWindex",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16251,7 +17037,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Tap",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16270,7 +17058,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Timer",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16318,7 +17108,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ToggleFF",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16366,7 +17158,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Trig",
         superclasses: &["Trig1", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16416,7 +17210,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Trig1",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16466,7 +17262,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TrigControl",
         superclasses: &["Control", "MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Synth control", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16490,7 +17288,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TwoPole",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16546,7 +17346,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "TwoZero",
         superclasses: &["TwoPole", "Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16602,7 +17404,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "UnaryOpUGen",
         superclasses: &["BasicOpUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16620,7 +17424,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Unpack1FFT",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16652,7 +17458,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "UnpackFFT",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>FFT", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16672,7 +17480,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "VDiskIn",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16705,7 +17515,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "VOsc",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16761,7 +17573,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "VOsc3",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16819,7 +17633,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "VarLag",
         superclasses: &["Filter", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16855,7 +17671,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "VarSaw",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16911,7 +17729,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Vibrato",
         superclasses: &["PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Deterministic", "UGens>Generators>Stochastic", "UGens>Filters>Pitch"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16975,7 +17795,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Warp1",
         superclasses: &["MultiOutUGen", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17014,7 +17836,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "WhiteNoise",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17064,7 +17888,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "WidthFirstUGen",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: true,
+        fft_size: None,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17074,7 +17900,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "Wrap",
         superclasses: &["InRange", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -17147,7 +17975,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "WrapIndex",
         superclasses: &["Index", "PureUGen", "UGen"],
         is_pure: true,
+        optimize: Optimize::DeadCode,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17201,7 +18031,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "XFade2",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -17255,7 +18087,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "XLine",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17313,7 +18147,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "XOut",
         superclasses: &["AbstractOut", "UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 2 },
         methods: &[
@@ -17365,7 +18201,9 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         name: "ZeroCrossing",
         superclasses: &["UGen"],
         is_pure: false,
+        optimize: Optimize::Nothing,
         is_width_first: false,
+        fft_size: None,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[

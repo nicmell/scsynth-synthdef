@@ -4,7 +4,7 @@
 use super::{Args, lang};
 use crate::builder::{NewUGen, SynthDefBuilder};
 use crate::error::BuildError;
-use crate::rate::{Rate, least_by_name};
+use crate::rate::{Rate, least_by_name, sort_by_rate};
 use crate::ugen_input::UGenInput;
 
 /// `Sum3.new`.
@@ -104,29 +104,8 @@ fn add_sum(
     mut inputs: Vec<UGenInput>,
 ) -> Result<UGenInput, BuildError> {
     let rate = least_by_name(inputs.iter().map(rate_of)).unwrap_or(Rate::Scalar);
-    sort_by_rate(&mut inputs);
+    sort_by_rate(&mut inputs, rate_of);
     builder.add(NewUGen::new(class, rate).inputs(inputs))
-}
-
-/// `insertionSortRange` of `sort { |a, b| a.rate < b.rate }`, which moves an
-/// input left past every input whose rate name is not less than its own. The
-/// stable sort of Rust gives another order for inputs of one rate.
-fn sort_by_rate(inputs: &mut [UGenInput]) {
-    let rank = |input: &UGenInput| match rate_of(input) {
-        Rate::Audio => 0,
-        Rate::Control => 1,
-        Rate::Demand => 2,
-        Rate::Scalar => 3,
-    };
-    for i in 1..inputs.len() {
-        let test = inputs[i].clone();
-        let mut j = i;
-        while j > 0 && rank(&inputs[j - 1]) >= rank(&test) {
-            inputs[j] = inputs[j - 1].clone();
-            j -= 1;
-        }
-        inputs[j] = test;
-    }
 }
 
 fn rate_of(input: &UGenInput) -> Rate {

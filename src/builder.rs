@@ -12,6 +12,7 @@ use crate::error::BuildError;
 use crate::file::Version;
 use crate::limits;
 use crate::operator;
+use crate::optimize::{self, Rewritten};
 use crate::pseudo::{self, lang};
 use crate::rate::{Rate, least_by_name};
 use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
@@ -202,17 +203,17 @@ struct MaxLocalBufs {
 }
 
 #[derive(Clone, Debug)]
-struct Node {
-    name: String,
-    rate: Rate,
-    inputs: Vec<Source>,
-    outputs: Vec<Rate>,
-    special_index: i16,
-    width_first_before: usize,
+pub(crate) struct Node {
+    pub(crate) name: String,
+    pub(crate) rate: Rate,
+    pub(crate) inputs: Vec<Source>,
+    pub(crate) outputs: Vec<Rate>,
+    pub(crate) special_index: i16,
+    pub(crate) width_first_before: usize,
 }
 
-#[derive(Clone, Copy, Debug)]
-enum Source {
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) enum Source {
     Number(f64),
     Output { ugen: usize, output: u32 },
 }
@@ -601,19 +602,28 @@ impl SynthDefBuilder {
         Ok(())
     }
 
-    /// Ends the build, as `finishBuild` does without `optimizeGraph`: it
-    /// collects the constants, sorts the UGens and indexes them.
+    /// Ends the build, as `finishBuild` does. It copies a PV chain for its
+    /// readers, as `addCopiesIfNeeded` does, and rewrites the graph, as
+    /// `optimizeGraph` does. Then it collects the constants, sorts the UGens
+    /// and indexes them.
     ///
     /// # Errors
     ///
-    /// A [`BuildError`] when the definition breaks a limit of scsynth.
-    pub fn finish(mut self) -> Result<SynthDef, BuildError> {
+    /// A [`BuildError`] when the definition breaks a limit of scsynth, and
+    /// [`BuildError::FinishBuild`] where `finishBuild` of sclang 3.14.1
+    /// throws or writes a broken definition.
+    pub fn finish(self) -> Result<SynthDef, BuildError> {
+        let mut graph = optimize::Graph::new(self.children, &self.width_first);
+        let copies = graph.add_copies(self.max_local_bufs.map(|max| max.node))?;
         if let Some(max) = self.max_local_bufs {
-            self.children[max.node].inputs[0] = Source::Number(f64::from(max.count));
+            let count = Source::Number(f64::from(max.count + copies));
+            graph.set_input(max.node, 0, count);
         }
+        graph.optimize_graph()?;
+        let Rewritten { nodes, width_first } = graph.into_rewritten();
         let mut constants = Vec::new();
         let mut constant_index = BTreeMap::new();
-        for node in &self.children {
+        for node in &nodes {
             for source in &node.inputs {
                 if let Source::Number(number) = *source {
                     constant_index.entry(number.to_bits()).or_insert_with(|| {
@@ -623,17 +633,17 @@ impl SynthDefBuilder {
                 }
             }
         }
-        let antecedents: Vec<Vec<usize>> = self
-            .children
+        let antecedents: Vec<Vec<usize>> = nodes
             .iter()
-            .map(|node| {
+            .zip(&width_first)
+            .map(|(node, width_first)| {
                 node.inputs
                     .iter()
                     .filter_map(|source| match *source {
                         Source::Output { ugen, .. } => Some(ugen),
                         Source::Number(_) => None,
                     })
-                    .chain(self.width_first[..node.width_first_before].iter().copied())
+                    .chain(width_first.iter().copied())
                     .collect()
             })
             .collect();
@@ -645,7 +655,7 @@ impl SynthDefBuilder {
         let children = order
             .iter()
             .map(|&ugen| {
-                let node = &self.children[ugen];
+                let node = &nodes[ugen];
                 UGen {
                     name: node.name.clone(),
                     rate: node.rate,
@@ -983,10 +993,11 @@ impl SynthDefBuilder {
         if no_mul {
             return lang::binary(self, "+", input, add);
         }
-        if can_be_mul_add(&input, &mul, &add) {
+        let rates = [rate_of(&input), rate_of(&mul), rate_of(&add)];
+        if can_be_mul_add(rates[0], rates[1], rates[2]) {
             return self.mul_add(input, mul, add);
         }
-        if can_be_mul_add(&mul, &input, &add) {
+        if can_be_mul_add(rates[1], rates[0], rates[2]) {
             return self.mul_add(mul, input, add);
         }
         let product = lang::binary(self, "*", input, mul)?;
@@ -1064,11 +1075,11 @@ fn is_number(input: &UGenInput, number: f64) -> bool {
     matches!(input, UGenInput::Number(value) if *value == number)
 }
 
-/// `MulAdd:canBeMulAdd`: whether a `MulAdd` takes these inputs in this
-/// order.
-fn can_be_mul_add(input: &UGenInput, mul: &UGenInput, add: &UGenInput) -> bool {
-    let slow = |value: &UGenInput| matches!(rate_of(value), Rate::Control | Rate::Scalar);
-    match rate_of(input) {
+/// `MulAdd:canBeMulAdd`: whether a `MulAdd` takes inputs at these rates in
+/// this order.
+pub(crate) fn can_be_mul_add(input: Rate, mul: Rate, add: Rate) -> bool {
+    let slow = |rate: Rate| matches!(rate, Rate::Control | Rate::Scalar);
+    match input {
         Rate::Audio => true,
         Rate::Control => slow(mul) && slow(add),
         Rate::Scalar | Rate::Demand => false,
@@ -1749,19 +1760,18 @@ mod tests {
         assert_eq!(shape(&products), "[u3.0, u4.0, u5.0]");
         let negated = builder.unary_op("neg", products).unwrap();
         assert_eq!(shape(&negated), "[u6.0, u7.0, u8.0]");
-        let def = builder.finish().unwrap();
-        let wrapped: Vec<&InputSpec> = def
+        let wrapped: Vec<Source> = builder
             .children
             .iter()
-            .filter(|ugen| ugen.name == "BinaryOpUGen")
-            .map(|ugen| &ugen.inputs[1])
+            .filter(|node| node.name == "BinaryOpUGen")
+            .map(|node| node.inputs[1])
             .collect();
         assert_eq!(
             wrapped,
             [
-                &InputSpec::Constant(4),
-                &InputSpec::Constant(5),
-                &InputSpec::Constant(4)
+                Source::Number(0.1),
+                Source::Number(0.2),
+                Source::Number(0.1)
             ]
         );
     }
@@ -2035,15 +2045,17 @@ mod tests {
         );
     }
 
-    /// The names of the UGens of a definition, with the operators.
-    fn names(def: &crate::synth_def::SynthDef) -> Vec<String> {
-        def.children
+    /// The names of the UGens that a build added, with the operators, in
+    /// the order of their creation.
+    fn names(builder: &SynthDefBuilder) -> Vec<String> {
+        builder
+            .children
             .iter()
-            .map(|ugen| match ugen.name.as_str() {
-                "BinaryOpUGen" => crate::operator::binary_name(ugen.special_index)
+            .map(|node| match node.name.as_str() {
+                "BinaryOpUGen" => crate::operator::binary_name(node.special_index)
                     .unwrap_or("?")
                     .to_owned(),
-                "UnaryOpUGen" => crate::operator::unary_name(ugen.special_index)
+                "UnaryOpUGen" => crate::operator::unary_name(node.special_index)
                     .unwrap_or("?")
                     .to_owned(),
                 name => name.to_owned(),
@@ -2087,8 +2099,7 @@ mod tests {
         assert!(negs.iter().all(|neg| neg.rate() == Some(Rate::Audio)));
         let product = fold("*", n(2.0), n(3.0));
         assert_eq!(product.rate(), Some(Rate::Scalar));
-        let def = builder.finish().unwrap();
-        assert_eq!(names(&def), ["SinOsc", "neg", "neg", "neg", "neg", "*"]);
+        assert_eq!(names(&builder), ["SinOsc", "neg", "neg", "neg", "neg", "*"]);
     }
 
     #[test]
@@ -2116,26 +2127,21 @@ mod tests {
         assert_eq!(slow.rate(), Some(Rate::Control));
         builder.madd(control, 0.5, audio.clone()).unwrap();
         builder.madd(2.0, 3.0, audio).unwrap();
-        let def = builder.finish().unwrap();
         assert_eq!(
-            names(&def),
+            names(&builder),
             [
-                "Control", "MulAdd", "*", "SinOsc", "neg", "*", "-", "+", "MulAdd", "MulAdd", "+",
+                "Control", "SinOsc", "neg", "*", "-", "+", "MulAdd", "MulAdd", "MulAdd", "*", "+",
                 "+"
             ]
         );
-        let swapped = &def.children[9];
+        let UGenInput::Output(swapped) = swapped else {
+            panic!("{swapped:?} is no output");
+        };
         assert_eq!(
-            swapped.inputs[..2],
+            builder.children[swapped.ugen].inputs[..2],
             [
-                InputSpec::UGen {
-                    index: 3,
-                    output: 0
-                },
-                InputSpec::UGen {
-                    index: 0,
-                    output: 0
-                }
+                Source::Output { ugen: 1, output: 0 },
+                Source::Output { ugen: 0, output: 0 }
             ]
         );
     }

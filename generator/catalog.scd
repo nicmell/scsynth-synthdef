@@ -273,6 +273,24 @@ var checkRules = (
 	T2K: [\t2k]
 );
 
+// What optimizeGraph does with a UGen, by the class that owns the method.
+var optimizeRules = (
+	UGen: \nothing,
+	DetectSilence: \nothing,
+	PureUGen: \dead_code,
+	PureMultiOutUGen: \dead_code,
+	UnaryOpUGen: \dead_code,
+	BinaryOpUGen: \binary_op
+);
+
+// How fftSize finds the size of the FFT of a PV chain, by the class that
+// owns the method.
+var fftRules = (
+	FFT: \buf_frames,
+	PackFFT: \input,
+	PV_ChainUGen: \chain
+);
+
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansionOf, wiring;
@@ -928,17 +946,29 @@ try {
 		var supers = class.superclasses;
 		var check = class.findRespondingMethodFor(\checkInputs).ownerClass;
 		var rule = checkRules[check.name];
+		var optimize = optimizeRules[class.findRespondingMethodFor(\optimizeGraph).ownerClass.name];
+		var fftSize = class.findRespondingMethodFor(\fftSize);
 		var doc = SCDoc.documents["Classes/" ++ class.name];
 		var kindOf = { |base| class == base or: { supers.includes(base) } };
 		if (rule.isNil) {
 			fail.("checkInputs of % belongs to %, which checkRules does not know"
 				.format(class, check.name));
 		};
+		if (optimize.isNil) {
+			fail.("optimizeGraph of % belongs to %, which optimizeRules does not know"
+				.format(class, class.findRespondingMethodFor(\optimizeGraph).ownerClass.name));
+		};
+		if (fftSize.notNil and: { fftRules[fftSize.ownerClass.name].isNil }) {
+			fail.("fftSize of % belongs to %, which fftRules does not know"
+				.format(class, fftSize.ownerClass.name));
+		};
 		[
 			\name -> class.name,
 			\superclasses -> supers.copyRange(0, supers.indexOf(UGen) ? -1).collect(_.name),
 			\pure -> (kindOf.(PureUGen) or: { kindOf.(PureMultiOutUGen) }),
+			\optimize -> optimize,
 			\width_first -> kindOf.(WidthFirstUGen),
+			\fft_size -> (fftSize !? { fftRules[fftSize.ownerClass.name] }),
 			\categories -> (doc !? { doc.categories } ? []),
 			\check_inputs -> ([\rule -> rule[0]] ++ switch (rule[0])
 				{ \n_inputs } { [\count -> rule[1]] }

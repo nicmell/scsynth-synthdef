@@ -467,6 +467,17 @@ pub enum BuildError {
         /// The rate.
         rate: Rate,
     },
+    /// `finishBuild` of sclang 3.14.1 throws for the graph, or writes a
+    /// broken definition: `addCopiesIfNeeded` cannot copy a PV chain, or
+    /// `optimizeGraph` folds a rewrite or removes a UGen that the graph
+    /// reads.
+    #[non_exhaustive]
+    FinishBuild {
+        /// The class of the UGen.
+        ugen: String,
+        /// What fails in sclang.
+        message: String,
+    },
 }
 
 impl fmt::Display for BuildError {
@@ -547,6 +558,7 @@ impl fmt::Display for BuildError {
             Self::UnsupportedRate { ugen, rate } => {
                 write!(f, "{ugen} takes no input at the rate {rate:?}")
             }
+            Self::FinishBuild { ugen, message } => write!(f, "{ugen}: {message}"),
         }
     }
 }

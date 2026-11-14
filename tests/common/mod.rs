@@ -2,6 +2,7 @@
 //! holds the sclang code of each.
 #![allow(dead_code)]
 
+mod optimize;
 mod pseudo;
 
 use std::fs;
@@ -87,19 +88,16 @@ pub const NAMES: &[&str] = &[
     "nestedreply",
     "nestedenv",
     "nestedpseudo",
+    "optimize",
+    "deadcode",
+    "pvcopy",
 ];
 
-/// The bytes of a golden file: the build without `optimizeGraph`, where
-/// `tests/fixtures/before_optimize` holds one.
+/// The bytes of a golden file.
 pub fn golden(name: &str) -> Vec<u8> {
-    let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
-    let file = format!("{name}.scsyndef");
-    let before_optimize = fixtures.join("before_optimize").join(&file);
-    let path = if before_optimize.exists() {
-        before_optimize
-    } else {
-        fixtures.join(file)
-    };
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures")
+        .join(format!("{name}.scsyndef"));
     fs::read(path).expect("the golden file reads")
 }
 
@@ -144,6 +142,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "mul_ops" => vec![mul_ops()],
         "madd_numbers" => vec![madd_numbers()],
         "folds" => vec![folds()],
+        "optimize" | "deadcode" | "pvcopy" => optimize::definitions(name),
         _ => pseudo::definitions(name),
     }
 }

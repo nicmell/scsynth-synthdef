@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.7.0 (2026-11-14)
+
+`optimizeGraph`, and the copies of PV chains of `addCopiesIfNeeded`, as the
+`finishBuild` of SuperCollider 3.14.1 runs them.
+
+### Added
+
+- `finish` copies a PV chain that two or more width-first UGens read, as
+  `addCopiesIfNeeded` does. Then it rewrites the graph, as `optimizeGraph`
+  does. See
+  [`optimizeGraph` and the copies of PV chains](README.md#optimizegraph-and-the-copies-of-pv-chains).
+- `Optimize` and `UGenClass::optimize`: what `optimizeGraph` does with a
+  UGen of the class. `FftSize` and `UGenClass::fft_size`: how `fftSize`
+  finds the size of the FFT of a PV chain.
+- `BuildError::FinishBuild`, for a graph where the `finishBuild` of sclang
+  3.14.1 throws or writes a broken definition.
+- `generator/fixtures.scd` writes the golden files of 0.7: `optimize`,
+  `deadcode` and `pvcopy`. Six graphs that the crate refuses must break in
+  sclang, or the script fails.
+
+### Changed
+
+- `finish` removes a pure UGen that nothing reads. It fuses a `+` into a
+  `Sum3`, a `Sum4`, a `MulAdd` or a `-`, and a `-` of a `neg` into a `+`.
+  So `x * 0.5 + 0.25` gives one `MulAdd`, and the constants follow the
+  rewritten graph.
+- The doc of `UGenClass::is_pure` no longer says what `optimizeGraph` does.
+  `UGenClass::optimize` holds that.
+- `tests/fixtures/before_optimize` goes, with the build without
+  `optimizeGraph` in `generator/fixtures.scd`. Each graph compares with the
+  file that sclang writes.
+
 ## 0.6.0 (2026-11-14)
 
 An array among the elements of an array argument, as each class of

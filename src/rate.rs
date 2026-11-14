@@ -51,12 +51,31 @@ impl Rate {
 /// `SequenceableCollection:rate`: audio, control, demand, scalar. Demand
 /// ranks after control, unlike the order of [`Rate`].
 pub(crate) fn least_by_name(rates: impl IntoIterator<Item = Rate>) -> Option<Rate> {
-    rates.into_iter().min_by_key(|rate| match rate {
+    rates.into_iter().min_by_key(|&rate| name_rank(rate))
+}
+
+/// `insertionSortRange` of `sort { |a, b| a.rate < b.rate }`, which moves an
+/// item left past every item whose rate name is not less than its own. The
+/// stable sort of Rust gives another order for items of one rate.
+pub(crate) fn sort_by_rate<T: Clone>(items: &mut [T], rate: impl Fn(&T) -> Rate) {
+    for i in 1..items.len() {
+        let test = items[i].clone();
+        let mut j = i;
+        while j > 0 && name_rank(rate(&items[j - 1])) >= name_rank(rate(&test)) {
+            items[j] = items[j - 1].clone();
+            j -= 1;
+        }
+        items[j] = test;
+    }
+}
+
+fn name_rank(rate: Rate) -> u8 {
+    match rate {
         Rate::Audio => 0,
         Rate::Control => 1,
         Rate::Demand => 2,
         Rate::Scalar => 3,
-    })
+    }
 }
 
 #[cfg(test)]

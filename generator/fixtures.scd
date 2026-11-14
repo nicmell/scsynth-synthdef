@@ -6,9 +6,8 @@
 //   sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 //
 // It exits with 1 if sclang is not 3.14.1, if a class or a method comes from
-// outside the core class library, or if finishBuild changes a graph of 0.1
-// or 0.2. It also writes tests/fixtures/before_optimize and
-// tests/fixtures/arithmetic.json.
+// outside the core class library, or if a graph that the crate refuses does
+// not break in sclang. It also writes tests/fixtures/arithmetic.json.
 (
 var root = thisProcess.nowExecutingPath.dirname.dirname;
 var fixtures = root +/+ "tests" +/+ "fixtures";
@@ -21,7 +20,7 @@ var fail = { |message|
 };
 var core = { |item| item.filenameSymbol.asString.beginsWith(library) };
 var build, write, written = 0;
-var buildBoth, writePseudo, rewritten = List.new, writeArithmetic;
+var writeCases, refused, writeArithmetic;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -38,9 +37,7 @@ try {
 		};
 	};
 
-	// SynthDef:build, which also fails when finishBuild adds, removes or
-	// rewires a UGen: addCopiesIfNeeded and optimizeGraph must leave the
-	// graph as the function built it.
+	// SynthDef:build.
 	build = { |name, func, rates, variants, class|
 		var def = (class ? SynthDef).newCopyArgs(
 			name: name.asSymbol,
@@ -48,74 +45,58 @@ try {
 			metadata: (),
 			children: Array(64)
 		);
-		var before;
 		protect {
 			def.initBuild;
 			def.buildUgenGraph(func, rates, nil);
-			before = def.children.collect { |ugen| [ugen, ugen.inputs.copy] };
 			def.finishBuild;
 		} {
 			UGen.buildSynthDef = nil;
 		};
-		if (def.children.size != before.size or: {
-			before.any { |pair|
-				def.children.includes(pair[0]).not or: { pair[0].inputs != pair[1] }
-			}
-		}) {
-			fail.("finishBuild changes the graph of %".format(name));
-		};
 		def
 	};
 
-	write = { |name, defs, folder|
+	write = { |name, defs|
 		var stream = CollStream.on(Int8Array.new(256));
 		if (defs.size == 1) {
 			stream.putAll(defs[0].asBytes);
 		} {
 			defs.writeDef(stream);
 		};
-		File.use((folder ? fixtures) +/+ name ++ ".scsyndef", "wb", { |file|
+		File.use(fixtures +/+ name ++ ".scsyndef", "wb", { |file|
 			file.putAll(stream.collection);
 		});
 		written = written + 1;
 	};
 
-	// The full build of SynthDef:build, and the build of finishBuild without
-	// optimizeGraph (SynthDef.sc:279), for the graphs of the pseudo-UGens.
-	buildBoth = { |name, func|
-		[true, false].collect { |optimize|
-			var def = SynthDef.newCopyArgs(
-				name: name.asSymbol,
-				metadata: (),
-				children: Array(64)
-			);
-			protect {
-				def.initBuild;
-				def.buildUgenGraph(func, nil, nil);
-				if (optimize) {
-					def.finishBuild;
-				} {
-					def.addCopiesIfNeeded;
-					def.collectConstants;
-					def.checkInputs;
-					def.topologicalSort;
-					def.indexUGens;
-				};
-			} {
-				UGen.buildSynthDef = nil;
-			};
-			def
-		}
+	// One file of full builds.
+	writeCases = { |name, cases|
+		write.(name, cases.collect { |case| build.(case[0], case[1]) });
 	};
 
-	// One file of full builds, and one in before_optimize when optimizeGraph
-	// rewrites a case of the file.
-	writePseudo = { |name, cases|
-		var pairs = cases.collect { |case| buildBoth.(case[0], case[1]) };
-		write.(name, pairs.collect(_.first));
-		if (pairs.any { |pair| pair[0].asBytes != pair[1].asBytes }) {
-			write.(name, pairs.collect(_.last), fixtures +/+ "before_optimize");
-			rewritten.add(name);
+	// A graph that the crate refuses must break in sclang: finishBuild
+	// throws, an AbstractOut goes missing, or a UGen comes twice.
+	refused = { |name, func|
+		var def = SynthDef.newCopyArgs(
+			name: name.asSymbol,
+			metadata: (),
+			children: Array(64)
+		);
+		var before, kept, thrown = false;
+		protect {
+			def.initBuild;
+			def.buildUgenGraph(func, nil, nil);
+			before = def.children.copy;
+			try { def.finishBuild } { thrown = true };
+		} {
+			UGen.buildSynthDef = nil;
+		};
+		// The sort leaves nil when it drops every UGen (measured).
+		kept = def.children ? [];
+		if (thrown.not and: {
+			before.select(_.isKindOf(AbstractOut)).every { |out| kept.includes(out) }
+			and: { kept.size == kept.asSet.size }
+		}) {
+			fail.("% does not break in sclang".format(name));
 		};
 	};
 
@@ -312,32 +293,29 @@ try {
 	})]);
 
 	// The pseudo-UGens of 0.3, one file each.
-	(fixtures +/+ "before_optimize").mkdir;
-	(fixtures +/+ "before_optimize/*.scsyndef").pathMatch.do { |path| File.delete(path) };
-
-	writePseudo.("pmosc", [
+	writeCases.("pmosc", [
 		[\pmosc_ar, { Out.ar(0, PMOsc.ar(440, 220, 2)) }],
 		[\pmosc_kr, { |car = 10| Out.kr(0, PMOsc.kr(car, 3, 1.5, 0.25, 0.5, 0.5)) }]
 	]);
-	writePseudo.("changed", [
+	writeCases.("changed", [
 		[\changed_kr, { Out.kr(0, Changed.kr(SinOsc.kr(1))) }],
 		[\changed_ar, { Out.ar(0, Changed.ar(SinOsc.ar(2), 0.1)) }],
 		[\changed_array, { Out.kr(0, Changed.kr(SinOsc.kr([1, 2]))) }]
 	]);
-	writePseudo.("silent", [
+	writeCases.("silent", [
 		[\silent_1, { Out.ar(0, Silent.ar) }],
 		[\silent_2, { Out.ar(0, Silent.ar(2)) }]
 	]);
-	writePseudo.("dstutter", [
+	writeCases.("dstutter", [
 		[\dstutter, { Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dstutter(2, Dseq([1, 2], inf)))) }]
 	]);
-	writePseudo.("tchoose", [
+	writeCases.("tchoose", [
 		[\tchoose_kr, { Out.kr(0, TChoose.kr(Impulse.kr(1), [SinOsc.kr(1), SinOsc.kr(2)])) }],
 		[\tchoose_ar, {
 			Out.ar(0, TChoose.ar(Impulse.ar(1), [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)]))
 		}]
 	]);
-	writePseudo.("twchoose", [
+	writeCases.("twchoose", [
 		[\twchoose_kr, {
 			Out.kr(0, TWChoose.kr(Impulse.kr(1), [SinOsc.kr(1), SinOsc.kr(2)], [0.3, 0.7]))
 		}],
@@ -345,12 +323,12 @@ try {
 			Out.ar(0, TWChoose.ar(Impulse.ar(1), [SinOsc.ar(1), SinOsc.ar(2)], [1, 3], 1))
 		}]
 	]);
-	writePseudo.("tap", [
+	writeCases.("tap", [
 		[\tap_1, { Out.ar(0, Tap.ar(0, 1, 0.2)) }],
 		[\tap_2, { |time = 0.5| Out.ar(0, Tap.ar(1, 2, time)) }]
 	]);
 	// With numbers, LinLin computes its result in the language.
-	writePseudo.("linlin", [
+	writeCases.("linlin", [
 		[\linlin_ar, { Out.ar(0, LinLin.ar(SinOsc.ar(1), -1, 1, 100, 200)) }],
 		[\linlin_kr, { Out.kr(0, LinLin.kr(SinOsc.kr(1), -1, 1, 100, 200)) }],
 		[\linlin_numbers, {
@@ -358,35 +336,35 @@ try {
 		}],
 		[\linlin_ugens, { |lo = 100| Out.kr(0, LinLin.kr(SinOsc.kr(1), -1, 1, lo, 200)) }]
 	]);
-	writePseudo.("soundin", [
+	writeCases.("soundin", [
 		[\soundin_0, { Out.ar(0, SoundIn.ar(0)) }],
 		[\soundin_01, { Out.ar(0, SoundIn.ar([0, 1])) }],
 		[\soundin_02, { Out.ar(0, SoundIn.ar([0, 2])) }],
 		[\soundin_mul, { Out.ar(0, SoundIn.ar(2, 0.5)) }],
 		[\soundin_ugen, { |bus = 1| Out.ar(0, SoundIn.ar(bus)) }]
 	]);
-	writePseudo.("selectx", [
+	writeCases.("selectx", [
 		[\selectx_ar, { |which = 0|
 			Out.ar(0, SelectX.ar(which, [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)]))
 		}],
 		[\selectx_kr, { Out.kr(0, SelectX.kr(0.5, [SinOsc.kr(1), SinOsc.kr(2)])) }]
 	]);
-	writePseudo.("blowpass4", [
+	writeCases.("blowpass4", [
 		[\blowpass4, { Out.ar(0, BLowPass4.ar(SinOsc.ar(1), 800, 0.5)) }],
 		[\blowpass4_ugens, { |freq = 800, rq = 0.5|
 			Out.ar(0, BLowPass4.ar(SinOsc.ar(1), freq, rq, 0.5))
 		}]
 	]);
-	writePseudo.("bhipass4", [
+	writeCases.("bhipass4", [
 		[\bhipass4, { Out.ar(0, BHiPass4.ar(SinOsc.ar(1), 800, 0.5)) }]
 	]);
 
-	writePseudo.("sum", [
+	writeCases.("sum", [
 		[\sum3_fold, { Out.ar(0, Sum3(SinOsc.ar(1), SinOsc.ar(2), 0)) }],
 		[\sum4_fold, { Out.ar(0, Sum4(SinOsc.ar(1), 0, SinOsc.kr(2), SinOsc.ar(3))) }],
 		[\sum3_array, { Out.ar(0, Sum3([SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3), SinOsc.ar(4))) }]
 	]);
-	writePseudo.("mix", [
+	writeCases.("mix", [
 		[\mix_1, { Out.ar(0, Mix(SinOsc.ar(1))) }],
 		[\mix_2, { Out.ar(0, Mix(SinOsc.ar([1, 2]))) }],
 		[\mix_3, { Out.ar(0, Mix(SinOsc.ar([1, 2, 3]))) }],
@@ -403,13 +381,13 @@ try {
 		[\mix_kr_number, { Out.kr(0, Mix.kr([1, 2])) }]
 	]);
 
-	writePseudo.("numchannels", [
+	writeCases.("numchannels", [
 		[\numchannels_mix, { Out.ar(0, NumChannels.ar(SinOsc.ar([1, 2, 3, 4]), 2)) }],
 		[\numchannels_cut, { Out.ar(0, NumChannels.ar(SinOsc.ar([1, 2, 3]), 2, false)) }],
 		[\numchannels_dup, { Out.ar(0, NumChannels.ar(SinOsc.ar(1), 3)) }],
 		[\numchannels_one, { Out.ar(0, NumChannels.ar([SinOsc.ar(1)], 1)) }]
 	]);
-	writePseudo.("selectxfocus", [
+	writeCases.("selectxfocus", [
 		[\selectxfocus, { |which = 0|
 			Out.ar(0, SelectXFocus.ar(which, [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)]))
 		}],
@@ -420,13 +398,13 @@ try {
 			Out.kr(0, SelectXFocus.kr(1.25, [SinOsc.kr(1), SinOsc.kr(2), SinOsc.kr(3)]))
 		}]
 	]);
-	writePseudo.("multitap", [
+	writeCases.("multitap", [
 		[\multitap, { Out.ar(0, MultiTap.ar(`[0.1, 0.2], `[0.5, 0.3], SinOsc.ar(1), bufnum: 0)) }],
 		[\multitap_levels, {
 			Out.ar(0, MultiTap.ar(`[0.1, 0.2, 0.3], `[0.5], SinOsc.ar(1), 0.5, 0, 1))
 		}]
 	]);
-	writePseudo.("splay", [
+	writeCases.("splay", [
 		[\splay_2, { Out.ar(0, Splay.ar(SinOsc.ar([1, 2]))) }],
 		[\splay_3, { Out.ar(0, Splay.ar(SinOsc.ar([1, 2, 3]))) }],
 		[\splay_mono, { Out.ar(0, Splay.ar(SinOsc.ar(1))) }],
@@ -439,7 +417,7 @@ try {
 		[\splay_levelcomp_number, { Out.ar(0, Splay.ar(SinOsc.ar([1, 2]), levelComp: 0.5)) }],
 		[\splay_levelcomp_ugen, { |lc = 0.5| Out.ar(0, Splay.ar(SinOsc.ar([1, 2]), levelComp: lc)) }]
 	]);
-	writePseudo.("dynklank", [
+	writeCases.("dynklank", [
 		[\dynklank_2, { Out.ar(0, DynKlank.ar(`[[800, 1071]], Impulse.ar(2))) }],
 		[\dynklank_3, { Out.ar(0, DynKlank.ar(`[[800, 1071, 1353], nil, [1, 1, 1]], Impulse.ar(2))) }],
 		[\dynklank_amps, { Out.ar(0, DynKlank.ar(`[[800, 1071], [0.5, 0.3]], Impulse.ar(2))) }],
@@ -449,12 +427,12 @@ try {
 		[\dynklank_kr, { Out.kr(0, DynKlank.kr(`[[8, 10]], Impulse.kr(2))) }],
 		[\dynklank_expand, { Out.ar(0, DynKlank.ar(`[[800, 1071]], Impulse.ar([2, 3]))) }]
 	]);
-	writePseudo.("dynklang", [
+	writeCases.("dynklang", [
 		[\dynklang_2, { Out.ar(0, DynKlang.ar(`[[800, 1000]])) }],
 		[\dynklang_amps, { Out.ar(0, DynKlang.ar(`[[800, 1000], [0.3, 0.3], [pi, pi]])) }],
 		[\dynklang_kr, { Out.kr(0, DynKlang.kr(`[[1, 2], nil, [0.5, 0.25]], 2, 1)) }]
 	]);
-	writePseudo.("unpackfft", [
+	writeCases.("unpackfft", [
 		[\unpackfft, {
 			var chain = FFT(0, SinOsc.ar(1));
 			Out.kr(0, Demand.kr(Impulse.kr(1), 0, UnpackFFT(chain, 16, 0, 2)))
@@ -466,7 +444,7 @@ try {
 	]);
 
 	// The delays and LinXFade2, which 0.3 makes addable.
-	writePseudo.("delays", [
+	writeCases.("delays", [
 		[\delayn_kr_input, { Out.ar(0, DelayN.ar(SinOsc.kr(1), 0.2, 0.1)) }],
 		[\combl_number, { Out.ar(0, CombL.ar(0.5, 0.2, 0.1, 1)) }],
 		[\allpassc_zero, { Out.ar(0, AllpassC.ar(0, 0.2, 0.1, 1)) }],
@@ -478,7 +456,7 @@ try {
 			Out.ar(0, DelTapRd.ar(0, tap, 0.1))
 		}]
 	]);
-	writePseudo.("linxfade2", [
+	writeCases.("linxfade2", [
 		[\linxfade2_level, { Out.ar(0, LinXFade2.ar(SinOsc.ar(1), SinOsc.ar(2), 0.5, 0.5)) }],
 		[\linxfade2_one, { Out.kr(0, LinXFade2.kr(SinOsc.kr(1), SinOsc.kr(2), -0.5)) }],
 		[\linxfade2_ugen, { |level = 0.5|
@@ -486,20 +464,20 @@ try {
 		}]
 	]);
 
-	writePseudo.("companderd", [
+	writeCases.("companderd", [
 		[\companderd, { Out.ar(0, CompanderD.ar(SinOsc.ar(1))) }],
 		[\companderd_number, { Out.ar(0, CompanderD.ar(0.5, 0.4, 1, 0.5, 0.02, 0.1, 0.5)) }]
 	]);
-	writePseudo.("hilbertfir", [
+	writeCases.("hilbertfir", [
 		[\hilbertfir, { Out.ar(0, HilbertFIR.ar(SinOsc.ar(1), 0)) }]
 	]);
-	writePseudo.("linselectx", [
+	writeCases.("linselectx", [
 		[\linselectx_ar, { |which = 0|
 			Out.ar(0, LinSelectX.ar(which, [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)]))
 		}],
 		[\linselectx_kr, { Out.kr(0, LinSelectX.kr(0.5, [SinOsc.kr(1), SinOsc.kr(2)])) }]
 	]);
-	writePseudo.("splayaz", [
+	writeCases.("splayaz", [
 		[\splayaz_3, { Out.ar(0, SplayAz.ar(4, SinOsc.ar([1, 2, 3]))) }],
 		[\splayaz_mono, { Out.ar(0, SplayAz.ar(2, SinOsc.ar(1))) }],
 		[\splayaz_kr, { Out.kr(0, SplayAz.kr(3, SinOsc.kr([1, 2]))) }],
@@ -511,7 +489,7 @@ try {
 	]);
 
 	// The rate methods that do more than new1, of 0.4.
-	writePseudo.("lag", [
+	writeCases.("lag", [
 		[\lag_kr, { |freq = 440| Out.kr(0, Lag.kr(freq, 0.1)) }],
 		[\lag_ar, { Out.ar(0, Lag.ar(SinOsc.ar(1), 0.01)) }],
 		[\lag2_kr, { |freq = 440| Out.kr(0, Lag2.kr(freq, 0.1)) }],
@@ -533,7 +511,7 @@ try {
 		[\lag_array, { |a = 1, b = 2| Out.kr(0, Lag.kr([a, b], 0.1)) }],
 		[\lag_array_scalar, { Out.kr(0, Lag.kr([1, 2], 0.1, 2)) }]
 	]);
-	writePseudo.("outzeros", [
+	writeCases.("outzeros", [
 		[\outzeros_one, { Out.ar(0, 0) }],
 		[\outzeros_two, { Out.ar(0, [SinOsc.ar(1), 0, 0]) }],
 		[\outzeros_negative, { Out.ar(0, [-0.0, SinOsc.ar(1)]) }],
@@ -542,7 +520,7 @@ try {
 		[\outzeros_x, { XOut.ar(0, 0.5, [SinOsc.ar(1), 0]) }],
 		[\outzeros_kr, { Out.kr(0, 0) }]
 	]);
-	writePseudo.("localbuf", [
+	writeCases.("localbuf", [
 		[\localbuf_fft, { Out.ar(0, IFFT(FFT(LocalBuf(2048), SinOsc.ar(1)))) }],
 		[\localbuf_two, {
 			var a = FFT(LocalBuf(1024), SinOsc.ar(1));
@@ -552,11 +530,11 @@ try {
 		[\localbuf_array, { Out.ar(0, IFFT(FFT(LocalBuf([512, 1024]), SinOsc.ar(1)))) }],
 		[\localbuf_channels, { Out.ar(0, PlayBuf.ar(2, LocalBuf(1024, 2))) }]
 	]);
-	writePseudo.("beattrack", [
+	writeCases.("beattrack", [
 		[\beattrack_auto, { Out.kr(0, BeatTrack.kr(SinOsc.ar(1))) }],
 		[\beattrack_chain, { Out.kr(0, BeatTrack.kr(FFT(LocalBuf(1024), SinOsc.ar(1)), 0.5)) }]
 	]);
-	writePseudo.("localin", [
+	writeCases.("localin", [
 		[\localin_ar, {
 			var in = LocalIn.ar(2);
 			LocalOut.ar(in * 0.5);
@@ -578,7 +556,7 @@ try {
 			Out.ar(0, in)
 		}]
 	]);
-	writePseudo.("poll", [
+	writeCases.("poll", [
 		[\poll_kr, { Poll.kr(10, SinOsc.kr(1)) }],
 		[\poll_label, { Poll.ar(Impulse.ar(2), SinOsc.ar(1), "freq", 7) }],
 		[\poll_symbol, { Poll.kr(Impulse.kr(2), SinOsc.kr(1), \amp) }],
@@ -590,12 +568,12 @@ try {
 		[\poll_out, { Out.ar(0, Poll.ar(10, SinOsc.ar(1))) }],
 		[\poll_bytes, { Poll.kr(10, SinOsc.kr(1), "é") }]
 	]);
-	writePseudo.("symbols", [
+	writeCases.("symbols", [
 		[\sendreply_bytes, { SendReply.kr(Impulse.kr(1), '/é', SinOsc.kr(1)) }]
 	]);
 
 	// The rules of their own, Klank, Klang and PingPong, of 0.5.
-	writePseudo.("bufwr", [
+	writeCases.("bufwr", [
 		[\bufwr_ar, {
 			var buf = LocalBuf(1024, 2);
 			BufWr.ar(SinOsc.ar([1, 2]), buf, Phasor.ar(0, 1, 0, 1024))
@@ -605,7 +583,7 @@ try {
 			BufWr.kr(SinOsc.kr(1), buf, Phasor.kr(0, 1, 0, 64), 0)
 		}]
 	]);
-	writePseudo.("duty", [
+	writeCases.("duty", [
 		[\duty_kr, { Out.kr(0, Duty.kr(Dseq([0.1, 0.2], inf), 0, Dseq([1, 2, 3], inf))) }],
 		[\duty_ar, { Out.ar(0, Duty.ar(Dseq([0.1, 0.2], inf), Impulse.ar(1), Dseq([1, 2], inf))) }],
 		[\duty_demand_reset, {
@@ -614,16 +592,16 @@ try {
 		[\duty_number, { Out.kr(0, Duty.kr(0.5, 0, Dseq([1, 2], inf))) }],
 		[\tduty_ar, { Out.ar(0, TDuty.ar(Dseq([0.1, 0.2], inf), 0, 1, 0, 1)) }]
 	]);
-	writePseudo.("peak", [
+	writeCases.("peak", [
 		[\peak_kr_audio, { Out.kr(0, Peak.kr(SinOsc.ar(1), Impulse.kr(1))) }],
 		[\peak_ar, { Out.ar(0, Peak.ar(SinOsc.ar(1), Impulse.ar(2))) }],
 		[\runningmax_kr, { Out.kr(0, RunningMax.kr(SinOsc.kr(1))) }],
 		[\runningmin_ar, { Out.ar(0, RunningMin.ar(SinOsc.ar(1))) }]
 	]);
-	writePseudo.("t2k", [
+	writeCases.("t2k", [
 		[\t2k, { Out.kr(0, T2K.kr(Impulse.ar(10))) }]
 	]);
-	writePseudo.("klank", [
+	writeCases.("klank", [
 		[\klank_3, {
 			Out.ar(0, Klank.ar(`[[800, 1071, 1353], [0.3, 0.2, 0.1], [1, 1, 1]], Impulse.ar(2)))
 		}],
@@ -633,12 +611,12 @@ try {
 		[\klank_scale, { |scale = 1| Out.ar(0, Klank.ar(`[[800, 1071]], Impulse.ar(2), scale)) }],
 		[\klank_expand, { Out.ar(0, Klank.ar(`[[800, 1071]], Impulse.ar([2, 3]))) }]
 	]);
-	writePseudo.("klang", [
+	writeCases.("klang", [
 		[\klang_3, { Out.ar(0, Klang.ar(`[[800, 1000], [0.3, 0.3], [pi, pi]])) }],
 		[\klang_default, { Out.ar(0, Klang.ar(`[[800, 1000, 1200]])) }],
 		[\klang_scale, { Out.ar(0, Klang.ar(`[[800, 1000]], SinOsc.kr(0.1, 0, 0.1, 1))) }]
 	]);
-	writePseudo.("pingpong", [
+	writeCases.("pingpong", [
 		[\pingpong, {
 			var buf = LocalBuf(44100, 2);
 			Out.ar(0, PingPong.ar(buf, [SinOsc.ar(1), SinOsc.ar(2)], 0.25))
@@ -659,7 +637,7 @@ try {
 	]);
 
 	// The arrays inside array arguments, of 0.6.
-	writePseudo.("nestedout", [
+	writeCases.("nestedout", [
 		[\nestedout_two, { Out.ar(0, [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]) }],
 		[\nestedout_bus, { Out.ar([0, 2], [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]) }],
 		[\nestedout_pan2, { Out.ar(0, Pan2.ar(SinOsc.ar([440, 660]), [-0.5, 0.5])) }],
@@ -670,7 +648,7 @@ try {
 		[\nestedout_kr, { Out.kr(0, [[SinOsc.kr(1), SinOsc.kr(2)], 0]) }],
 		[\nestedout_x, { XOut.ar(0, 0.5, [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]) }]
 	]);
-	writePseudo.("nestedwire", [
+	writeCases.("nestedwire", [
 		[\nestedwire_bufwr, {
 			var buf = LocalBuf(1024, 2);
 			BufWr.ar([[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)], buf, Phasor.ar(0, 1, 0, 1024))
@@ -688,7 +666,7 @@ try {
 		}],
 		[\nestedwire_twindex, { Out.kr(0, TWindex.kr(Impulse.kr(1), [[0.2, 0.8], 0.5])) }]
 	]);
-	writePseudo.("nestedreply", [
+	writeCases.("nestedreply", [
 		[\nestedreply_two, {
 			var values = [[SinOsc.kr(1), SinOsc.kr(2)], [SinOsc.kr(3), SinOsc.kr(4)]];
 			SendReply.kr(Impulse.kr(1), '/a', values)
@@ -701,7 +679,7 @@ try {
 		}],
 		[\nestedreply_ar, { SendReply.ar(Impulse.ar(1), '/d', [[SinOsc.ar(1)], [SinOsc.ar(2)]]) }]
 	]);
-	writePseudo.("nestedenv", [
+	writeCases.("nestedenv", [
 		[\nestedenv_two, {
 			var envelopes = [[0, 2, -99, -99, 1, 0.1, 1, 0, 0, 0.9, 1, 0], [0, 1, -99, -99, 1, 0.5, 1, 0]];
 			Out.kr(0, EnvGen.kr(envelopes))
@@ -711,7 +689,7 @@ try {
 			Out.ar(0, EnvGen.ar(envelopes, [gate, 1, gate * 0.5]))
 		}]
 	]);
-	writePseudo.("nestedpseudo", [
+	writeCases.("nestedpseudo", [
 		[\nestedpseudo_selectx, {
 			Out.ar(0, SelectX.ar(SinOsc.kr(1), [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]))
 		}],
@@ -748,9 +726,136 @@ try {
 		}]
 	]);
 
+	// optimizeGraph and the copies of PV chains, of 0.7. A function of its
+	// own: sclang 3.14.1 refuses one function with more literals, with
+	// "Selector table too big".
+	{
+		writeCases.("optimize", [
+			[\optimize_muladd, { Out.ar(0, SinOsc.ar * 0.5 + 0.25) }],
+			[\optimize_muladd_swap, { Out.ar(0, 0.5 * SinOsc.ar + 0.25) }],
+			[\optimize_muladd_right, { Out.ar(0, 0.25 + (SinOsc.ar * 0.5)) }],
+			[\optimize_args, { |amp = 0.1| Out.ar(0, SinOsc.ar * amp + 0.5) }],
+			[\optimize_muladd_kr, { Out.kr(0, SinOsc.kr * LFNoise1.kr + 2) }],
+			[\optimize_shared, {
+				var x = SinOsc.ar * 0.5;
+				Out.ar(0, [x + 0.25, x])
+			}],
+			[\optimize_kr_audio, { Out.ar(0, (SinOsc.kr * 2) + SinOsc.ar) }],
+			[\optimize_sum3, { Out.ar(0, SinOsc.ar(1) + SinOsc.ar(2) + SinOsc.ar(3)) }],
+			[\optimize_sum3_right, { Out.ar(0, SinOsc.ar(1) + (SinOsc.ar(2) + SinOsc.ar(3))) }],
+			[\optimize_sum4, { Out.ar(0, SinOsc.ar(1) + SinOsc.ar(2) + SinOsc.ar(3) + SinOsc.ar(4)) }],
+			[\optimize_sum5, {
+				Out.ar(0, SinOsc.ar(1) + SinOsc.ar(2) + SinOsc.ar(3) + SinOsc.ar(4) + SinOsc.ar(5))
+			}],
+			[\optimize_twice, {
+				var a = SinOsc.ar(1) + SinOsc.ar(2);
+				Out.ar(0, a + a)
+			}],
+			[\optimize_addneg, { Out.ar(0, SinOsc.ar(1) + SinOsc.ar(2).neg) }],
+			[\optimize_negadd, { Out.ar(0, SinOsc.ar(1).neg + SinOsc.ar(2)) }],
+			[\optimize_subneg, { Out.ar(0, (SinOsc.ar(1) + SinOsc.ar(2)) - SinOsc.ar(3).neg) }],
+			[\optimize_demand, {
+				var sum = Dseq([1, 2], inf) + Dseq([3, 4], inf) + Dseq([5], inf);
+				Out.kr(0, Demand.kr(Impulse.kr(1), 0, sum))
+			}]
+		]);
+		writeCases.("deadcode", [
+			[\deadcode_chain, {
+				SinOsc.ar(SinOsc.ar(1) * 100);
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_proxy, {
+				DC.ar(1) * 2;
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_detectsilence, {
+				DetectSilence.ar(SinOsc.ar(2));
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_arg, { |freq = 440|
+				freq * 2;
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_constant, {
+				SinOsc.ar(1234);
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_revisit, {
+				var x = SinOsc.ar(1);
+				var m = x * 2;
+				var a = m + 1;
+				m * a;
+				Out.ar(0, a)
+			}],
+			[\deadcode_revisit_swapped, {
+				var x = SinOsc.ar(1);
+				var m = x * 2;
+				var a = m + 1;
+				a * m;
+				Out.ar(0, a)
+			}],
+			[\deadcode_readers, {
+				var x = SinOsc.ar(1);
+				var s = x * 2 + 1;
+				x * 3;
+				x * 4;
+				Out.ar(0, s)
+			}]
+		]);
+		writeCases.("pvcopy", [
+			[\pvcopy_three, {
+				var chain = FFT(LocalBuf(512), SinOsc.ar);
+				var pvs = [PV_MagAbove(chain, 1), PV_MagBelow(chain, 1), PV_MagClip(chain, 1)];
+				Out.ar(0, pvs.collect { |pv| IFFT(pv) })
+			}],
+			[\pvcopy_slots, {
+				var chain = FFT(LocalBuf(512), SinOsc.ar);
+				Out.ar(0, [IFFT(PV_Mul(chain, chain)), IFFT(chain)])
+			}],
+			[\pvcopy_deep, {
+				var chain = PV_MagAbove(FFT(LocalBuf(512), SinOsc.ar), 1);
+				Out.ar(0, IFFT(chain) + IFFT(chain))
+			}],
+			[\pvcopy_analysis, {
+				var chain = FFT(LocalBuf(512), SinOsc.ar);
+				Out.ar(0, IFFT(PV_MagAbove(chain, 1)) * SpecCentroid.kr(chain))
+			}],
+			[\pvcopy_buffer, {
+				var buf = LocalBuf(16);
+				var chain = FFT(0, SinOsc.ar);
+				Out.ar(0, [IFFT(PV_MagAbove(chain, 1)), IFFT(PV_MagBelow(chain, 1)), PlayBuf.ar(1, buf)])
+			}]
+		]);
+		[
+			[\refused_fft_buffer, {
+				var chain = FFT(0, SinOsc.ar);
+				Out.ar(0, IFFT(PV_MagAbove(chain, 1)) + IFFT(PV_MagBelow(chain, 1)))
+			}],
+			[\refused_packfft, {
+				var chain = PackFFT(FFT(LocalBuf(512), SinOsc.ar), 512, [1, 0]);
+				Out.ar(0, IFFT(chain) + IFFT(chain))
+			}],
+			[\refused_ffttrigger, {
+				var chain = FFTTrigger(LocalBuf(512));
+				Out.ar(0, IFFT(chain) + IFFT(chain))
+			}],
+			[\refused_readers, {
+				var x = SinOsc.ar(1);
+				var s = x * 2 + 1;
+				x * 3;
+				x * 4;
+				x * 5;
+				Out.ar(0, s)
+			}],
+			[\refused_neg_zero, { Out.ar(0, SinOsc.ar + UnaryOpUGen('neg', 0)) }],
+			[\refused_neg_numbers, {
+				Out.ar(0, SinOsc.ar * BinaryOpUGen('+', 2, UnaryOpUGen('neg', 3)))
+			}]
+		].do { |case| refused.(case[0], case[1]) };
+	}.value;
+
 	writeArithmetic.();
 
-	"fixtures.scd: before_optimize holds %".format(rewritten).postln;
 	"fixtures.scd: wrote % golden files to %".format(written, fixtures).postln;
 	0.exit;
 } { |error|
