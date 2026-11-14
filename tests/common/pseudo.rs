@@ -53,6 +53,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "nestedwire" => nestedwire(),
         "nestedreply" => nestedreply(),
         "nestedenv" => nestedenv(),
+        "nestedpseudo" => [nested_selects(), nested_bodies()].concat(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -2172,6 +2173,142 @@ fn nestedenv() -> Vec<SynthDef> {
                 &[("envelope", input(envelopes)), ("gate", input(gates))],
             );
             out(b, "ar", gens);
+        }),
+    ]
+}
+
+fn nested_selects() -> Vec<SynthDef> {
+    vec![
+        def("nestedpseudo_selectx", vec![], |b| {
+            let which = sine(b, "kr", 1.0);
+            let choices = nested_sines(b, "ar");
+            let mixed = by_name(
+                b,
+                "SelectX",
+                "ar",
+                &[("which", input(which)), ("array", input(choices))],
+            );
+            out(b, "ar", mixed);
+        }),
+        def("nestedpseudo_linselectx", vec![], |b| {
+            let which = sine(b, "kr", 1.0);
+            let pair = sines(b, "kr", &[2.0, 3.0]);
+            let fourth = sine(b, "kr", 4.0);
+            let mixed = by_name(
+                b,
+                "LinSelectX",
+                "kr",
+                &[
+                    ("which", input(which)),
+                    ("array", input(UGenInput::Array(vec![pair, fourth]))),
+                ],
+            );
+            out(b, "kr", mixed);
+        }),
+        def("nestedpseudo_selectxfocus", vec![], |b| {
+            let which = sine(b, "kr", 1.0);
+            let choices = nested_sines(b, "ar");
+            let mixed = by_name(
+                b,
+                "SelectXFocus",
+                "ar",
+                &[("which", input(which)), ("array", input(choices))],
+            );
+            out(b, "ar", mixed);
+        }),
+        def("nestedpseudo_tchoose", vec![], |b| {
+            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let choices = nested_sines(b, "ar");
+            let chosen = by_name(
+                b,
+                "TChoose",
+                "ar",
+                &[("trig", input(trig)), ("array", input(choices))],
+            );
+            out(b, "ar", chosen);
+        }),
+        def("nestedpseudo_twchoose", vec![], |b| {
+            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let choices = nested_sines(b, "ar");
+            let weights = UGenInput::Array(vec![array(&[0.2, 0.8]), 0.5.into()]);
+            let chosen = by_name(
+                b,
+                "TWChoose",
+                "ar",
+                &[
+                    ("trig", input(trig)),
+                    ("array", input(choices)),
+                    ("weights", input(weights)),
+                ],
+            );
+            out(b, "ar", chosen);
+        }),
+    ]
+}
+
+fn nested_bodies() -> Vec<SynthDef> {
+    vec![
+        def("nestedpseudo_pingpong", vec![], |b| {
+            let buffer = local_buf(b, 44100.0, 2.0);
+            let sounds = nested_sines(b, "ar");
+            ping_pong_out(b, buffer, sounds, &[("delayTime", input(0.25))]);
+        }),
+        def("nestedpseudo_multitap", vec![], |b| {
+            let sounds = nested_sines(b, "ar");
+            let taps = by_name(
+                b,
+                "MultiTap",
+                "ar",
+                &[
+                    ("timesArray", input(array(&[0.1, 0.2]))),
+                    ("levelsArray", input(array(&[0.5, 0.3]))),
+                    ("in", input(sounds)),
+                    ("bufnum", input(0.0)),
+                ],
+            );
+            out(b, "ar", taps);
+        }),
+        def("nestedpseudo_multitap_times", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let times = UGenInput::Array(vec![array(&[0.1, 0.2]), 0.3.into()]);
+            let taps = by_name(
+                b,
+                "MultiTap",
+                "ar",
+                &[
+                    ("timesArray", input(times)),
+                    ("levelsArray", input(array(&[0.5]))),
+                    ("in", input(sound)),
+                    ("bufnum", input(0.0)),
+                ],
+            );
+            out(b, "ar", taps);
+        }),
+        def("nestedpseudo_localin", vec![], |b| {
+            let defaults = UGenInput::Array(vec![array(&[0.1, 0.2]), 0.3.into()]);
+            let feedback = by_name(
+                b,
+                "LocalIn",
+                "ar",
+                &[("numChannels", input(2.0)), ("default", input(defaults))],
+            );
+            out(b, "ar", feedback);
+        }),
+        def("nestedpseudo_numchannels", vec![], |b| {
+            let pair = sines(b, "ar", &[1.0, 2.0]);
+            let rest = sines(b, "ar", &[3.0, 4.0]);
+            let UGenInput::Array(rest) = rest else {
+                panic!("two sines give an array");
+            };
+            let mut sounds = vec![pair];
+            sounds.extend(rest);
+            let channels = num_channels(b, UGenInput::Array(sounds), 2.0, true);
+            out(b, "ar", channels);
+        }),
+        def("nestedpseudo_splayaz", vec![], |b| {
+            let sounds = nested_sines(b, "ar");
+            let spread = splay_az(b, "ar", 2.0, sounds, &[]);
+            out(b, "ar", spread);
         }),
     ]
 }

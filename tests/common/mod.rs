@@ -86,6 +86,7 @@ pub const NAMES: &[&str] = &[
     "nestedwire",
     "nestedreply",
     "nestedenv",
+    "nestedpseudo",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where
