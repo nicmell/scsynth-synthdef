@@ -80,6 +80,28 @@ fn a_pseudo_ugen_that_fails_adds_no_ugen() {
 }
 
 #[test]
+fn a_lag_of_a_control_and_a_number_breaks_check_inputs_as_in_sclang() {
+    // The control makes the array run at control rate, so nothing passes
+    // through, and Lag.kr(2) breaks checkSameRateAsFirstInput.
+    let mut b = builder();
+    let x = b.arguments()[0].clone();
+    let pair = UGenInput::Array(vec![x.clone(), 2.0.into()]);
+    let mixed = b.ugen("Lag", "kr", &[("in", input(pair)), ("lagTime", input(0.1))]);
+    assert!(
+        matches!(&mixed, Err(BuildError::CheckInputs { class, .. }) if class == "Lag"),
+        "{mixed:?}"
+    );
+    let audio = b.ugen("Lag", "ar", &[("in", input(x))]);
+    assert!(
+        matches!(&audio, Err(BuildError::CheckInputs { class, .. }) if class == "Lag"),
+        "{audio:?}"
+    );
+    let def = b.finish().unwrap();
+    let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
+    assert_eq!(names, ["Control"]);
+}
+
+#[test]
 fn mix_gives_0_for_no_input_and_refuses_a_mix_at_demand_rate() {
     let mut b = builder();
     let nothing = b.ugen("Mix", "new", &[("array", input(Vec::new()))]);

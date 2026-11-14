@@ -35,6 +35,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "hilbertfir" => hilbertfir(),
         "linselectx" => linselectx(),
         "splayaz" => splayaz(),
+        "lag" => [lag(), lag_folds()].concat(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1183,6 +1184,154 @@ fn splayaz() -> Vec<SynthDef> {
             let center = sine(b, "ar", 0.1);
             let spread = splay_az(b, "ar", 2.0, sounds, &[("center", input(center))]);
             out(b, "ar", spread);
+        }),
+    ]
+}
+
+/// `class.selector(args)` into `Out` at the rate of `selector`.
+fn lag_out(b: &mut SynthDefBuilder, class: &str, selector: &str, args: &[(&str, ArgValue)]) {
+    let lagged = by_name(b, class, selector, args);
+    out(b, selector, lagged);
+}
+
+/// A definition of `class.selector` on the argument `name`, at 440, with
+/// these other arguments.
+fn lag_of(
+    def_name: &str,
+    name: &str,
+    class: &'static str,
+    selector: &'static str,
+    args: &'static [(&str, f64)],
+) -> SynthDef {
+    def(def_name, vec![Arg::new(name, 440.0)], |b| {
+        let mut all = vec![("in", input(arg(b, name)))];
+        all.extend(args.iter().map(|&(name, value)| (name, input(value))));
+        lag_out(b, class, selector, &all);
+    })
+}
+
+/// A definition of `class.selector` on a `SinOsc.ar(1)`, with these other
+/// arguments.
+fn lag_of_sine(def_name: &str, class: &'static str, args: &'static [(&str, f64)]) -> SynthDef {
+    def(def_name, vec![], |b| {
+        let sound = sine(b, "ar", 1.0);
+        let mut all = vec![("in", input(sound))];
+        all.extend(args.iter().map(|&(name, value)| (name, input(value))));
+        lag_out(b, class, "ar", &all);
+    })
+}
+
+fn lag() -> Vec<SynthDef> {
+    vec![
+        lag_of("lag_kr", "freq", "Lag", "kr", &[("lagTime", 0.1)]),
+        lag_of_sine("lag_ar", "Lag", &[("lagTime", 0.01)]),
+        lag_of("lag2_kr", "freq", "Lag2", "kr", &[("lagTime", 0.1)]),
+        lag_of_sine("lag3_ar", "Lag3", &[("lagTime", 0.01)]),
+        lag_of("ramp_kr", "freq", "Ramp", "kr", &[("lagTime", 0.1)]),
+        lag_of(
+            "lagud_kr",
+            "freq",
+            "LagUD",
+            "kr",
+            &[("lagTimeU", 0.1), ("lagTimeD", 0.2)],
+        ),
+        lag_of_sine(
+            "lag2ud_ar",
+            "Lag2UD",
+            &[("lagTimeU", 0.01), ("lagTimeD", 0.02)],
+        ),
+        lag_of(
+            "lag3ud_kr",
+            "freq",
+            "Lag3UD",
+            "kr",
+            &[("lagTimeU", 0.1), ("lagTimeD", 0.2)],
+        ),
+        lag_of_sine("slew_ar", "Slew", &[("up", 100.0), ("dn", 200.0)]),
+        lag_of("slew_kr", "freq", "Slew", "kr", &[]),
+    ]
+}
+
+/// The cases of `lag` that give back their input, or that do not although
+/// a lag is 0.
+fn lag_folds() -> Vec<SynthDef> {
+    vec![
+        def("lag_number", vec![], |b| {
+            lag_out(
+                b,
+                "Lag",
+                "kr",
+                &[("in", input(440.0)), ("lagTime", input(0.1))],
+            );
+        }),
+        lag_of("lag_zero", "freq", "Lag", "kr", &[("lagTime", 0.0)]),
+        lag_of("lag_scalar", "i_freq", "Lag", "kr", &[("lagTime", 0.1)]),
+        lag_of(
+            "lagud_zero",
+            "freq",
+            "LagUD",
+            "kr",
+            &[("lagTimeU", 0.0), ("lagTimeD", 0.0)],
+        ),
+        lag_of("slew_scalar", "i_freq", "Slew", "kr", &[]),
+        def("lag_madd_number", vec![], |b| {
+            lag_out(
+                b,
+                "Lag",
+                "kr",
+                &[
+                    ("in", input(2.0)),
+                    ("lagTime", input(0.1)),
+                    ("mul", input(3.0)),
+                    ("add", input(4.0)),
+                ],
+            );
+        }),
+        def("lag_madd_scalar", vec![Arg::new("i_x", 1.0)], |b| {
+            let x = arg(b, "i_x");
+            lag_out(
+                b,
+                "Lag",
+                "kr",
+                &[
+                    ("in", input(x)),
+                    ("lagTime", input(0.1)),
+                    ("mul", input(2.0)),
+                    ("add", input(3.0)),
+                ],
+            );
+        }),
+        lag_of(
+            "lag_madd",
+            "freq",
+            "Lag",
+            "kr",
+            &[("lagTime", 0.1), ("mul", 2.0), ("add", 3.0)],
+        ),
+        def(
+            "lag_array",
+            vec![Arg::new("a", 1.0), Arg::new("b", 2.0)],
+            |b| {
+                let pair = UGenInput::Array(vec![arg(b, "a"), arg(b, "b")]);
+                lag_out(
+                    b,
+                    "Lag",
+                    "kr",
+                    &[("in", input(pair)), ("lagTime", input(0.1))],
+                );
+            },
+        ),
+        def("lag_array_scalar", vec![], |b| {
+            lag_out(
+                b,
+                "Lag",
+                "kr",
+                &[
+                    ("in", input(array(&[1.0, 2.0]))),
+                    ("lagTime", input(0.1)),
+                    ("mul", input(2.0)),
+                ],
+            );
         }),
     ]
 }

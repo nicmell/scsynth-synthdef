@@ -19734,8 +19734,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": 1
+          }
         },
         {
           "selector": "kr",
@@ -19769,8 +19789,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": 1
+          }
         }
       ]
     },
@@ -19823,8 +19863,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": 1
+          }
         },
         {
           "selector": "kr",
@@ -19858,8 +19918,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": 1
+          }
         }
       ]
     },
@@ -19919,8 +19999,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": null
+          }
         },
         {
           "selector": "kr",
@@ -19961,8 +20064,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": null
+          }
         }
       ]
     },
@@ -20015,8 +20141,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": 1
+          }
         },
         {
           "selector": "kr",
@@ -20050,8 +20196,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": 1
+          }
         }
       ]
     },
@@ -20111,8 +20277,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": null
+          }
         },
         {
           "selector": "kr",
@@ -20153,8 +20342,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": null
+          }
         }
       ]
     },
@@ -20332,8 +20544,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": null
+          }
         },
         {
           "selector": "kr",
@@ -20374,8 +20609,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": null
+          }
         }
       ]
     },
@@ -30141,8 +30399,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": 1
+          }
         },
         {
           "selector": "kr",
@@ -30176,8 +30454,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": 1
+          }
         }
       ]
     },
@@ -33205,8 +33503,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": null
+          }
         },
         {
           "selector": "kr",
@@ -33247,8 +33568,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "passthrough": {
+            "input": 0,
+            "zero": null
+          }
         }
       ]
     },

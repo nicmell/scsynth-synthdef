@@ -4,7 +4,8 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::catalog::{
-    self, Addable, ArgDefault, ArgKind, InputSlot, Outputs, RateMethod, UGenClass, Wiring,
+    self, Addable, ArgDefault, ArgKind, InputSlot, Outputs, Passthrough, RateMethod, UGenClass,
+    Wiring,
 };
 use crate::check_inputs;
 use crate::error::BuildError;
@@ -442,6 +443,11 @@ impl SynthDefBuilder {
         };
         let mut values = bind_arguments(class, method, args)?;
         let madd = madd_arguments(class, method, wiring, &values)?;
+        if let Some(through) = wiring.passthrough {
+            if let Some(input) = passed_through(through, &values) {
+                return self.transaction(|builder| builder.madd_input(class, input, madd));
+            }
+        }
         let level = level_argument(class, method, wiring, &values)?;
         let positions = expanding(wiring);
         let mut names = Vec::with_capacity(positions.len());
@@ -852,6 +858,22 @@ impl SynthDefBuilder {
         self.unary_leaf(special_index, input)
     }
 
+    /// `input.madd(mul, add)` in sclang: `(input * mul) + add` for a number,
+    /// as `SimpleNumber:madd` computes it, and else `MulAdd.new`.
+    fn madd_input(
+        &mut self,
+        class: &str,
+        input: UGenInput,
+        madd: Option<[UGenInput; 2]>,
+    ) -> Result<UGenInput, BuildError> {
+        let [mul, add] = madd.unwrap_or([UGenInput::Number(1.0), UGenInput::Number(0.0)]);
+        if let UGenInput::Number(_) = input {
+            let product = lang::binary(self, "*", input, mul)?;
+            return lang::binary(self, "+", product, add);
+        }
+        self.madd_expanded(class, &[input, mul, add])
+    }
+
     /// `MulAdd.new` over `values`: the input, `mul` and `add`, with the class
     /// that the errors name.
     fn madd_expanded(&mut self, ugen: &str, values: &[UGenInput]) -> Result<UGenInput, BuildError> {
@@ -994,6 +1016,19 @@ fn can_be_mul_add(input: &UGenInput, mul: &UGenInput, add: &UGenInput) -> bool {
 
 /// The positions of the arguments that expand: those of the wire, and the
 /// count of the outputs, as the method gives them `multiNew`.
+/// The input that a method of `through` gives back in place of an instance:
+/// an input at scalar rate, or any input with the number 0 in the zero
+/// argument.
+fn passed_through(through: Passthrough, values: &[ArgValue]) -> Option<UGenInput> {
+    let ArgValue::Input(input) = &values[through.input] else {
+        return None;
+    };
+    let zero = through.zero.is_some_and(|position| {
+        matches!(values[position], ArgValue::Input(UGenInput::Number(number)) if number == 0.0)
+    });
+    (zero || lang::rate(input) == Some(Rate::Scalar)).then(|| input.clone())
+}
+
 fn expanding(wiring: Wiring) -> Vec<usize> {
     let mut positions: Vec<usize> = wiring
         .inputs
@@ -1935,7 +1970,7 @@ mod tests {
             BuildError::UnknownMethod { .. }
         ));
         assert!(matches!(
-            refuse("Lag", "kr", &[]),
+            refuse("VarLag", "kr", &[]),
             BuildError::NotAddable { .. }
         ));
         assert!(matches!(

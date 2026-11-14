@@ -343,11 +343,8 @@ it.
 
 - These pseudo-UGens have no body. `Dunique.new` needs `LocalBuf`, and
   `InBus.ar` and `InBus.kr` read a `Bus` of sclang.
-- The Lag family returns its input for a number or a lag of 0: `Lag.ar`,
-  `Lag.kr`, `Lag2.ar`, `Lag2.kr`, `Lag2UD.ar`, `Lag2UD.kr`, `Lag3.ar`,
-  `Lag3.kr`, `Lag3UD.ar` and `Lag3UD.kr`.
-- So do `LagControl.ar`, `LagControl.kr`, `LagUD.ar`, `LagUD.kr`,
-  `Ramp.ar`, `Ramp.kr`, `Slew.ar`, `Slew.kr`, `VarLag.ar` and `VarLag.kr`.
+- `VarLag.ar` and `VarLag.kr` build an `Env` with their default warp.
+  `LagControl.ar` and `LagControl.kr` are controls.
 - `MulAdd.new` folds and orders its inputs. Use `madd` instead.
 - They also create other UGens: `BeatTrack.kr`, `LocalBuf.new`, `Poll.ar`,
   `Poll.kr` and `Poll.new`.
