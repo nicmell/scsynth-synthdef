@@ -508,6 +508,90 @@ try {
 		}]
 	]);
 
+	// The rate methods that do more than new1, of 0.4.
+	writePseudo.("lag", [
+		[\lag_kr, { |freq = 440| Out.kr(0, Lag.kr(freq, 0.1)) }],
+		[\lag_ar, { Out.ar(0, Lag.ar(SinOsc.ar(1), 0.01)) }],
+		[\lag2_kr, { |freq = 440| Out.kr(0, Lag2.kr(freq, 0.1)) }],
+		[\lag3_ar, { Out.ar(0, Lag3.ar(SinOsc.ar(1), 0.01)) }],
+		[\ramp_kr, { |freq = 440| Out.kr(0, Ramp.kr(freq, 0.1)) }],
+		[\lagud_kr, { |freq = 440| Out.kr(0, LagUD.kr(freq, 0.1, 0.2)) }],
+		[\lag2ud_ar, { Out.ar(0, Lag2UD.ar(SinOsc.ar(1), 0.01, 0.02)) }],
+		[\lag3ud_kr, { |freq = 440| Out.kr(0, Lag3UD.kr(freq, 0.1, 0.2)) }],
+		[\slew_ar, { Out.ar(0, Slew.ar(SinOsc.ar(1), 100, 200)) }],
+		[\slew_kr, { |freq = 440| Out.kr(0, Slew.kr(freq)) }],
+		[\lag_number, { Out.kr(0, Lag.kr(440, 0.1)) }],
+		[\lag_zero, { |freq = 440| Out.kr(0, Lag.kr(freq, 0)) }],
+		[\lag_scalar, { |i_freq = 440| Out.kr(0, Lag.kr(i_freq, 0.1)) }],
+		[\lagud_zero, { |freq = 440| Out.kr(0, LagUD.kr(freq, 0, 0)) }],
+		[\slew_scalar, { |i_freq = 440| Out.kr(0, Slew.kr(i_freq)) }],
+		[\lag_madd_number, { Out.kr(0, Lag.kr(2, 0.1, 3, 4)) }],
+		[\lag_madd_scalar, { |i_x = 1| Out.kr(0, Lag.kr(i_x, 0.1, 2, 3)) }],
+		[\lag_madd, { |freq = 440| Out.kr(0, Lag.kr(freq, 0.1, 2, 3)) }],
+		[\lag_array, { |a = 1, b = 2| Out.kr(0, Lag.kr([a, b], 0.1)) }],
+		[\lag_array_scalar, { Out.kr(0, Lag.kr([1, 2], 0.1, 2)) }]
+	]);
+	writePseudo.("outzeros", [
+		[\outzeros_one, { Out.ar(0, 0) }],
+		[\outzeros_two, { Out.ar(0, [SinOsc.ar(1), 0, 0]) }],
+		[\outzeros_negative, { Out.ar(0, [-0.0, SinOsc.ar(1)]) }],
+		[\outzeros_replace, { ReplaceOut.ar(0, [0, SinOsc.ar(1)]) }],
+		[\outzeros_offset, { OffsetOut.ar(0, 0) }],
+		[\outzeros_x, { XOut.ar(0, 0.5, [SinOsc.ar(1), 0]) }],
+		[\outzeros_kr, { Out.kr(0, 0) }]
+	]);
+	writePseudo.("localbuf", [
+		[\localbuf_fft, { Out.ar(0, IFFT(FFT(LocalBuf(2048), SinOsc.ar(1)))) }],
+		[\localbuf_two, {
+			var a = FFT(LocalBuf(1024), SinOsc.ar(1));
+			var b = FFT(LocalBuf(2048), SinOsc.ar(2));
+			Out.ar(0, [IFFT(a), IFFT(b)])
+		}],
+		[\localbuf_array, { Out.ar(0, IFFT(FFT(LocalBuf([512, 1024]), SinOsc.ar(1)))) }],
+		[\localbuf_channels, { Out.ar(0, PlayBuf.ar(2, LocalBuf(1024, 2))) }]
+	]);
+	writePseudo.("beattrack", [
+		[\beattrack_auto, { Out.kr(0, BeatTrack.kr(SinOsc.ar(1))) }],
+		[\beattrack_chain, { Out.kr(0, BeatTrack.kr(FFT(LocalBuf(1024), SinOsc.ar(1)), 0.5)) }]
+	]);
+	writePseudo.("localin", [
+		[\localin_ar, {
+			var in = LocalIn.ar(2);
+			LocalOut.ar(in * 0.5);
+			Out.ar(0, in)
+		}],
+		[\localin_default, {
+			var in = LocalIn.ar(3, [0.1, 0.2]);
+			LocalOut.ar(in);
+			Out.ar(0, in)
+		}],
+		[\localin_kr, {
+			var in = LocalIn.kr(1, 0.5);
+			LocalOut.kr(in + 1);
+			Out.kr(0, in)
+		}],
+		[\localin_zero, {
+			var in = LocalIn.ar(2);
+			LocalOut.ar([in[0], 0]);
+			Out.ar(0, in)
+		}]
+	]);
+	writePseudo.("poll", [
+		[\poll_kr, { Poll.kr(10, SinOsc.kr(1)) }],
+		[\poll_label, { Poll.ar(Impulse.ar(2), SinOsc.ar(1), "freq", 7) }],
+		[\poll_symbol, { Poll.kr(Impulse.kr(2), SinOsc.kr(1), \amp) }],
+		[\poll_proxy, { Poll.kr(10, Pan2.kr(SinOsc.kr(1))) }],
+		[\poll_integer, { Poll.kr(10, 440) }],
+		[\poll_float, { Poll.kr(10, 0.5) }],
+		[\poll_new, { |freq = 440| Poll.new(10, freq) }],
+		[\poll_new_scalar, { |i_x = 1| Poll.new(10, i_x) }],
+		[\poll_out, { Out.ar(0, Poll.ar(10, SinOsc.ar(1))) }],
+		[\poll_bytes, { Poll.kr(10, SinOsc.kr(1), "é") }]
+	]);
+	writePseudo.("symbols", [
+		[\sendreply_bytes, { SendReply.kr(Impulse.kr(1), '/é', SinOsc.kr(1)) }]
+	]);
+
 	writeArithmetic.();
 
 	"fixtures.scd: before_optimize holds %".format(rewritten).postln;
