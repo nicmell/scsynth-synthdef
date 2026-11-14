@@ -49,6 +49,11 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "klank" => klank(),
         "klang" => klang(),
         "pingpong" => pingpong(),
+        "nestedout" => nestedout(),
+        "nestedwire" => nestedwire(),
+        "nestedreply" => nestedreply(),
+        "nestedenv" => nestedenv(),
+        "nestedpseudo" => [nested_selects(), nested_bodies()].concat(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1930,6 +1935,380 @@ fn pingpong() -> Vec<SynthDef> {
         def("pingpong_bufnum", vec![], |b| {
             let sounds = two_sines(b);
             ping_pong_out(b, 0.0.into(), sounds, &[("delayTime", input(0.25))]);
+        }),
+    ]
+}
+
+/// `[[SinOsc(1), SinOsc(2)], SinOsc(3)]`, at the rate of `selector`.
+fn nested_sines(b: &mut SynthDefBuilder, selector: &str) -> UGenInput {
+    let pair = sines(b, selector, &[1.0, 2.0]);
+    let third = sine(b, selector, 3.0);
+    UGenInput::Array(vec![pair, third])
+}
+
+fn nestedout() -> Vec<SynthDef> {
+    vec![
+        def("nestedout_two", vec![], |b| {
+            let sounds = nested_sines(b, "ar");
+            out(b, "ar", sounds);
+        }),
+        def("nestedout_bus", vec![], |b| {
+            let sounds = nested_sines(b, "ar");
+            by_name(
+                b,
+                "Out",
+                "ar",
+                &[
+                    ("bus", input(array(&[0.0, 2.0]))),
+                    ("channelsArray", input(sounds)),
+                ],
+            );
+        }),
+        def("nestedout_pan2", vec![], |b| {
+            let sounds = sine(b, "ar", array(&[440.0, 660.0]));
+            let pans = by_name(
+                b,
+                "Pan2",
+                "ar",
+                &[("in", input(sounds)), ("pos", input(array(&[-0.5, 0.5])))],
+            );
+            out(b, "ar", pans);
+        }),
+        def("nestedout_deep", vec![], |b| {
+            let inner = nested_sines(b, "ar");
+            let fourth = sine(b, "ar", 4.0);
+            out(b, "ar", UGenInput::Array(vec![inner, fourth]));
+        }),
+        def("nestedout_zeros", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let inner = UGenInput::Array(vec![0.0.into(), sound]);
+            out(b, "ar", UGenInput::Array(vec![inner, 0.0.into()]));
+        }),
+        def("nestedout_kr", vec![], |b| {
+            let pair = sines(b, "kr", &[1.0, 2.0]);
+            out(b, "kr", UGenInput::Array(vec![pair, 0.0.into()]));
+        }),
+        def("nestedout_x", vec![], |b| {
+            let sounds = nested_sines(b, "ar");
+            by_name(
+                b,
+                "XOut",
+                "ar",
+                &[
+                    ("bus", input(0.0)),
+                    ("xfade", input(0.5)),
+                    ("channelsArray", input(sounds)),
+                ],
+            );
+        }),
+    ]
+}
+
+fn nestedwire() -> Vec<SynthDef> {
+    vec![
+        def("nestedwire_bufwr", vec![], |b| {
+            let buffer = local_buf(b, 1024.0, 2.0);
+            let sounds = nested_sines(b, "ar");
+            let phase = phasor(b, "ar", 1024.0);
+            by_name(
+                b,
+                "BufWr",
+                "ar",
+                &[
+                    ("inputArray", input(sounds)),
+                    ("bufnum", input(buffer)),
+                    ("phase", input(phase)),
+                ],
+            );
+        }),
+        def("nestedwire_recordbuf", vec![], |b| {
+            let sounds = nested_sines(b, "ar");
+            let buffer = local_buf(b, 1024.0, 2.0);
+            by_name(
+                b,
+                "RecordBuf",
+                "ar",
+                &[("inputArray", input(sounds)), ("bufnum", input(buffer))],
+            );
+        }),
+        def("nestedwire_demand", vec![], |b| {
+            let pair = UGenInput::Array(vec![dseq(b, &[1.0, 2.0]), dseq(b, &[3.0, 4.0])]);
+            let white = by_name(
+                b,
+                "Dwhite",
+                "new",
+                &[("lo", input(0.0)), ("hi", input(1.0))],
+            );
+            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let values = by_name(
+                b,
+                "Demand",
+                "kr",
+                &[
+                    ("trig", input(trig)),
+                    ("reset", input(0.0)),
+                    ("demandUGens", input(UGenInput::Array(vec![pair, white]))),
+                ],
+            );
+            out(b, "kr", values);
+        }),
+        def("nestedwire_dseq", vec![], |b| {
+            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let list = UGenInput::Array(vec![array(&[1.0, 2.0]), 3.0.into()]);
+            let lists = by_name(
+                b,
+                "Dseq",
+                "new",
+                &[("list", input(list)), ("repeats", input(f64::INFINITY))],
+            );
+            let values = by_name(
+                b,
+                "Demand",
+                "kr",
+                &[
+                    ("trig", input(trig)),
+                    ("reset", input(0.0)),
+                    ("demandUGens", input(lists)),
+                ],
+            );
+            out(b, "kr", values);
+        }),
+        def("nestedwire_select", vec![], |b| {
+            let which = sine(b, "kr", 1.0);
+            let sounds = nested_sines(b, "ar");
+            let selected = by_name(
+                b,
+                "Select",
+                "ar",
+                &[("which", input(which)), ("array", input(sounds))],
+            );
+            out(b, "ar", selected);
+        }),
+        def("nestedwire_twindex", vec![], |b| {
+            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let weights = UGenInput::Array(vec![array(&[0.2, 0.8]), 0.5.into()]);
+            let index = by_name(
+                b,
+                "TWindex",
+                "kr",
+                &[("in", input(trig)), ("array", input(weights))],
+            );
+            out(b, "kr", index);
+        }),
+    ]
+}
+
+fn reply(b: &mut SynthDefBuilder, selector: &str, trig: UGenInput, name: &str, values: UGenInput) {
+    by_name(
+        b,
+        "SendReply",
+        selector,
+        &[
+            ("trig", input(trig)),
+            ("cmdName", name.into()),
+            ("values", input(values)),
+        ],
+    );
+}
+
+fn nestedreply() -> Vec<SynthDef> {
+    vec![
+        def("nestedreply_two", vec![], |b| {
+            let values = UGenInput::Array(vec![
+                sines(b, "kr", &[1.0, 2.0]),
+                sines(b, "kr", &[3.0, 4.0]),
+            ]);
+            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            reply(b, "kr", trig, "/a", values);
+        }),
+        def("nestedreply_wrap", vec![], |b| {
+            let trig = by_name(
+                b,
+                "Impulse",
+                "kr",
+                &[("freq", input(array(&[1.0, 2.0, 3.0])))],
+            );
+            let values = nested_sines(b, "kr");
+            reply(b, "kr", trig, "/b", values);
+        }),
+        def("nestedreply_first", vec![], |b| {
+            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let first = sine(b, "kr", 1.0);
+            let pair = sines(b, "kr", &[2.0, 3.0]);
+            reply(b, "kr", trig, "/c", UGenInput::Array(vec![first, pair]));
+        }),
+        def("nestedreply_ar", vec![], |b| {
+            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let first = UGenInput::Array(vec![sine(b, "ar", 1.0)]);
+            let second = UGenInput::Array(vec![sine(b, "ar", 2.0)]);
+            reply(b, "ar", trig, "/d", UGenInput::Array(vec![first, second]));
+        }),
+    ]
+}
+
+fn nestedenv() -> Vec<SynthDef> {
+    vec![
+        def("nestedenv_two", vec![], |b| {
+            let envelopes = UGenInput::Array(vec![
+                array(&[
+                    0.0, 2.0, -99.0, -99.0, 1.0, 0.1, 1.0, 0.0, 0.0, 0.9, 1.0, 0.0,
+                ]),
+                array(&[0.0, 1.0, -99.0, -99.0, 1.0, 0.5, 1.0, 0.0]),
+            ]);
+            let gens = by_name(b, "EnvGen", "kr", &[("envelope", input(envelopes))]);
+            out(b, "kr", gens);
+        }),
+        def("nestedenv_gates", vec![Arg::new("gate", 1.0)], |b| {
+            let gate = arg(b, "gate");
+            let envelopes = UGenInput::Array(vec![
+                array(&[0.0, 1.0, -99.0, -99.0, 1.0, 0.1, 1.0, 0.0]),
+                array(&[0.0, 1.0, -99.0, -99.0, 1.0, 0.2, 1.0, 0.0]),
+            ]);
+            let half = b.binary_op("*", gate.clone(), 0.5).unwrap();
+            let gates = UGenInput::Array(vec![gate, 1.0.into(), half]);
+            let gens = by_name(
+                b,
+                "EnvGen",
+                "ar",
+                &[("envelope", input(envelopes)), ("gate", input(gates))],
+            );
+            out(b, "ar", gens);
+        }),
+    ]
+}
+
+fn nested_selects() -> Vec<SynthDef> {
+    vec![
+        def("nestedpseudo_selectx", vec![], |b| {
+            let which = sine(b, "kr", 1.0);
+            let choices = nested_sines(b, "ar");
+            let mixed = by_name(
+                b,
+                "SelectX",
+                "ar",
+                &[("which", input(which)), ("array", input(choices))],
+            );
+            out(b, "ar", mixed);
+        }),
+        def("nestedpseudo_linselectx", vec![], |b| {
+            let which = sine(b, "kr", 1.0);
+            let pair = sines(b, "kr", &[2.0, 3.0]);
+            let fourth = sine(b, "kr", 4.0);
+            let mixed = by_name(
+                b,
+                "LinSelectX",
+                "kr",
+                &[
+                    ("which", input(which)),
+                    ("array", input(UGenInput::Array(vec![pair, fourth]))),
+                ],
+            );
+            out(b, "kr", mixed);
+        }),
+        def("nestedpseudo_selectxfocus", vec![], |b| {
+            let which = sine(b, "kr", 1.0);
+            let choices = nested_sines(b, "ar");
+            let mixed = by_name(
+                b,
+                "SelectXFocus",
+                "ar",
+                &[("which", input(which)), ("array", input(choices))],
+            );
+            out(b, "ar", mixed);
+        }),
+        def("nestedpseudo_tchoose", vec![], |b| {
+            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let choices = nested_sines(b, "ar");
+            let chosen = by_name(
+                b,
+                "TChoose",
+                "ar",
+                &[("trig", input(trig)), ("array", input(choices))],
+            );
+            out(b, "ar", chosen);
+        }),
+        def("nestedpseudo_twchoose", vec![], |b| {
+            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let choices = nested_sines(b, "ar");
+            let weights = UGenInput::Array(vec![array(&[0.2, 0.8]), 0.5.into()]);
+            let chosen = by_name(
+                b,
+                "TWChoose",
+                "ar",
+                &[
+                    ("trig", input(trig)),
+                    ("array", input(choices)),
+                    ("weights", input(weights)),
+                ],
+            );
+            out(b, "ar", chosen);
+        }),
+    ]
+}
+
+fn nested_bodies() -> Vec<SynthDef> {
+    vec![
+        def("nestedpseudo_pingpong", vec![], |b| {
+            let buffer = local_buf(b, 44100.0, 2.0);
+            let sounds = nested_sines(b, "ar");
+            ping_pong_out(b, buffer, sounds, &[("delayTime", input(0.25))]);
+        }),
+        def("nestedpseudo_multitap", vec![], |b| {
+            let sounds = nested_sines(b, "ar");
+            let taps = by_name(
+                b,
+                "MultiTap",
+                "ar",
+                &[
+                    ("timesArray", input(array(&[0.1, 0.2]))),
+                    ("levelsArray", input(array(&[0.5, 0.3]))),
+                    ("in", input(sounds)),
+                    ("bufnum", input(0.0)),
+                ],
+            );
+            out(b, "ar", taps);
+        }),
+        def("nestedpseudo_multitap_times", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let times = UGenInput::Array(vec![array(&[0.1, 0.2]), 0.3.into()]);
+            let taps = by_name(
+                b,
+                "MultiTap",
+                "ar",
+                &[
+                    ("timesArray", input(times)),
+                    ("levelsArray", input(array(&[0.5]))),
+                    ("in", input(sound)),
+                    ("bufnum", input(0.0)),
+                ],
+            );
+            out(b, "ar", taps);
+        }),
+        def("nestedpseudo_localin", vec![], |b| {
+            let defaults = UGenInput::Array(vec![array(&[0.1, 0.2]), 0.3.into()]);
+            let feedback = by_name(
+                b,
+                "LocalIn",
+                "ar",
+                &[("numChannels", input(2.0)), ("default", input(defaults))],
+            );
+            out(b, "ar", feedback);
+        }),
+        def("nestedpseudo_numchannels", vec![], |b| {
+            let pair = sines(b, "ar", &[1.0, 2.0]);
+            let rest = sines(b, "ar", &[3.0, 4.0]);
+            let UGenInput::Array(rest) = rest else {
+                panic!("two sines give an array");
+            };
+            let mut sounds = vec![pair];
+            sounds.extend(rest);
+            let channels = num_channels(b, UGenInput::Array(sounds), 2.0, true);
+            out(b, "ar", channels);
+        }),
+        def("nestedpseudo_splayaz", vec![], |b| {
+            let sounds = nested_sines(b, "ar");
+            let spread = splay_az(b, "ar", 2.0, sounds, &[]);
+            out(b, "ar", spread);
         }),
     ]
 }

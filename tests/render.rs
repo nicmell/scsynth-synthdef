@@ -309,6 +309,20 @@ fn render_wiring(rendered: &mut String, method: &Value) {
         format!("Some({})", number(position))
     });
     writeln!(rendered, "                    silence: {silence},").unwrap();
+    let array_expansion =
+        method
+            .get("array_expansion")
+            .map_or("None", |value| match value.as_str() {
+                Some("elements") => "Some(ArrayExpansion::Elements)",
+                Some("flop") => "Some(ArrayExpansion::Flop)",
+                Some("refs") => "Some(ArrayExpansion::Refs)",
+                _ => panic!("{value} is no array expansion"),
+            });
+    writeln!(
+        rendered,
+        "                    array_expansion: {array_expansion},"
+    )
+    .unwrap();
     writeln!(rendered, "                }}),").unwrap();
 }
 
@@ -322,7 +336,7 @@ fn render_catalog(catalog: &Value) -> String {
     let mut rendered = String::from(HEADER);
     rendered.push_str("#![allow(clippy::unreadable_literal)]\n\n");
     rendered.push_str(
-        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, CheckInputs, InputSlot, Outputs, Passthrough,\n    PseudoClass, RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, InputSlot, Outputs,\n    Passthrough, PseudoClass, RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     writeln!(
         rendered,

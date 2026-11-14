@@ -658,6 +658,96 @@ try {
 		[\pingpong_bufnum, { Out.ar(0, PingPong.ar(0, [SinOsc.ar(1), SinOsc.ar(2)], 0.25)) }]
 	]);
 
+	// The arrays inside array arguments, of 0.6.
+	writePseudo.("nestedout", [
+		[\nestedout_two, { Out.ar(0, [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]) }],
+		[\nestedout_bus, { Out.ar([0, 2], [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]) }],
+		[\nestedout_pan2, { Out.ar(0, Pan2.ar(SinOsc.ar([440, 660]), [-0.5, 0.5])) }],
+		[\nestedout_deep, {
+			Out.ar(0, [[[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)], SinOsc.ar(4)])
+		}],
+		[\nestedout_zeros, { Out.ar(0, [[0, SinOsc.ar(1)], 0]) }],
+		[\nestedout_kr, { Out.kr(0, [[SinOsc.kr(1), SinOsc.kr(2)], 0]) }],
+		[\nestedout_x, { XOut.ar(0, 0.5, [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]) }]
+	]);
+	writePseudo.("nestedwire", [
+		[\nestedwire_bufwr, {
+			var buf = LocalBuf(1024, 2);
+			BufWr.ar([[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)], buf, Phasor.ar(0, 1, 0, 1024))
+		}],
+		[\nestedwire_recordbuf, {
+			RecordBuf.ar([[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)], LocalBuf(1024, 2))
+		}],
+		[\nestedwire_demand, {
+			var lists = [[Dseq([1, 2], inf), Dseq([3, 4], inf)], Dwhite(0, 1, inf)];
+			Out.kr(0, Demand.kr(Impulse.kr(1), 0, lists))
+		}],
+		[\nestedwire_dseq, { Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([[1, 2], 3], inf))) }],
+		[\nestedwire_select, {
+			Out.ar(0, Select.ar(SinOsc.kr(1), [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]))
+		}],
+		[\nestedwire_twindex, { Out.kr(0, TWindex.kr(Impulse.kr(1), [[0.2, 0.8], 0.5])) }]
+	]);
+	writePseudo.("nestedreply", [
+		[\nestedreply_two, {
+			var values = [[SinOsc.kr(1), SinOsc.kr(2)], [SinOsc.kr(3), SinOsc.kr(4)]];
+			SendReply.kr(Impulse.kr(1), '/a', values)
+		}],
+		[\nestedreply_wrap, {
+			SendReply.kr(Impulse.kr([1, 2, 3]), '/b', [[SinOsc.kr(1), SinOsc.kr(2)], SinOsc.kr(3)])
+		}],
+		[\nestedreply_first, {
+			SendReply.kr(Impulse.kr(1), '/c', [SinOsc.kr(1), [SinOsc.kr(2), SinOsc.kr(3)]])
+		}],
+		[\nestedreply_ar, { SendReply.ar(Impulse.ar(1), '/d', [[SinOsc.ar(1)], [SinOsc.ar(2)]]) }]
+	]);
+	writePseudo.("nestedenv", [
+		[\nestedenv_two, {
+			var envelopes = [[0, 2, -99, -99, 1, 0.1, 1, 0, 0, 0.9, 1, 0], [0, 1, -99, -99, 1, 0.5, 1, 0]];
+			Out.kr(0, EnvGen.kr(envelopes))
+		}],
+		[\nestedenv_gates, { |gate = 1|
+			var envelopes = [[0, 1, -99, -99, 1, 0.1, 1, 0], [0, 1, -99, -99, 1, 0.2, 1, 0]];
+			Out.ar(0, EnvGen.ar(envelopes, [gate, 1, gate * 0.5]))
+		}]
+	]);
+	writePseudo.("nestedpseudo", [
+		[\nestedpseudo_selectx, {
+			Out.ar(0, SelectX.ar(SinOsc.kr(1), [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]))
+		}],
+		[\nestedpseudo_linselectx, {
+			Out.kr(0, LinSelectX.kr(SinOsc.kr(1), [[SinOsc.kr(2), SinOsc.kr(3)], SinOsc.kr(4)]))
+		}],
+		[\nestedpseudo_selectxfocus, {
+			Out.ar(0, SelectXFocus.ar(SinOsc.kr(1), [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]))
+		}],
+		[\nestedpseudo_tchoose, {
+			Out.ar(0, TChoose.ar(Impulse.ar(1), [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]))
+		}],
+		[\nestedpseudo_twchoose, {
+			var weights = [[0.2, 0.8], 0.5];
+			Out.ar(0, TWChoose.ar(Impulse.ar(1), [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)], weights))
+		}],
+		[\nestedpseudo_pingpong, {
+			var buf = LocalBuf(44100, 2);
+			Out.ar(0, PingPong.ar(buf, [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)], 0.25))
+		}],
+		[\nestedpseudo_multitap, {
+			var in = [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)];
+			Out.ar(0, MultiTap.ar(`[0.1, 0.2], `[0.5, 0.3], in, bufnum: 0))
+		}],
+		[\nestedpseudo_multitap_times, {
+			Out.ar(0, MultiTap.ar(`[[0.1, 0.2], 0.3], `[0.5], SinOsc.ar(1), bufnum: 0))
+		}],
+		[\nestedpseudo_localin, { Out.ar(0, LocalIn.ar(2, [[0.1, 0.2], 0.3])) }],
+		[\nestedpseudo_numchannels, {
+			Out.ar(0, NumChannels.ar([[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3), SinOsc.ar(4)], 2))
+		}],
+		[\nestedpseudo_splayaz, {
+			Out.ar(0, SplayAz.ar(2, [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]))
+		}]
+	]);
+
 	writeArithmetic.();
 
 	"fixtures.scd: before_optimize holds %".format(rewritten).postln;

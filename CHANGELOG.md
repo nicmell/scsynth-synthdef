@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.6.0 (2026-11-14)
+
+An array among the elements of an array argument, as each class of
+SuperCollider 3.14.1 expands it.
+
+### Added
+
+- `ArrayExpansion` and `Wiring::array_expansion`: how the array argument of
+  a method takes an array among its elements. `Elements` marks the 34
+  methods that hand the elements to `multiNewList`, such as those of `Out`,
+  `BufWr` and `Demand`. `Flop` marks `SendReply`, and `Refs` marks `EnvGen`.
+- `generator/catalog.scd` measures it with nested arrays.
+- `generator/fixtures.scd` writes the golden files of 0.6: `nestedout`,
+  `nestedwire`, `nestedreply`, `nestedenv` and `nestedpseudo`.
+
+### Changed
+
+- `ugen` expands an array among the elements of an array argument as sclang
+  does, where it gave `BuildError::NestedArray`. So
+  `Out.ar(0, Pan2.ar(SinOsc.ar([440, 660]), [-0.5, 0.5]))` makes two `Out`.
+  The pseudo-UGens that call `Select`, `TWindex`, `BufWr` and `RecordBuf`
+  follow.
+- `BuildError::NestedArray` now marks an array that stays among the inputs
+  of a UGen, where sclang writes a file that scsynth misreads. Such an
+  array comes from two levels down in `SendReply`, and from the envelope of
+  `IEnvGen`. It also comes from the envelope of `EnvGen` after a first
+  element that is not an array.
+
 ## 0.5.0 (2026-11-14)
 
 The rules of `checkInputs` that classes define for themselves, `Klank`,
