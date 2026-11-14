@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.1 (2026-11-14)
+
+### Fixed
+
+- `cargo clippy` for `wasm32-unknown-unknown` passes again. A replacement
+  of `optimizeGraph` took a clone of the width-first antecedents of the
+  UGen that it replaces, which `clippy::assigning_clones` refuses on that
+  target alone. It takes them, as `replaceUGen` hands them over in sclang.
+  CI runs clippy for wasm32, where it ran `cargo check`.
+
 ## 0.7.0 (2026-11-14)
 
 `optimizeGraph`, and the copies of PV chains of `addCopiesIfNeeded`, as the
