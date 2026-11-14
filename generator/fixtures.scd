@@ -6,8 +6,9 @@
 //   sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 //
 // It exits with 1 if sclang is not 3.14.1, if a class or a method comes from
-// outside the core class library, or if finishBuild changes a graph of 0.1
-// or 0.2. It also writes tests/fixtures/before_optimize and
+// outside the core class library, if finishBuild changes a graph of 0.1 or
+// 0.2, or if a graph that the crate refuses does not break in sclang. It
+// also writes tests/fixtures/before_optimize and
 // tests/fixtures/arithmetic.json.
 (
 var root = thisProcess.nowExecutingPath.dirname.dirname;
@@ -22,6 +23,7 @@ var fail = { |message|
 var core = { |item| item.filenameSymbol.asString.beginsWith(library) };
 var build, write, written = 0;
 var buildBoth, writePseudo, rewritten = List.new, writeArithmetic;
+var writeCases, refused;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -116,6 +118,38 @@ try {
 		if (pairs.any { |pair| pair[0].asBytes != pair[1].asBytes }) {
 			write.(name, pairs.collect(_.last), fixtures +/+ "before_optimize");
 			rewritten.add(name);
+		};
+	};
+
+	// One file of full builds.
+	writeCases = { |name, cases|
+		write.(name, cases.collect { |case| buildBoth.(case[0], case[1]).first });
+	};
+
+	// A graph that the crate refuses must break in sclang: finishBuild
+	// throws, an AbstractOut goes missing, or a UGen comes twice.
+	refused = { |name, func|
+		var def = SynthDef.newCopyArgs(
+			name: name.asSymbol,
+			metadata: (),
+			children: Array(64)
+		);
+		var before, kept, thrown = false;
+		protect {
+			def.initBuild;
+			def.buildUgenGraph(func, nil, nil);
+			before = def.children.copy;
+			try { def.finishBuild } { thrown = true };
+		} {
+			UGen.buildSynthDef = nil;
+		};
+		// The sort leaves nil when it drops every UGen (measured).
+		kept = def.children ? [];
+		if (thrown.not and: {
+			before.select(_.isKindOf(AbstractOut)).every { |out| kept.includes(out) }
+			and: { kept.size == kept.asSet.size }
+		}) {
+			fail.("% does not break in sclang".format(name));
 		};
 	};
 
@@ -747,6 +781,134 @@ try {
 			Out.ar(0, SplayAz.ar(2, [[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)]))
 		}]
 	]);
+
+	// optimizeGraph and the copies of PV chains, of 0.7. A function of its
+	// own: sclang 3.14.1 refuses one function with more literals, with
+	// "Selector table too big".
+	{
+		writeCases.("optimize", [
+			[\optimize_muladd, { Out.ar(0, SinOsc.ar * 0.5 + 0.25) }],
+			[\optimize_muladd_swap, { Out.ar(0, 0.5 * SinOsc.ar + 0.25) }],
+			[\optimize_muladd_right, { Out.ar(0, 0.25 + (SinOsc.ar * 0.5)) }],
+			[\optimize_args, { |amp = 0.1| Out.ar(0, SinOsc.ar * amp + 0.5) }],
+			[\optimize_muladd_kr, { Out.kr(0, SinOsc.kr * LFNoise1.kr + 2) }],
+			[\optimize_shared, {
+				var x = SinOsc.ar * 0.5;
+				Out.ar(0, [x + 0.25, x])
+			}],
+			[\optimize_kr_audio, { Out.ar(0, (SinOsc.kr * 2) + SinOsc.ar) }],
+			[\optimize_sum3, { Out.ar(0, SinOsc.ar(1) + SinOsc.ar(2) + SinOsc.ar(3)) }],
+			[\optimize_sum3_right, { Out.ar(0, SinOsc.ar(1) + (SinOsc.ar(2) + SinOsc.ar(3))) }],
+			[\optimize_sum4, { Out.ar(0, SinOsc.ar(1) + SinOsc.ar(2) + SinOsc.ar(3) + SinOsc.ar(4)) }],
+			[\optimize_sum5, {
+				Out.ar(0, SinOsc.ar(1) + SinOsc.ar(2) + SinOsc.ar(3) + SinOsc.ar(4) + SinOsc.ar(5))
+			}],
+			[\optimize_twice, {
+				var a = SinOsc.ar(1) + SinOsc.ar(2);
+				Out.ar(0, a + a)
+			}],
+			[\optimize_addneg, { Out.ar(0, SinOsc.ar(1) + SinOsc.ar(2).neg) }],
+			[\optimize_negadd, { Out.ar(0, SinOsc.ar(1).neg + SinOsc.ar(2)) }],
+			[\optimize_subneg, { Out.ar(0, (SinOsc.ar(1) + SinOsc.ar(2)) - SinOsc.ar(3).neg) }],
+			[\optimize_demand, {
+				var sum = Dseq([1, 2], inf) + Dseq([3, 4], inf) + Dseq([5], inf);
+				Out.kr(0, Demand.kr(Impulse.kr(1), 0, sum))
+			}]
+		]);
+		writeCases.("deadcode", [
+			[\deadcode_chain, {
+				SinOsc.ar(SinOsc.ar(1) * 100);
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_proxy, {
+				DC.ar(1) * 2;
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_detectsilence, {
+				DetectSilence.ar(SinOsc.ar(2));
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_arg, { |freq = 440|
+				freq * 2;
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_constant, {
+				SinOsc.ar(1234);
+				Out.ar(0, SinOsc.ar)
+			}],
+			[\deadcode_revisit, {
+				var x = SinOsc.ar(1);
+				var m = x * 2;
+				var a = m + 1;
+				m * a;
+				Out.ar(0, a)
+			}],
+			[\deadcode_revisit_swapped, {
+				var x = SinOsc.ar(1);
+				var m = x * 2;
+				var a = m + 1;
+				a * m;
+				Out.ar(0, a)
+			}],
+			[\deadcode_readers, {
+				var x = SinOsc.ar(1);
+				var s = x * 2 + 1;
+				x * 3;
+				x * 4;
+				Out.ar(0, s)
+			}]
+		]);
+		writeCases.("pvcopy", [
+			[\pvcopy_three, {
+				var chain = FFT(LocalBuf(512), SinOsc.ar);
+				var pvs = [PV_MagAbove(chain, 1), PV_MagBelow(chain, 1), PV_MagClip(chain, 1)];
+				Out.ar(0, pvs.collect { |pv| IFFT(pv) })
+			}],
+			[\pvcopy_slots, {
+				var chain = FFT(LocalBuf(512), SinOsc.ar);
+				Out.ar(0, [IFFT(PV_Mul(chain, chain)), IFFT(chain)])
+			}],
+			[\pvcopy_deep, {
+				var chain = PV_MagAbove(FFT(LocalBuf(512), SinOsc.ar), 1);
+				Out.ar(0, IFFT(chain) + IFFT(chain))
+			}],
+			[\pvcopy_analysis, {
+				var chain = FFT(LocalBuf(512), SinOsc.ar);
+				Out.ar(0, IFFT(PV_MagAbove(chain, 1)) * SpecCentroid.kr(chain))
+			}],
+			[\pvcopy_buffer, {
+				var buf = LocalBuf(16);
+				var chain = FFT(0, SinOsc.ar);
+				Out.ar(0, [IFFT(PV_MagAbove(chain, 1)), IFFT(PV_MagBelow(chain, 1)), PlayBuf.ar(1, buf)])
+			}]
+		]);
+		[
+			[\refused_fft_buffer, {
+				var chain = FFT(0, SinOsc.ar);
+				Out.ar(0, IFFT(PV_MagAbove(chain, 1)) + IFFT(PV_MagBelow(chain, 1)))
+			}],
+			[\refused_packfft, {
+				var chain = PackFFT(FFT(LocalBuf(512), SinOsc.ar), 512, [1, 0]);
+				Out.ar(0, IFFT(chain) + IFFT(chain))
+			}],
+			[\refused_ffttrigger, {
+				var chain = FFTTrigger(LocalBuf(512));
+				Out.ar(0, IFFT(chain) + IFFT(chain))
+			}],
+			[\refused_readers, {
+				var x = SinOsc.ar(1);
+				var s = x * 2 + 1;
+				x * 3;
+				x * 4;
+				x * 5;
+				Out.ar(0, s)
+			}],
+			[\refused_neg_zero, { Out.ar(0, SinOsc.ar + UnaryOpUGen('neg', 0)) }],
+			[\refused_neg_numbers, {
+				Out.ar(0, SinOsc.ar * BinaryOpUGen('+', 2, UnaryOpUGen('neg', 3)))
+			}]
+		].do { |case| refused.(case[0], case[1]) };
+	}.value;
 
 	writeArithmetic.();
 
