@@ -96,6 +96,8 @@ assert_eq!(def.children.len(), 3);
   before the expansion. A number becomes a `DC`, and an output at another
   rate a `K2A`. `LinXFade2` multiplies its result by `level`, after the
   expansion.
+- Some methods do more than `UGen:new1`, and the crate copies them (see
+  [Methods that do more than `new1`](#methods-that-do-more-than-new1)).
 - `add` adds a UGen at the level of `UGen:new1`: its class, its rate, its
   inputs in the order of the wire, the rate of each output, its special
   index, and whether it is a `WidthFirstUGen`. Every UGen added after a
@@ -283,6 +285,36 @@ that `levelComp` gives two inputs at audio rate: the square root of 1/2.
 - A pseudo-UGen fails as the UGens that it adds fail. A call that fails
   adds no UGen.
 
+### Methods that do more than `new1`
+
+Some rate methods of real UGens do more than `UGen:new1`. The crate copies
+what each one does in sclang.
+
+- If its input runs at scalar rate, as a number does, the Lag family gives
+  back `in.madd(mul, add)` in place of a UGen. If `lagTime` is 0, `Lag`,
+  `Lag2`, `Lag3` and `Ramp` also give it back. `LagUD`, `Lag2UD`, `Lag3UD`
+  and `Slew` do not. For a number, `madd` computes `(in * mul) + add`.
+- The test runs before the expansion. So `Lag.kr([control, 2])` makes two
+  `Lag`, and the second breaks the rule of `checkInputs`, as in sclang.
+- At audio rate, `Out`, `ReplaceOut`, `OffsetOut`, `LocalOut` and `XOut`
+  put silence in place of each 0 channel, -0.0 too. The zeros of the top
+  level of the array share one `DC.ar(0)`, from the body of `Silent`.
+- The first `LocalBuf` of a build adds its `MaxLocalBufs`, and each
+  `LocalBuf` adds 1 to its count. `finish` writes the count. Each
+  `LocalBuf` is width-first, and takes the `MaxLocalBufs` as its last
+  input.
+- `BeatTrack.kr` puts an `FFT` of a `LocalBuf` in front of a chain that
+  comes from no `FFT`. The size of the buffer is
+  `if(SampleRate.ir > 48000, 2048, 1024)`, with the arithmetic of
+  `UGen:if`.
+- `LocalIn` has as many outputs as its count. Its default repeats to fill
+  the count.
+- `Poll` gives back its input, not itself. A number trigger becomes an
+  `Impulse` at the rate of the `Poll`. Without a label, the label names the
+  class of the input, as "UGen(SinOsc)".
+- The codes of a symbol and of a label are its bytes as `Char:ascii` gives
+  them in sclang, from -128 to 127.
+
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
@@ -301,37 +333,42 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
   holds the rate, the slot of each input, the outputs, the special index,
   whether `mul` and `add` apply, and whether a nested array expands again.
   It also holds the argument that goes through `asAudioRateInput`, and
-  whether `level` multiplies the result. `Addable::Pseudo` marks a method that a body of the crate builds (see
-  [Pseudo-UGens](#pseudo-ugens)). `Addable::No` holds the reason.
+  whether `level` multiplies the result. It holds the `Passthrough` of the
+  Lag family, and the argument whose zeros become silence.
+  `Addable::Pseudo` marks a method that a body of the crate builds (see
+  [Pseudo-UGens](#pseudo-ugens) and
+  [Methods that do more than `new1`](#methods-that-do-more-than-new1)).
+  `Addable::No` holds the reason.
 
 `generator/catalog.scd` measured each method in sclang. It calls the
 method twice, each time in a build of its own: once with distinct numbers,
 and once with distinct control-rate outputs. Both calls must create
 exactly one instance of the class, with the same wiring. Then the method is
 addable. The input of a delay at audio rate takes distinct audio-rate
-outputs instead, and `level` of `LinXFade2` takes 1.
+outputs instead, and `level` of `LinXFade2` takes 1. The input of the Lag
+family takes a control-rate output, so that the method makes an instance.
 More calls find whether a count or an array sets the number of outputs.
 Then, on each argument that expands, an array of two elements must make
 two instances, instance i with element i. An array inside an array must
-make three. 552 of the 635 methods are addable with a wiring, and the
-pseudo-UGens have a body. Most of the others do more than `UGen:new1` does:
+make three. 568 of the 635 methods are addable with a wiring, and 48 have
+a body. Most of the others do more than `UGen:new1` does:
 
 - The pseudo-UGens without a body, such as `Dunique`, create
   no instance of their class.
-- If its input is a number or its lag is 0, the Lag family returns the
-  input.
-- `LocalBuf` adds a `MaxLocalBufs`, and `Poll` an `Impulse`.
+- `VarLag` builds an `Env` with its default warp.
 - The control UGens take their special index from the build.
 - `UnaryOpUGen` and `BinaryOpUGen` take the name of an operator. Use
   `unary_op` and `binary_op` instead.
 - `MulAdd.new` folds, and orders its inputs. Use `madd` instead.
 
-The script also takes a census of the pseudo-UGens. Three tables name each
-class outside `UGen` that answers `ar` or `kr`, and each method that
-creates no instance of its class. The first table names the classes with
-a body, and the second the classes left out, with a reason. The third
-names the classes that are not pseudo-UGens. If a class is in no table,
-the script fails.
+The script also takes a census of the classes whose rate methods do more
+than `new1`. Three tables name each class outside `UGen` that answers `ar`
+or `kr`, and each method that creates no instance of its class. The first
+table names the classes with a body, and the second the classes left out,
+with a reason. The third names the classes that are not pseudo-UGens. If a
+class is in no table, the script fails. Two more tables name the methods
+of the Lag family and the arguments whose zeros become silence. Probes
+test each entry. If one does not hold, the script fails.
 
 The catalogue gives the page of each class in the help, and not its
 summary: the help of SuperCollider is GPL-3, and the crate copies none of
@@ -446,7 +483,9 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   argument or in `SendReply`: the builder refuses them (see Multichannel
   expansion).
 - An array of symbols: sclang expands a symbol argument too, as the command
-  names of `SendReply`. `ArgValue` holds one text.
+  names of `SendReply` or the labels of `Poll`. `ArgValue` holds one text.
+- The default label of `Poll` for a whole number names `Integer`. sclang
+  names `Float` for a Float such as 440.0.
 - Two numbers: `unary_op` and `binary_op` make a UGen of them, as
   `UnaryOpUGen.new` and `BinaryOpUGen.new` do. The operators of sclang
   compute them instead, as `2 * 3` gives 6. The crate cannot copy that.
@@ -456,9 +495,6 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - `mul` and `add` on a UGen without outputs, such as `AnalogOut`: sclang
   multiplies an output that the UGen does not have, and `optimizeGraph`
   removes the product. `ugen` refuses a value other than 1 and 0.
-- A 0 channel of `Out.ar`, `XOut.ar` or `LocalOut.ar`, such as `binary_op`
-  gives for `* 0`: sclang puts a `DC` in its place. `ugen` keeps the 0, and
-  the rule of `AbstractOut` refuses it.
 - An output in an array of buses of `SoundIn`: sclang builds a `+ 1` for
   its test of consecutive buses, and `optimizeGraph` removes it. `ugen`
   refuses the output.
@@ -477,23 +513,23 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-These are not in version 0.3, in the order of their value for sc-app3:
+These are not in version 0.4, in the order of their value for sc-app3:
 
 1. nested arrays in array arguments, as each class expands them
 2. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
-3. what rate methods do besides `new1`: the Lag family, `LocalBuf`,
-   `LocalIn`, `Poll` and the zeros of `Out`
-4. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs` and the
-   specs of the metadata
-5. `Env`, and the pseudo-UGens that wait for items 3 to 6: `Dunique`,
-   `PingPong`, `EnvGate`, and the `pvcalc` methods of `PV_ChainUGen`
-6. the rules of `checkInputs` that classes define for themselves
-7. sc3-plugins
+3. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs`, the
+   specs of the metadata, and `LagControl`
+4. `Env`, `VarLag`, and the pseudo-UGens that wait for items 3 and 4:
+   `EnvGate`, and the `pvcalc` methods of `PV_ChainUGen`
+5. the rules of `checkInputs` that classes define for themselves, and
+   `PingPong`, which needs the rule of `BufWr`
+6. sc3-plugins
 
 Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
 and the count of interconnect buffers. So are the pseudo-UGens `AudioIn`
 and `SplayZ`, deprecated since 3.10, and `InBus`, `XIn` and `XInFeedback`
-of `JITLib`. The methods of `UGen` that build graphs, such as `range` and
+of `JITLib`. `Dunique` builds a reader at each use as an input, and the
+crate adds the UGens of a method at its call. The methods of `UGen` that build graphs, such as `range` and
 `linlin`, are not pseudo-UGens. `range` needs the `signalRange` of each
 class, which the catalogue does not measure yet.
 
