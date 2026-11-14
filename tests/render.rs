@@ -301,6 +301,10 @@ fn render_wiring(rendered: &mut String, method: &Value) {
             )
         });
     writeln!(rendered, "                    passthrough: {passthrough},").unwrap();
+    let silence = method.get("silence").map_or("None".to_owned(), |position| {
+        format!("Some({})", number(position))
+    });
+    writeln!(rendered, "                    silence: {silence},").unwrap();
     writeln!(rendered, "                }}),").unwrap();
 }
 

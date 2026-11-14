@@ -13,9 +13,11 @@
 var root = thisProcess.nowExecutingPath.dirname.dirname;
 var fixtures = root +/+ "tests" +/+ "fixtures";
 var library = Platform.classLibraryDir;
+// sclang 3.14.1 runs the code after 1.exit (measured), so the throw stops it.
 var fail = { |message|
 	("fixtures.scd: " ++ message).postln;
 	1.exit;
+	Error(message).throw;
 };
 var core = { |item| item.filenameSymbol.asString.beginsWith(library) };
 var build, write, written = 0;

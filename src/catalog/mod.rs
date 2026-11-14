@@ -170,6 +170,10 @@ pub struct Wiring {
     /// When the method gives back its input in place of an instance, as the
     /// Lag family does for a number or a lag of 0.
     pub passthrough: Option<Passthrough>,
+    /// The position of the argument whose zeros become silence before the
+    /// expansion, through `replaceZeroesWithSilence`, as the channels of
+    /// `Out.ar`.
+    pub silence: Option<usize>,
 }
 
 /// When a method gives back `in.madd(mul, add)` in place of an instance: for
@@ -434,6 +438,24 @@ mod tests {
             .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.passthrough.is_some()))
             .count();
         assert_eq!(passthroughs, 16);
+    }
+
+    #[test]
+    fn the_zeros_of_the_outputs_at_audio_rate_become_silence() {
+        // Fact 7 of the plan of 0.4.
+        assert_eq!(wiring("Out", "ar").silence, Some(1));
+        assert_eq!(wiring("OffsetOut", "ar").silence, Some(1));
+        assert_eq!(wiring("LocalOut", "ar").silence, Some(0));
+        assert_eq!(wiring("XOut", "ar").silence, Some(2));
+        assert_eq!(wiring("Out", "kr").silence, None);
+        let silenced = all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter(
+                |method| matches!(method.addable, Addable::Yes(wiring) if wiring.silence.is_some()),
+            )
+            .count();
+        assert_eq!(silenced, 5);
     }
 
     #[test]

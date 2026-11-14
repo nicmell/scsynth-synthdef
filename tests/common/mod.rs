@@ -69,6 +69,7 @@ pub const NAMES: &[&str] = &[
     "linselectx",
     "splayaz",
     "lag",
+    "outzeros",
 ];
 
 /// The bytes of a golden file: the build without `optimizeGraph`, where

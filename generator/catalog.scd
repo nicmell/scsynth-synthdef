@@ -14,9 +14,11 @@
 var root = thisProcess.nowExecutingPath.dirname.dirname;
 var source = "SC_SOURCE".getenv ? "~/Projects/supercollider".standardizePath;
 var library = Platform.classLibraryDir;
+// sclang 3.14.1 runs the code after 1.exit (measured), so the throw stops it.
 var fail = { |message|
 	("catalog.scd: " ++ message).postln;
 	1.exit;
+	Error(message).throw;
 };
 var core = { |item| item.filenameSymbol.asString.beginsWith(library) };
 var show = { |path|
@@ -208,6 +210,14 @@ var passthroughs = [
 	[\Slew, \ar, \in, nil],
 	[\Slew, \kr, \in, nil]
 ];
+// The arguments whose zeros become the channels of a Silent.ar before
+// multiNewList, through replaceZeroesWithSilence, by the class that owns the
+// method. testSilence tests each entry.
+var silentZeros = [
+	[\Out, \ar, \channelsArray],
+	[\LocalOut, \ar, \channelsArray],
+	[\XOut, \ar, \channelsArray]
+];
 
 // An argument whose name holds one of these words needs an entry above.
 var arrayWords = ["array", "list", "values", "ugens", "envelope", "weights",
@@ -262,6 +272,7 @@ var checkRules = (
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, wiring, testPassthrough;
+var testSilence;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
 var classes, pseudoClasses, addable = 0, methods = 0, pseudo = 0, helpDir, json;
@@ -744,6 +755,24 @@ try {
 		};
 	};
 
+	// Fails unless the entry of silentZeros holds: a 0 in the array makes one
+	// DC at audio rate before the instance, which takes its output.
+	testSilence = { |class, selector, kinds, position|
+		var created = probe.(class, selector,
+			valuesAt.(kinds, position, [element.(position, 0), 0]))[1];
+		var holds = created.size == 2
+			and: { created[0].class === DC and: { created[0].rate == \audio } }
+			and: { created[1].class === class }
+			and: {
+				created[1].inputs.any { |input|
+					input.isKindOf(OutputProxy) and: { input.source === created[0] }
+				}
+			};
+		if (holds.not) {
+			fail.("the silence of %.% does not hold".format(class.name, selector));
+		};
+	};
+
 	// The kinds of the arguments of a method, with the kinds of `owner`, and
 	// the method as associations: its selector and its arguments.
 	describeArgs = { |class, selector, method, owner|
@@ -786,7 +815,8 @@ try {
 		var described = describeArgs.(class, selector, method, owner);
 		var names = (method.argNames ? []).drop(1).asArray;
 		var through = passthroughs.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
-		var wired, input, zero;
+		var silent = silentZeros.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
+		var wired, input, zero, position;
 		methods = methods + 1;
 		if (bodies.includes(class.name)) {
 			pseudo = pseudo + 1;
@@ -801,6 +831,11 @@ try {
 				zero = through[3] !? { |name| names.indexOf(name) };
 				testPassthrough.(class, selector, described[0], input, zero);
 				wired = wired ++ [\passthrough -> [\input -> input, \zero -> zero]];
+			};
+			if (silent.notNil and: { wired.isString.not }) {
+				position = names.indexOf(silent[2]);
+				testSilence.(class, selector, described[0], position);
+				wired = wired ++ [\silence -> position];
 			};
 			if (wired.isString and: { wired.contains("creates no instance") }
 				and: { census.includes(class.name).not }) {
@@ -888,8 +923,8 @@ try {
 	census.do { |name|
 		if (name.asClass.isNil) { fail.("the census names %, which is no class".format(name)) };
 	};
-	passthroughs.do { |entry|
-		if (entry[0].asClass.isNil) { fail.("passthroughs names %, which is no class".format(entry[0])) };
+	(passthroughs ++ silentZeros).do { |entry|
+		if (entry[0].asClass.isNil) { fail.("a table names %, which is no class".format(entry[0])) };
 	};
 	Class.allClasses.do { |class|
 		if (class.isMetaClass.not

@@ -198,6 +198,37 @@ pub(crate) fn as_audio_rate_input(
     }
 }
 
+/// `replaceZeroesWithSilence`: the zeros of the top level of `items`, -0.0
+/// too, become the channels of one `Silent.ar`, and each array inside goes
+/// the same way. Without a zero at the top level, nothing changes, not even
+/// in the arrays inside.
+pub(crate) fn replace_zeroes_with_silence(
+    builder: &mut SynthDefBuilder,
+    items: Vec<UGenInput>,
+) -> Result<Vec<UGenInput>, BuildError> {
+    let is_zero = |item: &UGenInput| matches!(item, UGenInput::Number(number) if *number == 0.0);
+    let zeros = items.iter().filter(|item| is_zero(item)).count();
+    if zeros == 0 {
+        return Ok(items);
+    }
+    let silent = builder.ugen(
+        "Silent",
+        "ar",
+        &[("numChannels", super::number(zeros).into())],
+    )?;
+    let mut channels = super::elements(silent).into_iter();
+    items
+        .into_iter()
+        .map(|item| match item {
+            item if is_zero(&item) => Ok(channels.next().unwrap_or(item)),
+            UGenInput::Array(inner) => {
+                replace_zeroes_with_silence(builder, inner).map(UGenInput::Array)
+            }
+            other => Ok(other),
+        })
+        .collect()
+}
+
 /// `a.blend(b, frac)`: `a + (frac * (b - a))` for a number. For a UGen, an
 /// `XFade2` when one side runs at audio rate, else a `LinXFade2`, with the
 /// pan of `frac`. An array blends element by element.

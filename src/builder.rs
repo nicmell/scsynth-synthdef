@@ -464,6 +464,13 @@ impl SynthDefBuilder {
             expanded.push(input.clone());
         }
         self.transaction(|builder| {
+            if let Some(position) = wiring.silence {
+                if let ArgValue::Input(channels) = &values[position] {
+                    let channels = pseudo::elements(channels.clone());
+                    let channels = lang::replace_zeroes_with_silence(builder, channels)?;
+                    values[position] = ArgValue::Input(UGenInput::Array(channels));
+                }
+            }
             let audio_slot = wiring
                 .audio_input
                 .and_then(|audio| positions.iter().position(|&position| position == audio));

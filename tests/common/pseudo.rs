@@ -36,6 +36,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "linselectx" => linselectx(),
         "splayaz" => splayaz(),
         "lag" => [lag(), lag_folds()].concat(),
+        "outzeros" => outzeros(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1333,5 +1334,48 @@ fn lag_folds() -> Vec<SynthDef> {
                 ],
             );
         }),
+    ]
+}
+
+/// `class.ar` with a bus of 0 and these other arguments.
+fn out_ar(b: &mut SynthDefBuilder, class: &str, args: &[(&str, ArgValue)]) {
+    let mut all = vec![("bus", input(0.0))];
+    all.extend(args.iter().cloned());
+    by_name(b, class, "ar", &all);
+}
+
+fn outzeros() -> Vec<SynthDef> {
+    vec![
+        def("outzeros_one", vec![], |b| out(b, "ar", 0.0.into())),
+        def("outzeros_two", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            out(
+                b,
+                "ar",
+                UGenInput::Array(vec![sound, 0.0.into(), 0.0.into()]),
+            );
+        }),
+        def("outzeros_negative", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            out(b, "ar", UGenInput::Array(vec![(-0.0).into(), sound]));
+        }),
+        def("outzeros_replace", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let channels = UGenInput::Array(vec![0.0.into(), sound]);
+            out_ar(b, "ReplaceOut", &[("channelsArray", input(channels))]);
+        }),
+        def("outzeros_offset", vec![], |b| {
+            out_ar(b, "OffsetOut", &[("channelsArray", input(0.0))]);
+        }),
+        def("outzeros_x", vec![], |b| {
+            let sound = sine(b, "ar", 1.0);
+            let channels = UGenInput::Array(vec![sound, 0.0.into()]);
+            out_ar(
+                b,
+                "XOut",
+                &[("xfade", input(0.5)), ("channelsArray", input(channels))],
+            );
+        }),
+        def("outzeros_kr", vec![], |b| out(b, "kr", 0.0.into())),
     ]
 }
