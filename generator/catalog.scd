@@ -88,6 +88,14 @@ var argumentKinds = [
 	[\LocalOut, \ar, \channelsArray, \array],
 	[\LocalOut, \kr, \channelsArray, \array],
 	[\MFCC, \kr, \numcoeff, \count],
+	[\Mix, \ar, \array, \array],
+	[\Mix, \kr, \array, \array],
+	[\Mix, \new, \array, \array],
+	[\MultiTap, \ar, \levelsArray, \array],
+	[\MultiTap, \ar, \timesArray, \array],
+	[\NumChannels, \ar, \input, \array],
+	[\NumChannels, \ar, \mixdown, \bool],
+	[\NumChannels, \ar, \numChannels, \count],
 	[\Out, \ar, \channelsArray, \array],
 	[\Out, \kr, \channelsArray, \array],
 	[\PackFFT, \new, \magsphases, \array],
@@ -106,6 +114,14 @@ var argumentKinds = [
 	[\ScopeOut2, \kr, \inputArray, \array],
 	[\Select, \ar, \array, \array],
 	[\Select, \kr, \array, \array],
+	[\SelectX, \ar, \array, \array],
+	[\SelectX, \kr, \array, \array],
+	[\SelectXFocus, \ar, \array, \array],
+	[\SelectXFocus, \ar, \wrap, \bool],
+	[\SelectXFocus, \kr, \array, \array],
+	[\SelectXFocus, \kr, \wrap, \bool],
+	[\SelectXFocus, \new, \array, \array],
+	[\SelectXFocus, \new, \wrap, \bool],
 	[\SendPeakRMS, \ar, \cmdName, \symbol],
 	[\SendPeakRMS, \kr, \cmdName, \symbol],
 	[\SendReply, \ar, \cmdName, \symbol],
@@ -115,13 +131,20 @@ var argumentKinds = [
 	[\SetBuf, \new, \values, \array],
 	[\SharedIn, \kr, \numChannels, \count],
 	[\SharedOut, \kr, \channelsArray, \array],
+	[\Silent, \ar, \numChannels, \count],
 	[\Splay, \ar, \inArray, \array],
 	[\Splay, \kr, \inArray, \array],
 	[\SplayAz, \ar, \inArray, \array],
 	[\SplayAz, \ar, \numChans, \count],
 	[\SplayAz, \kr, \inArray, \array],
 	[\SplayAz, \kr, \numChans, \count],
+	[\TChoose, \ar, \array, \array],
+	[\TChoose, \kr, \array, \array],
 	[\TGrains, \ar, \numChannels, \count],
+	[\TWChoose, \ar, \array, \array],
+	[\TWChoose, \ar, \weights, \array],
+	[\TWChoose, \kr, \array, \array],
+	[\TWChoose, \kr, \weights, \array],
 	[\TWindex, \ar, \array, \array],
 	[\TWindex, \kr, \array, \array],
 	[\Tap, \ar, \numChannels, \count],
@@ -130,6 +153,58 @@ var argumentKinds = [
 	[\XOut, \ar, \channelsArray, \array],
 	[\XOut, \kr, \channelsArray, \array]
 ];
+// The census of the pseudo-UGens: classes whose rate methods build other
+// UGens. The crate has a body for each rate method of a class of bodies.
+var bodies = [\BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter, \DynKlang,
+	\DynKlank, \HilbertFIR, \LinLin, \LinSelectX, \Mix, \MultiTap, \NumChannels, \PMOsc,
+	\SelectX, \SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz, \Sum3, \Sum4,
+	\TChoose, \TWChoose, \Tap, \UnpackFFT];
+// The classes of the census that have no body, and why.
+var leftOut = [
+	[\AudioIn, "deprecated since 3.10"],
+	[\Dunique, "needs LocalBuf: item 3 of Left out"],
+	[\EnvGate, "needs NamedControl and Env: items 4 and 5 of Left out"],
+	[\InBus, "reads a Bus of sclang, for NodeProxy"],
+	[\NamedControl, "a control: item 4 of Left out"],
+	[\PingPong, "needs LocalIn and the rule of BufWr: items 3 and 6 of Left out"],
+	[\SplayZ, "deprecated since 3.10"],
+	[\XIn, "a helper of InBus"],
+	[\XInFeedback, "a helper of InBus"]
+];
+// Classes that the census meets but that are no pseudo-UGens, and why.
+var notPseudo = [
+	[\Lag, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Lag2, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Lag2UD, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Lag3, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Lag3UD, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\LagControl, "returns its input for a lag of 0: item 3 of Left out"],
+	[\LagUD, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\LevelComp, "a helper of Splay and SplayAz"],
+	[\MulAdd, "folds: madd of the builder"],
+	[\Ndef, "a proxy of JITLib"],
+	[\Ramp, "returns its input for a number or a lag of 0: item 3 of Left out"],
+	[\Slew, "returns its input for a number: item 3 of Left out"],
+	[\VarLag, "returns its input for a number or a time of 0: item 3 of Left out"]
+];
+var census = bodies ++ leftOut.collect(_.first) ++ notPseudo.collect(_.first);
+
+// The arguments that pass through asAudioRateInput before multiNew, by the
+// class that owns the method. The probe gives them audio-rate outputs.
+var audioRateInputs = [
+	[\BufCombN, \ar, \in],
+	[\BufDelayN, \ar, \in],
+	[\CombN, \ar, \in],
+	[\DelTapWr, \ar, \in],
+	[\DelayN, \ar, \in]
+];
+// The arguments that multiply the result of multiNew, as `* level`. The
+// probe gives them 1, which the fold of `*` drops.
+var levelArguments = [
+	[\LinXFade2, \ar, \level],
+	[\LinXFade2, \kr, \level]
+];
+
 // An argument whose name holds one of these words needs an entry above.
 var arrayWords = ["array", "list", "values", "ugens", "envelope", "weights",
 	"magsphases", "spec", "chans", "levels", "times", "numchannels", "numcoeff",
@@ -181,11 +256,11 @@ var checkRules = (
 );
 
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
-var ugenOwner, kindsOf, probe, signal, element, numberValues, controlValues;
+var ugenOwner, kindsOf, probe, signal, element, audio, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, wiring;
-var describeMethod, describeClass;
+var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
-var classes, addable = 0, methods = 0, helpDir, json;
+var classes, pseudoClasses, addable = 0, methods = 0, pseudo = 0, helpDir, json;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -311,9 +386,12 @@ try {
 		{ fail.("no JSON for %".format(value)) }
 	};
 
+	// The class that owns a class method.
+	methodOwner = { |method| method.ownerClass.name.asString.drop(5).asSymbol.asClass };
+
 	// The UGen class that owns a class method, or nil for Object and the like.
 	ugenOwner = { |method|
-		var owner = method.ownerClass.name.asString.drop(5).asSymbol.asClass;
+		var owner = methodOwner.(method);
 		if (owner.notNil and: { owner == UGen or: { (owner.superclasses ? []).includes(UGen) } }) {
 			owner
 		}
@@ -324,8 +402,15 @@ try {
 			var entry = argumentKinds.detect { |entry|
 				entry[0] == owner.name and: { entry[1] == selector } and: { entry[2] == name }
 			};
+			var named = { |table|
+				table.any { |entry|
+					entry[0] == owner.name and: { entry[1] == selector } and: { entry[2] == name }
+				}
+			};
 			case
 			{ entry.notNil } { entry[3] }
+			{ named.(audioRateInputs) } { \audio }
+			{ named.(levelArguments) } { \level }
 			{ name == \mul } { \mul }
 			{ name == \add } { \add }
 			{ arrayWords.any { |word| name.asString.toLower.contains(word) } } {
@@ -365,6 +450,10 @@ try {
 	// The sentinels: distinct numbers, far from 0, 1 and the counts.
 	signal = { |position| 1000.25 + (17 * position) };
 	element = { |position, index| 2000.25 + (17 * position) + (0.5 * index) };
+	// An audio-rate output, made inside the build of a probe.
+	audio = { |position, index = 0|
+		AudioControl.ar([signal.(position) + (0.125 * index)]).asArray.first
+	};
 	numberValues = { |kinds, counts, sizes|
 		{
 			kinds.collect { |kind, position|
@@ -374,6 +463,8 @@ try {
 				{ \symbol } { '/abcd' }
 				{ \mul } { 1.0 }
 				{ \add } { 0.0 }
+				{ \level } { 1.0 }
+				{ \audio } { audio.(position) }
 				{ signal.(position) }
 			}
 		}
@@ -400,6 +491,8 @@ try {
 				{ \symbol } { '/abcd' }
 				{ \mul } { 1.0 }
 				{ \add } { 0.0 }
+				{ \level } { 1.0 }
+				{ \audio } { audio.(position) }
 			}
 		}
 	};
@@ -417,6 +510,7 @@ try {
 					switch (kinds[position])
 					{ \mul } {}
 					{ \add } {}
+					{ \level } {}
 					{ \symbol } {
 						var codes = value.asString.ascii;
 						if (inputs[i] == codes.size
@@ -469,9 +563,15 @@ try {
 	};
 
 	// The values of numberValues, with `value` at `position`.
+	// The values of numberValues, with `value` at `position`. A function makes
+	// the value inside the build.
 	valuesAt = { |kinds, position, value|
 		var values = numberValues.(kinds, [], []);
-		{ var arguments = values.value; arguments.put(position, value); arguments }
+		{
+			var arguments = values.value;
+			arguments.put(position, if (value.isFunction) { value.value } { value });
+			arguments
+		}
 	};
 
 	// How the method expands, as associations, or why it does not expand as
@@ -483,9 +583,11 @@ try {
 	expansionOf = { |class, selector, kinds, slots, dependence|
 		var positions = slots.select { |slot| slot[0] == \arg }.collect { |slot| slot[1] };
 		var failure, nested = true;
-		var matches = { |result, position, elements|
+		var matches = { |result, position|
 			var instances = result[1].select { |ugen| ugen.class === class };
+			var elements = result[2] !? { result[2][position].flat } ? [];
 			result[0].isNil
+			and: { elements.notEmpty }
 			and: { result[1].size == elements.size }
 			and: { instances.size == elements.size }
 			and: {
@@ -502,16 +604,25 @@ try {
 		positions.asSet.asArray.sort.do { |position|
 			var flat, deep;
 			if (failure.isNil) {
-				flat = if (kinds[position] == \count) { [2, 3] } {
-					[signal.(position), signal.(position) + 0.125]
-				};
-				deep = flat ++ [if (kinds[position] == \count) { 4 } { signal.(position) + 0.375 }];
 				case
-				{ matches.(probe.(class, selector, valuesAt.(kinds, position, flat)), position, flat).not } {
+				{ kinds[position] == \count } {
+					flat = [2, 3];
+					deep = [[2, 3], 4];
+				}
+				{ kinds[position] == \audio } {
+					flat = { [audio.(position, 0), audio.(position, 1)] };
+					deep = { [[audio.(position, 0), audio.(position, 1)], audio.(position, 2)] };
+				}
+				{
+					flat = [signal.(position), signal.(position) + 0.125];
+					deep = [flat, signal.(position) + 0.375];
+				};
+				case
+				{ matches.(probe.(class, selector, valuesAt.(kinds, position, flat)), position).not } {
 					failure = "an array on argument % does not make one instance per element"
 						.format(position);
 				}
-				{ matches.(probe.(class, selector, valuesAt.(kinds, position, [flat, deep[2]])), position, deep).not } {
+				{ matches.(probe.(class, selector, valuesAt.(kinds, position, deep)), position).not } {
 					nested = false;
 				};
 			};
@@ -584,28 +695,30 @@ try {
 						\special_index -> first.specialIndex,
 						\madd -> (kinds.includes(\mul) or: { kinds.includes(\add) })
 					] ++ expansion
+					++ if (kinds.includes(\audio)) { [\audio_input -> kinds.indexOf(\audio)] } { [] }
+					++ if (kinds.includes(\level)) { [\level -> true] } { [] }
 				}
 			}
 		}
 	};
 
-	describeMethod = { |class, selector, method, customCheck|
-		var owner = ugenOwner.(method);
+	// The kinds of the arguments of a method, with the kinds of `owner`, and
+	// the method as associations: its selector and its arguments.
+	describeArgs = { |class, selector, method, owner|
 		var names = (method.argNames ? []).drop(1).asArray;
 		var defaults = (method.prototypeFrame ? []).drop(1);
 		var kinds = kindsOf.(owner, selector, names);
-		var wired = wiring.(class, selector, kinds);
-		if (customCheck.notNil and: { wired.isString.not }) {
-			wired = "the checkInputs of % is a rule of its own".format(customCheck);
-		};
-		methods = methods + 1;
-		[
+		[kinds, [
 			\selector -> selector,
 			\args -> names.collect { |name, position|
 				var value = defaults[position];
 				[
 					\name -> name,
-					\kind -> if ([\mul, \add].includes(kinds[position])) { \signal } { kinds[position] },
+					\kind -> if ([\mul, \add, \level, \audio].includes(kinds[position])) {
+						\signal
+					} {
+						kinds[position]
+					},
 					\default -> case
 						{ value.isNil } { nil }
 						{ value === true or: { value === false } } { [\bool -> value] }
@@ -621,12 +734,54 @@ try {
 						{ fail.("%.% % has the default %".format(class, selector, name, value)) }
 				]
 			}
-		] ++ if (wired.isString) {
-			[\addable -> false, \reason -> wired]
+		]]
+	};
+
+	// A method of a UGen class: its body, or its wiring, or why it is not
+	// addable.
+	describeMethod = { |class, selector, method, customCheck|
+		var described = describeArgs.(class, selector, method, ugenOwner.(method));
+		var wired;
+		methods = methods + 1;
+		if (bodies.includes(class.name)) {
+			pseudo = pseudo + 1;
+			described[1] ++ [\addable -> "pseudo"]
 		} {
-			addable = addable + 1;
-			[\addable -> true] ++ wired
+			wired = wiring.(class, selector, described[0]);
+			if (customCheck.notNil and: { wired.isString.not }) {
+				wired = "the checkInputs of % is a rule of its own".format(customCheck);
+			};
+			if (wired.isString and: { wired.contains("creates no instance") }
+				and: { census.includes(class.name).not }) {
+				fail.("%.% creates no instance of its class, and the census does not name it"
+					.format(class.name, selector));
+			};
+			described[1] ++ if (wired.isString) {
+				[\addable -> false, \reason -> wired]
+			} {
+				addable = addable + 1;
+				[\addable -> true] ++ wired
+			}
 		}
+	};
+
+	// A class of bodies outside UGen, with its rate methods but the new of
+	// Object.
+	describePseudoClass = { |class|
+		var doc = SCDoc.documents["Classes/" ++ class.name];
+		[
+			\name -> class.name,
+			\categories -> (doc !? { doc.categories } ? []),
+			\methods -> Array.with(\ar, \kr, \ir, \new).select { |selector|
+				var method = class.class.findRespondingMethodFor(selector);
+				method.notNil and: { method.ownerClass != Meta_Object }
+			}.collect { |selector|
+				var method = class.class.findRespondingMethodFor(selector);
+				pseudo = pseudo + 1;
+				describeArgs.(class, selector, method, methodOwner.(method))[1]
+					++ [\addable -> "pseudo"]
+			}
+		]
 	};
 
 	describeClass = { |class|
@@ -677,18 +832,39 @@ try {
 	SCDoc.helpTargetDir_(helpDir);
 	SCDoc.indexAllDocuments;
 
+	// The census: each class outside UGen that answers ar or kr, and each
+	// class that it names, must exist and be named.
+	census.do { |name|
+		if (name.asClass.isNil) { fail.("the census names %, which is no class".format(name)) };
+	};
+	Class.allClasses.do { |class|
+		if (class.isMetaClass.not
+			and: { class != UGen and: { (class.superclasses ? []).includes(UGen).not } }
+			and: { [\ar, \kr].any { |selector| class.class.findRespondingMethodFor(selector).notNil } }
+			and: { census.includes(class.name).not }) {
+			fail.("% answers ar or kr, and the census does not name it".format(class.name));
+		};
+	};
+
 	classes = UGen.allSubclasses.asArray
 		.sort { |a, b| a.name.asString < b.name.asString }
 		.collect(describeClass);
+	pseudoClasses = bodies.collect(_.asClass)
+		.reject { |class| (class.superclasses ? []).includes(UGen) }
+		.sort { |a, b| a.name.asString < b.name.asString }
+		.collect(describePseudoClass);
 
 	json = toJSON.([
 		\sclang -> Main.version,
 		\operators -> [\unary -> unary, \binary -> binary],
-		\classes -> classes
+		\classes -> classes,
+		\pseudo_classes -> pseudoClasses
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
-	"catalog.scd: % unary and % binary operators, % classes, % of % methods addable"
-		.format(unary.size, binary.size, classes.size, addable, methods).postln;
+	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
+		++ "% pseudo-UGen methods, % classes outside UGen")
+		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
+			pseudoClasses.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;

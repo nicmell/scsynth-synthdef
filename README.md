@@ -87,10 +87,15 @@ assert_eq!(def.children.len(), 3);
 - `ugen` adds a UGen by its class name and the selector of a rate method,
   `ar`, `kr`, `ir` or `new`, with the arguments by name. The catalogue
   gives the order of the arguments, their defaults, the wiring and the
-  rule of `checkInputs`. An `ArgValue` is an input, or the text of a symbol
-  argument such as the command name of `SendReply`. A single input goes
-  where the method takes an array, as `asArray` makes it. An array
+  rule of `checkInputs`. An `ArgValue` is an input, a text or a boolean. A
+  text goes to a symbol argument, such as the command name of `SendReply`.
+  A boolean goes to an argument such as `wrap` of `SelectXFocus`. A single
+  input goes where the method takes an array, as `asArray` makes it. An array
   expands the UGen, and `mul` and `add` go through `madd`.
+- At audio rate, a delay passes its input through `asAudioRateInput`
+  before the expansion. A number becomes a `DC`, and an output at another
+  rate a `K2A`. `LinXFade2` multiplies its result by `level`, after the
+  expansion.
 - `add` adds a UGen at the level of `UGen:new1`: its class, its rate, its
   inputs in the order of the wire, the rate of each output, its special
   index, and whether it is a `WidthFirstUGen`. Every UGen added after a
@@ -172,11 +177,11 @@ The builder refuses two inputs that sclang takes:
   for each instance. `mul` 0 gives `add`. `mul` 1 with `add` 0 gives the
   input, and `mul` -1 with `add` 0 its `neg`. `add` 0 gives `input * mul`,
   `mul` -1 gives `add - input`, and `mul` 1 gives `input + add`.
-- Otherwise, if `canBeMulAdd` takes the input as the first input of a
-  `MulAdd`, `madd` makes that `MulAdd`. Else, if `canBeMulAdd` takes `mul`
-  first, `madd` makes a `MulAdd` with `mul` first. If `canBeMulAdd` takes
-  neither, `madd` makes a `*` and a `+`. These operators compute two
-  numbers, so `madd(2.0, 3.0, x)` gives `6 + x`.
+- If no case holds and `canBeMulAdd` takes the input first, `madd` makes
+  that `MulAdd`. If `canBeMulAdd` takes only `mul` first, `madd` makes a
+  `MulAdd` with `mul` first. If `canBeMulAdd` takes neither, `madd` makes a
+  `*` and a `+`. These operators compute two numbers, so
+  `madd(2.0, 3.0, x)` gives `6 + x`.
 - A `MulAdd` runs at the least rate by the name of its symbol, as
   `SequenceableCollection:rate` gives it: audio, control, demand, scalar. A
   `BinaryOpUGen` puts demand first.
@@ -202,42 +207,131 @@ scsynth does not check the rate of an input. For `Out.ar(0, 0.5)`, it
 copies a buffer's length of floats from the one float of the constant
 (`IOUGens.cpp:944`). `add` takes the inputs as they come.
 
+### Pseudo-UGens
+
+A pseudo-UGen is a class whose rate method builds other UGens, such as
+`LinLin.kr`. scsynth has no unit of its name. `ugen` adds a pseudo-UGen by
+its class name, as it adds any class of the catalogue. It gives back what
+the method gives in sclang: a number, an output, or an array of them.
+
+```rust
+use scsynth_synthdef::{SynthDefBuilder, UGenInput};
+
+// LinLin.kr(0.5, 0, 1, 10, 20): with numbers, sclang computes the result.
+let mut builder = SynthDefBuilder::new("lin", vec![])?;
+let args = [
+    ("in", 0.5.into()),
+    ("srclo", 0.0.into()),
+    ("srchi", 1.0.into()),
+    ("dstlo", 10.0.into()),
+    ("dsthi", 20.0.into()),
+];
+assert_eq!(builder.ugen("LinLin", "kr", &args)?, UGenInput::Number(15.0));
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+```rust
+use scsynth_synthdef::{SynthDefBuilder, UGenInput};
+
+// SynthDef(\splay, { Out.ar(0, Splay.ar(SinOsc.ar([220, 330]))) })
+let mut builder = SynthDefBuilder::new("splay", vec![])?;
+let freqs = UGenInput::Array(vec![220.0.into(), 330.0.into()]);
+let voices = builder.ugen("SinOsc", "ar", &[("freq", freqs.into())])?;
+let stereo = builder.ugen("Splay", "ar", &[("inArray", voices.into())])?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", stereo.into())])?;
+let def = builder.finish()?;
+let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
+let ops = ["BinaryOpUGen"; 4];
+assert_eq!(names[..4], ["SinOsc", "Pan2", "SinOsc", "Pan2"]);
+assert_eq!(names[4..8], ops);
+assert_eq!(names[8], "Out");
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+The two `+` sum the channels of the two `Pan2`. The two `*` apply the level
+that `levelComp` gives two inputs at audio rate: the square root of 1/2.
+
+- A body of the crate follows the sclang code of each method. It adds the
+  UGens in the order in which sclang adds them, so the topological sort
+  gives the order of sclang.
+- A body computes with its arguments as the language does. Two numbers
+  give a number, in f64, as sclang computes its Floats. An array goes
+  element by element. Anything else goes to `binary_op` and `unary_op`.
+- `tests/fixtures/arithmetic.json` tests each operator against sclang
+  3.14.1 for macOS on arm64. That sclang computes `%` and `fold2` of Floats
+  with one fused multiply-add, and so does the crate.
+- The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `CompanderD`,
+  `Dstutter`, `DynKlang`, `DynKlank`, `HilbertFIR`, `LinLin`, `LinSelectX`,
+  `Mix`, `MultiTap` and `NumChannels`.
+- It also builds `PMOsc`, `SelectX`, `SelectXFocus`, `Silent`, `SoundIn`,
+  `Splay`, `SplayAz`, `TChoose`, `TWChoose`, `Tap` and `UnpackFFT`.
+- `Splay`, `DynKlank` and `DynKlang` expand before their body, as their
+  `multiNew` or `multiNewList` does. `Splay` expands over each element of
+  `inArray` too, so an array of stereo pairs makes one Splay for each
+  channel.
+- The spec of `DynKlank` and `DynKlang` is an array of up to three arrays,
+  as `[freqs, amps, times]`. A missing array takes its default. Where sclang
+  takes nil in the middle, give the default, such as `[1.0]`.
+- `Sum3.new` and `Sum4.new` have a body too. An input of 0 folds the UGen
+  into a smaller sum. Then the UGen takes the least rate of its inputs by
+  name. It orders its inputs as the insertion sort of sclang does, which
+  reverses inputs of one rate.
+- `Mix` clumps its array by 4 into `Sum4`, `Sum3` or `+`, and mixes the
+  mixes again. Two numbers give a number, as `Mix([1, 2])` gives 3, but
+  `Mix([1, 2, 3])` gives a `Sum3` at scalar rate. `BuildError::UnsupportedRate`
+  refuses `Mix.ar` and `Mix.kr` of a mix at demand rate.
+- A pseudo-UGen fails as the UGens that it adds fail. A call that fails
+  adds no UGen.
+
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
 of SuperCollider 3.14.1. sc3-plugins are not in it. `catalog::lookup` gives
 a class by name, and `catalog::all` gives all of them, sorted by name.
+`catalog::pseudo_lookup` and `catalog::pseudo_all` give the pseudo-UGen
+classes outside `UGen` that the crate builds, such as `LinLin`.
 
 - A `UGenClass` has its superclasses, whether it is pure or width-first,
   its categories in the help, the rule of its `checkInputs`, and its rate
   methods. `doc_url` gives its page on doc.sccode.org.
+- A `PseudoClass` has its categories in the help and its rate methods.
 - A `RateMethod` is `ar`, `kr`, `ir` or `new`. It has its arguments, each
   with a kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
   holds the rate, the slot of each input, the outputs, the special index,
   whether `mul` and `add` apply, and whether a nested array expands again.
-  `Addable::No` holds the reason.
+  It also holds the argument that goes through `asAudioRateInput`, and
+  whether `level` multiplies the result. `Addable::Pseudo` marks a method that a body of the crate builds (see
+  [Pseudo-UGens](#pseudo-ugens)). `Addable::No` holds the reason.
 
 `generator/catalog.scd` measured each method in sclang. It calls the
 method twice, each time in a build of its own: once with distinct numbers,
 and once with distinct control-rate outputs. Both calls must create
 exactly one instance of the class, with the same wiring. Then the method is
-addable.
+addable. The input of a delay at audio rate takes distinct audio-rate
+outputs instead, and `level` of `LinXFade2` takes 1.
 More calls find whether a count or an array sets the number of outputs.
 Then, on each argument that expands, an array of two elements must make
 two instances, instance i with element i. An array inside an array must
-make three. 531 of the 635 methods are addable. Most of the others do more than
-`UGen:new1` does:
+make three. 552 of the 635 methods are addable with a wiring, and the
+pseudo-UGens have a body. Most of the others do more than `UGen:new1` does:
 
-- The pseudo-UGens, such as `Changed`, create no instance of the class.
+- The pseudo-UGens without a body, such as `Dunique`, create
+  no instance of their class.
 - If its input is a number or its lag is 0, the Lag family returns the
   input.
-- The delays at audio rate put a `DC` or a `K2A` before their input.
 - `LocalBuf` adds a `MaxLocalBufs`, and `Poll` an `Impulse`.
 - The control UGens take their special index from the build.
 - `UnaryOpUGen` and `BinaryOpUGen` take the name of an operator. Use
   `unary_op` and `binary_op` instead.
 - `MulAdd.new` folds, and orders its inputs. Use `madd` instead.
+
+The script also takes a census of the pseudo-UGens. Three tables name each
+class outside `UGen` that answers `ar` or `kr`, and each method that
+creates no instance of its class. The first table names the classes with
+a body, and the second the classes left out, with a reason. The third
+names the classes that are not pseudo-UGens. If a class is in no table,
+the script fails.
 
 The catalogue gives the page of each class in the help, and not its
 summary: the help of SuperCollider is GPL-3, and the crate copies none of
@@ -247,36 +341,33 @@ it.
 
 `tests/readme.rs` keeps this list equal to the catalogue.
 
-- They create no instance of their class: `Changed.ar`, `Changed.kr`,
-  `CompanderD.ar`, `Dstutter.new`, `Dunique.new`, `HilbertFIR.ar`,
-  `Lag.ar`, `Lag.kr`, `Lag2.ar`, `Lag2.kr`, `Lag2UD.ar`, `Lag2UD.kr`,
-  `Lag3.ar`, `Lag3.kr`, `Lag3UD.ar`, `Lag3UD.kr`, `LagControl.ar`,
-  `LagControl.kr`, `LagUD.ar`, `LagUD.kr`, `MulAdd.new`, `Ramp.ar`,
-  `Ramp.kr`, `Slew.ar`, `Slew.kr`, `Splay.ar`, `Splay.kr`, `SplayAz.ar`,
-  `SplayAz.kr`, `Tap.ar`, `UnpackFFT.new`, `VarLag.ar`, `VarLag.kr`.
-- They also create other UGens: `AllpassC.ar`, `AllpassL.ar`,
-  `AllpassN.ar`, `BeatTrack.kr`, `BufAllpassC.ar`, `BufAllpassL.ar`,
-  `BufAllpassN.ar`, `BufCombC.ar`, `BufCombL.ar`, `BufCombN.ar`,
-  `BufDelayC.ar`, `BufDelayL.ar`, `BufDelayN.ar`, `CombC.ar`, `CombL.ar`,
-  `CombN.ar`, `DelTapWr.ar`, `DelayC.ar`, `DelayL.ar`, `DelayN.ar`,
-  `LinXFade2.ar`, `LinXFade2.kr`, `LocalBuf.new`, `Poll.ar`, `Poll.kr`,
-  `Poll.new`.
+- These pseudo-UGens have no body. `Dunique.new` needs `LocalBuf`, and
+  `InBus.ar` and `InBus.kr` read a `Bus` of sclang.
+- The Lag family returns its input for a number or a lag of 0: `Lag.ar`,
+  `Lag.kr`, `Lag2.ar`, `Lag2.kr`, `Lag2UD.ar`, `Lag2UD.kr`, `Lag3.ar`,
+  `Lag3.kr`, `Lag3UD.ar` and `Lag3UD.kr`.
+- So do `LagControl.ar`, `LagControl.kr`, `LagUD.ar`, `LagUD.kr`,
+  `Ramp.ar`, `Ramp.kr`, `Slew.ar`, `Slew.kr`, `VarLag.ar` and `VarLag.kr`.
+- `MulAdd.new` folds and orders its inputs. Use `madd` instead.
+- They also create other UGens: `BeatTrack.kr`, `LocalBuf.new`, `Poll.ar`,
+  `Poll.kr` and `Poll.new`.
 - An input comes from no argument, or the inputs follow a count:
-  `DecodeB2.ar`, `DecodeB2.kr`, `Dwrand.new`, `LocalIn.ar`, `LocalIn.kr`,
-  `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`, `SendPeakRMS.kr`,
-  `SetBuf.new`.
+  `DecodeB2.ar`, `DecodeB2.kr`, `Dwrand.new`, `LocalIn.ar` and
+  `LocalIn.kr`.
+- So do `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`,
+  `SendPeakRMS.kr` and `SetBuf.new`.
 - They need arguments that the probe does not make, such as a `Ref`, a
-  `Rect`, a `Bus` or an operator, or they do not exist: `BinaryOpUGen.new`,
-  `DynKlang.ar`, `DynKlang.kr`, `DynKlank.ar`, `DynKlank.kr`, `InBus.ar`,
-  `InBus.kr`, `InRect.ar`, `InRect.kr`, `Klang.ar`, `Klank.ar`,
-  `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new`, `UnaryOpUGen.new`.
+  `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar`, `InRect.kr`,
+  `Klang.ar` and `Klank.ar`.
+- So do `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new` and
+  `UnaryOpUGen.new`. Some of these do not exist.
 - They take their special index from the build: `AudioControl.ar`,
-  `Control.ir`, `Control.kr`, `TrigControl.ir`, `TrigControl.kr`.
-- They take their rate from their inputs: `Sum3.new`, `Sum4.new`.
+  `Control.ir`, `Control.kr`, `TrigControl.ir` and `TrigControl.kr`.
 - Their class checks its inputs with a rule of its own: `BufWr.ar`,
-  `BufWr.kr`, `Duty.ar`, `Duty.kr`, `Peak.ar`, `Peak.kr`, `RunningMax.ar`,
-  `RunningMax.kr`, `RunningMin.ar`, `RunningMin.kr`, `T2K.kr`, `TDuty.ar`,
-  `TDuty.kr`.
+  `BufWr.kr`, `Duty.ar`, `Duty.kr`, `Peak.ar`, `Peak.kr` and
+  `RunningMax.ar`.
+- So do `RunningMax.kr`, `RunningMin.ar`, `RunningMin.kr`, `T2K.kr`,
+  `TDuty.ar` and `TDuty.kr`.
 
 ## Strictness
 
@@ -365,7 +456,7 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - Two numbers: `unary_op` and `binary_op` make a UGen of them, as
   `UnaryOpUGen.new` and `BinaryOpUGen.new` do. The operators of sclang
   compute them instead, as `2 * 3` gives 6. The crate cannot copy that.
-  `2 < 3` is `true`, which no UGen takes. `rand` draws when sclang builds.
+  `2 < 3` is `true`, which no UGen takes. When sclang builds, `rand` draws.
   sclang gives nan for `-2 ** 0.5`, and the `pow` of scsynth keeps the
   sign.
 - `mul` and `add` on a UGen without outputs, such as `AnalogOut`: sclang
@@ -374,23 +465,43 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - A 0 channel of `Out.ar`, `XOut.ar` or `LocalOut.ar`, such as `binary_op`
   gives for `* 0`: sclang puts a `DC` in its place. `ugen` keeps the 0, and
   the rule of `AbstractOut` refuses it.
+- An output in an array of buses of `SoundIn`: sclang builds a `+ 1` for
+  its test of consecutive buses, and `optimizeGraph` removes it. `ugen`
+  refuses the output.
+- The warnings of `Dstutter` and `Mix.kr`: the crate does no I/O, and
+  builds the same graph.
+- An array of specs for `DynKlank` and `DynKlang`: sclang expands it, as an
+  array of `Ref`s. `ugen` takes one spec.
+- A `spread` or a `center` of `SplayAz` at scalar rate: the `blend` of its
+  positions builds a `LinXFade2` outside the graph of sclang.
+  `BuildError::UnsupportedRate` refuses it, and a demand rate too, where
+  sclang throws.
+- The `fill` methods of `Mix`, `Splay` and `SplayAz`, which take a
+  function: build the array, then call `new`, `ar` or `kr`.
+- Numbers are the Floats of sclang. sclang keeps its Integers apart, but
+  gives the same values for the operators of the pseudo-UGens.
 
 ## Left out
 
-These are not in version 0.2, in the order of their value for sc-app3:
+These are not in version 0.3, in the order of their value for sc-app3:
 
 1. nested arrays in array arguments, as each class expands them
 2. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
-3. what rate methods do besides `new1`: the Lag family,
-   `asAudioRateInput`, `LocalBuf`, `Poll` and the zeros of `Out`
+3. what rate methods do besides `new1`: the Lag family, `LocalBuf`,
+   `LocalIn`, `Poll` and the zeros of `Out`
 4. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs` and the
    specs of the metadata
-5. `Env`, and the pseudo-UGens such as `Mix`, `Splay` and `SoundIn`
+5. `Env`, and the pseudo-UGens that wait for items 3 to 6: `Dunique`,
+   `PingPong`, `EnvGate`, and the `pvcalc` methods of `PV_ChainUGen`
 6. the rules of `checkInputs` that classes define for themselves
 7. sc3-plugins
 
 Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
-and the count of interconnect buffers.
+and the count of interconnect buffers. So are the pseudo-UGens `AudioIn`
+and `SplayZ`, deprecated since 3.10, and `InBus`, `XIn` and `XInFeedback`
+of `JITLib`. The methods of `UGen` that build graphs, such as `range` and
+`linlin`, are not pseudo-UGens. `range` needs the `signalRange` of each
+class, which the catalogue does not measure yet.
 
 ## Tests
 
@@ -409,8 +520,13 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 - `generator/sclang_conf.yaml` compiles the core class library of
   `/Applications/SuperCollider.app` alone, without the Extensions folder and
   without quarks. For another installation, change its path.
-- If `finishBuild` adds, removes or rewires a UGen, the script fails. So no
-  golden file holds a graph that `optimizeGraph` rewrites.
+- For a graph of 0.1 or 0.2: if `finishBuild` adds, removes or rewires a
+  UGen, the script fails.
+- For the graphs of 0.3: if `optimizeGraph` rewrites a definition of a file,
+  `tests/fixtures/before_optimize` holds a second file. The script builds it
+  with `finishBuild` without `optimizeGraph`, as the crate builds.
+- `tests/fixtures/arithmetic.json` holds operands and results of the
+  operators that sclang computes on Floats, as the bits of each f64.
 - `~/.bin/sclang` changes the directory, so the paths must be absolute.
 
 `generator/catalog.json` holds the catalogue and the tables of the

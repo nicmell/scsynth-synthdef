@@ -390,8 +390,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -528,8 +551,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -666,8 +712,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -3517,8 +3586,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3583,8 +3675,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3649,8 +3764,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3782,8 +3920,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3848,8 +4009,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3913,8 +4097,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         }
       ]
     },
@@ -3972,8 +4179,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         },
         {
           "selector": "kr",
@@ -4092,8 +4319,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         },
         {
           "selector": "kr",
@@ -4211,8 +4458,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 1
         },
         {
           "selector": "kr",
@@ -5069,8 +5336,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -5088,8 +5354,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -5637,8 +5902,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -5775,8 +6063,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -5912,8 +6223,31 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            },
+            {
+              "arg": 3
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -6179,8 +6513,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -8036,8 +8369,25 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true,
+          "audio_input": 1
         },
         {
           "selector": "kr",
@@ -8383,8 +8733,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -8504,8 +8874,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -8624,8 +9014,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [DC]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": true,
+          "nested_expansion": true,
+          "audio_input": 0
         },
         {
           "selector": "kr",
@@ -10412,8 +10822,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -11039,8 +11448,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -11065,8 +11473,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"
+          "addable": "pseudo"
         }
       ]
     },
@@ -11120,8 +11527,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -11158,8 +11564,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'at' not understood. Perhaps you misspelled 'as', or meant to call 'at' on another receiver?"
+          "addable": "pseudo"
         }
       ]
     },
@@ -15709,8 +16114,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -21452,8 +21856,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [BinaryOpUGen]"
+          "addable": true,
+          "rate": "audio",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "audio"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true,
+          "level": true
         },
         {
           "selector": "kr",
@@ -21485,8 +21909,28 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [BinaryOpUGen]"
+          "addable": true,
+          "rate": "control",
+          "inputs": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 1
+            },
+            {
+              "arg": 2
+            }
+          ],
+          "outputs": {
+            "fixed": [
+              "control"
+            ]
+          },
+          "special_index": 0,
+          "madd": false,
+          "nested_expansion": true,
+          "level": true
         }
       ]
     },
@@ -33114,8 +33558,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -33154,8 +33597,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -33231,8 +33673,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -33292,8 +33733,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -33920,8 +34360,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the rate depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -33963,8 +34402,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the rate depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -35187,8 +35625,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -35981,8 +36418,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -37797,6 +38233,781 @@
           "special_index": 0,
           "madd": false,
           "nested_expansion": true
+        }
+      ]
+    }
+  ],
+  "pseudo_classes": [
+    {
+      "name": "BHiPass4",
+      "categories": [
+        "UGens>Filters>BEQSuite"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 1200
+              }
+            },
+            {
+              "name": "rq",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BLowPass4",
+      "categories": [
+        "UGens>Filters>BEQSuite"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 1200
+              }
+            },
+            {
+              "name": "rq",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "LinLin",
+      "categories": [
+        "UGens>Maths"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "srclo",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "srchi",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dstlo",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dsthi",
+              "kind": "signal",
+              "default": {
+                "float": 2
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "srclo",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "srchi",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dstlo",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dsthi",
+              "kind": "signal",
+              "default": {
+                "float": 2
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "LinSelectX",
+      "categories": [
+        "UGens>Multichannel>Select"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "wrap",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "wrap",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Mix",
+      "categories": [
+        "UGens>Multichannel"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "MultiTap",
+      "categories": [
+        "UGens>Buffer",
+        "UGens>Delays>Buffer"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "timesArray",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "levelsArray",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "NumChannels",
+      "categories": [
+        "UGens>Multichannel"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "input",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "numChannels",
+              "kind": "count",
+              "default": {
+                "float": 2
+              }
+            },
+            {
+              "name": "mixdown",
+              "kind": "bool",
+              "default": {
+                "bool": true
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "PMOsc",
+      "categories": [
+        "UGens>Generators>Deterministic"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "carfreq",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "modfreq",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "pmindex",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "modphase",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "carfreq",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "modfreq",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "pmindex",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "modphase",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "SelectX",
+      "categories": [
+        "UGens>Multichannel>Select"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "wrap",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "wrap",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "SelectXFocus",
+      "categories": [
+        "UGens>Multichannel>Select"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "focus",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "wrap",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "focus",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "wrap",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "which",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "focus",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "wrap",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Silent",
+      "categories": [
+        "UGens>Generators>Single-value"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "numChannels",
+              "kind": "count",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "SoundIn",
+      "categories": [
+        "UGens>InOut"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "bus",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "TChoose",
+      "categories": [
+        "UGens>Triggers",
+        "UGens>Random"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "trig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "trig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "TWChoose",
+      "categories": [
+        "UGens>Triggers",
+        "UGens>Random"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "trig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "weights",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "normalize",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "trig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "array",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "weights",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "normalize",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
         }
       ]
     }

@@ -6,7 +6,9 @@
 //   sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 //
 // It exits with 1 if sclang is not 3.14.1, if a class or a method comes from
-// outside the core class library, or if finishBuild changes a graph.
+// outside the core class library, or if finishBuild changes a graph of 0.1
+// or 0.2. It also writes tests/fixtures/before_optimize and
+// tests/fixtures/arithmetic.json.
 (
 var root = thisProcess.nowExecutingPath.dirname.dirname;
 var fixtures = root +/+ "tests" +/+ "fixtures";
@@ -17,6 +19,7 @@ var fail = { |message|
 };
 var core = { |item| item.filenameSymbol.asString.beginsWith(library) };
 var build, write, written = 0;
+var buildBoth, writePseudo, rewritten = List.new, writeArithmetic;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -62,17 +65,100 @@ try {
 		def
 	};
 
-	write = { |name, defs|
+	write = { |name, defs, folder|
 		var stream = CollStream.on(Int8Array.new(256));
 		if (defs.size == 1) {
 			stream.putAll(defs[0].asBytes);
 		} {
 			defs.writeDef(stream);
 		};
-		File.use(fixtures +/+ name ++ ".scsyndef", "wb", { |file|
+		File.use((folder ? fixtures) +/+ name ++ ".scsyndef", "wb", { |file|
 			file.putAll(stream.collection);
 		});
 		written = written + 1;
+	};
+
+	// The full build of SynthDef:build, and the build of finishBuild without
+	// optimizeGraph (SynthDef.sc:279), for the graphs of the pseudo-UGens.
+	buildBoth = { |name, func|
+		[true, false].collect { |optimize|
+			var def = SynthDef.newCopyArgs(
+				name: name.asSymbol,
+				metadata: (),
+				children: Array(64)
+			);
+			protect {
+				def.initBuild;
+				def.buildUgenGraph(func, nil, nil);
+				if (optimize) {
+					def.finishBuild;
+				} {
+					def.addCopiesIfNeeded;
+					def.collectConstants;
+					def.checkInputs;
+					def.topologicalSort;
+					def.indexUGens;
+				};
+			} {
+				UGen.buildSynthDef = nil;
+			};
+			def
+		}
+	};
+
+	// One file of full builds, and one in before_optimize when optimizeGraph
+	// rewrites a case of the file.
+	writePseudo = { |name, cases|
+		var pairs = cases.collect { |case| buildBoth.(case[0], case[1]) };
+		write.(name, pairs.collect(_.first));
+		if (pairs.any { |pair| pair[0].asBytes != pair[1].asBytes }) {
+			write.(name, pairs.collect(_.last), fixtures +/+ "before_optimize");
+			rewritten.add(name);
+		};
+	};
+
+	// The operators of the arithmetic of the language on Floats, with each
+	// float as the 16 hexadecimal digits of its bits.
+	writeArithmetic = {
+		var bits = { |x|
+			x = x.asFloat;
+			x.high32Bits.asHexString(8) ++ x.low32Bits.asHexString(8)
+		};
+		var row = { |items| "[" ++ items.collect { |item| "\"" ++ item ++ "\"" }.join(", ") ++ "]" };
+		var values = [-2.5, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.7, 1000.0];
+		var binary = [['+', "+"], ['-', "-"], ['*', "*"], ['/', "/"], ['pow', "pow"],
+			['%', "mod"], ['round', "round"], ['trunc', "trunc"], ['roundUp', "roundUp"],
+			['fold2', "fold2"], ['max', "max"], ['min', "min"], ['absdif', "absdif"]];
+		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin];
+		var sections = List.new;
+		sections.add("  \"binary\": [\n" ++ binary.collect { |op|
+			values.collect { |a|
+				values.collect { |b|
+					"    " ++ row.([op[1], bits.(a), bits.(b), bits.(a.perform(op[0], b))])
+				}
+			}.flatten
+		}.flatten.join(",\n") ++ "\n  ]");
+		sections.add("  \"unary\": [\n" ++ unary.collect { |op|
+			values.collect { |a| "    " ++ row.([op.asString, bits.(a), bits.(a.perform(op))]) }
+		}.flatten.join(",\n") ++ "\n  ]");
+		sections.add("  \"clip\": [\n" ++ values.collect { |x|
+			[[0.0, 1.0], [-1.0, 1.0], [0.5, 2.0]].collect { |range|
+				"    " ++ row.([x, range[0], range[1], x.clip(range[0], range[1])].collect(bits))
+			}
+		}.flatten.join(",\n") ++ "\n  ]");
+		sections.add("  \"moddif\": [\n" ++ values.collect { |x|
+			[[0.0, 1.0], [1.0, 3.0], [2.0, 3.0]].collect { |pair|
+				"    " ++ row.([x, pair[0], pair[1], x.moddif(pair[0], pair[1])].collect(bits))
+			}
+		}.flatten.join(",\n") ++ "\n  ]");
+		sections.add("  \"linlin\": [\n" ++ values.collect { |x|
+			[[0.0, 1.0, -1.0, 1.0], [-1.0, 1.0, 0.0, 10.0]].collect { |range|
+				"    " ++ row.(([x] ++ range ++ [x.linlin(*range)]).collect(bits))
+			}
+		}.flatten.join(",\n") ++ "\n  ]");
+		File.use(fixtures +/+ "arithmetic.json", "w", { |file|
+			file.write("{\n" ++ sections.join(",\n") ++ "\n}\n");
+		});
 	};
 
 	write.("sine", [build.(\sine, { |out = 0, freq = 440, amp = 0.1|
@@ -223,6 +309,208 @@ try {
 		])
 	})]);
 
+	// The pseudo-UGens of 0.3, one file each.
+	(fixtures +/+ "before_optimize").mkdir;
+	(fixtures +/+ "before_optimize/*.scsyndef").pathMatch.do { |path| File.delete(path) };
+
+	writePseudo.("pmosc", [
+		[\pmosc_ar, { Out.ar(0, PMOsc.ar(440, 220, 2)) }],
+		[\pmosc_kr, { |car = 10| Out.kr(0, PMOsc.kr(car, 3, 1.5, 0.25, 0.5, 0.5)) }]
+	]);
+	writePseudo.("changed", [
+		[\changed_kr, { Out.kr(0, Changed.kr(SinOsc.kr(1))) }],
+		[\changed_ar, { Out.ar(0, Changed.ar(SinOsc.ar(2), 0.1)) }],
+		[\changed_array, { Out.kr(0, Changed.kr(SinOsc.kr([1, 2]))) }]
+	]);
+	writePseudo.("silent", [
+		[\silent_1, { Out.ar(0, Silent.ar) }],
+		[\silent_2, { Out.ar(0, Silent.ar(2)) }]
+	]);
+	writePseudo.("dstutter", [
+		[\dstutter, { Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dstutter(2, Dseq([1, 2], inf)))) }]
+	]);
+	writePseudo.("tchoose", [
+		[\tchoose_kr, { Out.kr(0, TChoose.kr(Impulse.kr(1), [SinOsc.kr(1), SinOsc.kr(2)])) }],
+		[\tchoose_ar, {
+			Out.ar(0, TChoose.ar(Impulse.ar(1), [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)]))
+		}]
+	]);
+	writePseudo.("twchoose", [
+		[\twchoose_kr, {
+			Out.kr(0, TWChoose.kr(Impulse.kr(1), [SinOsc.kr(1), SinOsc.kr(2)], [0.3, 0.7]))
+		}],
+		[\twchoose_ar, {
+			Out.ar(0, TWChoose.ar(Impulse.ar(1), [SinOsc.ar(1), SinOsc.ar(2)], [1, 3], 1))
+		}]
+	]);
+	writePseudo.("tap", [
+		[\tap_1, { Out.ar(0, Tap.ar(0, 1, 0.2)) }],
+		[\tap_2, { |time = 0.5| Out.ar(0, Tap.ar(1, 2, time)) }]
+	]);
+	// With numbers, LinLin computes its result in the language.
+	writePseudo.("linlin", [
+		[\linlin_ar, { Out.ar(0, LinLin.ar(SinOsc.ar(1), -1, 1, 100, 200)) }],
+		[\linlin_kr, { Out.kr(0, LinLin.kr(SinOsc.kr(1), -1, 1, 100, 200)) }],
+		[\linlin_numbers, {
+			Out.kr(0, [LinLin.kr(0.5, 0, 1, 10, 20), LinLin.ar(0.25, 0, 1, 0, 4)] * SinOsc.kr(1))
+		}],
+		[\linlin_ugens, { |lo = 100| Out.kr(0, LinLin.kr(SinOsc.kr(1), -1, 1, lo, 200)) }]
+	]);
+	writePseudo.("soundin", [
+		[\soundin_0, { Out.ar(0, SoundIn.ar(0)) }],
+		[\soundin_01, { Out.ar(0, SoundIn.ar([0, 1])) }],
+		[\soundin_02, { Out.ar(0, SoundIn.ar([0, 2])) }],
+		[\soundin_mul, { Out.ar(0, SoundIn.ar(2, 0.5)) }],
+		[\soundin_ugen, { |bus = 1| Out.ar(0, SoundIn.ar(bus)) }]
+	]);
+	writePseudo.("selectx", [
+		[\selectx_ar, { |which = 0|
+			Out.ar(0, SelectX.ar(which, [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)]))
+		}],
+		[\selectx_kr, { Out.kr(0, SelectX.kr(0.5, [SinOsc.kr(1), SinOsc.kr(2)])) }]
+	]);
+	writePseudo.("blowpass4", [
+		[\blowpass4, { Out.ar(0, BLowPass4.ar(SinOsc.ar(1), 800, 0.5)) }],
+		[\blowpass4_ugens, { |freq = 800, rq = 0.5|
+			Out.ar(0, BLowPass4.ar(SinOsc.ar(1), freq, rq, 0.5))
+		}]
+	]);
+	writePseudo.("bhipass4", [
+		[\bhipass4, { Out.ar(0, BHiPass4.ar(SinOsc.ar(1), 800, 0.5)) }]
+	]);
+
+	writePseudo.("sum", [
+		[\sum3_fold, { Out.ar(0, Sum3(SinOsc.ar(1), SinOsc.ar(2), 0)) }],
+		[\sum4_fold, { Out.ar(0, Sum4(SinOsc.ar(1), 0, SinOsc.kr(2), SinOsc.ar(3))) }],
+		[\sum3_array, { Out.ar(0, Sum3([SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3), SinOsc.ar(4))) }]
+	]);
+	writePseudo.("mix", [
+		[\mix_1, { Out.ar(0, Mix(SinOsc.ar(1))) }],
+		[\mix_2, { Out.ar(0, Mix(SinOsc.ar([1, 2]))) }],
+		[\mix_3, { Out.ar(0, Mix(SinOsc.ar([1, 2, 3]))) }],
+		[\mix_4, { Out.ar(0, Mix(SinOsc.ar([1, 2, 3, 4]))) }],
+		[\mix_5, { Out.ar(0, Mix(SinOsc.ar([1, 2, 3, 4, 5]))) }],
+		[\mix_9, { Out.ar(0, Mix(SinOsc.ar((1..9)))) }],
+		[\mix_rates3, { Out.ar(0, Mix([SinOsc.kr(1), SinOsc.ar(2), SinOsc.kr(3)])) }],
+		[\mix_rates4, { Out.ar(0, Mix([SinOsc.kr(1), SinOsc.ar(2), SinOsc.kr(3), SinOsc.ar(4)])) }],
+		[\mix_numbers, { Out.kr(0, [Mix([1, 2]), Mix([1, 2, 3])] * SinOsc.kr(1)) }],
+		[\mix_nested, { Out.ar(0, Mix([SinOsc.ar([1, 2]), SinOsc.ar([3, 4]), SinOsc.ar([5, 6])])) }],
+		[\mix_ar, { Out.ar(0, Mix.ar([SinOsc.kr(1), SinOsc.kr(2)])) }],
+		[\mix_ar_number, { Out.ar(0, Mix.ar([1, 2])) }],
+		[\mix_kr, { Out.kr(0, Mix.kr([SinOsc.ar(1), SinOsc.kr(2)])) }],
+		[\mix_kr_number, { Out.kr(0, Mix.kr([1, 2])) }]
+	]);
+
+	writePseudo.("numchannels", [
+		[\numchannels_mix, { Out.ar(0, NumChannels.ar(SinOsc.ar([1, 2, 3, 4]), 2)) }],
+		[\numchannels_cut, { Out.ar(0, NumChannels.ar(SinOsc.ar([1, 2, 3]), 2, false)) }],
+		[\numchannels_dup, { Out.ar(0, NumChannels.ar(SinOsc.ar(1), 3)) }],
+		[\numchannels_one, { Out.ar(0, NumChannels.ar([SinOsc.ar(1)], 1)) }]
+	]);
+	writePseudo.("selectxfocus", [
+		[\selectxfocus, { |which = 0|
+			Out.ar(0, SelectXFocus.ar(which, [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)]))
+		}],
+		[\selectxfocus_wrap, { |which = 0|
+			Out.ar(0, SelectXFocus.ar(which, [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)], 0.5, true))
+		}],
+		[\selectxfocus_number, {
+			Out.kr(0, SelectXFocus.kr(1.25, [SinOsc.kr(1), SinOsc.kr(2), SinOsc.kr(3)]))
+		}]
+	]);
+	writePseudo.("multitap", [
+		[\multitap, { Out.ar(0, MultiTap.ar(`[0.1, 0.2], `[0.5, 0.3], SinOsc.ar(1), bufnum: 0)) }],
+		[\multitap_levels, {
+			Out.ar(0, MultiTap.ar(`[0.1, 0.2, 0.3], `[0.5], SinOsc.ar(1), 0.5, 0, 1))
+		}]
+	]);
+	writePseudo.("splay", [
+		[\splay_2, { Out.ar(0, Splay.ar(SinOsc.ar([1, 2]))) }],
+		[\splay_3, { Out.ar(0, Splay.ar(SinOsc.ar([1, 2, 3]))) }],
+		[\splay_mono, { Out.ar(0, Splay.ar(SinOsc.ar(1))) }],
+		[\splay_spread, { |spread = 1| Out.ar(0, Splay.ar(SinOsc.ar([1, 2, 3]), spread)) }],
+		[\splay_nested, { Out.ar(0, Splay.ar([SinOsc.ar([1, 2]), SinOsc.ar([3, 4])]).flat) }],
+		[\splay_kr, { Out.kr(0, Splay.kr(SinOsc.kr([1, 2, 3]))) }],
+		[\splay_level, { |level = 0.5| Out.ar(0, Splay.ar(SinOsc.ar([1, 2]), 1, level)) }],
+		[\splay_center, { Out.ar(0, Splay.ar(SinOsc.ar([1, 2]), 0.5, 1, 0.25)) }],
+		[\splay_levelcomp_false, { Out.ar(0, Splay.ar(SinOsc.ar([1, 2]), levelComp: false)) }],
+		[\splay_levelcomp_number, { Out.ar(0, Splay.ar(SinOsc.ar([1, 2]), levelComp: 0.5)) }],
+		[\splay_levelcomp_ugen, { |lc = 0.5| Out.ar(0, Splay.ar(SinOsc.ar([1, 2]), levelComp: lc)) }]
+	]);
+	writePseudo.("dynklank", [
+		[\dynklank_2, { Out.ar(0, DynKlank.ar(`[[800, 1071]], Impulse.ar(2))) }],
+		[\dynklank_3, { Out.ar(0, DynKlank.ar(`[[800, 1071, 1353], nil, [1, 1, 1]], Impulse.ar(2))) }],
+		[\dynklank_amps, { Out.ar(0, DynKlank.ar(`[[800, 1071], [0.5, 0.3]], Impulse.ar(2))) }],
+		[\dynklank_scale, { |scale = 1|
+			Out.ar(0, DynKlank.ar(`[[800, 1071], nil, [1, 2]], Impulse.ar(2), scale))
+		}],
+		[\dynklank_kr, { Out.kr(0, DynKlank.kr(`[[8, 10]], Impulse.kr(2))) }],
+		[\dynklank_expand, { Out.ar(0, DynKlank.ar(`[[800, 1071]], Impulse.ar([2, 3]))) }]
+	]);
+	writePseudo.("dynklang", [
+		[\dynklang_2, { Out.ar(0, DynKlang.ar(`[[800, 1000]])) }],
+		[\dynklang_amps, { Out.ar(0, DynKlang.ar(`[[800, 1000], [0.3, 0.3], [pi, pi]])) }],
+		[\dynklang_kr, { Out.kr(0, DynKlang.kr(`[[1, 2], nil, [0.5, 0.25]], 2, 1)) }]
+	]);
+	writePseudo.("unpackfft", [
+		[\unpackfft, {
+			var chain = FFT(0, SinOsc.ar(1));
+			Out.kr(0, Demand.kr(Impulse.kr(1), 0, UnpackFFT(chain, 16, 0, 2)))
+		}],
+		[\unpackfft_default, {
+			var chain = FFT(0, SinOsc.ar(1));
+			Out.kr(0, Demand.kr(Impulse.kr(1), 0, UnpackFFT(chain, 4)))
+		}]
+	]);
+
+	// The delays and LinXFade2, which 0.3 makes addable.
+	writePseudo.("delays", [
+		[\delayn_kr_input, { Out.ar(0, DelayN.ar(SinOsc.kr(1), 0.2, 0.1)) }],
+		[\combl_number, { Out.ar(0, CombL.ar(0.5, 0.2, 0.1, 1)) }],
+		[\allpassc_zero, { Out.ar(0, AllpassC.ar(0, 0.2, 0.1, 1)) }],
+		[\bufdelayc_audio, { Out.ar(0, BufDelayC.ar(0, SinOsc.ar(1), 0.1)) }],
+		[\bufcombn_array, { Out.ar(0, BufCombN.ar(0, [SinOsc.kr(1), 0.25], 0.1, 1)) }],
+		[\delayn_mul, { Out.ar(0, DelayN.ar(SinOsc.ar(1), 0.2, 0.1, 0.5)) }],
+		[\deltapwr, {
+			var tap = DelTapWr.ar(0, SinOsc.kr(2));
+			Out.ar(0, DelTapRd.ar(0, tap, 0.1))
+		}]
+	]);
+	writePseudo.("linxfade2", [
+		[\linxfade2_level, { Out.ar(0, LinXFade2.ar(SinOsc.ar(1), SinOsc.ar(2), 0.5, 0.5)) }],
+		[\linxfade2_one, { Out.kr(0, LinXFade2.kr(SinOsc.kr(1), SinOsc.kr(2), -0.5)) }],
+		[\linxfade2_ugen, { |level = 0.5|
+			Out.ar(0, LinXFade2.ar(SinOsc.ar(1), SinOsc.ar(2), 0, level))
+		}]
+	]);
+
+	writePseudo.("companderd", [
+		[\companderd, { Out.ar(0, CompanderD.ar(SinOsc.ar(1))) }],
+		[\companderd_number, { Out.ar(0, CompanderD.ar(0.5, 0.4, 1, 0.5, 0.02, 0.1, 0.5)) }]
+	]);
+	writePseudo.("hilbertfir", [
+		[\hilbertfir, { Out.ar(0, HilbertFIR.ar(SinOsc.ar(1), 0)) }]
+	]);
+	writePseudo.("linselectx", [
+		[\linselectx_ar, { |which = 0|
+			Out.ar(0, LinSelectX.ar(which, [SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)]))
+		}],
+		[\linselectx_kr, { Out.kr(0, LinSelectX.kr(0.5, [SinOsc.kr(1), SinOsc.kr(2)])) }]
+	]);
+	writePseudo.("splayaz", [
+		[\splayaz_3, { Out.ar(0, SplayAz.ar(4, SinOsc.ar([1, 2, 3]))) }],
+		[\splayaz_mono, { Out.ar(0, SplayAz.ar(2, SinOsc.ar(1))) }],
+		[\splayaz_kr, { Out.kr(0, SplayAz.kr(3, SinOsc.kr([1, 2]))) }],
+		[\splayaz_spread, { Out.ar(0, SplayAz.ar(4, SinOsc.ar([1, 2, 3]), SinOsc.kr(0.1))) }],
+		[\splayaz_center, { |c = 0| Out.ar(0, SplayAz.ar(2, SinOsc.ar([1, 2]), 1, 1, 2, c)) }],
+		[\splayaz_audio_center, {
+			Out.ar(0, SplayAz.ar(2, SinOsc.ar([1, 2]), 1, 1, 2, SinOsc.ar(0.1)))
+		}]
+	]);
+
+	writeArithmetic.();
+
+	"fixtures.scd: before_optimize holds %".format(rewritten).postln;
 	"fixtures.scd: wrote % golden files to %".format(written, fixtures).postln;
 	0.exit;
 } { |error|

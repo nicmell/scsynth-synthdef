@@ -11,7 +11,8 @@ use crate::error::BuildError;
 use crate::file::Version;
 use crate::limits;
 use crate::operator;
-use crate::rate::Rate;
+use crate::pseudo::{self, lang};
+use crate::rate::{Rate, least_by_name};
 use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
 use crate::topo;
 use crate::ugen_input::{ArgValue, OutputProxy, UGenInput};
@@ -395,6 +396,11 @@ impl SynthDefBuilder {
     /// wiring and the rule of `checkInputs`. It gives back one output, or an
     /// array of the outputs when the UGen has none or several.
     ///
+    /// For a method that the catalogue marks [`Addable::Pseudo`], such as
+    /// `LinLin.kr`, a body of the crate adds the UGens that the method adds in
+    /// sclang, in the same order, and gives back what the method gives: a
+    /// number, an output, or an array of them.
+    ///
     /// An array on an argument of the wire, or on the count of the outputs,
     /// expands into several UGens, as `multiNewList` expands it, and the
     /// result is the array of their results. A single input is an array of
@@ -411,16 +417,32 @@ impl SynthDefBuilder {
     /// for an empty array where an argument expands, for an array inside an
     /// array where it does not expand, for a bad count of channels, for
     /// inputs that break the rule of `checkInputs`, and for an input that
-    /// [`add`](Self::add) refuses.
+    /// [`add`](Self::add) refuses. A pseudo-UGen fails as the UGens that it
+    /// adds fail.
     pub fn ugen(
         &mut self,
         class: &str,
         selector: &str,
         args: &[(&str, ArgValue)],
     ) -> Result<UGenInput, BuildError> {
-        let (ugen_class, method, wiring) = addable_method(class, selector)?;
+        let (ugen_class, method) = match find_method(class, selector)? {
+            Found::UGen(ugen_class, method) => (ugen_class, method),
+            Found::Pseudo(name, method) => return self.pseudo(name, method, args),
+        };
+        let wiring = match method.addable {
+            Addable::Yes(wiring) => wiring,
+            Addable::Pseudo => return self.pseudo(ugen_class.name, method, args),
+            Addable::No(reason) => {
+                return Err(BuildError::NotAddable {
+                    class: class.to_owned(),
+                    selector: selector.to_owned(),
+                    reason: reason.to_owned(),
+                });
+            }
+        };
         let mut values = bind_arguments(class, method, args)?;
         let madd = madd_arguments(class, method, wiring, &values)?;
+        let level = level_argument(class, method, wiring, &values)?;
         let positions = expanding(wiring);
         let mut names = Vec::with_capacity(positions.len());
         let mut expanded = Vec::with_capacity(positions.len());
@@ -436,6 +458,12 @@ impl SynthDefBuilder {
             expanded.push(input.clone());
         }
         self.transaction(|builder| {
+            let audio_slot = wiring
+                .audio_input
+                .and_then(|audio| positions.iter().position(|&position| position == audio));
+            if let Some(slot) = audio_slot {
+                expanded[slot] = lang::as_audio_rate_input(builder, expanded[slot].clone())?;
+            }
             let result = builder.expand(
                 class,
                 &names,
@@ -448,6 +476,10 @@ impl SynthDefBuilder {
                     builder.add_instance(class, ugen_class, method, wiring, &values)
                 },
             )?;
+            let result = match level {
+                Some(level) => lang::binary(builder, "*", result, level)?,
+                None => result,
+            };
             match madd {
                 Some([mul, add]) => builder.madd_expanded(class, &[result, mul, add]),
                 None => Ok(result),
@@ -610,6 +642,17 @@ impl SynthDefBuilder {
         Ok(def)
     }
 
+    /// Runs the body of a pseudo-UGen. A body that fails adds no UGen.
+    fn pseudo(
+        &mut self,
+        class: &'static str,
+        method: &'static RateMethod,
+        args: &[(&str, ArgValue)],
+    ) -> Result<UGenInput, BuildError> {
+        let values = bind_optional(class, method, args)?;
+        self.transaction(|builder| pseudo::build(builder, class, method, values))
+    }
+
     fn add_controls(
         &mut self,
         group: Group,
@@ -678,7 +721,7 @@ impl SynthDefBuilder {
     /// expand, named by `names` for the errors. `leaf` adds what one
     /// instance adds. Below the top, an array expands again only if
     /// `nested`.
-    fn expand<F>(
+    pub(crate) fn expand<F>(
         &mut self,
         ugen: &str,
         names: &[&str],
@@ -809,23 +852,6 @@ impl SynthDefBuilder {
         self.unary_leaf(special_index, input)
     }
 
-    /// `a op b` with the operator `*`, `+` or `-` of sclang: two numbers give
-    /// a number, and anything else goes to `BinaryOpUGen.new`.
-    fn operate(&mut self, op: &str, a: UGenInput, b: UGenInput) -> Result<UGenInput, BuildError> {
-        let computed = match (op, &a, &b) {
-            ("*", UGenInput::Number(x), UGenInput::Number(y)) => Some(x * y),
-            ("+", UGenInput::Number(x), UGenInput::Number(y)) => Some(x + y),
-            ("-", UGenInput::Number(x), UGenInput::Number(y)) => Some(x - y),
-            _ => None,
-        };
-        if let Some(number) = computed {
-            return Ok(UGenInput::Number(number));
-        }
-        let special_index =
-            operator::binary_index(op).ok_or_else(|| BuildError::UnknownOperator(op.to_owned()))?;
-        self.binary_leaf(op, special_index, a, b)
-    }
-
     /// `MulAdd.new` over `values`: the input, `mul` and `add`, with the class
     /// that the errors name.
     fn madd_expanded(&mut self, ugen: &str, values: &[UGenInput]) -> Result<UGenInput, BuildError> {
@@ -866,13 +892,13 @@ impl SynthDefBuilder {
             return self.neg(input);
         }
         if no_add {
-            return self.operate("*", input, mul);
+            return lang::binary(self, "*", input, mul);
         }
         if minus {
-            return self.operate("-", add, input);
+            return lang::binary(self, "-", add, input);
         }
         if no_mul {
-            return self.operate("+", input, add);
+            return lang::binary(self, "+", input, add);
         }
         if can_be_mul_add(&input, &mul, &add) {
             return self.mul_add(input, mul, add);
@@ -880,8 +906,8 @@ impl SynthDefBuilder {
         if can_be_mul_add(&mul, &input, &add) {
             return self.mul_add(mul, input, add);
         }
-        let product = self.operate("*", input, mul)?;
-        self.operate("+", product, add)
+        let product = lang::binary(self, "*", input, mul)?;
+        lang::binary(self, "+", product, add)
     }
 
     fn mul_add(
@@ -890,7 +916,7 @@ impl SynthDefBuilder {
         b: UGenInput,
         c: UGenInput,
     ) -> Result<UGenInput, BuildError> {
-        let rate = rate_by_name([rate_of(&a), rate_of(&b), rate_of(&c)]);
+        let rate = least_by_name([rate_of(&a), rate_of(&b), rate_of(&c)]).unwrap_or(Rate::Scalar);
         self.add(NewUGen::new(MUL_ADD, rate).inputs([a, b, c]))
     }
 
@@ -966,21 +992,6 @@ fn can_be_mul_add(input: &UGenInput, mul: &UGenInput, add: &UGenInput) -> bool {
     }
 }
 
-/// The rate of a `MulAdd`: `SequenceableCollection:rate` takes the least
-/// symbol, so demand ranks after control, unlike the order of [`Rate`].
-fn rate_by_name(rates: [Rate; 3]) -> Rate {
-    let by_name = |rate: &Rate| match rate {
-        Rate::Audio => 0,
-        Rate::Control => 1,
-        Rate::Demand => 2,
-        Rate::Scalar => 3,
-    };
-    rates
-        .into_iter()
-        .min_by_key(by_name)
-        .unwrap_or(Rate::Scalar)
-}
-
 /// The positions of the arguments that expand: those of the wire, and the
 /// count of the outputs, as the method gives them `multiNew`.
 fn expanding(wiring: Wiring) -> Vec<usize> {
@@ -1007,30 +1018,29 @@ fn to_float32(value: f64) -> f32 {
     value as f32
 }
 
-/// The class, the method and its wiring, if `ugen` can add the method.
-fn addable_method(
-    class: &str,
-    selector: &str,
-) -> Result<(&'static UGenClass, &'static RateMethod, Wiring), BuildError> {
-    let ugen_class =
-        catalog::lookup(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
-    let method = ugen_class
-        .method(selector)
-        .ok_or_else(|| BuildError::UnknownMethod {
-            class: class.to_owned(),
-            selector: selector.to_owned(),
-        })?;
-    let wiring = match method.addable {
-        Addable::Yes(wiring) => wiring,
-        Addable::No(reason) => {
-            return Err(BuildError::NotAddable {
-                class: class.to_owned(),
-                selector: selector.to_owned(),
-                reason: reason.to_owned(),
-            });
-        }
+/// A rate method that `ugen` finds by the name of its class.
+enum Found {
+    /// A method of a UGen class.
+    UGen(&'static UGenClass, &'static RateMethod),
+    /// A method of a pseudo-UGen class outside `UGen`, with the name of the
+    /// class.
+    Pseudo(&'static str, &'static RateMethod),
+}
+
+/// The method `selector` of the UGen class or the pseudo class `class`.
+fn find_method(class: &str, selector: &str) -> Result<Found, BuildError> {
+    let unknown_method = || BuildError::UnknownMethod {
+        class: class.to_owned(),
+        selector: selector.to_owned(),
     };
-    Ok((ugen_class, method, wiring))
+    if let Some(ugen_class) = catalog::lookup(class) {
+        let method = ugen_class.method(selector).ok_or_else(unknown_method)?;
+        return Ok(Found::UGen(ugen_class, method));
+    }
+    let pseudo_class =
+        catalog::pseudo_lookup(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
+    let method = pseudo_class.method(selector).ok_or_else(unknown_method)?;
+    Ok(Found::Pseudo(pseudo_class.name, method))
 }
 
 /// The value of each argument of `method`: the one that `args` gives by
@@ -1040,6 +1050,25 @@ fn bind_arguments(
     method: &RateMethod,
     args: &[(&str, ArgValue)],
 ) -> Result<Vec<ArgValue>, BuildError> {
+    bind_optional(class, method, args)?
+        .into_iter()
+        .zip(method.args)
+        .map(|(value, arg)| {
+            value.ok_or_else(|| BuildError::MissingArgument {
+                class: class.to_owned(),
+                argument: arg.name.to_owned(),
+            })
+        })
+        .collect()
+}
+
+/// The value of each argument of `method`: the one that `args` gives by
+/// name, or the default, or none for a nil default.
+fn bind_optional(
+    class: &str,
+    method: &RateMethod,
+    args: &[(&str, ArgValue)],
+) -> Result<Vec<Option<ArgValue>>, BuildError> {
     let mut values: Vec<Option<ArgValue>> = vec![None; method.args.len()];
     for (name, value) in args {
         let position = method
@@ -1055,22 +1084,20 @@ fn bind_arguments(
         }
         values[position] = Some(value.clone());
     }
-    method
+    Ok(method
         .args
         .iter()
         .zip(values)
         .map(|(arg, value)| match (value, arg.default) {
-            (Some(value), _) => Ok(value),
-            (None, Some(ArgDefault::Float(number))) => Ok(ArgValue::from(number)),
+            (Some(value), _) => Some(value),
+            (None, Some(ArgDefault::Float(number))) => Some(ArgValue::from(number)),
             (None, Some(ArgDefault::Symbol(text))) if arg.kind == ArgKind::Symbol => {
-                Ok(ArgValue::from(text))
+                Some(ArgValue::from(text))
             }
-            _ => Err(BuildError::MissingArgument {
-                class: class.to_owned(),
-                argument: arg.name.to_owned(),
-            }),
+            (None, Some(ArgDefault::Bool(value))) => Some(ArgValue::Bool(value)),
+            _ => None,
         })
-        .collect()
+        .collect())
 }
 
 /// The `mul` and `add` that `ugen` hands `madd`. `None` if the method
@@ -1102,6 +1129,25 @@ fn madd_arguments(
         madd[slot] = input.clone();
     }
     Ok(if no_outputs { None } else { Some(madd) })
+}
+
+/// The `level` that the method multiplies the result of its expansion by, as
+/// `LinXFade2` does, or `None`.
+fn level_argument(
+    class: &str,
+    method: &RateMethod,
+    wiring: Wiring,
+    values: &[ArgValue],
+) -> Result<Option<UGenInput>, BuildError> {
+    let position = method.args.iter().position(|arg| arg.name == "level");
+    match position
+        .filter(|_| wiring.level)
+        .map(|position| (position, &values[position]))
+    {
+        None => Ok(None),
+        Some((_, ArgValue::Input(level))) => Ok(Some(level.clone())),
+        Some((position, _)) => Err(wrong_kind(class, method, position, "a number or an output")),
+    }
 }
 
 fn wrong_kind(
@@ -1146,7 +1192,7 @@ fn wire_inputs(
                     return Err(nested_array(class, method, position));
                 }
                 ArgValue::Input(input) => inputs.push(input.clone()),
-                ArgValue::Text(_) => {
+                ArgValue::Text(_) | ArgValue::Bool(_) => {
                     return Err(wrong_kind(class, method, position, "a number or an output"));
                 }
             },
@@ -1158,14 +1204,18 @@ fn wire_inputs(
                     inputs.extend(items.iter().cloned());
                 }
                 ArgValue::Input(input) => inputs.push(input.clone()),
-                ArgValue::Text(_) => return Err(wrong_kind(class, method, position, "an array")),
+                ArgValue::Text(_) | ArgValue::Bool(_) => {
+                    return Err(wrong_kind(class, method, position, "an array"));
+                }
             },
             InputSlot::ArgString(position) => match &values[position] {
                 ArgValue::Text(text) => {
                     inputs.push(UGenInput::from(f64::from(to_u32(text.len()))));
                     inputs.extend(text.bytes().map(|byte| UGenInput::from(f64::from(byte))));
                 }
-                ArgValue::Input(_) => return Err(wrong_kind(class, method, position, "a symbol")),
+                ArgValue::Input(_) | ArgValue::Bool(_) => {
+                    return Err(wrong_kind(class, method, position, "a symbol"));
+                }
             },
         }
     }
@@ -1193,7 +1243,7 @@ fn wire_outputs(
             ArgValue::Input(UGenInput::Array(items)) if !items.is_empty() => {
                 Ok(vec![rate; items.len()])
             }
-            ArgValue::Input(UGenInput::Array(_)) | ArgValue::Text(_) => {
+            ArgValue::Input(UGenInput::Array(_)) | ArgValue::Text(_) | ArgValue::Bool(_) => {
                 Err(bad_count(class, method, arg))
             }
             ArgValue::Input(_) => Ok(vec![rate]),
@@ -1203,7 +1253,7 @@ fn wire_outputs(
 
 /// A whole number from 1 to `u16::MAX`, as a count of outputs.
 #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-fn count_to_usize(count: f64) -> usize {
+pub(crate) fn count_to_usize(count: f64) -> usize {
     count as usize
 }
 
