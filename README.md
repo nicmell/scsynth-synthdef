@@ -55,7 +55,7 @@ version.
 ## Building
 
 A `SynthDefBuilder` is the `SynthDef` of sclang during a build. It builds
-as `SynthDef.new` does, without `optimizeGraph`.
+as `SynthDef.new` does.
 
 ```rust
 use scsynth_synthdef::{Arg, NewUGen, Rate, SynthDefBuilder};
@@ -112,8 +112,12 @@ assert_eq!(def.children.len(), 3);
   index.
 - `madd` multiplies an input and adds to it, as `MulAdd.new` does.
 - `variant` adds a variant by control name, from the defaults.
-- `finish` collects the constants in the order of creation and of the
-  inputs, sorts the UGens as sclang sorts them, and checks the limits.
+- `finish` copies the PV chains and rewrites the graph, as `finishBuild`
+  does (see
+  [`optimizeGraph` and the copies of PV chains](#optimizegraph-and-the-copies-of-pv-chains)).
+  Then it collects the constants in the order of the children and of the
+  inputs. Last, it sorts the UGens as sclang sorts them, and checks the
+  limits.
 
 A `UGenInput` is a number, an `OutputProxy` or an array of them. An
 `OutputProxy` gives its rate and the index of its output. A call that fails
@@ -337,6 +341,44 @@ what each one does in sclang.
 - The codes of a symbol and of a label are its bytes as `Char:ascii` gives
   them in sclang, from -128 to 127.
 
+### `optimizeGraph` and the copies of PV chains
+
+`finish` runs `addCopiesIfNeeded` and `optimizeGraph`, as `finishBuild`
+does, before it collects the constants. So the constants follow the order
+of the rewritten graph.
+
+- A PV chain that two or more width-first UGens read gets copies, right
+  after the chain. Each slot of each reader but the last gets one: a
+  `BufFrames`, a `LocalBuf` and a `PV_Copy`. Each `LocalBuf` counts in the
+  `MaxLocalBufs` of the build. `fft_size` of the catalogue tells how a
+  chain finds the size of its FFT.
+- `optimizeGraph` visits each UGen in the order of the children. A pure
+  UGen that nothing reads goes, and each of its direct inputs gets another
+  visit. An output of a `MultiOutUGen` comes through an `OutputProxy`, so
+  the visit stops there: in `DC.ar(1) * 2`, the `*` goes, and the `DC`
+  stays. `optimize` of the catalogue tells what each class does.
+- A `+` becomes a `Sum3`, a `Sum4`, a `MulAdd` or a `-`, the first that
+  holds. A `-` of a `neg` becomes a `+`. A rewrite fuses only an input that
+  one UGen reads. So `osc * 0.5 + 0.25` becomes one `MulAdd`.
+- The crate copies the bookkeeping of sclang, with its quirks. The array of
+  the readers of a UGen has the room of sclang, so it is full at 4, 8, 16
+  and more readers. On a full array, an update goes missing. The order of
+  the inputs of a removed UGen decides which inputs fuse later.
+
+`BuildError::FinishBuild` refuses a graph where `finishBuild` of sclang
+3.14.1 throws or writes a broken definition:
+
+- A copy needs a `LocalBuf`, and the definition has none: sclang drops
+  UGens. Give the `FFT` a `LocalBuf`.
+- A copy of a chain of `PackFFT`, or of a chain without `fftSize`, such as
+  one of `FFTTrigger`: sclang throws.
+- A rewrite folds into a number or into one of its inputs, as
+  `x + neg(0)`, where `unary_op` made the `neg` of a number: sclang throws,
+  or writes a UGen twice.
+- After an update that goes missing, `optimizeGraph` removes a UGen that
+  another UGen reads: sclang drops UGens. So `x * 2 + 1`, with three more
+  readers of `x` that nothing reads, gives a definition with no UGens.
+
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
@@ -346,8 +388,11 @@ a class by name, and `catalog::all` gives all of them, sorted by name.
 classes outside `UGen` that the crate builds, such as `LinLin`.
 
 - A `UGenClass` has its superclasses, whether it is pure or width-first,
-  its categories in the help, the rule of its `checkInputs`, and its rate
-  methods. `doc_url` gives its page on doc.sccode.org.
+  and its categories in the help. It also has the rule of its
+  `checkInputs`, its `optimize` and its `fft_size`, and its rate methods.
+  `optimize` is what `optimizeGraph` does with a UGen of the class, and
+  `fft_size` is how `fftSize` finds the FFT of a PV chain. `doc_url` gives
+  its page on doc.sccode.org.
 - A `PseudoClass` has its categories in the help and its rate methods.
 - A `RateMethod` is `ar`, `kr`, `ir` or `new`. It has its arguments, each
   with a kind and a default, and an `Addable`.
@@ -394,7 +439,9 @@ table names the classes with a body, and the second the classes left out,
 with a reason. The third names the classes that are not pseudo-UGens. If a
 class is in no table, the script fails. Two more tables name the methods
 of the Lag family and the arguments whose zeros become silence. Probes
-test each entry. If one does not hold, the script fails.
+test each entry. If one does not hold, the script fails. Two more tables
+map the class that owns `optimizeGraph` and `fftSize` to `optimize` and
+`fft_size`. If no table names the owner, the script fails.
 
 The catalogue gives the page of each class in the help, and not its
 summary: the help of SuperCollider is GPL-3, and the crate copies none of
@@ -496,9 +543,15 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   "SimpleNumber-writeInputSpec constant not found: -0.0".
 - The variants: the builder writes them in the order of the calls. sclang
   writes them in the order of its dictionary.
-- The builder does not run `optimizeGraph`. sclang fuses `*` and `+` into
-  `MulAdd`, `+` into `Sum3` and `Sum4`, rewrites `a + b.neg` and
-  `a - b.neg`, and removes unused pure UGens.
+- A graph where `finishBuild` of sclang throws or writes a broken
+  definition: `BuildError::FinishBuild` refuses it (see
+  [`optimizeGraph` and the copies of PV chains](#optimizegraph-and-the-copies-of-pv-chains)).
+- A rewrite that folds into a new UGen, as `0 + x.neg` becomes `x.neg`:
+  `BuildError::FinishBuild` refuses it, where sclang rewrites it. Only
+  `add` builds such an input.
+- The checks of the inputs: when `ugen` adds a UGen, it checks the inputs.
+  sclang checks after `optimizeGraph`, so a UGen that it removes escapes
+  its check, as an unread `LPF.ar(SinOsc.kr)` does.
 - An empty array where an argument expands, and an array that stays among
   the inputs of a UGen: the builder refuses them (see Multichannel
   expansion).
@@ -535,14 +588,13 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-These are not in version 0.6, in the order of their value for sc-app3:
+These are not in version 0.7, in the order of their value for sc-app3:
 
-1. `optimizeGraph`, and `addCopiesIfNeeded` for PV chains
-2. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs`, the
+1. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs`, the
    specs of the metadata, and `LagControl`
-3. `Env`, `VarLag`, and the pseudo-UGens that wait for items 2 and 3:
+2. `Env`, `VarLag`, and the pseudo-UGens that wait for items 1 and 2:
    `EnvGate`, and the `pvcalc` methods of `PV_ChainUGen`
-4. sc3-plugins
+3. sc3-plugins
 
 Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
 and the count of interconnect buffers. So are the pseudo-UGens `AudioIn`
@@ -570,11 +622,8 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 - `generator/sclang_conf.yaml` compiles the core class library of
   `/Applications/SuperCollider.app` alone, without the Extensions folder and
   without quarks. For another installation, change its path.
-- For a graph of 0.1 or 0.2: if `finishBuild` adds, removes or rewires a
-  UGen, the script fails.
-- For the graphs of 0.3 to 0.6: if `optimizeGraph` rewrites a definition
-  of a file, `tests/fixtures/before_optimize` holds a second file. The script
-  builds it with `finishBuild` without `optimizeGraph`, as the crate builds.
+- A graph that the crate refuses with `BuildError::FinishBuild` must break
+  in sclang. If it does not, the script fails.
 - `tests/fixtures/arithmetic.json` holds operands and results of the
   operators that sclang computes on Floats, as the bits of each f64.
 - `~/.bin/sclang` changes the directory, so the paths must be absolute.
