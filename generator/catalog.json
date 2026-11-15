@@ -40199,6 +40199,51 @@
       ]
     },
     {
+      "name": "EnvGate",
+      "categories": [
+        "JITLib>NodeProxy"
+      ],
+      "methods": [
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "i_level",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "gate",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fadeTime",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "doneAction",
+              "kind": "signal",
+              "default": {
+                "float": 2
+              }
+            },
+            {
+              "name": "curve",
+              "kind": "curve",
+              "default": {
+                "symbol": "sin"
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "LinLin",
       "categories": [
         "UGens>Maths"

@@ -3,7 +3,7 @@
 use super::{Args, in_out};
 use crate::builder::SynthDefBuilder;
 use crate::catalog;
-use crate::env::unbubble;
+use crate::env::{Env, unbubble};
 use crate::error::BuildError;
 use crate::rate::{Rate, least_by_name};
 use crate::ugen_input::UGenInput;
@@ -165,8 +165,37 @@ pub(super) fn named_control(
         .as_ref()
         .map(Lags::of)
         .filter(|lags| *lags != Lags::Nil);
+    named(builder, &name, rate, values, lags, fixed_lag)
+}
+
+/// `\name.kr(value)`.
+pub(super) fn named_kr(
+    builder: &mut SynthDefBuilder,
+    name: &str,
+    value: f64,
+) -> Result<UGenInput, BuildError> {
+    let values = Some(Values::Number(value));
+    named(
+        builder,
+        name,
+        Some("control".to_owned()),
+        values,
+        None,
+        false,
+    )
+}
+
+/// `NamedControl.new` once its arguments are bound.
+fn named(
+    builder: &mut SynthDefBuilder,
+    name: &str,
+    rate: Option<String>,
+    values: Option<Values>,
+    lags: Option<Lags>,
+    fixed_lag: bool,
+) -> Result<UGenInput, BuildError> {
     let fixed_lag = fixed_lag || lags.as_ref().and_then(Lags::rate) == Some(Rate::Scalar);
-    let entry = entry(builder, &name, values, lags.as_ref(), rate, fixed_lag)?;
+    let entry = entry(builder, name, values, lags.as_ref(), rate, fixed_lag)?;
     match lags {
         Some(lags) if entry.fixed_lag => {
             if entry.lags.as_ref() != Some(&lags) {
@@ -175,11 +204,48 @@ pub(super) fn named_control(
             Ok(entry.control)
         }
         Some(lags) => {
-            let lags = lags.input(&name)?;
+            let lags = lags.input(name)?;
             Ok(unbubble(in_out::lag(builder, entry.control, lags)?))
         }
         None => Ok(entry.control),
     }
+}
+
+/// `EnvGate.new`: `\gate.kr(1)` and then `\fadeTime.kr(0.02)` for each
+/// argument that is nil, then `EnvGen.kr` of `Env([i_level, 1, 0], [1, 1],
+/// curve, 1)`, with the fade time as its time scale.
+pub(super) fn env_gate(
+    builder: &mut SynthDefBuilder,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let gate = match args.optional("gate")? {
+        Some(gate) => gate,
+        None => named_kr(builder, "gate", 1.0)?,
+    };
+    let fade_time = match args.optional("fadeTime")? {
+        Some(fade_time) => fade_time,
+        None => named_kr(builder, "fadeTime", 0.02)?,
+    };
+    let env = Env::from_parts(
+        vec![args.input("i_level")?, 1.0.into(), 0.0.into()],
+        vec![1.0.into(), 1.0.into()],
+        args.curve("curve")?,
+        Some(1.0),
+        None,
+        0.0.into(),
+    )?;
+    builder.ugen(
+        "EnvGen",
+        "kr",
+        &[
+            ("envelope", env.into()),
+            ("gate", gate.into()),
+            ("levelScale", 1.0.into()),
+            ("levelBias", 0.0.into()),
+            ("timeScale", fade_time.into()),
+            ("doneAction", args.value("doneAction")?),
+        ],
+    )
 }
 
 /// The entry of `name` in the table: the one there, whose values and rate

@@ -167,3 +167,10 @@ fn var_lag_refuses_what_sclang_throws_on() {
         "{rate:?}"
     );
 }
+
+#[test]
+fn env_gate_refuses_a_shape_that_sclang_does_not_know() {
+    let mut b = SynthDefBuilder::new("env_gate", vec![]).unwrap();
+    let gate = b.ugen("EnvGate", "new", &[("curve", "foo".into())]);
+    assert!(is_bad_env(&gate, "Env"), "{gate:?}");
+}

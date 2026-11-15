@@ -18669,7 +18669,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 16] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 17] = [
     PseudoClass {
         name: "BHiPass4",
         categories: &["UGens>Filters>BEQSuite"],
@@ -18699,6 +18699,23 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 16] = [
                     ArgSpec { name: "rq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "EnvGate",
+        categories: &["JITLib>NodeProxy"],
+        methods: &[
+            RateMethod {
+                selector: "new",
+                args: &[
+                    ArgSpec { name: "i_level", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "gate", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "fadeTime", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "doneAction", kind: ArgKind::Signal, default: Some(ArgDefault::Float(2.0)) },
+                    ArgSpec { name: "curve", kind: ArgKind::Curve, default: Some(ArgDefault::Symbol("sin")) },
                 ],
                 addable: Addable::Pseudo,
             },

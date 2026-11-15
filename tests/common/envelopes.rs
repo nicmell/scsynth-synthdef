@@ -3,9 +3,9 @@
 
 use scsynth_synthdef::{ArgValue, Curve, Env, SynthDef, SynthDefBuilder, UGenInput};
 
-use super::array;
 use super::controls::kr;
-use super::pseudo::{def, input, out};
+use super::pseudo::{def, input, out, sine};
+use super::{arg, array};
 
 /// The definitions of a golden file of 0.9.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
@@ -13,6 +13,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "env" => [constructors(), points(), curves(), outputs()].concat(),
         "ienv" => ienv(),
         "varlag" => varlag(),
+        "envgate" => envgate(),
         _ => panic!("no golden graph of 0.9 is named {name}"),
     }
 }
@@ -499,5 +500,69 @@ fn varlag() -> Vec<SynthDef> {
             let lagged = var_lag(b, "kr", &[("in", input(x)), ("time", input(0.0))]);
             out(b, "kr", lagged);
         }),
+    ]
+}
+
+/// `EnvGate(args)`.
+fn env_gate(b: &mut SynthDefBuilder, args: &[(&str, ArgValue)]) -> UGenInput {
+    b.ugen("EnvGate", "new", args)
+        .unwrap_or_else(|error| panic!("EnvGate.new: {error}"))
+}
+
+/// `Out.ar(0, sound * gate)`.
+fn gated_out(b: &mut SynthDefBuilder, sound: UGenInput, gate: UGenInput) {
+    let product = b.binary_op("*", sound, gate).unwrap();
+    out(b, "ar", product);
+}
+
+fn envgate() -> Vec<SynthDef> {
+    vec![
+        def("envgate_new", vec![], |b| {
+            let sound = sine(b, "ar", 440.0);
+            let gate = env_gate(b, &[]);
+            gated_out(b, sound, gate);
+        }),
+        def("envgate_args", vec![], |b| {
+            let sound = sine(b, "ar", 440.0);
+            let g = kr(b, "g", 1.0);
+            let gate = env_gate(
+                b,
+                &[
+                    ("i_level", input(0.0)),
+                    ("gate", input(g)),
+                    ("fadeTime", input(0.5)),
+                    ("doneAction", input(0.0)),
+                    ("curve", ArgValue::Curve(Curve::from("lin"))),
+                ],
+            );
+            gated_out(b, sound, gate);
+        }),
+        def("envgate_twice", vec![], |b| {
+            let sound = sine(b, "ar", 440.0);
+            let gate = env_gate(b, &[]);
+            let first = b.binary_op("*", sound, gate).unwrap();
+            let sound = sine(b, "ar", 2.0);
+            let gate = env_gate(b, &[]);
+            let second = b.binary_op("*", sound, gate).unwrap();
+            let sum = b.binary_op("+", first, second).unwrap();
+            out(b, "ar", sum);
+        }),
+        def("envgate_level", vec![], |b| {
+            let sound = sine(b, "ar", 440.0);
+            let level = kr(b, "l", 0.5);
+            let gate = env_gate(b, &[("i_level", input(level))]);
+            gated_out(b, sound, gate);
+        }),
+        def(
+            "envgate_markup",
+            vec![scsynth_synthdef::Arg::new("freq", 440.0)],
+            |b| {
+                let freq = arg(b, "freq");
+                let lag = var_lag(b, "kr", &[("in", input(freq)), ("time", input(0.2))]);
+                let osc = sine(b, "ar", lag);
+                let gate = env_gate(b, &[]);
+                gated_out(b, osc, gate);
+            },
+        ),
     ]
 }

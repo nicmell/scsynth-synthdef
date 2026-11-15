@@ -203,6 +203,7 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("DynKlang", "kr", fsin_osc::dyn_klang),
     ("DynKlank", "ar", fsin_osc::dyn_klank),
     ("DynKlank", "kr", fsin_osc::dyn_klank),
+    ("EnvGate", "new", graph_builder::env_gate),
     ("HilbertFIR", "ar", hilbert::hilbert_fir),
     ("Klang", "ar", fsin_osc::klang),
     ("Klank", "ar", fsin_osc::klank),

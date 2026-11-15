@@ -79,6 +79,7 @@ var argumentKinds = [
 	[\Env, \step, \levels, \array],
 	[\Env, \step, \times, \array],
 	[\Env, \xyc, \xyc, \array],
+	[\EnvGate, \new, \curve, \curve],
 	[\EnvGen, \ar, \envelope, \array],
 	[\EnvGen, \ar, \levelScale, \signal],
 	[\EnvGen, \ar, \timeScale, \signal],
@@ -204,7 +205,7 @@ var argumentKinds = [
 // a body for each rate method of a class of bodies, but a method that sclang
 // refuses as not valid for its subclass.
 var bodies = [\AudioControl, \BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD,
-	\Control, \Dstutter, \DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LagControl,
+	\Control, \Dstutter, \DynKlang, \DynKlank, \EnvGate, \HilbertFIR, \Klang, \Klank, \LagControl,
 	\LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix, \MultiTap, \NamedControl,
 	\NumChannels, \PMOsc, \PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
 	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT,
@@ -213,7 +214,6 @@ var bodies = [\AudioControl, \BeatTrack, \BHiPass4, \BLowPass4, \Changed, \Compa
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
 	[\Dunique, "builds its reader in asUGenInput, at each use as an input"],
-	[\EnvGate, "needs Env: item 1 of Left out"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
 	[\SplayZ, "deprecated since 3.10"],
 	[\XIn, "a helper of InBus"],
