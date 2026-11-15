@@ -159,13 +159,15 @@ var argumentKinds = [
 	[\XOut, \kr, \channelsArray, \array]
 ];
 // The census of the classes whose rate methods do more than new1: the
-// pseudo-UGens, whose rate methods build other UGens, and the classes of 0.4.
-// The crate has a body for each rate method of a class of bodies.
-var bodies = [\BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter,
-	\DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LinLin, \LinSelectX, \LocalBuf,
-	\LocalIn, \Mix, \MultiTap, \NumChannels, \PMOsc, \PingPong, \Poll, \SelectX,
-	\SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz, \Sum3, \Sum4, \TChoose,
-	\TWChoose, \Tap, \UnpackFFT];
+// pseudo-UGens, whose rate methods build other UGens, the classes of 0.4, and
+// the controls, which take their special index from the build. The crate has
+// a body for each rate method of a class of bodies, but a method that sclang
+// refuses as not valid for its subclass.
+var bodies = [\AudioControl, \BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD,
+	\Control, \Dstutter, \DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LagControl,
+	\LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix, \MultiTap, \NumChannels, \PMOsc,
+	\PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz,
+	\Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
@@ -179,7 +181,6 @@ var leftOut = [
 ];
 // Classes that the census meets but that are no pseudo-UGens, and why.
 var notPseudo = [
-	[\LagControl, "a control, which waits for NamedControl"],
 	[\LevelComp, "a helper of Splay and SplayAz"],
 	[\MulAdd, "folds: madd of the builder"],
 	[\Ndef, "a proxy of JITLib"],
@@ -888,11 +889,16 @@ try {
 		var names = (method.argNames ? []).drop(1).asArray;
 		var through = passthroughs.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
 		var silent = silentZeros.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
-		var wired, input, zero, position;
+		var wired, input, zero, position, refusal;
 		methods = methods + 1;
 		if (bodies.includes(class.name)) {
-			pseudo = pseudo + 1;
-			described[1] ++ [\addable -> "pseudo"]
+			refusal = probe.(class, selector, numberValues.(described[0], [], []))[0];
+			if (refusal.isString and: { refusal.contains("not valid for this subclass") }) {
+				described[1] ++ [\addable -> false, \reason -> refusal]
+			} {
+				pseudo = pseudo + 1;
+				described[1] ++ [\addable -> "pseudo"]
+			}
 		} {
 			wired = wiring.(class, selector, described[0]);
 			if (customCheck.notNil and: { wired.isString.not }) {

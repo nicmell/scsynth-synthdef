@@ -421,13 +421,12 @@ two instances, instance i with element i. An array inside an array must
 make three. Last, the array argument takes `[[e0, e1], e2]`, then
 `[e2, [e0, e1]]`. The instances that they make give its `ArrayExpansion`.
 If one instance keeps the array among its inputs, the method has none.
-581 of the 635 methods are addable with a wiring, and 51 have a body. Most
+581 of the 635 methods are addable with a wiring, and 58 have a body. Most
 of the others do more than `UGen:new1` does:
 
 - The pseudo-UGens without a body, such as `Dunique`, create
   no instance of their class.
 - `VarLag` builds an `Env` with its default warp.
-- The control UGens take their special index from the build.
 - `UnaryOpUGen` and `BinaryOpUGen` take the name of an operator. Use
   `unary_op` and `binary_op` instead.
 - `MulAdd.new` folds, and orders its inputs. Use `madd` instead.
@@ -454,7 +453,6 @@ it.
 - These pseudo-UGens have no body. `Dunique.new` builds its reader at each
   use as an input, and `InBus.ar` and `InBus.kr` read a `Bus` of sclang.
 - `VarLag.ar` and `VarLag.kr` build an `Env` with their default warp.
-  `LagControl.ar` and `LagControl.kr` are controls.
 - `MulAdd.new` folds and orders its inputs. Use `madd` instead.
 - An input comes from no argument, or the inputs follow a count:
   `DecodeB2.ar`, `DecodeB2.kr` and `Dwrand.new`.
@@ -464,8 +462,6 @@ it.
   `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar` and `InRect.kr`.
 - So do `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new` and
   `UnaryOpUGen.new`. Some of these do not exist.
-- They take their special index from the build: `AudioControl.ar`,
-  `Control.ir`, `Control.kr`, `TrigControl.ir` and `TrigControl.kr`.
 
 ## Strictness
 

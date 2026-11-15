@@ -186,7 +186,12 @@ pub struct SynthDefBuilder {
     name: String,
     controls: Vec<f64>,
     control_names: Vec<ControlName>,
-    sizes: Vec<usize>,
+    /// The size of the default of each name, or none for a name of
+    /// `Control.names` that has no default yet.
+    sizes: Vec<Option<usize>>,
+    /// The last name of the current function, which `Control.init` gives
+    /// its values when it has no default.
+    last_name: Option<usize>,
     arguments: Vec<UGenInput>,
     children: Vec<Node>,
     width_first: Vec<usize>,
@@ -248,6 +253,7 @@ impl SynthDefBuilder {
             controls: Vec::new(),
             control_names: Vec::new(),
             sizes: Vec::new(),
+            last_name: None,
             arguments: Vec::new(),
             children: Vec::new(),
             width_first: Vec::new(),
@@ -291,11 +297,12 @@ impl SynthDefBuilder {
             }
         }
         for (position, arg) in args.into_iter().enumerate() {
-            builder.sizes.push(arg.values.len());
+            builder.sizes.push(Some(arg.values.len()));
             builder.control_names.push(ControlName {
                 name: arg.name,
                 index: to_u32(indices[position]),
             });
+            builder.last_name = Some(builder.control_names.len() - 1);
         }
         builder.arguments = arguments;
         Ok(builder)
@@ -316,6 +323,22 @@ impl SynthDefBuilder {
             .iter()
             .position(|control| control.name == name)?;
         self.arguments.get(position)
+    }
+
+    /// Names the next parameters, as `Control.names` does: the name at
+    /// position `i` takes the index of the parameter `i` after those of the
+    /// build so far. A name has no default until a `Control` or a
+    /// `TrigControl` gives the last name its values.
+    pub fn control_names(&mut self, names: &[&str]) {
+        let index = self.controls.len();
+        for (offset, name) in names.iter().enumerate() {
+            self.control_names.push(ControlName {
+                name: (*name).to_owned(),
+                index: to_u32(index + offset),
+            });
+            self.sizes.push(None);
+            self.last_name = Some(self.control_names.len() - 1);
+        }
     }
 
     /// Adds a UGen, as `UGen:new1` does. It gives back one output, or an
@@ -556,13 +579,16 @@ impl SynthDefBuilder {
 
     /// Adds a variant: the defaults of the parameters, with the values of
     /// `values` by control name, as the `variants` of `SynthDef.new` give
-    /// them. Its name is `<definition>.<name>`.
+    /// them. Its name is `<definition>.<name>`. A name that two controls
+    /// share sets the last of them, as the map of names of sclang does.
     ///
     /// # Errors
     ///
     /// A [`BuildError`] for a name that a variant has already, for a control
     /// that the definition does not have, and for more values than the
-    /// control has.
+    /// default of the control has, or than the parameters hold from its
+    /// index. A name of [`control_names`](Self::control_names) without a
+    /// default takes no value.
     pub fn variant(&mut self, name: &str, values: &[(&str, Vec<f64>)]) -> Result<(), BuildError> {
         let full_name = format!("{}.{name}", self.name);
         if self
@@ -577,23 +603,27 @@ impl SynthDefBuilder {
             let Some(position) = self
                 .control_names
                 .iter()
-                .position(|control_name| control_name.name == *control)
+                .rposition(|control_name| control_name.name == *control)
             else {
                 return Err(BuildError::UnknownControl {
                     variant: full_name,
                     control: (*control).to_owned(),
                 });
             };
-            if control_values.len() > self.sizes[position] {
+            let start = to_usize(self.control_names[position].index);
+            let room = controls.len().saturating_sub(start);
+            let size = self.sizes[position].unwrap_or(0).min(room);
+            if control_values.len() > size {
                 return Err(BuildError::VariantSize {
                     variant: full_name,
                     control: (*control).to_owned(),
                     values: control_values.len(),
-                    size: self.sizes[position],
+                    size,
                 });
             }
-            let start = to_usize(self.control_names[position].index);
-            controls[start..start + control_values.len()].copy_from_slice(control_values);
+            if let Some(slots) = controls.get_mut(start..start + control_values.len()) {
+                slots.copy_from_slice(control_values);
+            }
         }
         self.variants.push(Variant {
             name: full_name,
@@ -713,7 +743,8 @@ impl SynthDefBuilder {
             Group::Control if lags.iter().any(|&lag| lag != 0.0) => {
                 let mut outputs = Vec::with_capacity(values.len());
                 for (values, lags) in values.chunks(16).zip(lags.chunks(16)) {
-                    outputs.extend(self.add_control("LagControl", Rate::Control, values, lags)?);
+                    let lags: Vec<UGenInput> = lags.iter().map(|&lag| lag.into()).collect();
+                    outputs.extend(self.add_control("LagControl", Rate::Control, values, &lags)?);
                 }
                 Ok(outputs)
             }
@@ -726,16 +757,20 @@ impl SynthDefBuilder {
         name: &str,
         rate: Rate,
         values: &[f64],
-        lags: &[f64],
+        lags: &[UGenInput],
     ) -> Result<Vec<OutputProxy>, BuildError> {
         let special_index = i16::try_from(self.controls.len())
             .map_err(|_| BuildError::TooManyParameters(self.controls.len()))?;
+        let mut inputs = Vec::with_capacity(lags.len());
+        for (input, lag) in lags.iter().enumerate() {
+            inputs.push(self.source(name, input, lag)?);
+        }
         self.controls.extend_from_slice(values);
         let index = self.children.len();
         self.children.push(Node {
             name: name.to_owned(),
             rate,
-            inputs: lags.iter().map(|&lag| Source::Number(lag)).collect(),
+            inputs,
             outputs: vec![rate; values.len()],
             special_index,
             width_first_before: self.width_first.len(),
@@ -750,18 +785,51 @@ impl SynthDefBuilder {
             .collect())
     }
 
-    /// Runs `build`, and removes the UGens that it added if it fails.
+    /// Adds a control UGen of `values` at the next parameter, as the `init`
+    /// of `Control`, `AudioControl` and `LagControl` does. A `Control` or a
+    /// `TrigControl` gives its values to the last name, if that name has no
+    /// default.
+    pub(crate) fn control_ugen(
+        &mut self,
+        class: &str,
+        rate: Rate,
+        values: &[f64],
+        lags: &[UGenInput],
+    ) -> Result<UGenInput, BuildError> {
+        self.add_control(class, rate, values, lags)?;
+        if matches!(class, "Control" | "TrigControl") {
+            if let Some(size @ None) = self.last_name.and_then(|name| self.sizes.get_mut(name)) {
+                *size = Some(values.len());
+            }
+        }
+        Ok(self.outputs_of(self.children.len() - 1))
+    }
+
+    /// Runs `build`, and gives back the build as it was if it fails: its
+    /// UGens, its parameters and its names.
     fn transaction<T>(
         &mut self,
         build: impl FnOnce(&mut Self) -> Result<T, BuildError>,
     ) -> Result<T, BuildError> {
         let (children, width_first) = (self.children.len(), self.width_first.len());
-        let max_local_bufs = self.max_local_bufs;
+        let (controls, names) = (self.controls.len(), self.control_names.len());
+        let (max_local_bufs, last_name) = (self.max_local_bufs, self.last_name);
+        let last_size = last_name.and_then(|name| self.sizes.get(name).copied());
         let result = build(self);
         if result.is_err() {
             self.children.truncate(children);
             self.width_first.truncate(width_first);
+            self.controls.truncate(controls);
+            self.control_names.truncate(names);
+            self.sizes.truncate(names);
             self.max_local_bufs = max_local_bufs;
+            self.last_name = last_name;
+            if let (Some(slot), Some(size)) = (
+                last_name.and_then(|name| self.sizes.get_mut(name)),
+                last_size,
+            ) {
+                *slot = size;
+            }
         }
         result
     }

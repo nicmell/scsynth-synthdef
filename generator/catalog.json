@@ -1547,8 +1547,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -6724,8 +6723,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         },
         {
           "selector": "ir",
@@ -6736,8 +6734,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -20922,8 +20919,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -20939,8 +20935,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "ir",
@@ -37389,8 +37384,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         },
         {
           "selector": "ir",
@@ -37401,8 +37395,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },

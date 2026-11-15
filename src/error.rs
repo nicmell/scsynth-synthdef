@@ -478,6 +478,15 @@ pub enum BuildError {
         /// What fails in sclang.
         message: String,
     },
+    /// A control that sclang 3.14.1 throws on, or writes a broken
+    /// definition for: values and lags of `LagControl` that differ in size.
+    #[non_exhaustive]
+    BadControl {
+        /// The class, such as `LagControl`.
+        class: String,
+        /// What fails in sclang.
+        message: String,
+    },
 }
 
 impl fmt::Display for BuildError {
@@ -553,7 +562,9 @@ impl fmt::Display for BuildError {
                 f,
                 "the argument {argument} of {class} must give at least one channel"
             ),
-            Self::CheckInputs { class, message } => write!(f, "{class}: {message}"),
+            Self::CheckInputs { class, message } | Self::BadControl { class, message } => {
+                write!(f, "{class}: {message}")
+            }
             Self::Limit(error) => write!(f, "{error}"),
             Self::UnsupportedRate { ugen, rate } => {
                 write!(f, "{ugen} takes no input at the rate {rate:?}")

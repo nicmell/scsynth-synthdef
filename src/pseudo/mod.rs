@@ -162,12 +162,15 @@ type Body = fn(&mut SynthDefBuilder, &Args) -> Result<UGenInput, BuildError>;
 /// The body of each method that the catalogue marks `Addable::Pseudo`, by
 /// class and selector.
 static BODIES: &[(&str, &str, Body)] = &[
+    ("AudioControl", "ar", in_out::audio_control_ar),
     ("BHiPass4", "ar", beq_suite::b_hi_pass4),
     ("BLowPass4", "ar", beq_suite::b_low_pass4),
     ("BeatTrack", "kr", machine_listening::beat_track),
     ("Changed", "ar", filter::changed),
     ("Changed", "kr", filter::changed),
     ("CompanderD", "ar", compander::compander_d),
+    ("Control", "ir", in_out::control_ir),
+    ("Control", "kr", in_out::control_kr),
     ("Dstutter", "new", demand::dstutter),
     ("DynKlang", "ar", fsin_osc::dyn_klang),
     ("DynKlang", "kr", fsin_osc::dyn_klang),
@@ -176,6 +179,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("HilbertFIR", "ar", hilbert::hilbert_fir),
     ("Klang", "ar", fsin_osc::klang),
     ("Klank", "ar", fsin_osc::klank),
+    ("LagControl", "ar", in_out::lag_control_ar),
+    ("LagControl", "kr", in_out::lag_control_kr),
     ("LinLin", "ar", line::lin_lin_ar),
     ("LinLin", "kr", line::lin_lin_kr),
     ("LinSelectX", "ar", osc::lin_select_x),
@@ -212,6 +217,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("TWChoose", "ar", osc::tw_choose),
     ("TWChoose", "kr", osc::tw_choose),
     ("Tap", "ar", buf_io::tap),
+    ("TrigControl", "ir", in_out::trig_control_ir),
+    ("TrigControl", "kr", in_out::trig_control_kr),
     ("UnpackFFT", "new", fft_unpacking::unpack_fft),
 ];
 

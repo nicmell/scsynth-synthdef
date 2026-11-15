@@ -637,7 +637,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                 args: &[
                     ArgSpec { name: "values", kind: ArgKind::Array, default: None },
                 ],
-                addable: Addable::No("the special index depends on the inputs"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -3063,14 +3063,14 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                 args: &[
                     ArgSpec { name: "values", kind: ArgKind::Array, default: None },
                 ],
-                addable: Addable::No("the special index depends on the inputs"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "ir",
                 args: &[
                     ArgSpec { name: "values", kind: ArgKind::Array, default: None },
                 ],
-                addable: Addable::No("the special index depends on the inputs"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -9421,7 +9421,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "values", kind: ArgKind::Array, default: None },
                     ArgSpec { name: "lags", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -9429,7 +9429,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "values", kind: ArgKind::Array, default: None },
                     ArgSpec { name: "lags", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("with control-rate inputs, the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "ir",
@@ -17273,14 +17273,14 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                 args: &[
                     ArgSpec { name: "values", kind: ArgKind::Array, default: None },
                 ],
-                addable: Addable::No("the special index depends on the inputs"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "ir",
                 args: &[
                     ArgSpec { name: "values", kind: ArgKind::Array, default: None },
                 ],
-                addable: Addable::No("the special index depends on the inputs"),
+                addable: Addable::Pseudo,
             },
         ],
     },

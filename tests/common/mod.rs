@@ -2,6 +2,7 @@
 //! holds the sclang code of each.
 #![allow(dead_code)]
 
+mod controls;
 mod optimize;
 mod pseudo;
 
@@ -91,6 +92,7 @@ pub const NAMES: &[&str] = &[
     "optimize",
     "deadcode",
     "pvcopy",
+    "controlugens",
 ];
 
 /// The bytes of a golden file.
@@ -143,6 +145,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "madd_numbers" => vec![madd_numbers()],
         "folds" => vec![folds()],
         "optimize" | "deadcode" | "pvcopy" => optimize::definitions(name),
+        "controlugens" => controls::definitions(name),
         _ => pseudo::definitions(name),
     }
 }
