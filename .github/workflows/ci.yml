@@ -34,8 +34,8 @@ jobs:
         run: cargo doc --locked --no-deps --all-features
         env:
           RUSTDOCFLAGS: "-Dwarnings"
-      - name: wasm32
-        run: cargo check --locked --all-features --target wasm32-unknown-unknown
+      - name: clippy (wasm32)
+        run: cargo clippy --locked --all-features --target wasm32-unknown-unknown
       - name: package
         run: cargo package --locked --target-dir "$RUNNER_TEMP/package"
 

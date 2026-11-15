@@ -18,6 +18,7 @@ README lists the same items under "Left out".
 ## sc-app3
 
 sc-app3 takes version 0.7 by a move of its submodule
-`crates/scsynth-synthdef` to the tag `v0.7.0`, on a branch of sc-app3. A
+`crates/scsynth-synthdef` to the tag `v0.7.1`, on a branch of sc-app3. A
 new test of sc-expression compiles the markup of `optimize_args` against
-the golden file of the crate.
+the golden file of the crate. The clippy of sc-app3 lints the crate for
+`wasm32-unknown-unknown`, which `v0.7.0` fails.
