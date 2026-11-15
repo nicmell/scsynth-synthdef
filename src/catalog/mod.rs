@@ -536,7 +536,7 @@ mod tests {
     #[test]
     fn a_method_that_does_more_than_new1_is_not_addable() {
         // Fact 33 of the plan of 0.1.
-        assert!(reason("VarLag", "kr").contains("no instance"));
+        assert!(reason("Dunique", "new").contains("no instance"));
         assert!(reason("MaxLocalBufs", "new").contains("no argument"));
         assert_eq!(wiring("DelayN", "kr").rate, Rate::Control);
     }

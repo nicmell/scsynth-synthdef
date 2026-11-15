@@ -130,3 +130,40 @@ fn an_ienv_gen_that_fails_takes_back_the_sum_of_the_times() {
         def.children
     );
 }
+
+#[test]
+fn var_lag_refuses_what_sclang_throws_on() {
+    let mut b = SynthDefBuilder::new("var_lag", vec![]).unwrap();
+    let x = b
+        .ugen(
+            "NamedControl",
+            "kr",
+            &[("name", "x".into()), ("values", input(1.0))],
+        )
+        .unwrap();
+    // sclang: "Env shape not defined".
+    let warp = b.ugen(
+        "VarLag",
+        "kr",
+        &[
+            ("in", input(x.clone())),
+            ("time", input(0.2)),
+            ("warp", "foo".into()),
+        ],
+    );
+    assert!(is_bad_env(&warp, "VarLag"), "{warp:?}");
+    // A real VarLag at audio rate takes the rule of Filter.
+    let rate = b.ugen(
+        "VarLag",
+        "ar",
+        &[
+            ("in", input(x)),
+            ("time", input(0.2)),
+            ("warp", "lin".into()),
+        ],
+    );
+    assert!(
+        matches!(rate, Err(BuildError::CheckInputs { .. })),
+        "{rate:?}"
+    );
+}

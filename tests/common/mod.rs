@@ -99,6 +99,7 @@ pub const NAMES: &[&str] = &[
     "namedcontrol",
     "env",
     "ienv",
+    "varlag",
 ];
 
 /// The bytes of a golden file.
@@ -152,7 +153,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "folds" => vec![folds()],
         "optimize" | "deadcode" | "pvcopy" => optimize::definitions(name),
         "controlugens" | "defwrap" | "specs" | "namedcontrol" => controls::definitions(name),
-        "env" | "ienv" => envelopes::definitions(name),
+        "env" | "ienv" | "varlag" => envelopes::definitions(name),
         _ => pseudo::definitions(name),
     }
 }

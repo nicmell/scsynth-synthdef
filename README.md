@@ -542,7 +542,6 @@ it.
 
 - These pseudo-UGens have no body. `Dunique.new` builds its reader at each
   use as an input, and `InBus.ar` and `InBus.kr` read a `Bus` of sclang.
-- `VarLag.ar` and `VarLag.kr` build an `Env` with their default warp.
 - `MulAdd.new` folds and orders its inputs. Use `madd` instead.
 - An input comes from no argument, or the inputs follow a count:
   `DecodeB2.ar`, `DecodeB2.kr` and `Dwrand.new`.

@@ -12,6 +12,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
     match name {
         "env" => [constructors(), points(), curves(), outputs()].concat(),
         "ienv" => ienv(),
+        "varlag" => varlag(),
         _ => panic!("no golden graph of 0.9 is named {name}"),
     }
 }
@@ -394,6 +395,109 @@ fn ienv() -> Vec<SynthDef> {
             ]);
             let made = env(b, "xyc", &[("xyc", input(points))]);
             ienv_out(b, made, 1.5.into());
+        }),
+    ]
+}
+
+/// `VarLag.selector(args)`.
+fn var_lag(b: &mut SynthDefBuilder, selector: &str, args: &[(&str, ArgValue)]) -> UGenInput {
+    b.ugen("VarLag", selector, args)
+        .unwrap_or_else(|error| panic!("VarLag.{selector}: {error}"))
+}
+
+/// `\\name.ar(value)`.
+fn ar(b: &mut SynthDefBuilder, name: &str, value: f64) -> UGenInput {
+    b.ugen(
+        "NamedControl",
+        "ar",
+        &[("name", name.into()), ("values", input(value))],
+    )
+    .unwrap()
+}
+
+/// A definition of `Out.kr(0, VarLag.kr(\\x.kr(1), 0.2, ...))`, with these
+/// more arguments.
+fn lag_of(name: &str, more: Vec<(&'static str, ArgValue)>) -> SynthDef {
+    def(name, vec![], move |b| {
+        let x = kr(b, "x", 1.0);
+        let mut args = vec![("in", input(x)), ("time", input(0.2))];
+        args.extend(more);
+        let lagged = var_lag(b, "kr", &args);
+        out(b, "kr", lagged);
+    })
+}
+
+fn varlag() -> Vec<SynthDef> {
+    let warp = |curve: Curve| ("warp", ArgValue::Curve(curve));
+    vec![
+        lag_of("varlag_kr", vec![]),
+        def("varlag_ar", vec![], |b| {
+            let x = ar(b, "x", 1.0);
+            let lagged = var_lag(b, "ar", &[("in", input(x)), ("time", input(0.2))]);
+            out(b, "ar", lagged);
+        }),
+        lag_of("varlag_lin", vec![warp(Curve::from("lin"))]),
+        lag_of("varlag_one", vec![warp(Curve::from(1.0))]),
+        def("varlag_exp", vec![], |b| {
+            let x = ar(b, "x", 1.0);
+            let t = kr(b, "t", 0.2);
+            let lagged = var_lag(
+                b,
+                "ar",
+                &[
+                    ("in", input(x)),
+                    ("time", input(t)),
+                    ("curvature", input(2.0)),
+                    warp(Curve::from("exp")),
+                ],
+            );
+            out(b, "ar", lagged);
+        }),
+        lag_of(
+            "varlag_three",
+            vec![("curvature", input(-2.0)), warp(Curve::from(3.0))],
+        ),
+        lag_of("varlag_start", vec![("start", input(0.5))]),
+        def("varlag_ugen_warp", vec![], |b| {
+            let x = kr(b, "x", 1.0);
+            let w = kr(b, "w", 5.0);
+            let lagged = var_lag(
+                b,
+                "kr",
+                &[("in", input(x)), ("time", input(0.2)), warp(Curve::from(w))],
+            );
+            out(b, "kr", lagged);
+        }),
+        def("varlag_array", vec![], |b| {
+            let inputs = UGenInput::Array(vec![kr(b, "x", 1.0), kr(b, "y", 2.0)]);
+            let lagged = var_lag(b, "kr", &[("in", input(inputs)), ("time", input(0.2))]);
+            out(b, "kr", lagged);
+        }),
+        lag_of(
+            "varlag_array_warp",
+            vec![warp(Curve::Array(vec![Curve::from(5.0), Curve::from(1.0)]))],
+        ),
+        lag_of(
+            "varlag_madd",
+            vec![("mul", input(2.0)), ("add", input(1.0))],
+        ),
+        def("varlag_scalar", vec![], |b| {
+            let lagged = var_lag(
+                b,
+                "kr",
+                &[
+                    ("in", input(3.0)),
+                    ("time", input(0.2)),
+                    ("mul", input(2.0)),
+                    ("add", input(1.0)),
+                ],
+            );
+            out(b, "kr", lagged);
+        }),
+        def("varlag_time_zero", vec![], |b| {
+            let x = kr(b, "x", 1.0);
+            let lagged = var_lag(b, "kr", &[("in", input(x)), ("time", input(0.0))]);
+            out(b, "kr", lagged);
         }),
     ]
 }

@@ -2460,7 +2460,7 @@ mod tests {
             BuildError::UnknownMethod { .. }
         ));
         assert!(matches!(
-            refuse("VarLag", "kr", &[]),
+            refuse("Dunique", "new", &[]),
             BuildError::NotAddable { .. }
         ));
         assert!(matches!(

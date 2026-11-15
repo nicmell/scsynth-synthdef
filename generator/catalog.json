@@ -38663,7 +38663,7 @@
             },
             {
               "name": "warp",
-              "kind": "signal",
+              "kind": "curve",
               "default": {
                 "float": 5
               }
@@ -38688,8 +38688,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -38717,7 +38716,7 @@
             },
             {
               "name": "warp",
-              "kind": "signal",
+              "kind": "curve",
               "default": {
                 "float": 5
               }
@@ -38742,8 +38741,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },

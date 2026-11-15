@@ -192,6 +192,8 @@ var argumentKinds = [
 	[\TWindex, \kr, \array, \array],
 	[\Tap, \ar, \numChannels, \count],
 	[\VDiskIn, \ar, \numChannels, \count],
+	[\VarLag, \ar, \warp, \curve],
+	[\VarLag, \kr, \warp, \curve],
 	[\Warp1, \ar, \numChannels, \count],
 	[\XOut, \ar, \channelsArray, \array],
 	[\XOut, \kr, \channelsArray, \array]
@@ -205,7 +207,8 @@ var bodies = [\AudioControl, \BeatTrack, \BHiPass4, \BLowPass4, \Changed, \Compa
 	\Control, \Dstutter, \DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LagControl,
 	\LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix, \MultiTap, \NamedControl,
 	\NumChannels, \PMOsc, \PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
-	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT];
+	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT,
+	\VarLag];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
@@ -220,8 +223,7 @@ var leftOut = [
 var notPseudo = [
 	[\LevelComp, "a helper of Splay and SplayAz"],
 	[\MulAdd, "folds: madd of the builder"],
-	[\Ndef, "a proxy of JITLib"],
-	[\VarLag, "builds an Env with its default warp, which waits for Env"]
+	[\Ndef, "a proxy of JITLib"]
 ];
 var census = bodies ++ leftOut.collect(_.first) ++ notPseudo.collect(_.first);
 

@@ -252,6 +252,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("TrigControl", "ir", in_out::trig_control_ir),
     ("TrigControl", "kr", in_out::trig_control_kr),
     ("UnpackFFT", "new", fft_unpacking::unpack_fft),
+    ("VarLag", "ar", filter::var_lag),
+    ("VarLag", "kr", filter::var_lag),
 ];
 
 /// Runs the body of the method `method` of `class` on its bound arguments.
