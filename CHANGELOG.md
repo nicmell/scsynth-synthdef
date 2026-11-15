@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.8.0 (2026-11-15)
+
+The controls that a graph function makes after its arguments, as sclang
+3.14.1 makes them.
+
+### Added
+
+- `ugen` adds `NamedControl.ar`, `kr`, `ir`, `tr` and `new`, as
+  `\freq.kr(440)` adds them, with the table of names of the build. See
+  [Controls inside the graph](README.md#controls-inside-the-graph).
+- `ugen` adds `Control.kr`, `Control.ir`, `TrigControl.kr`,
+  `TrigControl.ir`, `AudioControl.ar`, `LagControl.kr` and
+  `LagControl.ar`. `SynthDefBuilder::control_names` names the next
+  parameters, as `Control.names` does.
+- `SynthDefBuilder::wrap`: the controls of the arguments of a function
+  inside the graph function, and a closure that takes them, as
+  `SynthDef.wrap` does.
+- `ControlSpec`, `catalog::spec` and `catalog::specs`: the 23 specs of
+  `Spec.specs`.
+- `BuildError::BadControl`, for a control that sclang throws on.
+- `generator/fixtures.scd` writes the golden files of 0.8:
+  `controlugens`, `defwrap`, `specs` and `namedcontrol`. Sixteen graphs
+  that the crate refuses must break in sclang, or the script fails.
+
+### Changed
+
+- The seven methods of the classes of controls no longer give
+  `NotAddable`. `ugen` refuses 21 methods, from 28. `LagControl.ir` stays
+  refused.
+- `variant` takes the last of two entries of one name, as the map of
+  sclang does. It takes no value past the parameters, and no value for a
+  name of `control_names` without a default.
+- A call that fails also gives back the parameters and the names of the
+  build as they were.
+- A `RateMethod` can be `tr`, as `NamedControl.tr` is.
+
 ## 0.7.1 (2026-11-14)
 
 ### Fixed

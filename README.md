@@ -84,6 +84,9 @@ assert_eq!(def.children.len(), 3);
     follows the order of the arguments.
 - `arguments` gives one `UGenInput` per argument: an output, or an array of
   outputs for an array.
+- `wrap`, `control_names`, and `ugen` with `NamedControl` and the classes
+  of controls add controls after the arguments (see
+  [Controls inside the graph](#controls-inside-the-graph)).
 - `ugen` adds a UGen by its class name and the selector of a rate method,
   `ar`, `kr`, `ir`, `tr` or `new`, with the arguments by name. The catalogue
   gives the order of the arguments, their defaults, the wiring and the
@@ -111,7 +114,9 @@ assert_eq!(def.children.len(), 3);
   `operator` gives the special index of each name, and the name of each
   index.
 - `madd` multiplies an input and adds to it, as `MulAdd.new` does.
-- `variant` adds a variant by control name, from the defaults.
+- `variant` adds a variant by control name, from the defaults. A name that
+  two controls share sets the last of them, as the map of names of sclang
+  does.
 - `finish` copies the PV chains and rewrites the graph, as `finishBuild`
   does (see
   [`optimizeGraph` and the copies of PV chains](#optimizegraph-and-the-copies-of-pv-chains)).
@@ -379,6 +384,86 @@ of the rewritten graph.
   another UGen reads: sclang drops UGens. So `x * 2 + 1`, with three more
   readers of `x` that nothing reads, gives a definition with no UGens.
 
+### Controls inside the graph
+
+A graph function can make controls after its arguments. The crate builds
+them as sclang 3.14.1 does, and each control UGen takes the next
+parameters of the build.
+
+```rust
+use scsynth_synthdef::{Arg, SynthDefBuilder};
+
+// SynthDef(\named, { |amp = 0.1|
+//     var freq = \freq.kr(440, 0.1);
+//     Out.ar(0, SynthDef.wrap({ |pan = 0| Pan2.ar(SinOsc.ar(freq), pan) }) * amp)
+// })
+let mut builder = SynthDefBuilder::new("named", vec![Arg::new("amp", 0.1)])?;
+let amp = builder.arguments()[0].clone();
+let freq = builder.ugen(
+    "NamedControl",
+    "kr",
+    &[("name", "freq".into()), ("values", 440.0.into()), ("lags", 0.1.into())],
+)?;
+let sound = builder.wrap(vec![Arg::new("pan", 0.0)], |builder, inputs| {
+    let sine = builder.ugen("SinOsc", "ar", &[("freq", freq.into())])?;
+    builder.ugen("Pan2", "ar", &[("in", sine.into()), ("pos", inputs[0].clone().into())])
+})?;
+let sound = builder.binary_op("*", sound, amp)?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", sound.into())])?;
+let def = builder.finish()?;
+let names: Vec<&str> = def.control_names.iter().map(|name| name.name.as_str()).collect();
+assert_eq!(names, ["amp", "freq", "pan"]);
+assert_eq!(def.controls, [0.1, 440.0, 0.0]);
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+- `NamedControl.ar`, `kr`, `ir`, `tr` and `new` add a named control, as
+  `\freq.kr(440)` does. The first use of a name makes its control UGen,
+  and a later use gives back the same control.
+- A name whose second byte is `_` has a prefix: its first byte. The first
+  match gives the rate: audio (the prefix `a` or `ar`), trigger (`t` or
+  `tr`), scalar (`i` or `ir`), else control. The arguments of `new` try
+  scalar first.
+- Each 0 among the lags becomes nil, so a lag of 0 means no lag. Lags at
+  scalar rate, such as a number, are fixed, and so are all lags with
+  `fixedLag`. Fixed lags make a `LagControl`. Other lags add a `Lag` at
+  each use, at the rate of the control.
+- The order of the uses counts. A first use with a number lag makes a
+  `LagControl`, which a later use without a lag reads. A first use without
+  a lag, then a number lag, gives a `Control` and a `Lag`.
+- A prefix drops fixed lags, so `\x_freq.kr(440, 0.1)` has no lag.
+  `NamedControl.ir` and `NamedControl.tr` with a number lag give a
+  `LagControl` at control rate.
+- The values can nest. The control takes them flat, and the result takes
+  their shape. A spec without values gives the default of the spec of that
+  name in `catalog::spec`.
+- `control_names` names the next parameters, as `Control.names` does. Then
+  `ugen` adds `Control`, `TrigControl`, `AudioControl` or `LagControl` by
+  name. If the last name has no default, a `Control` or a `TrigControl`
+  gives it its values.
+- `LagControl.kr` takes the values in groups of 16, and gives back an
+  array. `LagControl.ar` is an `AudioControl` and its `Lag`s.
+- `wrap` adds the controls of the arguments of a function inside the graph
+  function, as `SynthDef.wrap` does. Then it calls a closure with their
+  inputs. The controls take the groups of rate of `new`. For
+  `prependArgs`, the closure takes their values from its caller, and `new`
+  and `wrap` get only the arguments that become controls.
+- If the metadata of a definition has specs, sclang gives an argument
+  without a default the default of the spec of its name. Give that default
+  to `Arg::new`.
+- Two controls can share a name, such as an argument and a `NamedControl`.
+  The crate writes both entries, as sclang does (see [Traps](#traps)).
+
+`BuildError::BadControl` refuses a control that sclang throws on:
+
+- A later use of a `NamedControl` that gives other values, another rate,
+  or other fixed lags than the first use.
+- An unknown spec on a `NamedControl` without values.
+- A 0 among lags that reach a UGen. A prefix keeps fixed lags from the
+  UGens.
+- Values and lags of `LagControl.kr` that differ in size: sclang gives nil,
+  and its reader throws.
+
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
@@ -394,6 +479,9 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
   `fft_size` is how `fftSize` finds the FFT of a PV chain. `doc_url` gives
   its page on doc.sccode.org.
 - A `PseudoClass` has its categories in the help and its rate methods.
+- `catalog::spec` and `catalog::specs` give the 23 `ControlSpec`s of
+  `Spec.specs`: the range, the warp, the step, the default and the units
+  of each name, such as `freq`.
 - A `RateMethod` is `ar`, `kr`, `ir`, `tr` or `new`. It has its arguments,
   each with a kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
@@ -440,7 +528,9 @@ class is in no table, the script fails. Two more tables name the methods
 of the Lag family and the arguments whose zeros become silence. Probes
 test each entry. If one does not hold, the script fails. Two more tables
 map the class that owns `optimizeGraph` and `fftSize` to `optimize` and
-`fft_size`. If no table names the owner, the script fails.
+`fft_size`. If no table names the owner, the script fails. Last, the
+script writes the specs of `Spec.specs`. It fails on a spec that is not a
+`ControlSpec`, and on a warp that is not a symbol.
 
 The catalogue gives the page of each class in the help, and not its
 summary: the help of SuperCollider is GPL-3, and the crate copies none of
@@ -516,6 +606,10 @@ The crate does not rule these out, and neither does sclang:
 - An array argument shorter than what the UGen reads. For example, a raw
   envelope for `EnvGen` with too few values makes scsynth read past the
   inputs of the unit.
+- Two controls of one name, such as an argument and a `NamedControl`.
+  scsynth sets the first of them at `/s_new` and `/n_set` (measured in
+  NRT). Its table of parameters keeps the first name (`HashTable::Add`). A
+  variant sets the last of them.
 - The inputs of `add`, which take no check but NaN. A UGen with fewer
   inputs than its plugin reads, or with inputs at the wrong rate, reaches
   scsynth as it is.
@@ -581,21 +675,30 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   function: build the array, then call `new`, `ar` or `kr`.
 - Numbers are the Floats of sclang. sclang keeps its Integers apart, but
   gives the same values for the operators of the pseudo-UGens.
+- A spec as an array or a `ControlSpec`, such as `[0, 1, \lin, 0, 0.5]`:
+  the `spec` of `NamedControl` takes a name of `catalog::specs`. Give the
+  default of such a spec as the values. sclang keeps the spec only in the
+  metadata, which the crate does not build.
+- A `NamedControl` without a name: sclang names it `nil`, and `ugen`
+  refuses it.
+- Values and lags of `LagControl.kr` that differ in size: if nothing reads
+  the result, sclang skips the call. `ugen` refuses it.
+- `LagControl.kr` with no values: sclang adds nothing, and `ugen` refuses
+  it.
 
 ## Left out
 
-These are not in version 0.7, in the order of their value for sc-app3:
+These are not in version 0.8, in the order of their value for sc-app3:
 
-1. `NamedControl`, `Control.names`, `SynthDef.wrap`, `prependArgs`, the
-   specs of the metadata, and `LagControl`
-2. `Env`, `VarLag`, and the pseudo-UGens that wait for items 1 and 2:
-   `EnvGate`, and the `pvcalc` methods of `PV_ChainUGen`
+1. `Env`, `VarLag`, and `EnvGate`, which waits for `Env`
+2. The `pvcalc` methods of `PV_ChainUGen`, which take a function and need
+   `PackFFT`
 3. sc3-plugins
 
-Also left out: the view of `SynthDesc` (its inputs, outputs and metadata),
-and the count of interconnect buffers. So are the pseudo-UGens `AudioIn`
-and `SplayZ`, deprecated since 3.10, and `InBus`, `XIn` and `XInFeedback`
-of `JITLib`. `Dunique` builds a reader at each use as an input, and the
+Also left out: the view of `SynthDesc` (its inputs, outputs and metadata,
+the specs included), and the count of interconnect buffers. So are the
+pseudo-UGens `AudioIn` and `SplayZ`, deprecated since 3.10, and `InBus`,
+`XIn` and `XInFeedback` of `JITLib`. `Dunique` builds a reader at each use as an input, and the
 crate adds the UGens of a method at its call. The methods of `UGen` that
 build graphs, such as `range` and `linlin`, are not pseudo-UGens. `range`
 needs the `signalRange` of each class, which the catalogue does not measure
@@ -618,8 +721,10 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 - `generator/sclang_conf.yaml` compiles the core class library of
   `/Applications/SuperCollider.app` alone, without the Extensions folder and
   without quarks. For another installation, change its path.
-- A graph that the crate refuses with `BuildError::FinishBuild` must break
-  in sclang. If it does not, the script fails.
+- A graph that the crate refuses must break in sclang, or the script
+  fails. The build or the write throws, or the definition is broken. A
+  broken definition lacks an `Out`, holds a UGen twice, points a name past
+  the parameters, or writes a variant without values.
 - `tests/fixtures/arithmetic.json` holds operands and results of the
   operators that sclang computes on Floats, as the bits of each f64.
 - `~/.bin/sclang` changes the directory, so the paths must be absolute.
