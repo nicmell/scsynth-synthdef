@@ -13,7 +13,7 @@ use crate::file::Version;
 use crate::limits;
 use crate::operator;
 use crate::optimize::{self, Rewritten};
-use crate::pseudo::{self, lang};
+use crate::pseudo::{self, NamedEntry, lang};
 use crate::rate::{Rate, least_by_name};
 use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
 use crate::topo;
@@ -192,6 +192,8 @@ pub struct SynthDefBuilder {
     /// The last name of the current function, which `Control.init` gives
     /// its values when it has no default.
     last_name: Option<usize>,
+    /// The table of `NamedControl` for the build, in the order of the names.
+    named: Vec<NamedEntry>,
     arguments: Vec<UGenInput>,
     children: Vec<Node>,
     width_first: Vec<usize>,
@@ -240,6 +242,7 @@ impl SynthDefBuilder {
             control_names: Vec::new(),
             sizes: Vec::new(),
             last_name: None,
+            named: Vec::new(),
             arguments: Vec::new(),
             children: Vec::new(),
             width_first: Vec::new(),
@@ -819,6 +822,27 @@ impl SynthDefBuilder {
             .collect())
     }
 
+    /// Names the next parameter, with a default of `size` values, as
+    /// `addIr`, `addKr`, `addTr` and `addAr` do for a `NamedControl`.
+    pub(crate) fn add_control_name(&mut self, name: &str, size: usize) {
+        self.control_names.push(ControlName {
+            name: name.to_owned(),
+            index: to_u32(self.controls.len()),
+        });
+        self.sizes.push(Some(size));
+        self.last_name = Some(self.control_names.len() - 1);
+    }
+
+    /// The table of `NamedControl` for the build.
+    pub(crate) fn named_controls(&self) -> &[NamedEntry] {
+        &self.named
+    }
+
+    /// Adds a name to the table of `NamedControl`.
+    pub(crate) fn push_named_control(&mut self, entry: NamedEntry) {
+        self.named.push(entry);
+    }
+
     /// Adds a control UGen of `values` at the next parameter, as the `init`
     /// of `Control`, `AudioControl` and `LagControl` does. A `Control` or a
     /// `TrigControl` gives its values to the last name, if that name has no
@@ -846,7 +870,11 @@ impl SynthDefBuilder {
         build: impl FnOnce(&mut Self) -> Result<T, BuildError>,
     ) -> Result<T, BuildError> {
         let (children, width_first) = (self.children.len(), self.width_first.len());
-        let (controls, names) = (self.controls.len(), self.control_names.len());
+        let (controls, names, entries) = (
+            self.controls.len(),
+            self.control_names.len(),
+            self.named.len(),
+        );
         let (max_local_bufs, last_name) = (self.max_local_bufs, self.last_name);
         let last_size = last_name.and_then(|name| self.sizes.get(name).copied());
         let result = build(self);
@@ -856,6 +884,7 @@ impl SynthDefBuilder {
             self.controls.truncate(controls);
             self.control_names.truncate(names);
             self.sizes.truncate(names);
+            self.named.truncate(entries);
             self.max_local_bufs = max_local_bufs;
             self.last_name = last_name;
             if let (Some(slot), Some(size)) = (

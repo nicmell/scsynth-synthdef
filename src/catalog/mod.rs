@@ -80,7 +80,7 @@ impl PseudoClass {
     }
 }
 
-/// A rate method of a class: `ar`, `kr`, `ir` or `new`.
+/// A rate method of a class: `ar`, `kr`, `ir`, `tr` or `new`.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[non_exhaustive]
 pub struct RateMethod {

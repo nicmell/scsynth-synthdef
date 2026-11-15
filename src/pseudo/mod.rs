@@ -11,6 +11,7 @@ mod demand;
 mod fft_unpacking;
 mod filter;
 mod fsin_osc;
+mod graph_builder;
 mod hilbert;
 mod in_out;
 pub(crate) mod lang;
@@ -22,6 +23,8 @@ mod pm_osc;
 mod poll;
 mod sound_in;
 mod splay;
+
+pub(crate) use graph_builder::NamedEntry;
 
 use crate::builder::{SynthDefBuilder, count_to_usize};
 use crate::catalog::RateMethod;
@@ -37,7 +40,7 @@ pub(crate) struct Args {
 }
 
 impl Args {
-    /// The selector of the method: `ar`, `kr`, `ir` or `new`.
+    /// The selector of the method: `ar`, `kr`, `ir`, `tr` or `new`.
     pub(crate) fn selector(&self) -> &'static str {
         self.method.selector
     }
@@ -192,6 +195,11 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("Mix", "kr", mix::mix_kr),
     ("Mix", "new", mix::mix_new),
     ("MultiTap", "ar", pm_osc::multi_tap),
+    ("NamedControl", "ar", graph_builder::named_control),
+    ("NamedControl", "ir", graph_builder::named_control),
+    ("NamedControl", "kr", graph_builder::named_control),
+    ("NamedControl", "new", graph_builder::named_control),
+    ("NamedControl", "tr", graph_builder::named_control),
     ("NumChannels", "ar", mix::num_channels),
     ("PMOsc", "ar", pm_osc::pm_osc),
     ("PMOsc", "kr", pm_osc::pm_osc),

@@ -18249,7 +18249,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 15] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 16] = [
     PseudoClass {
         name: "BHiPass4",
         categories: &["UGens>Filters>BEQSuite"],
@@ -18376,6 +18376,65 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 15] = [
                     ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "bufnum", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "NamedControl",
+        categories: &["UGens>Synth control"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "name", kind: ArgKind::Symbol, default: None },
+                    ArgSpec { name: "values", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "lags", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "spec", kind: ArgKind::Symbol, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "name", kind: ArgKind::Symbol, default: None },
+                    ArgSpec { name: "values", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "lags", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "fixedLag", kind: ArgKind::Bool, default: Some(ArgDefault::Bool(false)) },
+                    ArgSpec { name: "spec", kind: ArgKind::Symbol, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "ir",
+                args: &[
+                    ArgSpec { name: "name", kind: ArgKind::Symbol, default: None },
+                    ArgSpec { name: "values", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "lags", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "spec", kind: ArgKind::Symbol, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "tr",
+                args: &[
+                    ArgSpec { name: "name", kind: ArgKind::Symbol, default: None },
+                    ArgSpec { name: "values", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "lags", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "spec", kind: ArgKind::Symbol, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "new",
+                args: &[
+                    ArgSpec { name: "name", kind: ArgKind::Symbol, default: None },
+                    ArgSpec { name: "values", kind: ArgKind::Array, default: None },
+                    ArgSpec { name: "rate", kind: ArgKind::Symbol, default: None },
+                    ArgSpec { name: "lags", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "fixedLag", kind: ArgKind::Bool, default: Some(ArgDefault::Bool(false)) },
+                    ArgSpec { name: "spec", kind: ArgKind::Symbol, default: None },
                 ],
                 addable: Addable::Pseudo,
             },

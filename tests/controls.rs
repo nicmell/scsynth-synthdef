@@ -178,3 +178,152 @@ fn a_wrap_refuses_its_arguments_as_new_does() {
         "{twice:?}"
     );
 }
+
+/// `NamedControl.selector` with these arguments by name.
+fn named(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    args: &[(&str, ArgValue)],
+) -> Result<UGenInput, BuildError> {
+    b.ugen("NamedControl", selector, args)
+}
+
+fn kr(name: &str, values: impl Into<UGenInput>) -> Vec<(&str, ArgValue)> {
+    vec![("name", ArgValue::from(name)), ("values", input(values))]
+}
+
+fn kr_lag(
+    name: &str,
+    values: impl Into<UGenInput>,
+    lags: impl Into<UGenInput>,
+) -> Vec<(&str, ArgValue)> {
+    let mut args = kr(name, values);
+    args.push(("lags", input(lags)));
+    args
+}
+
+fn is_bad_control(result: &Result<UGenInput, BuildError>) -> bool {
+    matches!(result, Err(BuildError::BadControl { class, .. }) if class == "NamedControl")
+}
+
+#[test]
+fn a_named_control_refuses_a_second_use_that_disagrees() {
+    let mut b = SynthDefBuilder::new("named", vec![]).unwrap();
+    named(&mut b, "kr", &kr("freq", 440.0)).unwrap();
+    let values = named(&mut b, "kr", &kr("freq", 220.0));
+    assert!(is_bad_control(&values), "{values:?}");
+    let rate = named(&mut b, "ar", &kr("freq", 440.0));
+    assert!(is_bad_control(&rate), "{rate:?}");
+    named(&mut b, "kr", &kr_lag("a", 1.0, 0.1)).unwrap();
+    let lags = named(&mut b, "kr", &kr_lag("a", 1.0, 0.2));
+    assert!(is_bad_control(&lags), "{lags:?}");
+    let lt = named(&mut b, "kr", &kr("lt", 0.2)).unwrap();
+    let output = named(&mut b, "kr", &kr_lag("a", 1.0, lt));
+    assert!(is_bad_control(&output), "{output:?}");
+    // A spec without values gives its default first.
+    let spec = |name: &str| {
+        vec![
+            ("name", ArgValue::from("s")),
+            ("spec", ArgValue::from(name)),
+        ]
+    };
+    named(&mut b, "kr", &spec("freq")).unwrap();
+    let other = named(&mut b, "kr", &spec("amp"));
+    assert!(is_bad_control(&other), "{other:?}");
+}
+
+#[test]
+fn a_named_control_refuses_a_0_among_the_lags_that_reach_a_ugen() {
+    let mut b = SynthDefBuilder::new("zeros", vec![]).unwrap();
+    let fixed = named(
+        &mut b,
+        "kr",
+        &kr_lag("x", numbers(&[1.0, 2.0]), numbers(&[0.1, 0.0])),
+    );
+    assert!(is_bad_control(&fixed), "{fixed:?}");
+    let l = named(&mut b, "kr", &kr("l", 0.2)).unwrap();
+    let lags = UGenInput::Array(vec![0.0.into(), l]);
+    let lagged = named(&mut b, "kr", &kr_lag("y", numbers(&[1.0, 2.0]), lags));
+    assert!(is_bad_control(&lagged), "{lagged:?}");
+    // The failed call leaves no y in the table, so another default holds.
+    let again = named(&mut b, "kr", &kr("y", 3.0));
+    assert!(again.is_ok(), "{again:?}");
+    // A prefix skips the LagControl, and the lags reach no UGen.
+    let prefixed = named(
+        &mut b,
+        "kr",
+        &kr_lag("x_a", numbers(&[1.0, 2.0]), numbers(&[0.1, 0.0])),
+    );
+    assert!(prefixed.is_ok(), "{prefixed:?}");
+}
+
+#[test]
+fn a_named_control_refuses_what_sclang_throws_on() {
+    let mut b = SynthDefBuilder::new("refused", vec![Arg::new("x", 1.0)]).unwrap();
+    let x = b.arguments()[0].clone();
+    let spec = named(
+        &mut b,
+        "kr",
+        &[
+            ("name", ArgValue::from("a")),
+            ("spec", ArgValue::from("nosuchspec")),
+        ],
+    );
+    assert!(is_bad_control(&spec), "{spec:?}");
+    // sclang reads the default of the spec only for no values.
+    let valued = named(
+        &mut b,
+        "kr",
+        &[
+            ("name", ArgValue::from("b")),
+            ("values", input(0.5)),
+            ("spec", ArgValue::from("nosuchspec")),
+        ],
+    );
+    assert!(valued.is_ok(), "{valued:?}");
+    let output = named(&mut b, "kr", &kr("c", x));
+    assert!(
+        matches!(output, Err(BuildError::WrongKind { .. })),
+        "{output:?}"
+    );
+    let empty = named(&mut b, "kr", &kr("d", numbers(&[])));
+    assert!(
+        matches!(empty, Err(BuildError::EmptyInput { .. })),
+        "{empty:?}"
+    );
+    let nameless = named(&mut b, "kr", &[("values", input(1.0))]);
+    assert!(
+        matches!(nameless, Err(BuildError::MissingArgument { .. })),
+        "{nameless:?}"
+    );
+    let sizes = named(
+        &mut b,
+        "kr",
+        &kr_lag("e", numbers(&[1.0, 2.0]), numbers(&[0.1, 0.2, 0.3])),
+    );
+    assert!(
+        matches!(&sizes, Err(BuildError::BadControl { class, .. }) if class == "LagControl"),
+        "{sizes:?}"
+    );
+}
+
+#[test]
+fn a_named_control_that_fails_leaves_no_name_behind() {
+    let mut b = SynthDefBuilder::new("undo", vec![]).unwrap();
+    let sizes = named(
+        &mut b,
+        "kr",
+        &kr_lag("x", numbers(&[1.0, 2.0]), numbers(&[0.1, 0.2, 0.3])),
+    );
+    assert!(sizes.is_err(), "{sizes:?}");
+    let x = named(&mut b, "kr", &kr("x", 5.0)).unwrap();
+    sine_out(&mut b, x);
+    let def = b.finish().unwrap();
+    assert_eq!(def.controls, [5.0]);
+    let names: Vec<&str> = def
+        .control_names
+        .iter()
+        .map(|name| name.name.as_str())
+        .collect();
+    assert_eq!(names, ["x"]);
+}

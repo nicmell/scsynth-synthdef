@@ -40018,6 +40018,163 @@
       ]
     },
     {
+      "name": "NamedControl",
+      "categories": [
+        "UGens>Synth control"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fixedLag",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "ir",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "tr",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "rate",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fixedLag",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "NumChannels",
       "categories": [
         "UGens>Multichannel"

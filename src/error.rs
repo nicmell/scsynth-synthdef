@@ -479,7 +479,10 @@ pub enum BuildError {
         message: String,
     },
     /// A control that sclang 3.14.1 throws on, or writes a broken
-    /// definition for: values and lags of `LagControl` that differ in size.
+    /// definition for. A `NamedControl` takes other values, another rate or
+    /// other fixed lags than the first use of its name, names an unknown
+    /// spec, or holds a 0 among lags that reach a UGen. Or the values and
+    /// the lags of a `LagControl` differ in size.
     #[non_exhaustive]
     BadControl {
         /// The class, such as `LagControl`.

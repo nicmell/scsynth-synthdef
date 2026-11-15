@@ -98,6 +98,24 @@ var argumentKinds = [
 	[\Mix, \new, \array, \array],
 	[\MultiTap, \ar, \levelsArray, \array],
 	[\MultiTap, \ar, \timesArray, \array],
+	[\NamedControl, \ar, \name, \symbol],
+	[\NamedControl, \ar, \spec, \symbol],
+	[\NamedControl, \ar, \values, \array],
+	[\NamedControl, \ir, \name, \symbol],
+	[\NamedControl, \ir, \spec, \symbol],
+	[\NamedControl, \ir, \values, \array],
+	[\NamedControl, \kr, \fixedLag, \bool],
+	[\NamedControl, \kr, \name, \symbol],
+	[\NamedControl, \kr, \spec, \symbol],
+	[\NamedControl, \kr, \values, \array],
+	[\NamedControl, \new, \fixedLag, \bool],
+	[\NamedControl, \new, \name, \symbol],
+	[\NamedControl, \new, \rate, \symbol],
+	[\NamedControl, \new, \spec, \symbol],
+	[\NamedControl, \new, \values, \array],
+	[\NamedControl, \tr, \name, \symbol],
+	[\NamedControl, \tr, \spec, \symbol],
+	[\NamedControl, \tr, \values, \array],
 	[\NumChannels, \ar, \input, \array],
 	[\NumChannels, \ar, \mixdown, \bool],
 	[\NumChannels, \ar, \numChannels, \count],
@@ -166,16 +184,15 @@ var argumentKinds = [
 // refuses as not valid for its subclass.
 var bodies = [\AudioControl, \BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD,
 	\Control, \Dstutter, \DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LagControl,
-	\LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix, \MultiTap, \NumChannels, \PMOsc,
-	\PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz,
-	\Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT];
+	\LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix, \MultiTap, \NamedControl,
+	\NumChannels, \PMOsc, \PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
+	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
 	[\Dunique, "builds its reader in asUGenInput, at each use as an input"],
-	[\EnvGate, "needs NamedControl and Env: items 4 and 5 of Left out"],
+	[\EnvGate, "needs Env: item 1 of Left out"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
-	[\NamedControl, "a control: item 4 of Left out"],
 	[\SplayZ, "deprecated since 3.10"],
 	[\XIn, "a helper of InBus"],
 	[\XInFeedback, "a helper of InBus"]
@@ -937,7 +954,7 @@ try {
 		[
 			\name -> class.name,
 			\categories -> (doc !? { doc.categories } ? []),
-			\methods -> Array.with(\ar, \kr, \ir, \new).select { |selector|
+			\methods -> Array.with(\ar, \kr, \ir, \tr, \new).select { |selector|
 				var method = class.class.findRespondingMethodFor(selector);
 				method.notNil and: { method.ownerClass != Meta_Object }
 			}.collect { |selector|

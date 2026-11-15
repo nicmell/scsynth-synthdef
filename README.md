@@ -85,7 +85,7 @@ assert_eq!(def.children.len(), 3);
 - `arguments` gives one `UGenInput` per argument: an output, or an array of
   outputs for an array.
 - `ugen` adds a UGen by its class name and the selector of a rate method,
-  `ar`, `kr`, `ir` or `new`, with the arguments by name. The catalogue
+  `ar`, `kr`, `ir`, `tr` or `new`, with the arguments by name. The catalogue
   gives the order of the arguments, their defaults, the wiring and the
   rule of `checkInputs`. An `ArgValue` is an input, a text or a boolean. A
   text goes to a symbol argument, such as the command name of `SendReply`.
@@ -394,8 +394,8 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
   `fft_size` is how `fftSize` finds the FFT of a PV chain. `doc_url` gives
   its page on doc.sccode.org.
 - A `PseudoClass` has its categories in the help and its rate methods.
-- A `RateMethod` is `ar`, `kr`, `ir` or `new`. It has its arguments, each
-  with a kind and a default, and an `Addable`.
+- A `RateMethod` is `ar`, `kr`, `ir`, `tr` or `new`. It has its arguments,
+  each with a kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
   holds the rate, the slot of each input, the outputs, the special index,
   whether `mul` and `add` apply, and whether a nested array expands again.
@@ -421,7 +421,7 @@ two instances, instance i with element i. An array inside an array must
 make three. Last, the array argument takes `[[e0, e1], e2]`, then
 `[e2, [e0, e1]]`. The instances that they make give its `ArrayExpansion`.
 If one instance keeps the array among its inputs, the method has none.
-581 of the 635 methods are addable with a wiring, and 58 have a body. Most
+581 of the 635 methods are addable with a wiring, and 63 have a body. Most
 of the others do more than `UGen:new1` does:
 
 - The pseudo-UGens without a body, such as `Dunique`, create
