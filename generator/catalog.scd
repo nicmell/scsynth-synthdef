@@ -1,5 +1,6 @@
-// generator/catalog.json: the catalogue of the core UGens and the tables of
-// the operators, from sclang 3.14.1 and the sources of SuperCollider 3.14.1.
+// generator/catalog.json: the catalogue of the core UGens, the tables of the
+// operators, and the specs of Spec.specs, from sclang 3.14.1 and the sources
+// of SuperCollider 3.14.1.
 // Run it from the root of the repository, with absolute paths, since
 // ~/.bin/sclang changes the directory:
 //
@@ -298,7 +299,7 @@ var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansio
 var testPassthrough, testSilence;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
-var classes, pseudoClasses, addable = 0, methods = 0, pseudo = 0, helpDir, json;
+var classes, pseudoClasses, specs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -1032,18 +1033,48 @@ try {
 		.reject { |class| (class.superclasses ? []).includes(UGen) }
 		.sort { |a, b| a.name.asString < b.name.asString }
 		.collect(describePseudoClass);
+	// The specs of Spec.specs, which give the default of a NamedControl
+	// with a spec, and of an argument without a default when the metadata
+	// has specs.
+	specs = Spec.specs.keys.asArray.sort.collect { |name|
+		var spec = Spec.specs[name], warp;
+		var number = { |value|
+			case
+				{ value.isNaN } { "nan" }
+				{ value == inf } { "inf" }
+				{ value == -inf } { "-inf" }
+				{ value }
+		};
+		if (spec.class != ControlSpec) {
+			fail.("the spec % is a %, not a ControlSpec".format(name, spec.class));
+		};
+		warp = spec.warp.asSpecifier;
+		if (warp.isKindOf(Symbol).not) {
+			fail.("the warp of the spec % is %, not a symbol".format(name, warp));
+		};
+		[
+			\name -> name,
+			\minval -> number.(spec.minval),
+			\maxval -> number.(spec.maxval),
+			\warp -> warp,
+			\step -> number.(spec.step),
+			\default -> number.(spec.default),
+			\units -> spec.units
+		]
+	};
 
 	json = toJSON.([
 		\sclang -> Main.version,
 		\operators -> [\unary -> unary, \binary -> binary],
 		\classes -> classes,
-		\pseudo_classes -> pseudoClasses
+		\pseudo_classes -> pseudoClasses,
+		\specs -> specs
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
-		++ "% pseudo-UGen methods, % classes outside UGen")
+		++ "% pseudo-UGen methods, % classes outside UGen, % specs")
 		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
-			pseudoClasses.size).postln;
+			pseudoClasses.size, specs.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;

@@ -353,9 +353,9 @@ fn render_catalog(catalog: &Value) -> String {
         .collect();
     classes.sort_by(|a, b| text(&a["name"]).cmp(text(&b["name"])));
     let mut rendered = String::from(HEADER);
-    rendered.push_str("#![allow(clippy::unreadable_literal)]\n\n");
+    rendered.push_str("#![allow(clippy::approx_constant, clippy::unreadable_literal)]\n\n");
     rendered.push_str(
-        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,\n    Optimize, Outputs, Passthrough, PseudoClass, RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, ControlSpec, FftSize,\n    InputSlot, Optimize, Outputs, Passthrough, PseudoClass, RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     writeln!(
         rendered,
@@ -419,6 +419,7 @@ fn render_catalog(catalog: &Value) -> String {
     }
     rendered.push_str("];\n");
     render_pseudo_classes(&mut rendered, catalog);
+    render_specs(&mut rendered, catalog);
     rendered
 }
 
@@ -449,6 +450,33 @@ fn render_pseudo_classes(rendered: &mut String, catalog: &Value) {
             render_method(rendered, method);
         }
         writeln!(rendered, "        ],").unwrap();
+        writeln!(rendered, "    }},").unwrap();
+    }
+    rendered.push_str("];\n");
+}
+
+fn render_specs(rendered: &mut String, catalog: &Value) {
+    let mut specs: Vec<&Value> = catalog["specs"]
+        .as_array()
+        .expect("a list of specs")
+        .iter()
+        .collect();
+    specs.sort_by(|a, b| text(&a["name"]).cmp(text(&b["name"])));
+    writeln!(
+        rendered,
+        "\npub(super) static SPECS: [ControlSpec; {}] = [",
+        specs.len()
+    )
+    .unwrap();
+    for spec in specs {
+        writeln!(rendered, "    ControlSpec {{").unwrap();
+        writeln!(rendered, "        name: {:?},", text(&spec["name"])).unwrap();
+        writeln!(rendered, "        minval: {},", float(&spec["minval"])).unwrap();
+        writeln!(rendered, "        maxval: {},", float(&spec["maxval"])).unwrap();
+        writeln!(rendered, "        warp: {:?},", text(&spec["warp"])).unwrap();
+        writeln!(rendered, "        step: {},", float(&spec["step"])).unwrap();
+        writeln!(rendered, "        default: {},", float(&spec["default"])).unwrap();
+        writeln!(rendered, "        units: {:?},", text(&spec["units"])).unwrap();
         writeln!(rendered, "    }},").unwrap();
     }
     rendered.push_str("];\n");

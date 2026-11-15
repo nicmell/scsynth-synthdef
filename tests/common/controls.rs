@@ -1,7 +1,7 @@
 //! The graphs of the golden files of 0.8, the controls inside the graph.
 //! `generator/fixtures.scd` holds the sclang code of each.
 
-use scsynth_synthdef::{Arg, BuildError, SynthDef, SynthDefBuilder, UGenInput};
+use scsynth_synthdef::{Arg, BuildError, SynthDef, SynthDefBuilder, UGenInput, catalog};
 
 use super::pseudo::{def, input, out, sine};
 use super::{arg, array, by_name, flat};
@@ -11,6 +11,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
     match name {
         "controlugens" => [names(), control_ugens(), lag_controls(), vec![variant()]].concat(),
         "defwrap" => [wraps(), prepends()].concat(),
+        "specs" => vec![specs()],
         _ => panic!("no golden graph of 0.8 is named {name}"),
     }
 }
@@ -264,4 +265,17 @@ fn prepends() -> Vec<SynthDef> {
         prepend("prepend", 0.0.into()),
         prepend("prepend_array", array(&[0.0, 1.0])),
     ]
+}
+
+/// An argument without a default per spec, under `metadata: (specs: ())`:
+/// each takes the default of the spec of its name.
+fn specs() -> SynthDef {
+    let args = catalog::specs()
+        .iter()
+        .map(|spec| Arg::new(spec.name, spec.default))
+        .collect();
+    def("specs_args", args, |b| {
+        let values = UGenInput::Array(b.arguments().to_vec());
+        out(b, "kr", values);
+    })
 }
