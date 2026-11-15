@@ -1,7 +1,7 @@
 //! The graphs of the golden files of 0.8, the controls inside the graph.
 //! `generator/fixtures.scd` holds the sclang code of each.
 
-use scsynth_synthdef::{Arg, SynthDef, SynthDefBuilder, UGenInput};
+use scsynth_synthdef::{Arg, BuildError, SynthDef, SynthDefBuilder, UGenInput};
 
 use super::pseudo::{def, input, out, sine};
 use super::{arg, array, by_name, flat};
@@ -10,6 +10,7 @@ use super::{arg, array, by_name, flat};
 pub fn definitions(name: &str) -> Vec<SynthDef> {
     match name {
         "controlugens" => [names(), control_ugens(), lag_controls(), vec![variant()]].concat(),
+        "defwrap" => [wraps(), prepends()].concat(),
         _ => panic!("no golden graph of 0.8 is named {name}"),
     }
 }
@@ -159,5 +160,108 @@ fn lag_controls() -> Vec<SynthDef> {
             let c = lag_control(b, "ar", array(&[1.0, 2.0]), array(&[0.1, 0.2]));
             sines_out(b, c);
         }),
+    ]
+}
+
+/// `SinOsc.ar * x`, at the default frequency.
+fn sine_times(b: &mut SynthDefBuilder, x: UGenInput) -> Result<UGenInput, BuildError> {
+    let sound = sine(b, "ar", 440.0);
+    b.binary_op("*", sound, x)
+}
+
+fn wraps() -> Vec<SynthDef> {
+    vec![
+        def("defwrap_arg", vec![Arg::new("freq", 440.0)], |b| {
+            let freq = arg(b, "freq");
+            let sound = b
+                .wrap(vec![Arg::new("amp", 0.1)], |b, inputs| {
+                    let sound = sine(b, "ar", freq);
+                    b.binary_op("*", sound, inputs[0].clone())
+                })
+                .unwrap();
+            out(b, "ar", sound);
+        }),
+        def("defwrap_prepend", vec![], |b| {
+            let sig = sine(b, "ar", 440.0);
+            let sound = b
+                .wrap(vec![Arg::new("amp", 0.1)], |b, inputs| {
+                    b.binary_op("*", sig, inputs[0].clone())
+                })
+                .unwrap();
+            out(b, "ar", sound);
+        }),
+        def("defwrap_rates", vec![], |b| {
+            let args = vec![Arg::new("amp", 0.1).lag(0.2), Arg::new("i_x", 2.0)];
+            let sound = b
+                .wrap(args, |b, inputs| {
+                    let sound = sine(b, "ar", inputs[1].clone());
+                    b.binary_op("*", sound, inputs[0].clone())
+                })
+                .unwrap();
+            out(b, "ar", sound);
+        }),
+        def("defwrap_same_name", vec![Arg::new("amp", 0.1)], |b| {
+            let amp = arg(b, "amp");
+            let sound = b
+                .wrap(vec![Arg::new("amp", 0.2)], |b, inputs| {
+                    sine_times(b, inputs[0].clone())
+                })
+                .unwrap();
+            let sound = b.binary_op("*", sound, amp).unwrap();
+            out(b, "ar", sound);
+        }),
+        def("defwrap_twice", vec![], |b| {
+            let a = b
+                .wrap(vec![Arg::new("a", 1.0)], |b, inputs| {
+                    Ok(sine(b, "ar", inputs[0].clone()))
+                })
+                .unwrap();
+            let c = b
+                .wrap(vec![Arg::new("b", 2.0)], |b, inputs| {
+                    Ok(sine(b, "ar", inputs[0].clone()))
+                })
+                .unwrap();
+            let sum = b.binary_op("+", a, c).unwrap();
+            out(b, "ar", sum);
+        }),
+        def("defwrap_names", vec![], |b| {
+            b.control_names(&["a", "b"]);
+            b.wrap(vec![Arg::new("c", 7.0)], |_, inputs| Ok(inputs[0].clone()))
+                .unwrap();
+            let c = control(b, "Control", "kr", array(&[1.0, 2.0]));
+            sines_out(b, c);
+            b.variant("x", &[("b", vec![5.0])]).unwrap();
+        }),
+        def("defwrap_variant", vec![Arg::new("amp", 0.1)], |b| {
+            let sound = b
+                .wrap(vec![Arg::new("amp", 0.2)], |b, inputs| {
+                    sine_times(b, inputs[0].clone())
+                })
+                .unwrap();
+            out(b, "ar", sound);
+            b.variant("x", &[("amp", vec![0.5])]).unwrap();
+        }),
+    ]
+}
+
+/// The graph function `{ |bus, freq = 440| Out.ar(bus, SinOsc.ar(freq)) }`
+/// with the `prependArgs` `[bus]`: only `freq` becomes a control.
+fn prepend(name: &str, bus: UGenInput) -> SynthDef {
+    def(name, vec![Arg::new("freq", 440.0)], |b| {
+        let freq = arg(b, "freq");
+        let sound = sine(b, "ar", freq);
+        by_name(
+            b,
+            "Out",
+            "ar",
+            &[("bus", input(bus)), ("channelsArray", input(sound))],
+        );
+    })
+}
+
+fn prepends() -> Vec<SynthDef> {
+    vec![
+        prepend("prepend", 0.0.into()),
+        prepend("prepend_array", array(&[0.0, 1.0])),
     ]
 }

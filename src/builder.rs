@@ -233,6 +233,28 @@ impl SynthDefBuilder {
     /// A [`BuildError`] for two arguments of one name, for an empty array,
     /// for a lag on a scalar, trigger or audio argument, and for a NaN lag.
     pub fn new(name: impl Into<String>, args: Vec<Arg>) -> Result<Self, BuildError> {
+        let mut builder = Self {
+            build: NEXT_BUILD.fetch_add(1, Ordering::Relaxed),
+            name: name.into(),
+            controls: Vec::new(),
+            control_names: Vec::new(),
+            sizes: Vec::new(),
+            last_name: None,
+            arguments: Vec::new(),
+            children: Vec::new(),
+            width_first: Vec::new(),
+            variants: Vec::new(),
+            max_local_bufs: None,
+        };
+        builder.arguments = builder.add_arguments(args)?;
+        Ok(builder)
+    }
+
+    /// Adds the controls of the arguments of a function, as
+    /// `addControlsFromArgsOfFunc` and `buildControls` do: a control UGen
+    /// for each group of rate, at the next parameters, and the names in the
+    /// order of the arguments. It gives back one input per argument.
+    fn add_arguments(&mut self, args: Vec<Arg>) -> Result<Vec<UGenInput>, BuildError> {
         for (position, arg) in args.iter().enumerate() {
             if args[..position].iter().any(|other| other.name == arg.name) {
                 return Err(BuildError::DuplicateArgument(arg.name.clone()));
@@ -247,19 +269,6 @@ impl SynthDefBuilder {
                 return Err(BuildError::LagOnNonControl(arg.name.clone()));
             }
         }
-        let mut builder = Self {
-            build: NEXT_BUILD.fetch_add(1, Ordering::Relaxed),
-            name: name.into(),
-            controls: Vec::new(),
-            control_names: Vec::new(),
-            sizes: Vec::new(),
-            last_name: None,
-            arguments: Vec::new(),
-            children: Vec::new(),
-            width_first: Vec::new(),
-            variants: Vec::new(),
-            max_local_bufs: None,
-        };
         let mut arguments = vec![UGenInput::Array(Vec::new()); args.len()];
         let mut indices = vec![0; args.len()];
         for group in [Group::Scalar, Group::Trigger, Group::Audio, Group::Control] {
@@ -269,7 +278,7 @@ impl SynthDefBuilder {
             if members.is_empty() {
                 continue;
             }
-            let mut index = builder.controls.len();
+            let mut index = self.controls.len();
             let mut values = Vec::new();
             let mut lags = Vec::new();
             for &position in &members {
@@ -278,7 +287,7 @@ impl SynthDefBuilder {
                 values.extend_from_slice(&args[position].values);
                 lags.extend(args[position].lag_values());
             }
-            let mut outputs = builder.add_controls(group, &values, &lags)?.into_iter();
+            let mut outputs = self.add_controls(group, &values, &lags)?.into_iter();
             for &position in &members {
                 let arg = &args[position];
                 let proxies: Vec<UGenInput> = outputs
@@ -297,15 +306,14 @@ impl SynthDefBuilder {
             }
         }
         for (position, arg) in args.into_iter().enumerate() {
-            builder.sizes.push(Some(arg.values.len()));
-            builder.control_names.push(ControlName {
+            self.sizes.push(Some(arg.values.len()));
+            self.control_names.push(ControlName {
                 name: arg.name,
                 index: to_u32(indices[position]),
             });
-            builder.last_name = Some(builder.control_names.len() - 1);
+            self.last_name = Some(self.control_names.len() - 1);
         }
-        builder.arguments = arguments;
-        Ok(builder)
+        Ok(arguments)
     }
 
     /// One input per argument, in the order of the arguments: an output, or
@@ -339,6 +347,32 @@ impl SynthDefBuilder {
             self.sizes.push(None);
             self.last_name = Some(self.control_names.len() - 1);
         }
+    }
+
+    /// Adds the controls of the arguments of a function inside the graph
+    /// function, and calls `body` with one input per argument, as
+    /// `SynthDef.wrap` does. The controls take the next parameters, in the
+    /// groups of rate of [`new`](Self::new). Around `body`, the last name is
+    /// the last of `args`, as `controlNames` holds only the names of the
+    /// function in sclang. For `prependArgs`, `body` takes their values from
+    /// its caller, and `args` holds only the arguments that become controls.
+    ///
+    /// # Errors
+    ///
+    /// The errors of [`new`](Self::new) for `args`, and those of `body`. A
+    /// call that fails leaves the build as it was.
+    pub fn wrap<T>(
+        &mut self,
+        args: Vec<Arg>,
+        body: impl FnOnce(&mut Self, &[UGenInput]) -> Result<T, BuildError>,
+    ) -> Result<T, BuildError> {
+        self.transaction(|builder| {
+            let outer = builder.last_name.take();
+            let inputs = builder.add_arguments(args)?;
+            let result = body(builder, &inputs);
+            builder.last_name = outer;
+            result
+        })
     }
 
     /// Adds a UGen, as `UGen:new1` does. It gives back one output, or an

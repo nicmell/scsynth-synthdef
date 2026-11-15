@@ -123,3 +123,58 @@ fn a_control_call_that_fails_leaves_the_parameters_and_the_names_as_they_were() 
     assert_eq!(def.controls, [1.0, 5.0, 6.0]);
     assert_eq!(def.variants[0].values, [1.0, 7.0, 8.0]);
 }
+
+#[test]
+fn a_wrap_without_arguments_hides_the_names_of_the_outer_function() {
+    // controlNames is nil around the wrapped function, so its Control gives
+    // a no default, and sclang writes the variant broken.
+    let mut b = SynthDefBuilder::new("hidden", vec![]).unwrap();
+    b.control_names(&["a"]);
+    let c = b
+        .wrap(vec![], |b, _| {
+            b.ugen("Control", "kr", &[("values", input(1.0))])
+        })
+        .unwrap();
+    sine_out(&mut b, c);
+    let variant = b.variant("x", &[("a", vec![2.0])]);
+    assert!(
+        matches!(variant, Err(BuildError::VariantSize { size: 0, .. })),
+        "{variant:?}"
+    );
+}
+
+#[test]
+fn a_wrap_that_fails_leaves_the_build_as_it_was() {
+    let mut b = SynthDefBuilder::new("undo", vec![]).unwrap();
+    let failed = b.wrap(vec![Arg::new("a", 1.0)], |b, inputs| {
+        b.ugen("SinOsc", "ar", &[("freq", input(inputs[0].clone()))])?;
+        b.ugen("NoSuchClass", "ar", &[])
+    });
+    assert!(
+        matches!(failed, Err(BuildError::UnknownClass(_))),
+        "{failed:?}"
+    );
+    let c = b
+        .wrap(vec![Arg::new("b", 2.0)], |_, inputs| Ok(inputs[0].clone()))
+        .unwrap();
+    sine_out(&mut b, c);
+    let def = b.finish().unwrap();
+    assert_eq!(def.controls, [2.0]);
+    let names: Vec<&str> = def
+        .control_names
+        .iter()
+        .map(|name| name.name.as_str())
+        .collect();
+    assert_eq!(names, ["b"]);
+    assert_eq!(def.children.len(), 3);
+}
+
+#[test]
+fn a_wrap_refuses_its_arguments_as_new_does() {
+    let mut b = SynthDefBuilder::new("twice", vec![]).unwrap();
+    let twice = b.wrap(vec![Arg::new("a", 1.0), Arg::new("a", 2.0)], |_, _| Ok(()));
+    assert!(
+        matches!(twice, Err(BuildError::DuplicateArgument(_))),
+        "{twice:?}"
+    );
+}

@@ -93,6 +93,7 @@ pub const NAMES: &[&str] = &[
     "deadcode",
     "pvcopy",
     "controlugens",
+    "defwrap",
 ];
 
 /// The bytes of a golden file.
@@ -145,7 +146,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "madd_numbers" => vec![madd_numbers()],
         "folds" => vec![folds()],
         "optimize" | "deadcode" | "pvcopy" => optimize::definitions(name),
-        "controlugens" => controls::definitions(name),
+        "controlugens" | "defwrap" => controls::definitions(name),
         _ => pseudo::definitions(name),
     }
 }
