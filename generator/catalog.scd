@@ -1,5 +1,6 @@
-// generator/catalog.json: the catalogue of the core UGens and the tables of
-// the operators, from sclang 3.14.1 and the sources of SuperCollider 3.14.1.
+// generator/catalog.json: the catalogue of the core UGens, the tables of the
+// operators, and the specs of Spec.specs, from sclang 3.14.1 and the sources
+// of SuperCollider 3.14.1.
 // Run it from the root of the repository, with absolute paths, since
 // ~/.bin/sclang changes the directory:
 //
@@ -97,6 +98,24 @@ var argumentKinds = [
 	[\Mix, \new, \array, \array],
 	[\MultiTap, \ar, \levelsArray, \array],
 	[\MultiTap, \ar, \timesArray, \array],
+	[\NamedControl, \ar, \name, \symbol],
+	[\NamedControl, \ar, \spec, \symbol],
+	[\NamedControl, \ar, \values, \array],
+	[\NamedControl, \ir, \name, \symbol],
+	[\NamedControl, \ir, \spec, \symbol],
+	[\NamedControl, \ir, \values, \array],
+	[\NamedControl, \kr, \fixedLag, \bool],
+	[\NamedControl, \kr, \name, \symbol],
+	[\NamedControl, \kr, \spec, \symbol],
+	[\NamedControl, \kr, \values, \array],
+	[\NamedControl, \new, \fixedLag, \bool],
+	[\NamedControl, \new, \name, \symbol],
+	[\NamedControl, \new, \rate, \symbol],
+	[\NamedControl, \new, \spec, \symbol],
+	[\NamedControl, \new, \values, \array],
+	[\NamedControl, \tr, \name, \symbol],
+	[\NamedControl, \tr, \spec, \symbol],
+	[\NamedControl, \tr, \values, \array],
 	[\NumChannels, \ar, \input, \array],
 	[\NumChannels, \ar, \mixdown, \bool],
 	[\NumChannels, \ar, \numChannels, \count],
@@ -159,27 +178,27 @@ var argumentKinds = [
 	[\XOut, \kr, \channelsArray, \array]
 ];
 // The census of the classes whose rate methods do more than new1: the
-// pseudo-UGens, whose rate methods build other UGens, and the classes of 0.4.
-// The crate has a body for each rate method of a class of bodies.
-var bodies = [\BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD, \Dstutter,
-	\DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LinLin, \LinSelectX, \LocalBuf,
-	\LocalIn, \Mix, \MultiTap, \NumChannels, \PMOsc, \PingPong, \Poll, \SelectX,
-	\SelectXFocus, \Silent, \SoundIn, \Splay, \SplayAz, \Sum3, \Sum4, \TChoose,
-	\TWChoose, \Tap, \UnpackFFT];
+// pseudo-UGens, whose rate methods build other UGens, the classes of 0.4, and
+// the controls, which take their special index from the build. The crate has
+// a body for each rate method of a class of bodies, but a method that sclang
+// refuses as not valid for its subclass.
+var bodies = [\AudioControl, \BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD,
+	\Control, \Dstutter, \DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LagControl,
+	\LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix, \MultiTap, \NamedControl,
+	\NumChannels, \PMOsc, \PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
+	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
 	[\Dunique, "builds its reader in asUGenInput, at each use as an input"],
-	[\EnvGate, "needs NamedControl and Env: items 4 and 5 of Left out"],
+	[\EnvGate, "needs Env: item 1 of Left out"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
-	[\NamedControl, "a control: item 4 of Left out"],
 	[\SplayZ, "deprecated since 3.10"],
 	[\XIn, "a helper of InBus"],
 	[\XInFeedback, "a helper of InBus"]
 ];
 // Classes that the census meets but that are no pseudo-UGens, and why.
 var notPseudo = [
-	[\LagControl, "a control, which waits for NamedControl"],
 	[\LevelComp, "a helper of Splay and SplayAz"],
 	[\MulAdd, "folds: madd of the builder"],
 	[\Ndef, "a proxy of JITLib"],
@@ -297,7 +316,7 @@ var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansio
 var testPassthrough, testSilence;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
-var classes, pseudoClasses, addable = 0, methods = 0, pseudo = 0, helpDir, json;
+var classes, pseudoClasses, specs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -888,11 +907,16 @@ try {
 		var names = (method.argNames ? []).drop(1).asArray;
 		var through = passthroughs.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
 		var silent = silentZeros.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
-		var wired, input, zero, position;
+		var wired, input, zero, position, refusal;
 		methods = methods + 1;
 		if (bodies.includes(class.name)) {
-			pseudo = pseudo + 1;
-			described[1] ++ [\addable -> "pseudo"]
+			refusal = probe.(class, selector, numberValues.(described[0], [], []))[0];
+			if (refusal.isString and: { refusal.contains("not valid for this subclass") }) {
+				described[1] ++ [\addable -> false, \reason -> refusal]
+			} {
+				pseudo = pseudo + 1;
+				described[1] ++ [\addable -> "pseudo"]
+			}
 		} {
 			wired = wiring.(class, selector, described[0]);
 			if (customCheck.notNil and: { wired.isString.not }) {
@@ -930,7 +954,7 @@ try {
 		[
 			\name -> class.name,
 			\categories -> (doc !? { doc.categories } ? []),
-			\methods -> Array.with(\ar, \kr, \ir, \new).select { |selector|
+			\methods -> Array.with(\ar, \kr, \ir, \tr, \new).select { |selector|
 				var method = class.class.findRespondingMethodFor(selector);
 				method.notNil and: { method.ownerClass != Meta_Object }
 			}.collect { |selector|
@@ -1026,18 +1050,48 @@ try {
 		.reject { |class| (class.superclasses ? []).includes(UGen) }
 		.sort { |a, b| a.name.asString < b.name.asString }
 		.collect(describePseudoClass);
+	// The specs of Spec.specs, which give the default of a NamedControl
+	// with a spec, and of an argument without a default when the metadata
+	// has specs.
+	specs = Spec.specs.keys.asArray.sort.collect { |name|
+		var spec = Spec.specs[name], warp;
+		var number = { |value|
+			case
+				{ value.isNaN } { "nan" }
+				{ value == inf } { "inf" }
+				{ value == -inf } { "-inf" }
+				{ value }
+		};
+		if (spec.class != ControlSpec) {
+			fail.("the spec % is a %, not a ControlSpec".format(name, spec.class));
+		};
+		warp = spec.warp.asSpecifier;
+		if (warp.isKindOf(Symbol).not) {
+			fail.("the warp of the spec % is %, not a symbol".format(name, warp));
+		};
+		[
+			\name -> name,
+			\minval -> number.(spec.minval),
+			\maxval -> number.(spec.maxval),
+			\warp -> warp,
+			\step -> number.(spec.step),
+			\default -> number.(spec.default),
+			\units -> spec.units
+		]
+	};
 
 	json = toJSON.([
 		\sclang -> Main.version,
 		\operators -> [\unary -> unary, \binary -> binary],
 		\classes -> classes,
-		\pseudo_classes -> pseudoClasses
+		\pseudo_classes -> pseudoClasses,
+		\specs -> specs
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
-		++ "% pseudo-UGen methods, % classes outside UGen")
+		++ "% pseudo-UGen methods, % classes outside UGen, % specs")
 		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
-			pseudoClasses.size).postln;
+			pseudoClasses.size, specs.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;

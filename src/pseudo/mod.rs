@@ -11,6 +11,7 @@ mod demand;
 mod fft_unpacking;
 mod filter;
 mod fsin_osc;
+mod graph_builder;
 mod hilbert;
 mod in_out;
 pub(crate) mod lang;
@@ -22,6 +23,8 @@ mod pm_osc;
 mod poll;
 mod sound_in;
 mod splay;
+
+pub(crate) use graph_builder::NamedEntry;
 
 use crate::builder::{SynthDefBuilder, count_to_usize};
 use crate::catalog::RateMethod;
@@ -37,7 +40,7 @@ pub(crate) struct Args {
 }
 
 impl Args {
-    /// The selector of the method: `ar`, `kr`, `ir` or `new`.
+    /// The selector of the method: `ar`, `kr`, `ir`, `tr` or `new`.
     pub(crate) fn selector(&self) -> &'static str {
         self.method.selector
     }
@@ -162,12 +165,15 @@ type Body = fn(&mut SynthDefBuilder, &Args) -> Result<UGenInput, BuildError>;
 /// The body of each method that the catalogue marks `Addable::Pseudo`, by
 /// class and selector.
 static BODIES: &[(&str, &str, Body)] = &[
+    ("AudioControl", "ar", in_out::audio_control_ar),
     ("BHiPass4", "ar", beq_suite::b_hi_pass4),
     ("BLowPass4", "ar", beq_suite::b_low_pass4),
     ("BeatTrack", "kr", machine_listening::beat_track),
     ("Changed", "ar", filter::changed),
     ("Changed", "kr", filter::changed),
     ("CompanderD", "ar", compander::compander_d),
+    ("Control", "ir", in_out::control_ir),
+    ("Control", "kr", in_out::control_kr),
     ("Dstutter", "new", demand::dstutter),
     ("DynKlang", "ar", fsin_osc::dyn_klang),
     ("DynKlang", "kr", fsin_osc::dyn_klang),
@@ -176,6 +182,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("HilbertFIR", "ar", hilbert::hilbert_fir),
     ("Klang", "ar", fsin_osc::klang),
     ("Klank", "ar", fsin_osc::klank),
+    ("LagControl", "ar", in_out::lag_control_ar),
+    ("LagControl", "kr", in_out::lag_control_kr),
     ("LinLin", "ar", line::lin_lin_ar),
     ("LinLin", "kr", line::lin_lin_kr),
     ("LinSelectX", "ar", osc::lin_select_x),
@@ -187,6 +195,11 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("Mix", "kr", mix::mix_kr),
     ("Mix", "new", mix::mix_new),
     ("MultiTap", "ar", pm_osc::multi_tap),
+    ("NamedControl", "ar", graph_builder::named_control),
+    ("NamedControl", "ir", graph_builder::named_control),
+    ("NamedControl", "kr", graph_builder::named_control),
+    ("NamedControl", "new", graph_builder::named_control),
+    ("NamedControl", "tr", graph_builder::named_control),
     ("NumChannels", "ar", mix::num_channels),
     ("PMOsc", "ar", pm_osc::pm_osc),
     ("PMOsc", "kr", pm_osc::pm_osc),
@@ -212,6 +225,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("TWChoose", "ar", osc::tw_choose),
     ("TWChoose", "kr", osc::tw_choose),
     ("Tap", "ar", buf_io::tap),
+    ("TrigControl", "ir", in_out::trig_control_ir),
+    ("TrigControl", "kr", in_out::trig_control_kr),
     ("UnpackFFT", "new", fft_unpacking::unpack_fft),
 ];
 

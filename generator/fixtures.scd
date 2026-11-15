@@ -38,16 +38,16 @@ try {
 	};
 
 	// SynthDef:build.
-	build = { |name, func, rates, variants, class|
+	build = { |name, func, rates, variants, class, prependArgs, metadata|
 		var def = (class ? SynthDef).newCopyArgs(
 			name: name.asSymbol,
 			variants: variants,
-			metadata: (),
+			metadata: metadata ? (),
 			children: Array(64)
 		);
 		protect {
 			def.initBuild;
-			def.buildUgenGraph(func, rates, nil);
+			def.buildUgenGraph(func, rates, prependArgs);
 			def.finishBuild;
 		} {
 			UGen.buildSynthDef = nil;
@@ -68,34 +68,56 @@ try {
 		written = written + 1;
 	};
 
-	// One file of full builds.
+	// One file of full builds. A case is a name, a function, and an Event
+	// of the rates, the variants, the prependArgs and the metadata.
 	writeCases = { |name, cases|
-		write.(name, cases.collect { |case| build.(case[0], case[1]) });
+		write.(name, cases.collect { |case|
+			var options = case[2] ? ();
+			build.(case[0], case[1], options[\rates], options[\variants], nil,
+				options[\prependArgs], options[\metadata])
+		});
 	};
 
-	// A graph that the crate refuses must break in sclang: finishBuild
-	// throws, an AbstractOut goes missing, or a UGen comes twice.
-	refused = { |name, func|
+	// A graph that the crate refuses must break in sclang: the build or the
+	// write throws, an AbstractOut goes missing, a UGen comes twice, a name
+	// points past the end of the parameters, or a variant writes no values.
+	refused = { |name, func, variants|
 		var def = SynthDef.newCopyArgs(
 			name: name.asSymbol,
+			variants: variants,
 			metadata: (),
 			children: Array(64)
 		);
-		var before, kept, thrown = false;
+		var before, kept, bytes, plain, broken = false;
 		protect {
-			def.initBuild;
-			def.buildUgenGraph(func, nil, nil);
-			before = def.children.copy;
-			try { def.finishBuild } { thrown = true };
+			try {
+				def.initBuild;
+				def.buildUgenGraph(func, nil, nil);
+				before = def.children.copy;
+				def.finishBuild;
+			} { broken = true };
 		} {
 			UGen.buildSynthDef = nil;
 		};
-		// The sort leaves nil when it drops every UGen (measured).
-		kept = def.children ? [];
-		if (thrown.not and: {
-			before.select(_.isKindOf(AbstractOut)).every { |out| kept.includes(out) }
-			and: { kept.size == kept.asSet.size }
-		}) {
+		if (broken.not) {
+			// The sort leaves nil when it drops every UGen (measured).
+			kept = def.children ? [];
+			broken = before.select(_.isKindOf(AbstractOut)).any { |out| kept.includes(out).not }
+				or: { kept.size != kept.asSet.size }
+				or: { (def.allControlNames ? []).any { |cn| cn.index > def.controls.size } };
+		};
+		if (broken.not) {
+			try { bytes = def.asBytes } { broken = true };
+		};
+		// A variant on a name without a default writes the count of the
+		// variants and stops (measured), so the bytes keep the size of the
+		// definition without variants.
+		if (broken.not and: { variants.size > 0 }) {
+			def.variants = nil;
+			plain = def.asBytes;
+			broken = bytes.size == plain.size;
+		};
+		if (broken.not) {
 			fail.("% does not break in sclang".format(name));
 		};
 	};
@@ -851,6 +873,216 @@ try {
 			[\refused_neg_numbers, {
 				Out.ar(0, SinOsc.ar * BinaryOpUGen('+', 2, UnaryOpUGen('neg', 3)))
 			}]
+		].do { |case| refused.(case[0], case[1]) };
+	}.value;
+
+	// The controls inside the graph, of 0.8, in functions of their own for
+	// the same reason.
+	{
+		writeCases.("controlugens", [
+			[\controlugens_names, { Out.ar(0, SinOsc.ar(Control.names([\a, \b]).kr([1, 2]))) }],
+			[\controlugens_names_short, { Out.ar(0, SinOsc.ar(Control.names([\a]).kr([1, 2]))) }],
+			// b points at the end of the parameters, as the name of an empty
+			// array does.
+			[\controlugens_names_long, { Out.ar(0, SinOsc.ar(Control.names([\a, \b]).kr([1]))) }],
+			[\controlugens_names_ir, { Out.ar(0, SinOsc.ar(Control.names([\a, \b]).ir([1, 2]))) }],
+			[\controlugens_trig_names, { Out.ar(0, SinOsc.ar(TrigControl.names([\t]).kr(1))) }],
+			[\controlugens_audio_names, { Out.ar(0, SinOsc.ar(AudioControl.names([\in]).ar(0))) }],
+			[\controlugens_after_arg, { |freq = 440|
+				Out.ar(0, SinOsc.ar(freq) * Control.names([\amp]).kr(0.1))
+			}],
+			[\controlugens_names_trig, {
+				Control.names([\a, \b]);
+				Out.ar(0, SinOsc.ar(TrigControl.kr([1, 2])))
+			}],
+			[\controlugens_unnamed, { Out.ar(0, SinOsc.ar(Control.kr([1, 2]))) }],
+			[\controlugens_nested, { Out.ar(0, SinOsc.ar(Control.kr([[1, 2], 3]).flat)) }],
+			[\controlugens_trig_ir, { Out.ar(0, SinOsc.ar(TrigControl.ir(1))) }],
+			[\lagcontrol_two, { Out.ar(0, SinOsc.ar(LagControl.kr([1, 2], [0.1, 0.2]))) }],
+			[\lagcontrol_number, { Out.ar(0, SinOsc.ar(LagControl.kr([1, 2], 0.1))) }],
+			[\lagcontrol_seventeen, { Out.kr(0, LagControl.kr((1..17), 0.1)) }],
+			[\lagcontrol_nested, {
+				Out.ar(0, SinOsc.ar(LagControl.kr([[1, 2], 3], [0.1, 0.2]).flat))
+			}],
+			[\lagcontrol_arg_lag, { |lag = 0.1|
+				Out.ar(0, SinOsc.ar(LagControl.kr([1, 2], [lag, 0.2])))
+			}],
+			[\lagcontrol_names, {
+				Control.names([\a, \b]);
+				Out.ar(0, SinOsc.ar(LagControl.kr([1, 2], [0.1, 0.2])))
+			}],
+			[\lagcontrol_ar, { Out.ar(0, SinOsc.ar(LagControl.ar(1, 0.1))) }],
+			[\lagcontrol_ar_two, { Out.ar(0, SinOsc.ar(LagControl.ar([1, 2], [0.1, 0.2]))) }],
+			[\controlugens_variant, {
+				Out.ar(0, SinOsc.ar(Control.names([\a, \b]).kr([1, 2])))
+			}, (variants: (x: [b: 5]))]
+		]);
+		[
+			[\refused_control_empty, { Control.kr([]); Out.ar(0, SinOsc.ar) }],
+			[\refused_lagcontrol_sizes, { Out.ar(0, SinOsc.ar(LagControl.kr([1, 2], [0.1]))) }],
+			[\refused_names_past, { Out.ar(0, SinOsc.ar(Control.names([\a, \b, \c]).kr([1]))) }],
+			[\refused_variant_default, {
+				Out.ar(0, SinOsc.ar(Control.names([\a, \b]).kr([1, 2])))
+			}, (x: [a: 3])],
+			[\refused_variant_past, {
+				Out.ar(0, SinOsc.ar(Control.names([\a, \b]).kr([1, 2])))
+			}, (x: [b: [5, 6]])]
+		].do { |case| refused.(case[0], case[1], case[2]) };
+	}.value;
+	{
+		writeCases.("defwrap", [
+			[\defwrap_arg, { |freq = 440|
+				Out.ar(0, SynthDef.wrap({ |amp = 0.1| SinOsc.ar(freq) * amp }))
+			}],
+			[\defwrap_prepend, {
+				Out.ar(0, SynthDef.wrap({ |sig, amp = 0.1| sig * amp }, nil, [SinOsc.ar]))
+			}],
+			[\defwrap_rates, {
+				Out.ar(0, SynthDef.wrap({ |amp = 0.1, i_x = 2| SinOsc.ar(i_x) * amp }, [0.2]))
+			}],
+			[\defwrap_same_name, { |amp = 0.1|
+				Out.ar(0, SynthDef.wrap({ |amp = 0.2| SinOsc.ar * amp }) * amp)
+			}],
+			[\defwrap_twice, {
+				Out.ar(0, SynthDef.wrap({ |a = 1| SinOsc.ar(a) }) + SynthDef.wrap({ |b = 2| SinOsc.ar(b) }))
+			}],
+			// a and c share the index 0. After the wrap, b is the last name
+			// again, so Control.kr gives it a default, which the variant needs.
+			[\defwrap_names, {
+				Control.names([\a, \b]);
+				SynthDef.wrap({ |c = 7| c });
+				Out.ar(0, SinOsc.ar(Control.kr([1, 2])))
+			}, (variants: (x: [b: 5]))],
+			[\defwrap_variant, { |amp = 0.1|
+				Out.ar(0, SynthDef.wrap({ |amp = 0.2| SinOsc.ar * amp }))
+			}, (variants: (x: [amp: 0.5]))],
+			[\prepend, { |bus, freq = 440| Out.ar(bus, SinOsc.ar(freq)) }, (prependArgs: [0])],
+			[\prepend_array, { |bus, freq = 440|
+				Out.ar(bus, SinOsc.ar(freq))
+			}, (prependArgs: [[0, 1]])]
+		]);
+	}.value;
+	{
+		// One argument without a default per spec of the table.
+		var names = Spec.specs.keys.asArray.sort;
+		var func = ("{ |" ++ names.join(", ") ++ "| Out.kr(0, [" ++ names.join(", ") ++ "]) }")
+			.interpret;
+		writeCases.("specs", [[\specs_args, func, (metadata: (specs: ()))]]);
+	}.value;
+	{
+		var cases = List.new;
+		{
+			cases.addAll([
+				[\namedcontrol_one, { Out.ar(0, SinOsc.ar(\freq.kr(440))) }],
+				[\namedcontrol_twice, { Out.ar(0, SinOsc.ar(\freq.kr(440)) + SinOsc.ar(\freq.kr)) }],
+				[\namedcontrol_after_arg, { |amp = 0.1| Out.ar(0, SinOsc.ar(\freq.kr(440)) * amp) }],
+				[\namedcontrol_arg_name, { |freq = 440|
+					Out.ar(0, SinOsc.ar(\freq.kr(220)) + SinOsc.ar(freq))
+				}],
+				[\namedcontrol_rates, { Out.ar(0, SinOsc.ar(\a.ir(1)) * \b.tr(2) + \c.ar(3) + \d.kr(4)) }],
+				[\namedcontrol_prefixes, { Out.ar(0, SinOsc.ar(\i_a.kr(1)) * \t_b.kr(2) + \a_c.kr(3)) }],
+				[\namedcontrol_prefix_rate, {
+					Out.ar(0, SinOsc.ar(\i_x.ar(1)) + \t_y.ir(1) + \i_z.tr(1) + \a_w.ir(1))
+				}],
+				[\namedcontrol_new, {
+					Out.ar(0, SinOsc.ar(NamedControl(\a, 1, \audio)) + NamedControl(\b, 2)
+						+ NamedControl(\c, 3, \foo) + NamedControl(\d, 4, \trigger)
+						+ NamedControl(\e, 5, \scalar))
+				}],
+				[\namedcontrol_array, { Out.ar(0, SinOsc.ar(\freqs.kr([440, 660]))) }],
+				[\namedcontrol_nested, { Out.ar(0, SinOsc.ar(\x.kr([[1, 2], [3, 4]]).flat)) }],
+				[\namedcontrol_no_value, { Out.ar(0, SinOsc.ar(\freq.kr)) }],
+				[\namedcontrol_one_value, { Out.ar(0, SinOsc.ar(\x.kr([440]))) }]
+			]);
+		}.value;
+		{
+			cases.addAll([
+				[\namedcontrol_lag, { Out.ar(0, SinOsc.ar(\freq.kr(440, 0.1))) }],
+				[\namedcontrol_lag_zero, { Out.ar(0, SinOsc.ar(\freq.kr(440, 0))) }],
+				[\namedcontrol_lag_array, { Out.ar(0, SinOsc.ar(\freqs.kr([440, 660], [0.1, 0.2]))) }],
+				[\namedcontrol_lag_one_for_two, { Out.ar(0, SinOsc.ar(\freqs.kr([440, 660], 0.1))) }],
+				[\namedcontrol_lag_seventeen, { Out.kr(0, \x.kr((1..17), 0.1)) }],
+				[\namedcontrol_lag_twice, {
+					Out.ar(0, SinOsc.ar(\freq.kr(440, 0.1)) + SinOsc.ar(\freq.kr(440, 0.1)))
+				}],
+				[\namedcontrol_lag_then_none, {
+					Out.ar(0, SinOsc.ar(\freq.kr(440, 0.1)) + SinOsc.ar(\freq.kr(440)))
+				}],
+				[\namedcontrol_none_then_lag, {
+					Out.ar(0, SinOsc.ar(\freq.kr(440)) + SinOsc.ar(\freq.kr(440, 0.1)))
+				}],
+				[\namedcontrol_lag_ugen, { Out.ar(0, SinOsc.ar(\freq.kr(440, \lt.kr(0.2)))) }],
+				[\namedcontrol_lag_ugen_twice, {
+					Out.ar(0, SinOsc.ar(\freq.kr(440, \lt.kr(0.2))) + SinOsc.ar(\freq.kr(440, \lt.kr(0.2))))
+				}],
+				[\namedcontrol_ugen_then_fixed, {
+					Out.ar(0, SinOsc.ar(\a.kr(1, \lt.kr(0.2))) + SinOsc.ar(\a.kr(1, 0.1)))
+				}],
+				[\namedcontrol_fixed_ugen, { Out.ar(0, SinOsc.ar(\a.kr(1, \lt.kr(0.2), true))) }]
+			]);
+		}.value;
+		{
+			cases.addAll([
+				[\namedcontrol_lag_ugens, {
+					Out.ar(0, SinOsc.ar(\x.kr([1, 2], [\l1.kr(0.1), \l2.kr(0.2)])))
+				}],
+				[\namedcontrol_lag_ugens_one_value, {
+					Out.ar(0, SinOsc.ar(\x.kr(1, [\l1.kr(0.1), \l2.kr(0.2)])))
+				}],
+				[\namedcontrol_lag_ugen_two_values, { Out.ar(0, SinOsc.ar(\x.kr([1, 2], \l.kr(0.1)))) }],
+				[\namedcontrol_lag_mixed, { Out.ar(0, SinOsc.ar(\x.kr([1, 2], [0.1, \l.kr(0.2)]))) }],
+				// A prefix drops the fixed lag.
+				[\namedcontrol_prefix_lag, { Out.ar(0, SinOsc.ar(\x_freq.kr(440, 0.1)) + \a_.kr(1, 0.1)) }],
+				[\namedcontrol_ir_lag, {
+					Out.ar(0, SinOsc.ar(NamedControl.ir(\a, 1, 0.1)) * NamedControl.tr(\b, 1, 0.1))
+				}],
+				[\namedcontrol_ar_lag, { Out.ar(0, SinOsc.ar(\a.ar(1, 0.1))) }],
+				[\namedcontrol_ir_lag_ugen, { Out.ar(0, SinOsc.ar(NamedControl.ir(\a, 1, \lt.kr(0.2)))) }],
+				[\namedcontrol_tr_lag_ugen, { Out.ar(0, SinOsc.ar(\t_x.kr(1, \lt.kr(0.2)))) }],
+				[\namedcontrol_ar_lag_ugen, { Out.ar(0, SinOsc.ar(\a.ar(1, \lt.kr(0.2)))) }]
+			]);
+		}.value;
+		{
+			cases.addAll([
+				[\namedcontrol_wrap, {
+					Out.ar(0, SinOsc.ar(\freq.kr(440)) + SynthDef.wrap({ SinOsc.ar(\freq.kr) }))
+				}],
+				[\namedcontrol_control_names, {
+					Out.ar(0, SinOsc.ar(Control.names([\a]).kr(1)) + SinOsc.ar(\a.kr(2)))
+				}],
+				[\namedcontrol_spec, {
+					Out.ar(0, SinOsc.ar(\freq.kr(spec: \freq)) * \amp.kr(0.5, spec: \amp)
+						* \rq.kr(spec: \rq) + SinOsc.ar(\freq.kr(440)))
+				}],
+				[\namedcontrol_variant, { |freq = 440|
+					Out.ar(0, SinOsc.ar(freq) + SinOsc.ar(\freq.kr(220)))
+				}, (variants: (x: [freq: 330]))],
+				// The graph of the test of sc-app3.
+				[\namedcontrol_markup, {
+					var freq = \freq.kr(440, 0.1);
+					var osc = SinOsc.ar(freq);
+					var amp = \amp.kr(0.1);
+					Out.ar(0, osc * amp)
+				}]
+			]);
+		}.value;
+		writeCases.("namedcontrol", cases.asArray);
+		[
+			[\refused_nc_values, { Out.ar(0, SinOsc.ar(\freq.kr(440)) + SinOsc.ar(\freq.kr(220))) }],
+			[\refused_nc_rate, { Out.ar(0, SinOsc.ar(\freq.kr(440)) + SinOsc.ar(\freq.ar(440))) }],
+			[\refused_nc_fixed_lags, { Out.ar(0, SinOsc.ar(\a.kr(1, 0.1)) + SinOsc.ar(\a.kr(1, 0.2))) }],
+			[\refused_nc_fixed_then_ugen, {
+				Out.ar(0, SinOsc.ar(\a.kr(1, 0.1)) + SinOsc.ar(\a.kr(1, \lt.kr(0.2))))
+			}],
+			[\refused_nc_zero_fixed, { Out.ar(0, SinOsc.ar(\freqs.kr([440, 660], [0.1, 0]))) }],
+			[\refused_nc_zero_lag, { Out.ar(0, SinOsc.ar(\x.kr([1, 2], [0, \l.kr(0.2)]))) }],
+			[\refused_nc_spec, { Out.ar(0, SinOsc.ar(\amp.kr(spec: \nosuchspec))) }],
+			[\refused_nc_second_spec, {
+				Out.ar(0, SinOsc.ar(\freq.kr(spec: \freq)) + SinOsc.ar(\freq.kr(spec: \amp)))
+			}],
+			[\refused_nc_output_value, { Out.ar(0, SinOsc.ar(\x.kr(SinOsc.kr))) }],
+			[\refused_nc_empty, { Out.ar(0, SinOsc.ar(\x.kr([]))) }],
+			[\refused_nc_lag_sizes, { Out.ar(0, SinOsc.ar(\x.kr([1, 2], [0.1, 0.2, 0.3]))) }]
 		].do { |case| refused.(case[0], case[1]) };
 	}.value;
 

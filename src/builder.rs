@@ -13,7 +13,7 @@ use crate::file::Version;
 use crate::limits;
 use crate::operator;
 use crate::optimize::{self, Rewritten};
-use crate::pseudo::{self, lang};
+use crate::pseudo::{self, NamedEntry, lang};
 use crate::rate::{Rate, least_by_name};
 use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
 use crate::topo;
@@ -186,7 +186,14 @@ pub struct SynthDefBuilder {
     name: String,
     controls: Vec<f64>,
     control_names: Vec<ControlName>,
-    sizes: Vec<usize>,
+    /// The size of the default of each name, or none for a name of
+    /// `Control.names` that has no default yet.
+    sizes: Vec<Option<usize>>,
+    /// The last name of the current function, which `Control.init` gives
+    /// its values when it has no default.
+    last_name: Option<usize>,
+    /// The table of `NamedControl` for the build, in the order of the names.
+    named: Vec<NamedEntry>,
     arguments: Vec<UGenInput>,
     children: Vec<Node>,
     width_first: Vec<usize>,
@@ -228,6 +235,29 @@ impl SynthDefBuilder {
     /// A [`BuildError`] for two arguments of one name, for an empty array,
     /// for a lag on a scalar, trigger or audio argument, and for a NaN lag.
     pub fn new(name: impl Into<String>, args: Vec<Arg>) -> Result<Self, BuildError> {
+        let mut builder = Self {
+            build: NEXT_BUILD.fetch_add(1, Ordering::Relaxed),
+            name: name.into(),
+            controls: Vec::new(),
+            control_names: Vec::new(),
+            sizes: Vec::new(),
+            last_name: None,
+            named: Vec::new(),
+            arguments: Vec::new(),
+            children: Vec::new(),
+            width_first: Vec::new(),
+            variants: Vec::new(),
+            max_local_bufs: None,
+        };
+        builder.arguments = builder.add_arguments(args)?;
+        Ok(builder)
+    }
+
+    /// Adds the controls of the arguments of a function, as
+    /// `addControlsFromArgsOfFunc` and `buildControls` do: a control UGen
+    /// for each group of rate, at the next parameters, and the names in the
+    /// order of the arguments. It gives back one input per argument.
+    fn add_arguments(&mut self, args: Vec<Arg>) -> Result<Vec<UGenInput>, BuildError> {
         for (position, arg) in args.iter().enumerate() {
             if args[..position].iter().any(|other| other.name == arg.name) {
                 return Err(BuildError::DuplicateArgument(arg.name.clone()));
@@ -242,18 +272,6 @@ impl SynthDefBuilder {
                 return Err(BuildError::LagOnNonControl(arg.name.clone()));
             }
         }
-        let mut builder = Self {
-            build: NEXT_BUILD.fetch_add(1, Ordering::Relaxed),
-            name: name.into(),
-            controls: Vec::new(),
-            control_names: Vec::new(),
-            sizes: Vec::new(),
-            arguments: Vec::new(),
-            children: Vec::new(),
-            width_first: Vec::new(),
-            variants: Vec::new(),
-            max_local_bufs: None,
-        };
         let mut arguments = vec![UGenInput::Array(Vec::new()); args.len()];
         let mut indices = vec![0; args.len()];
         for group in [Group::Scalar, Group::Trigger, Group::Audio, Group::Control] {
@@ -263,7 +281,7 @@ impl SynthDefBuilder {
             if members.is_empty() {
                 continue;
             }
-            let mut index = builder.controls.len();
+            let mut index = self.controls.len();
             let mut values = Vec::new();
             let mut lags = Vec::new();
             for &position in &members {
@@ -272,7 +290,7 @@ impl SynthDefBuilder {
                 values.extend_from_slice(&args[position].values);
                 lags.extend(args[position].lag_values());
             }
-            let mut outputs = builder.add_controls(group, &values, &lags)?.into_iter();
+            let mut outputs = self.add_controls(group, &values, &lags)?.into_iter();
             for &position in &members {
                 let arg = &args[position];
                 let proxies: Vec<UGenInput> = outputs
@@ -291,14 +309,14 @@ impl SynthDefBuilder {
             }
         }
         for (position, arg) in args.into_iter().enumerate() {
-            builder.sizes.push(arg.values.len());
-            builder.control_names.push(ControlName {
+            self.sizes.push(Some(arg.values.len()));
+            self.control_names.push(ControlName {
                 name: arg.name,
                 index: to_u32(indices[position]),
             });
+            self.last_name = Some(self.control_names.len() - 1);
         }
-        builder.arguments = arguments;
-        Ok(builder)
+        Ok(arguments)
     }
 
     /// One input per argument, in the order of the arguments: an output, or
@@ -316,6 +334,48 @@ impl SynthDefBuilder {
             .iter()
             .position(|control| control.name == name)?;
         self.arguments.get(position)
+    }
+
+    /// Names the next parameters, as `Control.names` does: the name at
+    /// position `i` takes the index of the parameter `i` after those of the
+    /// build so far. A name has no default until a `Control` or a
+    /// `TrigControl` gives the last name its values.
+    pub fn control_names(&mut self, names: &[&str]) {
+        let index = self.controls.len();
+        for (offset, name) in names.iter().enumerate() {
+            self.control_names.push(ControlName {
+                name: (*name).to_owned(),
+                index: to_u32(index + offset),
+            });
+            self.sizes.push(None);
+            self.last_name = Some(self.control_names.len() - 1);
+        }
+    }
+
+    /// Adds the controls of the arguments of a function inside the graph
+    /// function, and calls `body` with one input per argument, as
+    /// `SynthDef.wrap` does. The controls take the next parameters, in the
+    /// groups of rate of [`new`](Self::new). Around `body`, the last name is
+    /// the last of `args`, as `controlNames` holds only the names of the
+    /// function in sclang. For `prependArgs`, `body` takes their values from
+    /// its caller, and `args` holds only the arguments that become controls.
+    ///
+    /// # Errors
+    ///
+    /// The errors of [`new`](Self::new) for `args`, and those of `body`. A
+    /// call that fails leaves the build as it was.
+    pub fn wrap<T>(
+        &mut self,
+        args: Vec<Arg>,
+        body: impl FnOnce(&mut Self, &[UGenInput]) -> Result<T, BuildError>,
+    ) -> Result<T, BuildError> {
+        self.transaction(|builder| {
+            let outer = builder.last_name.take();
+            let inputs = builder.add_arguments(args)?;
+            let result = body(builder, &inputs);
+            builder.last_name = outer;
+            result
+        })
     }
 
     /// Adds a UGen, as `UGen:new1` does. It gives back one output, or an
@@ -556,13 +616,16 @@ impl SynthDefBuilder {
 
     /// Adds a variant: the defaults of the parameters, with the values of
     /// `values` by control name, as the `variants` of `SynthDef.new` give
-    /// them. Its name is `<definition>.<name>`.
+    /// them. Its name is `<definition>.<name>`. A name that two controls
+    /// share sets the last of them, as the map of names of sclang does.
     ///
     /// # Errors
     ///
     /// A [`BuildError`] for a name that a variant has already, for a control
     /// that the definition does not have, and for more values than the
-    /// control has.
+    /// default of the control has, or than the parameters hold from its
+    /// index. A name of [`control_names`](Self::control_names) without a
+    /// default takes no value.
     pub fn variant(&mut self, name: &str, values: &[(&str, Vec<f64>)]) -> Result<(), BuildError> {
         let full_name = format!("{}.{name}", self.name);
         if self
@@ -577,23 +640,27 @@ impl SynthDefBuilder {
             let Some(position) = self
                 .control_names
                 .iter()
-                .position(|control_name| control_name.name == *control)
+                .rposition(|control_name| control_name.name == *control)
             else {
                 return Err(BuildError::UnknownControl {
                     variant: full_name,
                     control: (*control).to_owned(),
                 });
             };
-            if control_values.len() > self.sizes[position] {
+            let start = to_usize(self.control_names[position].index);
+            let room = controls.len().saturating_sub(start);
+            let size = self.sizes[position].unwrap_or(0).min(room);
+            if control_values.len() > size {
                 return Err(BuildError::VariantSize {
                     variant: full_name,
                     control: (*control).to_owned(),
                     values: control_values.len(),
-                    size: self.sizes[position],
+                    size,
                 });
             }
-            let start = to_usize(self.control_names[position].index);
-            controls[start..start + control_values.len()].copy_from_slice(control_values);
+            if let Some(slots) = controls.get_mut(start..start + control_values.len()) {
+                slots.copy_from_slice(control_values);
+            }
         }
         self.variants.push(Variant {
             name: full_name,
@@ -713,7 +780,8 @@ impl SynthDefBuilder {
             Group::Control if lags.iter().any(|&lag| lag != 0.0) => {
                 let mut outputs = Vec::with_capacity(values.len());
                 for (values, lags) in values.chunks(16).zip(lags.chunks(16)) {
-                    outputs.extend(self.add_control("LagControl", Rate::Control, values, lags)?);
+                    let lags: Vec<UGenInput> = lags.iter().map(|&lag| lag.into()).collect();
+                    outputs.extend(self.add_control("LagControl", Rate::Control, values, &lags)?);
                 }
                 Ok(outputs)
             }
@@ -726,16 +794,20 @@ impl SynthDefBuilder {
         name: &str,
         rate: Rate,
         values: &[f64],
-        lags: &[f64],
+        lags: &[UGenInput],
     ) -> Result<Vec<OutputProxy>, BuildError> {
         let special_index = i16::try_from(self.controls.len())
             .map_err(|_| BuildError::TooManyParameters(self.controls.len()))?;
+        let mut inputs = Vec::with_capacity(lags.len());
+        for (input, lag) in lags.iter().enumerate() {
+            inputs.push(self.source(name, input, lag)?);
+        }
         self.controls.extend_from_slice(values);
         let index = self.children.len();
         self.children.push(Node {
             name: name.to_owned(),
             rate,
-            inputs: lags.iter().map(|&lag| Source::Number(lag)).collect(),
+            inputs,
             outputs: vec![rate; values.len()],
             special_index,
             width_first_before: self.width_first.len(),
@@ -750,18 +822,77 @@ impl SynthDefBuilder {
             .collect())
     }
 
-    /// Runs `build`, and removes the UGens that it added if it fails.
+    /// Names the next parameter, with a default of `size` values, as
+    /// `addIr`, `addKr`, `addTr` and `addAr` do for a `NamedControl`.
+    pub(crate) fn add_control_name(&mut self, name: &str, size: usize) {
+        self.control_names.push(ControlName {
+            name: name.to_owned(),
+            index: to_u32(self.controls.len()),
+        });
+        self.sizes.push(Some(size));
+        self.last_name = Some(self.control_names.len() - 1);
+    }
+
+    /// The table of `NamedControl` for the build.
+    pub(crate) fn named_controls(&self) -> &[NamedEntry] {
+        &self.named
+    }
+
+    /// Adds a name to the table of `NamedControl`.
+    pub(crate) fn push_named_control(&mut self, entry: NamedEntry) {
+        self.named.push(entry);
+    }
+
+    /// Adds a control UGen of `values` at the next parameter, as the `init`
+    /// of `Control`, `AudioControl` and `LagControl` does. A `Control` or a
+    /// `TrigControl` gives its values to the last name, if that name has no
+    /// default.
+    pub(crate) fn control_ugen(
+        &mut self,
+        class: &str,
+        rate: Rate,
+        values: &[f64],
+        lags: &[UGenInput],
+    ) -> Result<UGenInput, BuildError> {
+        self.add_control(class, rate, values, lags)?;
+        if matches!(class, "Control" | "TrigControl") {
+            if let Some(size @ None) = self.last_name.and_then(|name| self.sizes.get_mut(name)) {
+                *size = Some(values.len());
+            }
+        }
+        Ok(self.outputs_of(self.children.len() - 1))
+    }
+
+    /// Runs `build`, and gives back the build as it was if it fails: its
+    /// UGens, its parameters and its names.
     fn transaction<T>(
         &mut self,
         build: impl FnOnce(&mut Self) -> Result<T, BuildError>,
     ) -> Result<T, BuildError> {
         let (children, width_first) = (self.children.len(), self.width_first.len());
-        let max_local_bufs = self.max_local_bufs;
+        let (controls, names, entries) = (
+            self.controls.len(),
+            self.control_names.len(),
+            self.named.len(),
+        );
+        let (max_local_bufs, last_name) = (self.max_local_bufs, self.last_name);
+        let last_size = last_name.and_then(|name| self.sizes.get(name).copied());
         let result = build(self);
         if result.is_err() {
             self.children.truncate(children);
             self.width_first.truncate(width_first);
+            self.controls.truncate(controls);
+            self.control_names.truncate(names);
+            self.sizes.truncate(names);
+            self.named.truncate(entries);
             self.max_local_bufs = max_local_bufs;
+            self.last_name = last_name;
+            if let (Some(slot), Some(size)) = (
+                last_name.and_then(|name| self.sizes.get_mut(name)),
+                last_size,
+            ) {
+                *slot = size;
+            }
         }
         result
     }

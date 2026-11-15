@@ -1547,8 +1547,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -6724,8 +6723,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         },
         {
           "selector": "ir",
@@ -6736,8 +6734,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -20922,8 +20919,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -20939,8 +20935,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "ir",
@@ -37389,8 +37384,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         },
         {
           "selector": "ir",
@@ -37401,8 +37395,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the special index depends on the inputs"
+          "addable": "pseudo"
         }
       ]
     },
@@ -40025,6 +40018,163 @@
       ]
     },
     {
+      "name": "NamedControl",
+      "categories": [
+        "UGens>Synth control"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fixedLag",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "ir",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "tr",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "name",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "values",
+              "kind": "array",
+              "default": null
+            },
+            {
+              "name": "rate",
+              "kind": "symbol",
+              "default": null
+            },
+            {
+              "name": "lags",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fixedLag",
+              "kind": "bool",
+              "default": {
+                "bool": false
+              }
+            },
+            {
+              "name": "spec",
+              "kind": "symbol",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "NumChannels",
       "categories": [
         "UGens>Multichannel"
@@ -40511,6 +40661,215 @@
           "addable": "pseudo"
         }
       ]
+    }
+  ],
+  "specs": [
+    {
+      "name": "amp",
+      "minval": 0,
+      "maxval": 1,
+      "warp": "amp",
+      "step": 0,
+      "default": 0,
+      "units": ""
+    },
+    {
+      "name": "ampx4",
+      "minval": 0,
+      "maxval": 4,
+      "warp": "amp",
+      "step": 0,
+      "default": 0,
+      "units": ""
+    },
+    {
+      "name": "audiobus",
+      "minval": 0,
+      "maxval": 1023,
+      "warp": "linear",
+      "step": 1,
+      "default": 0,
+      "units": ""
+    },
+    {
+      "name": "beats",
+      "minval": 0,
+      "maxval": 20,
+      "warp": "linear",
+      "step": 0,
+      "default": 0,
+      "units": "Hz"
+    },
+    {
+      "name": "bipolar",
+      "minval": -1,
+      "maxval": 1,
+      "warp": "linear",
+      "step": 0,
+      "default": 0,
+      "units": ""
+    },
+    {
+      "name": "boostcut",
+      "minval": -20,
+      "maxval": 20,
+      "warp": "linear",
+      "step": 0,
+      "default": 0,
+      "units": "dB"
+    },
+    {
+      "name": "controlbus",
+      "minval": 0,
+      "maxval": 16383,
+      "warp": "linear",
+      "step": 1,
+      "default": 0,
+      "units": ""
+    },
+    {
+      "name": "db",
+      "minval": "-inf",
+      "maxval": 0,
+      "warp": "db",
+      "step": 0,
+      "default": "-inf",
+      "units": "dB"
+    },
+    {
+      "name": "delay",
+      "minval": 0.0001,
+      "maxval": 1,
+      "warp": "exp",
+      "step": 0,
+      "default": 0.29999999999999999,
+      "units": "sec"
+    },
+    {
+      "name": "detune",
+      "minval": -20,
+      "maxval": 20,
+      "warp": "linear",
+      "step": 0,
+      "default": 0,
+      "units": "Hz"
+    },
+    {
+      "name": "fadePx",
+      "minval": 0,
+      "maxval": 100,
+      "warp": "amp",
+      "step": 0,
+      "default": 0.02,
+      "units": ""
+    },
+    {
+      "name": "freq",
+      "minval": 20,
+      "maxval": 20000,
+      "warp": "exp",
+      "step": 0,
+      "default": 440,
+      "units": "Hz"
+    },
+    {
+      "name": "lofreq",
+      "minval": 0.10000000000000001,
+      "maxval": 100,
+      "warp": "exp",
+      "step": 0,
+      "default": 6,
+      "units": "Hz"
+    },
+    {
+      "name": "midfreq",
+      "minval": 25,
+      "maxval": 4200,
+      "warp": "exp",
+      "step": 0,
+      "default": 440,
+      "units": "Hz"
+    },
+    {
+      "name": "midi",
+      "minval": 0,
+      "maxval": 127,
+      "warp": "linear",
+      "step": 0,
+      "default": 64,
+      "units": ""
+    },
+    {
+      "name": "midinote",
+      "minval": 0,
+      "maxval": 127,
+      "warp": "linear",
+      "step": 0,
+      "default": 60,
+      "units": ""
+    },
+    {
+      "name": "midivelocity",
+      "minval": 1,
+      "maxval": 127,
+      "warp": "linear",
+      "step": 0,
+      "default": 64,
+      "units": ""
+    },
+    {
+      "name": "pan",
+      "minval": -1,
+      "maxval": 1,
+      "warp": "linear",
+      "step": 0,
+      "default": 0,
+      "units": ""
+    },
+    {
+      "name": "phase",
+      "minval": 0,
+      "maxval": 6.2831853071795862,
+      "warp": "linear",
+      "step": 0,
+      "default": 0,
+      "units": ""
+    },
+    {
+      "name": "rate",
+      "minval": 0.125,
+      "maxval": 8,
+      "warp": "exp",
+      "step": 0,
+      "default": 1,
+      "units": ""
+    },
+    {
+      "name": "rq",
+      "minval": 0.001,
+      "maxval": 2,
+      "warp": "exp",
+      "step": 0,
+      "default": 0.70699999999999996,
+      "units": ""
+    },
+    {
+      "name": "unipolar",
+      "minval": 0,
+      "maxval": 1,
+      "warp": "linear",
+      "step": 0,
+      "default": 0,
+      "units": ""
+    },
+    {
+      "name": "widefreq",
+      "minval": 0.10000000000000001,
+      "maxval": 20000,
+      "warp": "exp",
+      "step": 0,
+      "default": 440,
+      "units": "Hz"
     }
   ]
 }

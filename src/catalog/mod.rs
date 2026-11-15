@@ -80,7 +80,7 @@ impl PseudoClass {
     }
 }
 
-/// A rate method of a class: `ar`, `kr`, `ir` or `new`.
+/// A rate method of a class: `ar`, `kr`, `ir`, `tr` or `new`.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[non_exhaustive]
 pub struct RateMethod {
@@ -317,6 +317,29 @@ pub enum FftSize {
     Chain,
 }
 
+/// A `ControlSpec` of `Spec.specs` in sclang 3.14.1: the spec of a name,
+/// as `\freq.asSpec` gives it. Its default is the default of a
+/// `NamedControl` with the spec and no values, and of an argument without a
+/// default when the metadata of the definition has specs.
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[non_exhaustive]
+pub struct ControlSpec {
+    /// The name, such as `freq`.
+    pub name: &'static str,
+    /// The value at the start of the range.
+    pub minval: f64,
+    /// The value at the end of the range.
+    pub maxval: f64,
+    /// The warp, as `asSpecifier` names it, such as `linear` or `exp`.
+    pub warp: &'static str,
+    /// The step that the values round to, or 0.
+    pub step: f64,
+    /// The default value.
+    pub default: f64,
+    /// The units, such as `Hz`, or nothing.
+    pub units: &'static str,
+}
+
 /// The class with this name.
 #[must_use]
 pub fn lookup(name: &str) -> Option<&'static UGenClass> {
@@ -349,11 +372,25 @@ pub fn pseudo_all() -> &'static [PseudoClass] {
     &generated::PSEUDO_CLASSES
 }
 
+/// The spec of `Spec.specs` with this name.
+#[must_use]
+pub fn spec(name: &str) -> Option<&'static ControlSpec> {
+    let specs = specs();
+    let position = specs.binary_search_by(|spec| spec.name.cmp(name)).ok()?;
+    specs.get(position)
+}
+
+/// All the specs of `Spec.specs`, sorted by name.
+#[must_use]
+pub fn specs() -> &'static [ControlSpec] {
+    &generated::SPECS
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         Addable, ArrayExpansion, CheckInputs, FftSize, InputSlot, Optimize, Outputs, Wiring, all,
-        lookup, pseudo_all, pseudo_lookup,
+        lookup, pseudo_all, pseudo_lookup, spec, specs,
     };
     use crate::rate::Rate;
 
@@ -596,6 +633,30 @@ mod tests {
                 .iter()
                 .all(|class| !matches!(class.check_inputs, CheckInputs::Custom(_)))
         );
+    }
+
+    #[test]
+    #[allow(clippy::float_cmp)]
+    fn the_specs_are_the_23_of_sclang() {
+        assert_eq!(specs().len(), 23);
+        let freq = spec("freq").unwrap();
+        assert_eq!(
+            (
+                freq.minval,
+                freq.maxval,
+                freq.warp,
+                freq.default,
+                freq.units
+            ),
+            (20.0, 20000.0, "exp", 440.0, "Hz")
+        );
+        let db = spec("db").unwrap();
+        assert_eq!(
+            (db.minval, db.default),
+            (f64::NEG_INFINITY, f64::NEG_INFINITY)
+        );
+        assert_eq!(spec("rq").unwrap().default, 0.707);
+        assert!(spec("nosuchspec").is_none());
     }
 
     #[test]
