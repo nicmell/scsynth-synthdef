@@ -4,10 +4,11 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::catalog::{
-    self, Addable, ArgDefault, ArgKind, ArrayExpansion, InputSlot, Outputs, Passthrough,
-    RateMethod, UGenClass, Wiring,
+    self, Addable, ArgDefault, ArgKind, ArrayExpansion, ConvertEnv, InputSlot, Outputs,
+    Passthrough, RateMethod, UGenClass, Wiring,
 };
 use crate::check_inputs;
+use crate::env::Env;
 use crate::error::BuildError;
 use crate::file::Version;
 use crate::limits;
@@ -378,6 +379,39 @@ impl SynthDefBuilder {
         })
     }
 
+    /// Makes an envelope by a class method of `Env` that makes one, such as
+    /// `perc`, with the arguments by name, as sclang makes it. The catalogue
+    /// gives the order of the arguments and their defaults. A constructor
+    /// that computes with outputs, as `adsr` with a `sustainLevel` that is
+    /// an output, adds the UGens of its math at once, as sclang does.
+    ///
+    /// # Errors
+    ///
+    /// A [`BuildError`] for a method that `Env` lacks, for an argument that
+    /// the method does not take or that is of the wrong kind, and
+    /// [`BuildError::BadEnv`] where sclang throws. A call that fails leaves
+    /// the build as it was.
+    pub fn env(&mut self, selector: &str, args: &[(&str, ArgValue)]) -> Result<Env, BuildError> {
+        let method = catalog::env_method(selector).ok_or_else(|| BuildError::UnknownMethod {
+            class: "Env".to_owned(),
+            selector: selector.to_owned(),
+        })?;
+        let values = bind_optional("Env", method, args)?;
+        self.transaction(|builder| pseudo::env::build(builder, method, values))
+    }
+
+    /// `asArrayForInterpolation`: the envelope as `IEnvGen` reads it, an
+    /// array per channel, one channel included. Its fourth value is
+    /// `times.sum`, which adds UGens when a time is an output.
+    ///
+    /// # Errors
+    ///
+    /// [`BuildError::BadEnv`] for a shape that sclang does not know, and the
+    /// errors of [`binary_op`](Self::binary_op).
+    pub fn env_array_for_interpolation(&mut self, env: &Env) -> Result<UGenInput, BuildError> {
+        self.transaction(|builder| pseudo::env::array_for_interpolation(builder, env))
+    }
+
     /// Adds a UGen, as `UGen:new1` does. It gives back one output, or an
     /// array of the outputs when the UGen has none or several.
     ///
@@ -548,7 +582,11 @@ impl SynthDefBuilder {
             if let Some(slot) = audio_slot {
                 expanded[slot] = lang::as_audio_rate_input(builder, expanded[slot].clone())?;
             }
-            let array = array_part(wiring, &values);
+            let channels = match ugen_class.convert_env {
+                Some(form) => builder.convert_env(form, method, &mut values)?,
+                None => None,
+            };
+            let array = channels.or_else(|| array_part(wiring, &values));
             if let Some((position, part)) = &array {
                 for value in part.values() {
                     names.push(method.args[*position].name);
@@ -754,6 +792,36 @@ impl SynthDefBuilder {
         };
         limits::check(&def, Version::V2).map_err(BuildError::Limit)?;
         Ok(def)
+    }
+
+    /// The `envelope` of `values` as `convertEnv` takes an `Env`: the array
+    /// of `EnvGen`, which the `Refs` expansion takes, or the channels of
+    /// `IEnvGen`. Several channels of `IEnvGen` expand, as instances, with
+    /// the index.
+    fn convert_env(
+        &mut self,
+        form: ConvertEnv,
+        method: &RateMethod,
+        values: &mut [ArgValue],
+    ) -> Result<Option<(usize, ArrayPart)>, BuildError> {
+        let Some(position) = method.args.iter().position(|arg| arg.name == "envelope") else {
+            return Ok(None);
+        };
+        let ArgValue::Env(env) = &values[position] else {
+            return Ok(None);
+        };
+        if form == ConvertEnv::Array {
+            values[position] = ArgValue::Input(env.as_array()?);
+            return Ok(None);
+        }
+        let env = env.clone();
+        let channels = pseudo::elements(pseudo::env::array_for_interpolation(self, &env)?);
+        if let [channel] = channels.as_slice() {
+            values[position] = ArgValue::Input(channel.clone());
+            return Ok(None);
+        }
+        values[position] = ArgValue::Input(UGenInput::Array(channels.clone()));
+        Ok(Some((position, ArrayPart::Instances(channels))))
     }
 
     /// Runs the body of a pseudo-UGen. A body that fails adds no UGen.
@@ -1385,9 +1453,14 @@ fn bind_optional(
         .map(|(arg, value)| match (value, arg.default) {
             (Some(value), _) => Some(value),
             (None, Some(ArgDefault::Float(number))) => Some(ArgValue::from(number)),
-            (None, Some(ArgDefault::Symbol(text))) if arg.kind == ArgKind::Symbol => {
+            (None, Some(ArgDefault::Symbol(text)))
+                if matches!(arg.kind, ArgKind::Symbol | ArgKind::Curve) =>
+            {
                 Some(ArgValue::from(text))
             }
+            (None, Some(ArgDefault::Floats(numbers))) => Some(ArgValue::Input(UGenInput::Array(
+                numbers.iter().map(|&number| number.into()).collect(),
+            ))),
             (None, Some(ArgDefault::Bool(value))) => Some(ArgValue::Bool(value)),
             _ => None,
         })
@@ -1486,7 +1559,7 @@ fn wire_inputs(
                     return Err(nested_array(class, method, position));
                 }
                 ArgValue::Input(input) => inputs.push(input.clone()),
-                ArgValue::Text(_) | ArgValue::Bool(_) => {
+                ArgValue::Text(_) | ArgValue::Bool(_) | ArgValue::Env(_) | ArgValue::Curve(_) => {
                     return Err(wrong_kind(class, method, position, "a number or an output"));
                 }
             },
@@ -1498,13 +1571,13 @@ fn wire_inputs(
                     inputs.extend(items.iter().cloned());
                 }
                 ArgValue::Input(input) => inputs.push(input.clone()),
-                ArgValue::Text(_) | ArgValue::Bool(_) => {
+                ArgValue::Text(_) | ArgValue::Bool(_) | ArgValue::Env(_) | ArgValue::Curve(_) => {
                     return Err(wrong_kind(class, method, position, "an array"));
                 }
             },
             InputSlot::ArgString(position) => match &values[position] {
                 ArgValue::Text(text) => inputs.extend(symbol_codes(text)),
-                ArgValue::Input(_) | ArgValue::Bool(_) => {
+                ArgValue::Input(_) | ArgValue::Bool(_) | ArgValue::Env(_) | ArgValue::Curve(_) => {
                     return Err(wrong_kind(class, method, position, "a symbol"));
                 }
             },
@@ -1534,9 +1607,11 @@ fn wire_outputs(
             ArgValue::Input(UGenInput::Array(items)) if !items.is_empty() => {
                 Ok(vec![rate; items.len()])
             }
-            ArgValue::Input(UGenInput::Array(_)) | ArgValue::Text(_) | ArgValue::Bool(_) => {
-                Err(bad_count(class, method, arg))
-            }
+            ArgValue::Input(UGenInput::Array(_))
+            | ArgValue::Text(_)
+            | ArgValue::Bool(_)
+            | ArgValue::Env(_)
+            | ArgValue::Curve(_) => Err(bad_count(class, method, arg)),
             ArgValue::Input(_) => Ok(vec![rate]),
         },
     }

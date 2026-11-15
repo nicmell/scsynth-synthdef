@@ -24,6 +24,9 @@ pub struct UGenClass {
     /// How `fftSize` finds the size of the FFT of a PV chain of the class.
     /// `None` for a class without `fftSize`.
     pub fft_size: Option<FftSize>,
+    /// How `convertEnv` takes an `Env` as the envelope of the class. `None`
+    /// for a class without `convertEnv`.
+    pub convert_env: Option<ConvertEnv>,
     /// The categories of the class in the help of SuperCollider, such as
     /// `UGens>Generators>Deterministic`.
     pub categories: &'static [&'static str],
@@ -120,6 +123,9 @@ pub enum ArgKind {
     Symbol,
     /// A boolean, such as `wrap` of `SelectXFocus`.
     Bool,
+    /// A curve of an envelope, such as the `curve` of `Env.perc`: a shape
+    /// by name, a value, or an array of them.
+    Curve,
 }
 
 /// The default value of an argument.
@@ -132,6 +138,8 @@ pub enum ArgDefault {
     Symbol(&'static str),
     /// A boolean.
     Bool(bool),
+    /// An array of numbers, such as the `levels` of `Env.new`.
+    Floats(&'static [f64]),
 }
 
 /// Whether `SynthDefBuilder::ugen` can add a method by name.
@@ -317,6 +325,17 @@ pub enum FftSize {
     Chain,
 }
 
+/// How `convertEnv` of sclang takes an `Env` as the envelope of a UGen, by
+/// the class that owns the method.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum ConvertEnv {
+    /// Through `asMultichannelArray`, as `EnvGen` does.
+    Array,
+    /// Through `asArrayForInterpolation`, as `IEnvGen` does.
+    Interpolation,
+}
+
 /// A `ControlSpec` of `Spec.specs` in sclang 3.14.1: the spec of a name,
 /// as `\freq.asSpec` gives it. Its default is the default of a
 /// `NamedControl` with the spec and no values, and of an argument without a
@@ -386,11 +405,27 @@ pub fn specs() -> &'static [ControlSpec] {
     &generated::SPECS
 }
 
+/// The class method of `Env` with this selector that makes an envelope,
+/// such as `perc`.
+#[must_use]
+pub fn env_method(selector: &str) -> Option<&'static RateMethod> {
+    env_methods()
+        .iter()
+        .find(|method| method.selector == selector)
+}
+
+/// The class methods of `Env` that make an envelope, with their arguments.
+#[must_use]
+pub fn env_methods() -> &'static [RateMethod] {
+    &generated::ENV_METHODS
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
-        Addable, ArrayExpansion, CheckInputs, FftSize, InputSlot, Optimize, Outputs, Wiring, all,
-        lookup, pseudo_all, pseudo_lookup, spec, specs,
+        Addable, ArgDefault, ArgKind, ArrayExpansion, CheckInputs, ConvertEnv, FftSize, InputSlot,
+        Optimize, Outputs, Wiring, all, env_method, env_methods, lookup, pseudo_all, pseudo_lookup,
+        spec, specs,
     };
     use crate::rate::Rate;
 
@@ -633,6 +668,34 @@ mod tests {
                 .iter()
                 .all(|class| !matches!(class.check_inputs, CheckInputs::Custom(_)))
         );
+    }
+
+    #[test]
+    fn convert_env_and_the_methods_of_env_are_those_of_sclang() {
+        let converting: Vec<(&str, ConvertEnv)> = all()
+            .iter()
+            .filter_map(|class| class.convert_env.map(|form| (class.name, form)))
+            .collect();
+        assert_eq!(
+            converting,
+            [
+                ("EnvGen", ConvertEnv::Array),
+                ("IEnvGen", ConvertEnv::Interpolation)
+            ]
+        );
+        assert_eq!(env_methods().len(), 14);
+        let perc = env_method("perc").unwrap();
+        let curve = perc.args.iter().find(|arg| arg.name == "curve").unwrap();
+        assert_eq!(
+            (curve.kind, curve.default),
+            (ArgKind::Curve, Some(ArgDefault::Float(-4.0)))
+        );
+        let new = env_method("new").unwrap();
+        assert_eq!(
+            new.args[0].default,
+            Some(ArgDefault::Floats(&[0.0, 1.0, 0.0]))
+        );
+        assert!(env_method("shapeNumber").is_none());
     }
 
     #[test]

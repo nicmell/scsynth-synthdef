@@ -115,6 +115,15 @@ fn default(value: &Value) -> String {
         "float" => format!("ArgDefault::Float({})", float(inner)),
         "symbol" => format!("ArgDefault::Symbol({:?})", text(inner)),
         "bool" => format!("ArgDefault::Bool({})", inner.as_bool().expect("a boolean")),
+        "floats" => {
+            let floats: Vec<String> = inner
+                .as_array()
+                .expect("an array of floats")
+                .iter()
+                .map(float)
+                .collect();
+            format!("ArgDefault::Floats(&[{}])", floats.join(", "))
+        }
         other => panic!("{other} is no kind of default"),
     };
     format!("Some({default})")
@@ -127,6 +136,7 @@ fn kind(value: &Value) -> &'static str {
         "array" => "ArgKind::Array",
         "symbol" => "ArgKind::Symbol",
         "bool" => "ArgKind::Bool",
+        "curve" => "ArgKind::Curve",
         other => panic!("{other} is no kind of argument"),
     }
 }
@@ -170,6 +180,15 @@ fn fft_size(value: &Value) -> &'static str {
         Some("input") => "Some(FftSize::Input)",
         Some("chain") => "Some(FftSize::Chain)",
         _ => panic!("{value} is no rule of fftSize"),
+    }
+}
+
+fn convert_env(value: &Value) -> &'static str {
+    match value.as_str() {
+        None if value.is_null() => "None",
+        Some("array") => "Some(ConvertEnv::Array)",
+        Some("interpolation") => "Some(ConvertEnv::Interpolation)",
+        _ => panic!("{value} is no rule of convertEnv"),
     }
 }
 
@@ -355,7 +374,7 @@ fn render_catalog(catalog: &Value) -> String {
     let mut rendered = String::from(HEADER);
     rendered.push_str("#![allow(clippy::approx_constant, clippy::unreadable_literal)]\n\n");
     rendered.push_str(
-        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, ControlSpec, FftSize,\n    InputSlot, Optimize, Outputs, Passthrough, PseudoClass, RateMethod, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, ControlSpec, ConvertEnv,\n    FftSize, InputSlot, Optimize, Outputs, Passthrough, PseudoClass, RateMethod, UGenClass,\n    Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     writeln!(
         rendered,
@@ -400,6 +419,12 @@ fn render_catalog(catalog: &Value) -> String {
         .unwrap();
         writeln!(
             rendered,
+            "        convert_env: {},",
+            convert_env(&class["convert_env"])
+        )
+        .unwrap();
+        writeln!(
+            rendered,
             "        categories: {},",
             strings(&class["categories"])
         )
@@ -420,7 +445,24 @@ fn render_catalog(catalog: &Value) -> String {
     rendered.push_str("];\n");
     render_pseudo_classes(&mut rendered, catalog);
     render_specs(&mut rendered, catalog);
+    render_env_methods(&mut rendered, catalog);
     rendered
+}
+
+fn render_env_methods(rendered: &mut String, catalog: &Value) {
+    let methods = catalog["env_methods"]
+        .as_array()
+        .expect("a list of methods of Env");
+    writeln!(
+        rendered,
+        "\npub(super) static ENV_METHODS: [RateMethod; {}] = [",
+        methods.len()
+    )
+    .unwrap();
+    for method in methods {
+        render_method(rendered, method);
+    }
+    rendered.push_str("];\n");
 }
 
 fn render_pseudo_classes(rendered: &mut String, catalog: &Value) {

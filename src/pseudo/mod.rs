@@ -8,6 +8,7 @@ mod buf_io;
 mod compander;
 mod delay_wr;
 mod demand;
+pub(crate) mod env;
 mod fft_unpacking;
 mod filter;
 mod fsin_osc;
@@ -28,6 +29,7 @@ pub(crate) use graph_builder::NamedEntry;
 
 use crate::builder::{SynthDefBuilder, count_to_usize};
 use crate::catalog::RateMethod;
+use crate::env::Curve;
 use crate::error::BuildError;
 use crate::ugen_input::{ArgValue, UGenInput};
 
@@ -107,6 +109,28 @@ impl Args {
             None => Ok(None),
             Some(ArgValue::Text(text)) => Ok(Some(text.clone())),
             Some(_) => Err(self.wrong_kind(name, "a symbol")),
+        }
+    }
+
+    /// The curve of the argument `name`: a curve, a text as a shape, or an
+    /// input as values.
+    pub(crate) fn curve(&self, name: &str) -> Result<Curve, BuildError> {
+        self.optional_curve(name)?
+            .ok_or_else(|| BuildError::MissingArgument {
+                class: self.class.to_owned(),
+                argument: name.to_owned(),
+            })
+    }
+
+    /// The curve of the argument `name`, or none for an argument whose
+    /// default is nil.
+    pub(crate) fn optional_curve(&self, name: &str) -> Result<Option<Curve>, BuildError> {
+        match self.slot(name)? {
+            None => Ok(None),
+            Some(ArgValue::Curve(curve)) => Ok(Some(curve.clone())),
+            Some(ArgValue::Text(text)) => Ok(Some(Curve::from(text.as_str()))),
+            Some(ArgValue::Input(input)) => Ok(Some(Curve::from(input.clone()))),
+            Some(_) => Err(self.wrong_kind(name, "a curve")),
         }
     }
 

@@ -3,6 +3,7 @@
 use super::{Args, in_out};
 use crate::builder::SynthDefBuilder;
 use crate::catalog;
+use crate::env::unbubble;
 use crate::error::BuildError;
 use crate::rate::{Rate, least_by_name};
 use crate::ugen_input::UGenInput;
@@ -312,14 +313,6 @@ fn reshape_like(control: UGenInput, values: &Values) -> UGenInput {
     let mut outputs = Vec::new();
     flatten(control, &mut outputs);
     shape(values, &outputs, &mut 0)
-}
-
-/// `unbubble`: the element of an array of one.
-fn unbubble(input: UGenInput) -> UGenInput {
-    match input {
-        UGenInput::Array(mut items) if items.len() == 1 => items.remove(0),
-        other => other,
-    }
 }
 
 fn bad(message: String) -> BuildError {

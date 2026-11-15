@@ -303,7 +303,7 @@ fn named(
 }
 
 /// `\\name.kr(value)`.
-fn kr(b: &mut SynthDefBuilder, name: &str, value: impl Into<UGenInput>) -> UGenInput {
+pub(super) fn kr(b: &mut SynthDefBuilder, name: &str, value: impl Into<UGenInput>) -> UGenInput {
     named(b, "kr", name, Some(value.into()), None)
 }
 
