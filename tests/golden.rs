@@ -24,7 +24,7 @@ fn golden_files() -> Vec<PathBuf> {
 #[test]
 fn every_golden_file_writes_back_to_its_bytes() {
     let files = golden_files();
-    assert_eq!(files.len(), 77, "{files:?}");
+    assert_eq!(files.len(), 81, "{files:?}");
     for path in files {
         let bytes = fs::read(&path).expect("a golden file reads");
         let file = read_def_file(&bytes).unwrap_or_else(|error| panic!("{path:?}: {error}"));
