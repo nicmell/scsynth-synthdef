@@ -347,7 +347,10 @@ what each one does in sclang.
   the count.
 - `Poll` gives back its input, not itself. A number trigger becomes an
   `Impulse` at the rate of the `Poll`. Without a label, the label names the
-  class of the input, as "UGen(SinOsc)".
+  class of the input, as "UGen(SinOsc)". `Poll.new` takes the rate of each
+  element of `in` before the expansion. So in
+  `Poll.new(10, [[SinOsc.ar, SinOsc.kr], x])`, both elements of the inner
+  array get a `Poll` at audio rate.
 - `DemandEnvGen.ar` takes its `gate` and its `reset` to audio rate
   together. If one of them runs at audio rate, `K2A.ar` takes the other
   one. The rate of an array is the least of its rates by name, so
@@ -643,8 +646,10 @@ of 600 and 200.
   each element, as `multiChannelPerform` does. An array among the
   arguments spreads over the elements, and the shorter array wraps.
   `degrad`, `raddeg`, the signs and `degreeToKey` send the same arguments
-  to each element. `minNyquist` adds one `SampleRate`. If `label` is nil,
-  `poll` and `dpoll` label each element `UGen Array [i]`.
+  to each element. `minNyquist` adds one `SampleRate`. `poll` and `dpoll`
+  call `Poll` and `Dpoll` once with the whole array. So the arrays among
+  their arguments lace with the elements in the same way. If `label` is
+  nil, they label each element `UGen Array [i]`.
 - A number gets the method of `Float`. It computes a number where it can,
   as `0.25.linlin(0, 1, 200, 800)` gives 350. The lag family gives the
   number itself. An output among the arguments adds UGens, as in sclang.
@@ -716,8 +721,9 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
   the class.
 - `catalog::env_range` and `catalog::env_ranges` give `range`, `exprange`
   and `curverange` of `Env`, with their arguments.
-- A `RateMethod` is `ar`, `kr`, `ir`, `tr` or `new`. It has its arguments,
-  each with a kind and a default, and an `Addable`.
+- A `RateMethod` is a rate method, such as `ar`, `kr`, `ir`, `tr` or
+  `new`, or one of the methods above. It has its arguments, each with a
+  kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
   holds the rate, the slot of each input, the outputs, the special index,
   whether `mul` and `add` apply, and whether a nested array expands again.
@@ -993,7 +999,7 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-This is not in version 0.12, the next item of value for sc-app3:
+This is not in version 0.13, the next item of value for sc-app3:
 
 1. sc3-plugins
 

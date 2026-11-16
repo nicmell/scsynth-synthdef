@@ -3,9 +3,9 @@
 
 use scsynth_synthdef::{ArgValue, Curve, Env, SynthDef, SynthDefBuilder, UGenInput};
 
-use super::controls::kr;
+use super::controls::{ar, kr};
 use super::pseudo::{def, input, out, sine};
-use super::{arg, array};
+use super::{arg, array, by_name};
 
 /// The definitions of a golden file of 0.9.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
@@ -50,8 +50,7 @@ fn env_gen(
 ) -> UGenInput {
     let mut all = vec![("envelope", ArgValue::Env(env))];
     all.extend(args.iter().cloned());
-    b.ugen("EnvGen", selector, &all)
-        .unwrap_or_else(|error| panic!("EnvGen.{selector}: {error}"))
+    by_name(b, "EnvGen", selector, &all)
 }
 
 /// `Out.kr(0, EnvGen.kr(env))`.
@@ -315,8 +314,7 @@ fn ienv_gen(
 ) -> UGenInput {
     let mut all = vec![("envelope", ArgValue::Env(env)), ("index", input(index))];
     all.extend(args.iter().cloned());
-    b.ugen("IEnvGen", selector, &all)
-        .unwrap_or_else(|error| panic!("IEnvGen.{selector}: {error}"))
+    by_name(b, "IEnvGen", selector, &all)
 }
 
 /// `Out.kr(0, IEnvGen.kr(env, index))`.
@@ -372,13 +370,7 @@ fn ienv() -> Vec<SynthDef> {
         }),
         def("ienv_madd", vec![], |b| {
             let made = env(b, "perc", &[]);
-            let index = b
-                .ugen(
-                    "NamedControl",
-                    "ar",
-                    &[("name", "i".into()), ("values", input(0.0))],
-                )
-                .unwrap();
+            let index = ar(b, "i", 0.0);
             let sound = ienv_gen(
                 b,
                 "ar",
@@ -402,18 +394,7 @@ fn ienv() -> Vec<SynthDef> {
 
 /// `VarLag.selector(args)`.
 fn var_lag(b: &mut SynthDefBuilder, selector: &str, args: &[(&str, ArgValue)]) -> UGenInput {
-    b.ugen("VarLag", selector, args)
-        .unwrap_or_else(|error| panic!("VarLag.{selector}: {error}"))
-}
-
-/// `\\name.ar(value)`.
-fn ar(b: &mut SynthDefBuilder, name: &str, value: f64) -> UGenInput {
-    b.ugen(
-        "NamedControl",
-        "ar",
-        &[("name", name.into()), ("values", input(value))],
-    )
-    .unwrap()
+    by_name(b, "VarLag", selector, args)
 }
 
 /// A definition of `Out.kr(0, VarLag.kr(\\x.kr(1), 0.2, ...))`, with these
@@ -505,8 +486,7 @@ fn varlag() -> Vec<SynthDef> {
 
 /// `EnvGate(args)`.
 fn env_gate(b: &mut SynthDefBuilder, args: &[(&str, ArgValue)]) -> UGenInput {
-    b.ugen("EnvGate", "new", args)
-        .unwrap_or_else(|error| panic!("EnvGate.new: {error}"))
+    by_name(b, "EnvGate", "new", args)
 }
 
 /// `Out.ar(0, sound * gate)`.

@@ -37,8 +37,8 @@ pub struct UGenClass {
     pub categories: &'static [&'static str],
     /// The rule of its `checkInputs`.
     pub check_inputs: CheckInputs,
-    /// What `signalRange` gives for a UGen of the class, which `range` and
-    /// `exprange` read.
+    /// What `signalRange` gives for a UGen of the class, which `range`,
+    /// `exprange` and `curverange` read.
     pub signal_range: SignalRange,
     /// The methods `ar`, `kr`, `ir` and `new` that the class responds to and
     /// that a UGen class defines.
@@ -49,15 +49,13 @@ impl UGenClass {
     /// The method with this selector.
     #[must_use]
     pub fn method(&self, selector: &str) -> Option<&'static RateMethod> {
-        self.methods
-            .iter()
-            .find(|method| method.selector == selector)
+        by_selector(self.methods, selector)
     }
 
     /// The page of the class in the help of SuperCollider.
     #[must_use]
     pub fn doc_url(&self) -> String {
-        format!("https://doc.sccode.org/Classes/{}.html", self.name)
+        doc_url(self.name)
     }
 }
 
@@ -100,8 +98,8 @@ pub struct PseudoClass {
     pub name: &'static str,
     /// The categories of the class in the help of SuperCollider.
     pub categories: &'static [&'static str],
-    /// The methods `ar`, `kr`, `ir` and `new` that the class responds to,
-    /// but the `new` of `Object`.
+    /// The methods `ar`, `kr`, `ir`, `tr` and `new` that the class responds
+    /// to, but the `new` of `Object`.
     pub methods: &'static [RateMethod],
 }
 
@@ -109,19 +107,19 @@ impl PseudoClass {
     /// The method with this selector.
     #[must_use]
     pub fn method(&self, selector: &str) -> Option<&'static RateMethod> {
-        self.methods
-            .iter()
-            .find(|method| method.selector == selector)
+        by_selector(self.methods, selector)
     }
 
     /// The page of the class in the help of SuperCollider.
     #[must_use]
     pub fn doc_url(&self) -> String {
-        format!("https://doc.sccode.org/Classes/{}.html", self.name)
+        doc_url(self.name)
     }
 }
 
-/// A rate method of a class: `ar`, `kr`, `ir`, `tr` or `new`.
+/// A method of the catalogue: a rate method of a class, such as `ar`, `kr`,
+/// `ir`, `tr` or `new`, or a method of `Env`, of `PV_ChainUGen` or of `UGen`
+/// that builds a graph.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[non_exhaustive]
 pub struct RateMethod {
@@ -129,7 +127,9 @@ pub struct RateMethod {
     pub selector: &'static str,
     /// The arguments, in order.
     pub args: &'static [ArgSpec],
-    /// Whether `SynthDefBuilder::ugen` can add the method by name, and how.
+    /// How the crate adds the method. For a rate method, whether
+    /// `SynthDefBuilder::ugen` can add it by name. Every other method is
+    /// `Pseudo`.
     pub addable: Addable,
 }
 
@@ -192,8 +192,9 @@ pub enum Addable {
     /// It cannot, for this reason: the probe of the generator found a
     /// behavior that the wiring does not describe.
     No(&'static str),
-    /// It can, with a body of the crate that adds what the method adds in
-    /// sclang: the method of a pseudo-UGen.
+    /// A body of the crate adds what the method adds in sclang: the method
+    /// of a pseudo-UGen, which `SynthDefBuilder::ugen` takes, or a method of
+    /// `Env`, of `PV_ChainUGen` or of `UGen`, which a call of its own takes.
     Pseudo,
 }
 
@@ -404,14 +405,23 @@ pub struct ControlSpec {
     pub units: &'static str,
 }
 
+fn by_selector(methods: &'static [RateMethod], selector: &str) -> Option<&'static RateMethod> {
+    methods.iter().find(|method| method.selector == selector)
+}
+
+fn by_name<T>(items: &'static [T], name: &str, key: fn(&T) -> &str) -> Option<&'static T> {
+    let position = items.binary_search_by(|item| key(item).cmp(name)).ok()?;
+    items.get(position)
+}
+
+fn doc_url(class: &str) -> String {
+    format!("https://doc.sccode.org/Classes/{class}.html")
+}
+
 /// The class with this name.
 #[must_use]
 pub fn lookup(name: &str) -> Option<&'static UGenClass> {
-    let classes = all();
-    let position = classes
-        .binary_search_by(|class| class.name.cmp(name))
-        .ok()?;
-    classes.get(position)
+    by_name(all(), name, |class| class.name)
 }
 
 /// All the classes, sorted by name.
@@ -423,11 +433,7 @@ pub fn all() -> &'static [UGenClass] {
 /// The pseudo-UGen class outside `UGen` with this name.
 #[must_use]
 pub fn pseudo_lookup(name: &str) -> Option<&'static PseudoClass> {
-    let classes = pseudo_all();
-    let position = classes
-        .binary_search_by(|class| class.name.cmp(name))
-        .ok()?;
-    classes.get(position)
+    by_name(pseudo_all(), name, |class| class.name)
 }
 
 /// All the pseudo-UGen classes outside `UGen`, sorted by name.
@@ -439,9 +445,7 @@ pub fn pseudo_all() -> &'static [PseudoClass] {
 /// The spec of `Spec.specs` with this name.
 #[must_use]
 pub fn spec(name: &str) -> Option<&'static ControlSpec> {
-    let specs = specs();
-    let position = specs.binary_search_by(|spec| spec.name.cmp(name)).ok()?;
-    specs.get(position)
+    by_name(specs(), name, |spec| spec.name)
 }
 
 /// All the specs of `Spec.specs`, sorted by name.
@@ -454,9 +458,7 @@ pub fn specs() -> &'static [ControlSpec] {
 /// such as `perc`.
 #[must_use]
 pub fn env_method(selector: &str) -> Option<&'static RateMethod> {
-    env_methods()
-        .iter()
-        .find(|method| method.selector == selector)
+    by_selector(env_methods(), selector)
 }
 
 /// The class methods of `Env` that make an envelope, with their arguments.
@@ -469,9 +471,7 @@ pub fn env_methods() -> &'static [RateMethod] {
 /// a range, such as `exprange`.
 #[must_use]
 pub fn env_range(selector: &str) -> Option<&'static RateMethod> {
-    env_ranges()
-        .iter()
-        .find(|method| method.selector == selector)
+    by_selector(env_ranges(), selector)
 }
 
 /// The instance methods of `Env` that map its levels to a range, with their
@@ -485,9 +485,7 @@ pub fn env_ranges() -> &'static [RateMethod] {
 /// function, such as `pvcalc`.
 #[must_use]
 pub fn pv_method(selector: &str) -> Option<&'static RateMethod> {
-    pv_methods()
-        .iter()
-        .find(|method| method.selector == selector)
+    by_selector(pv_methods(), selector)
 }
 
 /// The instance methods of `PV_ChainUGen` that take a function, with their
@@ -530,6 +528,17 @@ mod tests {
         }
     }
 
+    /// Every wiring of the methods of the classes.
+    fn wirings() -> impl Iterator<Item = Wiring> {
+        all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter_map(|method| match method.addable {
+                Addable::Yes(wiring) => Some(wiring),
+                Addable::No(_) | Addable::Pseudo => None,
+            })
+    }
+
     fn reason(class: &str, selector: &str) -> &'static str {
         match lookup(class).unwrap().method(selector).unwrap().addable {
             Addable::No(reason) => reason,
@@ -543,6 +552,17 @@ mod tests {
         assert_eq!(all().len(), 419);
         assert!(all().windows(2).all(|pair| pair[0].name < pair[1].name));
         assert!(lookup("DFM1").is_none());
+        let mut counts = [0; 3];
+        for method in all().iter().flat_map(|class| class.methods) {
+            counts[match method.addable {
+                Addable::Yes(_) => 0,
+                Addable::Pseudo => 1,
+                Addable::No(_) => 2,
+            }] += 1;
+        }
+        assert_eq!(counts, [581, 36, 18]);
+        let pseudo_methods: usize = pseudo_all().iter().map(|class| class.methods.len()).sum();
+        assert_eq!(counts[1] + pseudo_methods, 67);
     }
 
     #[test]
@@ -616,14 +636,8 @@ mod tests {
         assert!(!wiring("SendReply", "kr").nested_expansion);
         assert!(!wiring("SendReply", "ar").nested_expansion);
         assert!(wiring("SinOsc", "ar").nested_expansion);
-        let one_level = all()
-            .iter()
-            .flat_map(|class| class.methods)
-            .filter(
-                |method| matches!(method.addable, Addable::Yes(wiring) if !wiring.nested_expansion),
-            )
-            .count();
-        assert_eq!(one_level, 2);
+        let one_level = wirings().filter(|wiring| !wiring.nested_expansion);
+        assert_eq!(one_level.count(), 2);
     }
 
     #[test]
@@ -643,12 +657,8 @@ mod tests {
         assert_eq!(wiring("DelayN", "kr").audio_input, None);
         assert!(wiring("LinXFade2", "kr").level);
         assert!(!wiring("XFade2", "kr").level);
-        let converted = all()
-            .iter()
-            .flat_map(|class| class.methods)
-            .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.audio_input.is_some()))
-            .count();
-        assert_eq!(converted, 19);
+        let converted = wirings().filter(|wiring| wiring.audio_input.is_some());
+        assert_eq!(converted.count(), 19);
     }
 
     #[test]
@@ -913,12 +923,8 @@ mod tests {
             Some(&[4, 5][..])
         );
         assert_eq!(wiring("DemandEnvGen", "kr").audio_together, None);
-        let together = all()
-            .iter()
-            .flat_map(|class| class.methods)
-            .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.audio_together.is_some()))
-            .count();
-        assert_eq!(together, 1);
+        let together = wirings().filter(|wiring| wiring.audio_together.is_some());
+        assert_eq!(together.count(), 1);
     }
 
     #[test]
@@ -930,12 +936,8 @@ mod tests {
         assert_eq!(wiring("Lag3UD", "kr").passthrough.unwrap().zero, None);
         assert_eq!(wiring("Slew", "ar").passthrough.unwrap().zero, None);
         assert_eq!(wiring("LPF", "ar").passthrough, None);
-        let passthroughs = all()
-            .iter()
-            .flat_map(|class| class.methods)
-            .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.passthrough.is_some()))
-            .count();
-        assert_eq!(passthroughs, 16);
+        let passthroughs = wirings().filter(|wiring| wiring.passthrough.is_some());
+        assert_eq!(passthroughs.count(), 16);
     }
 
     #[test]
@@ -946,14 +948,8 @@ mod tests {
         assert_eq!(wiring("LocalOut", "ar").silence, Some(0));
         assert_eq!(wiring("XOut", "ar").silence, Some(2));
         assert_eq!(wiring("Out", "kr").silence, None);
-        let silenced = all()
-            .iter()
-            .flat_map(|class| class.methods)
-            .filter(
-                |method| matches!(method.addable, Addable::Yes(wiring) if wiring.silence.is_some()),
-            )
-            .count();
-        assert_eq!(silenced, 5);
+        let silenced = wirings().filter(|wiring| wiring.silence.is_some());
+        assert_eq!(silenced.count(), 5);
     }
 
     #[test]
@@ -973,20 +969,12 @@ mod tests {
         );
         assert_eq!(wiring("IEnvGen", "kr").array_expansion, None);
         assert_eq!(wiring("SinOsc", "ar").array_expansion, None);
-        let arrays: Vec<Option<ArrayExpansion>> = all()
-            .iter()
-            .flat_map(|class| class.methods)
-            .filter_map(|method| match method.addable {
-                Addable::Yes(wiring)
-                    if wiring
-                        .inputs
-                        .iter()
-                        .any(|slot| matches!(slot, InputSlot::ArgArray(_))) =>
-                {
-                    Some(wiring.array_expansion)
-                }
-                _ => None,
+        let arrays: Vec<Option<ArrayExpansion>> = wirings()
+            .filter(|wiring| {
+                let array = |slot: &InputSlot| matches!(slot, InputSlot::ArgArray(_));
+                wiring.inputs.iter().any(array)
             })
+            .map(|wiring| wiring.array_expansion)
             .collect();
         let count = |expansion| arrays.iter().filter(|&&found| found == expansion).count();
         assert_eq!(

@@ -77,45 +77,28 @@ pub(super) fn dyn_klang(
     )
 }
 
-/// `Klank.ar`: the expansion of `multiNewList` over `input`, `freqscale`,
-/// `freqoffset` and `decayscale`, then a `Klank` whose inputs end with the
-/// triplets of the spec `[freqs, amps, times]`.
+/// `Klank.ar` and `Klang.ar`: the expansion of `multiNewList` over the
+/// arguments after the spec, then a UGen whose inputs end with the triplets
+/// of the spec, `[freqs, amps, times]` or `[freqs, amps, phases]`.
 pub(super) fn klank(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {
-    let partials = triplets("Klank", &args.array("specificationsArrayRef")?, [1.0, 1.0])?;
-    let values = [
-        args.input("input")?,
-        args.input("freqscale")?,
-        args.input("freqoffset")?,
-        args.input("decayscale")?,
-    ];
-    builder.expand(
-        "Klank",
-        &["input", "freqscale", "freqoffset", "decayscale"],
-        &values,
-        true,
-        &mut |builder, instance| {
-            let inputs = [instance, &partials].concat();
-            builder.add(NewUGen::new("Klank", Rate::Audio).inputs(inputs))
-        },
-    )
-}
-
-/// `Klang.ar`: the expansion of `multiNewList` over `freqscale` and
-/// `freqoffset`, then a `Klang` whose inputs end with the triplets of the
-/// spec `[freqs, amps, phases]`.
-pub(super) fn klang(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {
-    let partials = triplets("Klang", &args.array("specificationsArrayRef")?, [1.0, 0.0])?;
-    let values = [args.input("freqscale")?, args.input("freqoffset")?];
-    builder.expand(
-        "Klang",
-        &["freqscale", "freqoffset"],
-        &values,
-        true,
-        &mut |builder, instance| {
-            let inputs = [instance, &partials].concat();
-            builder.add(NewUGen::new("Klang", Rate::Audio).inputs(inputs))
-        },
-    )
+    let class = args.class;
+    let (names, defaults): (&[&str], _) = if class == "Klank" {
+        (
+            &["input", "freqscale", "freqoffset", "decayscale"],
+            [1.0, 1.0],
+        )
+    } else {
+        (&["freqscale", "freqoffset"], [1.0, 0.0])
+    };
+    let partials = triplets(class, &args.array("specificationsArrayRef")?, defaults)?;
+    let values: Vec<UGenInput> = names
+        .iter()
+        .map(|name| args.input(name))
+        .collect::<Result<_, _>>()?;
+    builder.expand(class, names, &values, true, &mut |builder, instance| {
+        let inputs = [instance, &partials].concat();
+        builder.add(NewUGen::new(class, Rate::Audio).inputs(inputs))
+    })
 }
 
 /// The triplets of `new1` of `Klank` and `Klang`:

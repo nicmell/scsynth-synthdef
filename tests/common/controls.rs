@@ -307,6 +307,11 @@ pub(super) fn kr(b: &mut SynthDefBuilder, name: &str, value: impl Into<UGenInput
     named(b, "kr", name, Some(value.into()), None)
 }
 
+/// `\\name.ar(value)`.
+pub(super) fn ar(b: &mut SynthDefBuilder, name: &str, value: f64) -> UGenInput {
+    named(b, "ar", name, Some(value.into()), None)
+}
+
 /// `\\name.kr(value, lags)`.
 fn kr_lag(
     b: &mut SynthDefBuilder,

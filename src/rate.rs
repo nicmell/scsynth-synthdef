@@ -57,15 +57,14 @@ pub(crate) fn least_by_name(rates: impl IntoIterator<Item = Rate>) -> Option<Rat
 /// `insertionSortRange` of `sort { |a, b| a.rate < b.rate }`, which moves an
 /// item left past every item whose rate name is not less than its own. The
 /// stable sort of Rust gives another order for items of one rate.
-pub(crate) fn sort_by_rate<T: Clone>(items: &mut [T], rate: impl Fn(&T) -> Rate) {
+pub(crate) fn sort_by_rate<T>(items: &mut [T], rate: impl Fn(&T) -> Rate) {
     for i in 1..items.len() {
-        let test = items[i].clone();
+        let rank = name_rank(rate(&items[i]));
         let mut j = i;
-        while j > 0 && name_rank(rate(&items[j - 1])) >= name_rank(rate(&test)) {
-            items[j] = items[j - 1].clone();
+        while j > 0 && name_rank(rate(&items[j - 1])) >= rank {
             j -= 1;
         }
-        items[j] = test;
+        items[j..=i].rotate_right(1);
     }
 }
 

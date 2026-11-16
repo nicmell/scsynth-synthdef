@@ -3,7 +3,7 @@
 //! the shorter of two arrays wraps. Anything else goes to `BinaryOpUGen.new`
 //! or `UnaryOpUGen.new`.
 
-use crate::builder::{NewUGen, SynthDefBuilder};
+use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
 use crate::rate::{Rate, least_by_name};
 use crate::ugen_input::UGenInput;
@@ -83,8 +83,8 @@ pub(crate) fn rate(value: &UGenInput) -> Option<Rate> {
 }
 
 /// `x.clip(lo, hi)`: `sc_clip` of a number, a `Clip` at the rate of a UGen,
-/// or `max(lo, min(hi, x))` at demand rate. An array clips element by
-/// element. The primitive of a number fails on bounds that are not numbers.
+/// or `max(lo, min(hi, x))` at demand rate. The primitive of a number fails
+/// on bounds that are not numbers.
 pub(crate) fn clip(
     builder: &mut SynthDefBuilder,
     x: UGenInput,
@@ -102,11 +102,6 @@ pub(crate) fn clip(
                 message: "Primitive '_ClipFloat' failed. Wrong type.".to_owned(),
             }),
         },
-        UGenInput::Array(items) if !items.is_empty() => items
-            .into_iter()
-            .map(|item| clip(builder, item, lo.clone(), hi.clone()))
-            .collect::<Result<_, _>>()
-            .map(UGenInput::Array),
         UGenInput::Output(output) if output.rate() == Rate::Demand => {
             let below = binary(builder, "min", hi, output.into())?;
             binary(builder, "max", lo, below)
@@ -117,65 +112,6 @@ pub(crate) fn clip(
                 "Clip",
                 selector,
                 &[("in", other.into()), ("lo", lo.into()), ("hi", hi.into())],
-            )
-        }
-    }
-}
-
-/// `x.moddif(y, mod)`. For a number, `SimpleNumber:moddif`:
-/// `mod * 0.5 - absdif(absdif(x, y) % mod, mod * 0.5)`. For a UGen, a
-/// `ModDif` at its rate. An array goes element by element, and the shorter
-/// array wraps.
-pub(crate) fn moddif(
-    builder: &mut SynthDefBuilder,
-    x: UGenInput,
-    y: UGenInput,
-    modulus: UGenInput,
-) -> Result<UGenInput, BuildError> {
-    match x {
-        UGenInput::Number(_) => {
-            let distance = binary(builder, "absdif", x, y)?;
-            let reduced = binary(builder, "mod", distance, modulus.clone())?;
-            let half = binary(builder, "*", modulus, 0.5.into())?;
-            let gap = binary(builder, "absdif", reduced, half.clone())?;
-            binary(builder, "-", half, gap)
-        }
-        UGenInput::Array(ref items) if !items.is_empty() => {
-            let size = [&x, &y, &modulus]
-                .iter()
-                .filter_map(|value| match value {
-                    UGenInput::Array(items) => Some(items.len()),
-                    _ => None,
-                })
-                .max()
-                .unwrap_or(1);
-            (0..size)
-                .map(|index| {
-                    let at = |value: &UGenInput| element(value, index);
-                    moddif(builder, at(&x), at(&y), at(&modulus))
-                })
-                .collect::<Result<_, _>>()
-                .map(UGenInput::Array)
-        }
-        UGenInput::Output(output) if output.rate() == Rate::Demand => builder.expand(
-            "ModDif",
-            &["x", "y", "mod"],
-            &[x, y, modulus],
-            true,
-            &mut |builder, instance| {
-                builder.add(NewUGen::new("ModDif", Rate::Demand).inputs(instance.to_vec()))
-            },
-        ),
-        other => {
-            let selector = selector_for_rate(rate(&other).unwrap_or(Rate::Scalar));
-            builder.ugen(
-                "ModDif",
-                selector,
-                &[
-                    ("x", other.into()),
-                    ("y", y.into()),
-                    ("mod", modulus.into()),
-                ],
             )
         }
     }
@@ -233,70 +169,6 @@ pub(crate) fn replace_zeroes_with_silence(
             other => Ok(other),
         })
         .collect()
-}
-
-/// `a.blend(b, frac)`: `a + (frac * (b - a))` for a number. For a UGen, an
-/// `XFade2` when one side runs at audio rate, else a `LinXFade2`, with the
-/// pan of `frac`. An array blends element by element.
-pub(crate) fn blend(
-    builder: &mut SynthDefBuilder,
-    a: UGenInput,
-    b: UGenInput,
-    frac: f64,
-) -> Result<UGenInput, BuildError> {
-    match a {
-        UGenInput::Number(_) => {
-            let difference = binary(builder, "-", b, a.clone())?;
-            let scaled = binary(builder, "*", frac.into(), difference)?;
-            binary(builder, "+", a, scaled)
-        }
-        UGenInput::Array(ref items) if !items.is_empty() => {
-            let size = match &b {
-                UGenInput::Array(others) => items.len().max(others.len()),
-                _ => items.len(),
-            };
-            (0..size)
-                .map(|index| blend(builder, element(&a, index), element(&b, index), frac))
-                .collect::<Result<_, _>>()
-                .map(UGenInput::Array)
-        }
-        other => {
-            let (own, that) = (rate(&other), rate(&b));
-            let unsupported = |rate| BuildError::UnsupportedRate {
-                ugen: "UGen:blend".to_owned(),
-                rate,
-            };
-            if own == Some(Rate::Demand) || that == Some(Rate::Demand) {
-                return Err(unsupported(Rate::Demand));
-            }
-            let pan = linlin(frac, 0.0, 1.0, -1.0, 1.0);
-            let (selector, class, a, b, pan) = if own == Some(Rate::Audio) {
-                ("ar", "XFade2", other, b, pan)
-            } else if that == Some(Rate::Audio) {
-                ("ar", "XFade2", b, other, -pan)
-            } else if own == Some(Rate::Control) {
-                ("kr", "LinXFade2", other, b, pan)
-            } else {
-                return Err(unsupported(Rate::Scalar));
-            };
-            builder.ugen(
-                class,
-                selector,
-                &[("inA", a.into()), ("inB", b.into()), ("pan", pan.into())],
-            )
-        }
-    }
-}
-
-/// `SimpleNumber:linlin` with the clip `minmax`.
-pub(crate) fn linlin(x: f64, in_min: f64, in_max: f64, out_min: f64, out_max: f64) -> f64 {
-    if x <= in_min {
-        out_min
-    } else if x >= in_max {
-        out_max
-    } else {
-        (x - in_min) / (in_max - in_min) * (out_max - out_min) + out_min
-    }
 }
 
 /// `methodSelectorForRate` of a class that answers `ir`, as `Clip` and
@@ -409,8 +281,8 @@ fn modulo(input: f64, hi: f64) -> f64 {
     if hi == 0.0 {
         return 0.0;
     }
-    // sclang 3.14.1 for macOS on arm64 computes `in - hi * floor(in / hi)`
-    // with one fused multiply-add: 1000 % 3.7 is 0.9999999999999067.
+    // One fused multiply-add, as sclang 3.14.1 on arm64 computes it (see the
+    // README and tests/fixtures/arithmetic.json).
     (-hi).mul_add((shifted / hi).floor(), shifted)
 }
 
@@ -448,10 +320,20 @@ pub(crate) fn fold(input: f64, lo: f64, hi: f64) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{clip, fold, linlin, moddif, number_binary, number_unary, wrap};
+    use super::super::ugen_methods::send_message;
+    use super::{fold, number_binary, number_unary, wrap};
     use crate::builder::SynthDefBuilder;
-    use crate::ugen_input::UGenInput;
+    use crate::ugen_input::{ArgValue, UGenInput};
     use serde_json::Value;
+
+    /// `x.selector(args)` of numbers, as `send` sends it.
+    fn sent(builder: &mut SynthDefBuilder, x: f64, selector: &str, args: &[f64]) -> f64 {
+        let given = args.iter().map(|&arg| Some(ArgValue::from(arg))).collect();
+        match send_message(builder, x.into(), selector, given) {
+            Ok(UGenInput::Number(number)) => number,
+            other => panic!("{x}.{selector}{args:?}: {other:?}"),
+        }
+    }
 
     const TABLE: &str = include_str!("../../tests/fixtures/arithmetic.json");
 
@@ -507,14 +389,9 @@ mod tests {
     fn clip_and_moddif_of_numbers_compute_as_sclang_computes_them() {
         let table: Value = serde_json::from_str(TABLE).expect("the table is JSON");
         let mut builder = SynthDefBuilder::new("arithmetic", vec![]).expect("a build");
-        let number = |value: UGenInput| match value {
-            UGenInput::Number(number) => number,
-            other => panic!("{other:?} is not a number"),
-        };
         for row in rows(&table, "clip") {
             let [x, lo, hi, expected] = [0, 1, 2, 3].map(|column| float(&row[column]));
-            let computed = clip(&mut builder, x.into(), lo.into(), hi.into());
-            let computed = number(computed.expect("clip computes"));
+            let computed = sent(&mut builder, x, "clip", &[lo, hi]);
             assert!(
                 same("clip", computed, expected),
                 "{x}.clip({lo}, {hi}): {computed}"
@@ -522,8 +399,7 @@ mod tests {
         }
         for row in rows(&table, "moddif") {
             let [x, y, modulus, expected] = [0, 1, 2, 3].map(|column| float(&row[column]));
-            let computed = moddif(&mut builder, x.into(), y.into(), modulus.into());
-            let computed = number(computed.expect("moddif computes"));
+            let computed = sent(&mut builder, x, "moddif", &[y, modulus]);
             assert!(
                 same("moddif", computed, expected),
                 "{x}.moddif({y}, {modulus}): {computed}"
@@ -551,10 +427,16 @@ mod tests {
     #[test]
     fn linlin_of_numbers_computes_as_sclang_computes_it() {
         let table: Value = serde_json::from_str(TABLE).expect("the table is JSON");
+        let mut builder = SynthDefBuilder::new("arithmetic", vec![]).expect("a build");
         for row in rows(&table, "linlin") {
             let [x, in_min, in_max, out_min, out_max, expected] =
                 [0, 1, 2, 3, 4, 5].map(|column| float(&row[column]));
-            let computed = linlin(x, in_min, in_max, out_min, out_max);
+            let computed = sent(
+                &mut builder,
+                x,
+                "linlin",
+                &[in_min, in_max, out_min, out_max],
+            );
             assert!(same("linlin", computed, expected), "{x}.linlin: {computed}");
         }
         assert_eq!(rows(&table, "linlin").len(), 18);

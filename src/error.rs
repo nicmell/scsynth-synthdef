@@ -386,7 +386,7 @@ pub enum BuildError {
         /// The name of the argument.
         argument: String,
     },
-    /// An input is an output of another build.
+    /// An input is an output of another build, or of a call that failed.
     #[non_exhaustive]
     ForeignOutput {
         /// The class of the UGen.
@@ -510,9 +510,8 @@ pub enum BuildError {
         /// What fails in sclang.
         message: String,
     },
-    /// An envelope that sclang 3.14.1 throws on: no levels, a shape that it
-    /// does not know, levels and times of `Env.step` that differ in size,
-    /// or a `warp` of `VarLag` that it does not know.
+    /// An envelope that sclang 3.14.1 throws on. [Envelopes](crate#envelopes)
+    /// and [The methods of `UGen`](crate#the-methods-of-ugen) list the cases.
     #[non_exhaustive]
     BadEnv {
         /// The method, such as `Env.step`.
@@ -533,9 +532,8 @@ pub enum BuildError {
         message: String,
     },
     /// A message of `SynthDefBuilder::send` that sclang 3.14.1 throws on, or
-    /// writes a broken definition for: a selector that it does not know, a
-    /// receiver that does not understand the message, a test of `if` on an
-    /// output, or a rate that the method does not take.
+    /// writes a broken definition for. [The methods of
+    /// `UGen`](crate#the-methods-of-ugen) lists the cases.
     #[non_exhaustive]
     BadMethod {
         /// The selector, such as `range`.
@@ -572,7 +570,10 @@ impl fmt::Display for BuildError {
                 "the argument {argument} of {ugen} holds an array inside an array, which does not expand there"
             ),
             Self::ForeignOutput { ugen, input } => {
-                write!(f, "input {input} of {ugen} is an output of another build")
+                write!(
+                    f,
+                    "input {input} of {ugen} is an output of another build, or of a call that failed"
+                )
             }
             Self::UnknownOperator(name) => write!(f, "'{name}' is no operator of scsynth"),
             Self::DuplicateVariant(name) => write!(f, "two variants are named '{name}'"),

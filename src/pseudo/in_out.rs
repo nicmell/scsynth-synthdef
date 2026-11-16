@@ -1,56 +1,22 @@
 //! The bodies of `InOut.sc`.
 
-use super::Args;
+use super::ugen_methods::send_message;
+use super::{Args, elements};
 use crate::builder::{NewUGen, SynthDefBuilder};
-use crate::catalog;
-use crate::check_inputs;
 use crate::error::BuildError;
 use crate::rate::Rate;
-use crate::ugen_input::UGenInput;
+use crate::ugen_input::{ArgValue, UGenInput};
 
-/// `Control.kr`.
-pub(super) fn control_kr(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    controls(builder, "Control", Rate::Control, &args.array("values")?)
-}
-
-/// `Control.ir`.
-pub(super) fn control_ir(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    controls(builder, "Control", Rate::Scalar, &args.array("values")?)
-}
-
-/// `TrigControl.kr`.
-pub(super) fn trig_control_kr(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    controls(
-        builder,
-        "TrigControl",
-        Rate::Control,
-        &args.array("values")?,
-    )
-}
-
-/// `TrigControl.ir`: a `TrigControl` at scalar rate.
-pub(super) fn trig_control_ir(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    controls(builder, "TrigControl", Rate::Scalar, &args.array("values")?)
-}
-
-/// `AudioControl.ar`.
-pub(super) fn audio_control_ar(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    controls(builder, "AudioControl", Rate::Audio, &args.array("values")?)
+/// `Control.kr`, `Control.ir`, `TrigControl.kr`, `TrigControl.ir` and
+/// `AudioControl.ar`: the control UGen of the class at the rate of the
+/// method.
+pub(super) fn control(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {
+    let rate = match args.selector() {
+        "ar" => Rate::Audio,
+        "kr" => Rate::Control,
+        _ => Rate::Scalar,
+    };
+    controls(builder, args.class, rate, &args.array("values")?)
 }
 
 /// `LagControl.kr`: a number lag serves each value.
@@ -58,13 +24,7 @@ pub(super) fn lag_control_kr(
     builder: &mut SynthDefBuilder,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    let values = args.array("values")?;
-    let lags = match args.input("lags")? {
-        UGenInput::Number(lag) => vec![UGenInput::Number(lag); values.len()],
-        UGenInput::Array(lags) => lags,
-        lag @ UGenInput::Output(_) => vec![lag],
-    };
-    lag_controls(builder, &values, &lags)
+    lag_controls(builder, &args.array("values")?, args.input("lags")?)
 }
 
 /// `LagControl.ar`: an `AudioControl` of the values, and its `lag`.
@@ -91,14 +51,18 @@ pub(super) fn controls(
     })
 }
 
-/// The `LagControl`s of `values`, with one lag per value: each group of 16
-/// expands as `multiNewList` expands it. The outputs of the groups follow
-/// one another in one array.
+/// The `LagControl`s of `values`, with one lag per value, or a number lag
+/// for each: each group of 16 expands as `multiNewList` expands it. The
+/// outputs of the groups follow one another in one array.
 pub(super) fn lag_controls(
     builder: &mut SynthDefBuilder,
     values: &[UGenInput],
-    lags: &[UGenInput],
+    lags: UGenInput,
 ) -> Result<UGenInput, BuildError> {
+    let lags = match lags {
+        UGenInput::Number(lag) => vec![UGenInput::Number(lag); values.len()],
+        lags => elements(lags),
+    };
     if values.len() != lags.len() {
         return Err(BuildError::BadControl {
             class: "LagControl".to_owned(),
@@ -128,44 +92,18 @@ pub(super) fn lag_controls(
                 builder.control_ugen("LagControl", Rate::Control, &numbers, lags)
             },
         )?;
-        match group {
-            UGenInput::Array(items) => outputs.extend(items),
-            output => outputs.push(output),
-        }
+        outputs.extend(elements(group));
     }
     Ok(UGenInput::Array(outputs))
 }
 
-/// `UGen:lag` with one lag time: a `Lag` at the rate of each channel, as
-/// `Lag.multiNew` adds it, with no passthrough.
+/// `UGen:lag` with one lag time, as `send` sends it.
 pub(super) fn lag(
     builder: &mut SynthDefBuilder,
     input: UGenInput,
     lags: UGenInput,
 ) -> Result<UGenInput, BuildError> {
-    let rule = catalog::lookup("Lag").map(|class| class.check_inputs);
-    builder.expand(
-        "Lag",
-        &["in", "lagTime"],
-        &[input, lags],
-        true,
-        &mut |builder, instance| {
-            let rate = instance[0].rate().unwrap_or(Rate::Scalar);
-            if let Some(rule) = rule {
-                check_inputs::check(rule, rate, instance).map_err(|message| {
-                    BuildError::CheckInputs {
-                        class: "Lag".to_owned(),
-                        message,
-                    }
-                })?;
-            }
-            builder.add(
-                NewUGen::new("Lag", rate)
-                    .inputs(instance.to_vec())
-                    .outputs([rate]),
-            )
-        },
-    )
+    send_message(builder, input, "lag", vec![Some(ArgValue::from(lags))])
 }
 
 /// The numbers of an instance of control values: a control UGen takes no

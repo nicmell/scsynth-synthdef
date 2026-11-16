@@ -1,4 +1,7 @@
 {
+  "audioinput": {
+    "audioinput_negative_zero": 1
+  },
   "beattrack": {
     "beattrack_auto": 1,
     "beattrack_chain": 1
@@ -466,6 +469,18 @@
     "poll_out": 2,
     "poll_proxy": 0,
     "poll_symbol": 0
+  },
+  "pollarrays": {
+    "pollarrays_dpoll_nested": 0,
+    "pollarrays_dpoll_run": 0,
+    "pollarrays_dpoll_trigid": 0,
+    "pollarrays_label": 0,
+    "pollarrays_nested": 2,
+    "pollarrays_new_nested": 2,
+    "pollarrays_new_trigs": 2,
+    "pollarrays_three": 0,
+    "pollarrays_trig": 0,
+    "pollarrays_trigid": 0
   },
   "pvcalc": {
     "pvcalc2": 1,

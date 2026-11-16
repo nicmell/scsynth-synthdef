@@ -10,16 +10,8 @@ use crate::synth_def::{InputSpec, SynthDef, UGen};
 
 impl SynthDef {
     /// The number of wire buffers that scsynth 3.14.1 gives the definition:
-    /// the most buffers of audio-rate outputs in use at one time. While it
-    /// runs, scsynth refuses a definition that needs more than its `-w`, 64
-    /// by default, and with it every other definition of the same file.
-    ///
-    /// scsynth walks the UGens in file order. A UGen frees the buffers that
-    /// its inputs read for the last time, then takes a buffer for each
-    /// audio-rate output, so an output can take the buffer of an input. A
-    /// unit of [`cant_alias`](crate::catalog::UGenClass::cant_alias) takes
-    /// its buffers first. A demand-rate UGen frees no buffer, and an output
-    /// that nothing reads keeps its buffer to the end.
+    /// the most buffers of audio-rate outputs in use at one time, as
+    /// [Wire buffers](crate#wire-buffers) tells.
     ///
     /// # Errors
     ///

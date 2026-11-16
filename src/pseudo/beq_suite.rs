@@ -7,29 +7,10 @@ use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
 use crate::ugen_input::UGenInput;
 
-/// `BLowPass4.ar`: two `SOS` in a chain, with the coefficients of
-/// `BLowPass.sc`.
-pub(super) fn b_low_pass4(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    b_pass4(builder, args, false)
-}
-
-/// `BHiPass4.ar`: two `SOS` in a chain, with the coefficients of
-/// `BHiPass.sc`.
-pub(super) fn b_hi_pass4(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    b_pass4(builder, args, true)
-}
-
-fn b_pass4(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-    high: bool,
-) -> Result<UGenInput, BuildError> {
+/// `BLowPass4.ar` and `BHiPass4.ar`: two `SOS` in a chain, with the
+/// coefficients of `BLowPass.sc` or `BHiPass.sc`.
+pub(super) fn b_pass4(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {
+    let high = args.class == "BHiPass4";
     let rq = lang::unary(builder, "sqrt", args.input("rq")?)?;
     let [a0, a1, a2, b1, b2] = coefficients(builder, args.input("freq")?, rq, high)?;
     let first = builder.ugen(

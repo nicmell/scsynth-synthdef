@@ -1,34 +1,24 @@
 //! The pseudo-UGens of `Osc.sc`.
 
 use super::mix::mix;
+use super::ugen_methods::send_message;
 use super::{Args, lang, number};
 use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
-use crate::ugen_input::UGenInput;
+use crate::ugen_input::{ArgValue, UGenInput};
 
-/// `SelectX.ar` and `SelectX.kr`: an `XFade2` of the two `Select`s around
+/// `SelectX.ar`, `SelectX.kr`, `LinSelectX.ar` and `LinSelectX.kr`: an
+/// `XFade2`, or a `LinXFade2` for `LinSelectX`, of the two `Select`s around
 /// `which`. The method takes `wrap`, and `new1` ignores it.
 pub(super) fn select_x(
     builder: &mut SynthDefBuilder,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    select_between(builder, args, "XFade2")
-}
-
-/// `LinSelectX.ar` and `LinSelectX.kr`: `SelectX` with a `LinXFade2`.
-pub(super) fn lin_select_x(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    select_between(builder, args, "LinXFade2")
-}
-
-/// `SelectX:new1`, with `crossfade` as its `crossfadeClass`.
-fn select_between(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-    crossfade: &str,
-) -> Result<UGenInput, BuildError> {
+    let crossfade = if args.class == "LinSelectX" {
+        "LinXFade2"
+    } else {
+        "XFade2"
+    };
     let selector = args.selector();
     let which = args.input("which")?;
     let array = args.value("array")?;
@@ -74,7 +64,11 @@ pub(super) fn select_x_focus(
     let mut weighted = Vec::with_capacity(array.len());
     for (index, input) in array.into_iter().enumerate() {
         let distance = if wrap {
-            lang::moddif(builder, which.clone(), number(index), size.clone())?
+            let given = vec![
+                Some(ArgValue::from(number(index))),
+                Some(ArgValue::from(size.clone())),
+            ];
+            send_message(builder, which.clone(), "moddif", given)?
         } else {
             lang::binary(builder, "absdif", which.clone(), number(index))?
         };

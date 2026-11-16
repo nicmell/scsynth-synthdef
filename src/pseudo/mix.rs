@@ -27,19 +27,17 @@ pub(super) fn mix_ar(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenI
 /// `Mix.kr`: an `A2K` before each audio-rate input, the mix, and a `DC` after
 /// a number.
 pub(super) fn mix_kr(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {
-    let mut array = args.array("array")?;
-    if lang::rate(&UGenInput::Array(array.clone())) == Some(Rate::Audio) {
-        array = array
-            .into_iter()
-            .map(|unit| {
-                if lang::rate(&unit) == Some(Rate::Audio) {
-                    builder.ugen("A2K", "kr", &[("in", unit.into())])
-                } else {
-                    Ok(unit)
-                }
-            })
-            .collect::<Result<_, _>>()?;
-    }
+    let array: Vec<UGenInput> = args
+        .array("array")?
+        .into_iter()
+        .map(|unit| {
+            if lang::rate(&unit) == Some(Rate::Audio) {
+                builder.ugen("A2K", "kr", &[("in", unit.into())])
+            } else {
+                Ok(unit)
+            }
+        })
+        .collect::<Result<_, _>>()?;
     let result = mix(builder, &array)?;
     match lang::rate(&result) {
         Some(Rate::Control) => Ok(result),

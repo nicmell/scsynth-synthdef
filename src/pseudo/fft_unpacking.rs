@@ -1,10 +1,9 @@
 //! The pseudo-UGens of `FFTUnpacking.sc`, and the methods of `PV_ChainUGen`
 //! that take a function.
 
-use super::{Args, elements, lang, number};
-use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize};
+use super::{Args, elements, float, lang, multi_new, number};
+use crate::builder::{SynthDefBuilder, count_to_usize};
 use crate::catalog::{self, RateMethod};
-use crate::check_inputs;
 use crate::env::flop;
 use crate::error::BuildError;
 use crate::rate::Rate;
@@ -18,17 +17,25 @@ pub(super) fn unpack_fft(
 ) -> Result<UGenInput, BuildError> {
     let chain = args.value("chain")?;
     let bufsize = args.constant("bufsize")?;
-    unpack(builder, args, &chain, bufsize)
+    let (magnitudes, phases) = unpack(builder, args, &chain, bufsize)?;
+    Ok(UGenInput::Array(
+        magnitudes
+            .into_iter()
+            .zip(phases)
+            .flat_map(|(magnitude, phase)| [magnitude, phase])
+            .collect(),
+    ))
 }
 
-/// The bins of `chain` from `frombin` to `tobin` of `args`, as `UnpackFFT`
-/// gives them. `tobin` is at most `bufsize / 2`.
+/// The magnitudes and the phases of the bins of `chain` from `frombin` to
+/// `tobin` of `args`, as `UnpackFFT` gives them. `tobin` is at most
+/// `bufsize / 2`.
 fn unpack(
     builder: &mut SynthDefBuilder,
     args: &Args,
     chain: &ArgValue,
     bufsize: f64,
-) -> Result<UGenInput, BuildError> {
+) -> Result<(Vec<UGenInput>, Vec<UGenInput>), BuildError> {
     let frombin = args.constant("frombin")?;
     let upper = bufsize / 2.0;
     let tobin = match args.optional("tobin")? {
@@ -50,14 +57,7 @@ fn unpack(
         )
     };
     let magnitudes = elements(unpack(builder, 0.0)?);
-    let phases = elements(unpack(builder, 1.0)?);
-    Ok(UGenInput::Array(
-        magnitudes
-            .into_iter()
-            .zip(phases)
-            .flat_map(|(magnitude, phase)| [magnitude, phase])
-            .collect(),
-    ))
+    Ok((magnitudes, elements(unpack(builder, 1.0)?)))
 }
 
 /// `PackFFT.new`: the chain, `bufsize`, `frombin`, `tobin`, `zeroothers`,
@@ -97,30 +97,7 @@ fn pack(
     ];
     names.resize(values.len() + magsphases.len(), "magsphases");
     values.extend(magsphases);
-    builder.expand(
-        "PackFFT",
-        &names,
-        &values,
-        true,
-        &mut |builder, instance| {
-            let inputs = instance.to_vec();
-            let class = catalog::lookup("PackFFT");
-            if let Some(class) = class {
-                check_inputs::check(class.check_inputs, Rate::Control, &inputs).map_err(
-                    |message| BuildError::CheckInputs {
-                        class: "PackFFT".to_owned(),
-                        message,
-                    },
-                )?;
-            }
-            builder.add(
-                NewUGen::new("PackFFT", Rate::Control)
-                    .inputs(inputs)
-                    .outputs([Rate::Control])
-                    .width_first(class.is_some_and(|class| class.is_width_first)),
-            )
-        },
-    )
+    multi_new(builder, "PackFFT", Rate::Control, &names, &values)
 }
 
 /// `PV_ChainUGen:pvcalc`: `func` of the magnitudes and of the phases of the
@@ -134,7 +111,7 @@ pub(crate) fn pvcalc(
 ) -> Result<UGenInput, BuildError> {
     let args = pv_args(builder, &chain, method, values)?;
     let numframes = args.constant("numframes")?;
-    let (magnitudes, phases) = unpacked(builder, &args, &chain, numframes)?;
+    let (magnitudes, phases) = unpack(builder, &args, &chain.clone().into(), numframes)?;
     let result = func(
         builder,
         UGenInput::Array(magnitudes),
@@ -167,8 +144,8 @@ pub(crate) fn pvcalc2(
     let args = pv_args(builder, &chain, method, values)?;
     let chain2 = args.input("chain2")?;
     let numframes = args.constant("numframes")?;
-    let (magnitudes, phases) = unpacked(builder, &args, &chain, numframes)?;
-    let (magnitudes2, phases2) = unpacked(builder, &args, &chain2, numframes)?;
+    let (magnitudes, phases) = unpack(builder, &args, &chain.clone().into(), numframes)?;
+    let (magnitudes2, phases2) = unpack(builder, &args, &chain2.into(), numframes)?;
     let result = func(
         builder,
         UGenInput::Array(magnitudes),
@@ -204,10 +181,10 @@ pub(crate) fn pvcollect(
     let args = pv_args(builder, &chain, method, values)?;
     let numframes = args.constant("numframes")?;
     let frombin = args.constant("frombin")?;
-    let (magnitudes, phases) = unpacked(builder, &args, &chain, numframes)?;
+    let (magnitudes, phases) = unpack(builder, &args, &chain.clone().into(), numframes)?;
     let mut magsphases = Vec::new();
     for (index, (magnitude, phase)) in magnitudes.into_iter().zip(phases).enumerate() {
-        let index = f64::from(u32::try_from(index).unwrap_or(u32::MAX));
+        let index = float(index);
         let mut result = elements(func(
             builder,
             magnitude,
@@ -224,8 +201,7 @@ pub(crate) fn pvcollect(
 }
 
 /// The arguments of a method of `PV_ChainUGen`, whose receiver `chain` must
-/// be one output of a `PV_ChainUGen`: sclang understands the method on no
-/// other value.
+/// be one output of a `PV_ChainUGen`.
 fn pv_args(
     builder: &SynthDefBuilder,
     chain: &UGenInput,
@@ -246,22 +222,6 @@ fn pv_args(
     } else {
         Err(args.wrong_kind("chain", "one output of a PV_ChainUGen"))
     }
-}
-
-/// The magnitudes and the phases of the bins of `chain`, as
-/// `UnpackFFT(...).clump(2).flop` gives them.
-fn unpacked(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-    chain: &UGenInput,
-    numframes: f64,
-) -> Result<(Vec<UGenInput>, Vec<UGenInput>), BuildError> {
-    let chain = ArgValue::Input(chain.clone());
-    let bins = elements(unpack(builder, args, &chain, numframes)?);
-    Ok(bins
-        .chunks_exact(2)
-        .map(|pair| (pair[0].clone(), pair[1].clone()))
-        .unzip())
 }
 
 /// What `pvcalc` packs: the result of `func` as the switch on its size
@@ -290,11 +250,7 @@ fn series(first: f64, last: f64) -> UGenInput {
     let size = count_to_usize(((last - first) / step).trunc()) + 1;
     UGenInput::Array(
         (0..size)
-            .map(|index| {
-                UGenInput::Number(
-                    first + step * f64::from(u32::try_from(index).unwrap_or(u32::MAX)),
-                )
-            })
+            .map(|index| UGenInput::Number(first + step * float(index)))
             .collect(),
     )
 }

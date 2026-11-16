@@ -15,7 +15,7 @@ pub(crate) const NAME_MAX: usize = 31;
 /// `count` definitions fit one file, whose count of definitions is an int16
 /// in every version.
 pub(crate) fn check_definitions(count: usize) -> Result<(), LimitError> {
-    fits(count, int16_max(), CountKind::Definitions)
+    fits(count, INT16_MAX, CountKind::Definitions)
         .map_err(|kind| LimitError::new(String::new(), kind))
 }
 
@@ -26,16 +26,16 @@ pub(crate) fn check(def: &SynthDef, version: Version) -> Result<(), LimitError> 
 
 fn check_definition(def: &SynthDef, version: Version) -> Result<(), LimitErrorKind> {
     let max = if version == Version::V2 {
-        int32_max()
+        INT32_MAX
     } else {
-        int16_max()
+        INT16_MAX
     };
     name(&def.name, DEFINITION_NAME_MAX, NameKind::Definition)?;
     fits(def.constants.len(), max, CountKind::Constants)?;
     fits(def.controls.len(), max, CountKind::Parameters)?;
     fits(def.control_names.len(), max, CountKind::ParameterNames)?;
     fits(def.children.len(), max, CountKind::UGens)?;
-    fits(def.variants.len(), int16_max(), CountKind::Variants)?;
+    fits(def.variants.len(), INT16_MAX, CountKind::Variants)?;
     for control_name in &def.control_names {
         name(&control_name.name, NAME_MAX, NameKind::Parameter)?;
         if to_usize(control_name.index) > def.controls.len() {
@@ -117,13 +117,9 @@ pub(crate) fn to_usize(index: u32) -> usize {
     usize::try_from(index).unwrap_or(usize::MAX)
 }
 
-fn int16_max() -> usize {
-    usize::try_from(i16::MAX).unwrap_or(usize::MAX)
-}
+const INT16_MAX: usize = i16::MAX as usize;
 
-fn int32_max() -> usize {
-    usize::try_from(i32::MAX).unwrap_or(usize::MAX)
-}
+const INT32_MAX: usize = i32::MAX as usize;
 
 #[cfg(test)]
 mod tests {

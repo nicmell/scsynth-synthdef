@@ -5,7 +5,7 @@
 use scsynth_synthdef::{ArgValue, BuildError, SynthDef, SynthDefBuilder, UGenInput};
 
 use super::controls::kr;
-use super::pseudo::{def, input, out, sine};
+use super::pseudo::{def, fft, ifft, input, local_buf, out, sine};
 use super::{array, by_name, element};
 
 /// The definitions of a golden file of 0.11.
@@ -19,14 +19,9 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
 
 /// `FFT(LocalBuf(8), SinOsc.ar)`.
 fn chain(b: &mut SynthDefBuilder) -> UGenInput {
-    let buffer = by_name(b, "LocalBuf", "new", &[("numFrames", input(8.0))]);
+    let buffer = local_buf(b, 8.0, 1.0);
     let sound = sine(b, "ar", 440.0);
-    by_name(
-        b,
-        "FFT",
-        "new",
-        &[("buffer", input(buffer)), ("in", input(sound))],
-    )
+    fft(b, buffer, sound)
 }
 
 /// `PackFFT(chain, bufsize, magsphases, ...)` of the arguments, into
@@ -38,7 +33,7 @@ fn pack_out(b: &mut SynthDefBuilder, args: &[(&str, ArgValue)]) {
 
 /// `Out.ar(0, IFFT(chain))`.
 fn ifft_out(b: &mut SynthDefBuilder, chain: UGenInput) {
-    let sound = by_name(b, "IFFT", "new", &[("buffer", input(chain))]);
+    let sound = ifft(b, chain);
     out(b, "ar", sound);
 }
 
@@ -117,22 +112,9 @@ fn packfft_arrays() -> Vec<SynthDef> {
             pack_out(b, &args);
         }),
         def("packfft_chains", vec![], |b| {
-            let buffers = by_name(
-                b,
-                "LocalBuf",
-                "new",
-                &[
-                    ("numFrames", input(8.0)),
-                    ("numChannels", input(array(&[1.0, 1.0]))),
-                ],
-            );
+            let buffers = local_buf(b, 8.0, array(&[1.0, 1.0]));
             let sounds = sine(b, "ar", array(&[1.0, 2.0]));
-            let chains = by_name(
-                b,
-                "FFT",
-                "new",
-                &[("buffer", input(buffers)), ("in", input(sounds))],
-            );
+            let chains = fft(b, buffers, sounds);
             let args = [
                 ("chain", input(chains)),
                 ("bufsize", input(8.0)),
@@ -191,14 +173,9 @@ fn pvcalc() -> Vec<SynthDef> {
         calc("pvcalc_past", &bins(0.0, 10.0), identity()),
         def("pvcalc2", vec![], |b| {
             let c = chain(b);
-            let buffer = by_name(b, "LocalBuf", "new", &[("numFrames", input(8.0))]);
+            let buffer = local_buf(b, 8.0, 1.0);
             let sound = sine(b, "ar", 2.0);
-            let d = by_name(
-                b,
-                "FFT",
-                "new",
-                &[("buffer", input(buffer)), ("in", input(sound))],
-            );
+            let d = fft(b, buffer, sound);
             let args = [("chain2", input(d)), ("numframes", input(8.0))];
             let packed = b
                 .pvcalc2(c, &args, |b, m, p, m2, _| {

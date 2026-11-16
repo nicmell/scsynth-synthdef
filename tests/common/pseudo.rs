@@ -1,8 +1,10 @@
-//! The graphs of the golden files of the pseudo-UGens, built with `ugen`.
-//! `generator/fixtures.scd` holds the sclang code of each.
+//! The graphs of most golden files of the pseudo-UGens and of the rate
+//! methods, built with `ugen`, and the helpers that the other modules of
+//! `common` share. `generator/fixtures.scd` holds the sclang code of each.
 
 use scsynth_synthdef::{Arg, ArgValue, SynthDef, SynthDefBuilder, UGenInput};
 
+use super::controls::ar;
 use super::{arg, array, by_name, element, flat};
 
 /// The definitions of a golden file of the pseudo-UGens.
@@ -30,6 +32,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "dynklang" => dynklang(),
         "unpackfft" => unpackfft(),
         "delays" => delays(),
+        "audioinput" => audioinput(),
         "linxfade2" => linxfade2(),
         "companderd" => companderd(),
         "hilbertfir" => hilbertfir(),
@@ -80,7 +83,7 @@ pub(super) fn sine(
 }
 
 /// `SinOsc`s of these frequencies, as an array.
-fn sines(builder: &mut SynthDefBuilder, selector: &str, freqs: &[f64]) -> UGenInput {
+pub(super) fn sines(builder: &mut SynthDefBuilder, selector: &str, freqs: &[f64]) -> UGenInput {
     UGenInput::Array(
         freqs
             .iter()
@@ -178,32 +181,15 @@ fn silent() -> Vec<SynthDef> {
 
 fn dstutter() -> Vec<SynthDef> {
     vec![def("dstutter", vec![], |b| {
-        let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
-        let seq = by_name(
-            b,
-            "Dseq",
-            "new",
-            &[
-                ("list", input(array(&[1.0, 2.0]))),
-                ("repeats", input(f64::INFINITY)),
-            ],
-        );
+        let trig = impulse(b, "kr", 1.0);
+        let seq = dseq(b, &[1.0, 2.0]);
         let dup = by_name(
             b,
             "Dstutter",
             "new",
             &[("n", input(2.0)), ("in", input(seq))],
         );
-        let demand = by_name(
-            b,
-            "Demand",
-            "kr",
-            &[
-                ("trig", input(trig)),
-                ("reset", input(0.0)),
-                ("demandUGens", input(dup)),
-            ],
-        );
+        let demand = demand(b, trig, dup);
         out(b, "kr", demand);
     })]
 }
@@ -211,7 +197,7 @@ fn dstutter() -> Vec<SynthDef> {
 fn tchoose() -> Vec<SynthDef> {
     vec![
         def("tchoose_kr", vec![], |b| {
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let trig = impulse(b, "kr", 1.0);
             let choices = sines(b, "kr", &[1.0, 2.0]);
             let chosen = by_name(
                 b,
@@ -222,7 +208,7 @@ fn tchoose() -> Vec<SynthDef> {
             out(b, "kr", chosen);
         }),
         def("tchoose_ar", vec![], |b| {
-            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let trig = impulse(b, "ar", 1.0);
             let choices = sines(b, "ar", &[1.0, 2.0, 3.0]);
             let chosen = by_name(
                 b,
@@ -238,7 +224,7 @@ fn tchoose() -> Vec<SynthDef> {
 fn twchoose() -> Vec<SynthDef> {
     vec![
         def("twchoose_kr", vec![], |b| {
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let trig = impulse(b, "kr", 1.0);
             let choices = sines(b, "kr", &[1.0, 2.0]);
             let chosen = by_name(
                 b,
@@ -253,7 +239,7 @@ fn twchoose() -> Vec<SynthDef> {
             out(b, "kr", chosen);
         }),
         def("twchoose_ar", vec![], |b| {
-            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let trig = impulse(b, "ar", 1.0);
             let choices = sines(b, "ar", &[1.0, 2.0]);
             let chosen = by_name(
                 b,
@@ -824,7 +810,7 @@ fn splay() -> Vec<SynthDef> {
     ]
 }
 
-/// A spec of `DynKlank` or `DynKlang`: arrays of numbers.
+/// A spec of `DynKlank`, `DynKlang`, `Klank` or `Klang`: arrays of numbers.
 fn spec(parts: &[&[f64]]) -> UGenInput {
     UGenInput::Array(parts.iter().map(|part| array(part)).collect())
 }
@@ -837,7 +823,7 @@ fn dyn_klank(
     freq: UGenInput,
     scale: Option<UGenInput>,
 ) -> UGenInput {
-    let trigger = by_name(b, "Impulse", selector, &[("freq", input(freq))]);
+    let trigger = impulse(b, selector, freq);
     let mut args = vec![
         ("specificationsArrayRef", input(spec(parts))),
         ("input", input(trigger)),
@@ -921,26 +907,12 @@ fn dynklang() -> Vec<SynthDef> {
 fn unpacked(name: &str, bufsize: f64, args: &[(&str, ArgValue)]) -> SynthDef {
     def(name, vec![], |b| {
         let sound = sine(b, "ar", 1.0);
-        let chain = by_name(
-            b,
-            "FFT",
-            "new",
-            &[("buffer", input(0.0)), ("in", input(sound))],
-        );
-        let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+        let chain = fft(b, 0.0.into(), sound);
+        let trig = impulse(b, "kr", 1.0);
         let mut all = vec![("chain", input(chain)), ("bufsize", input(bufsize))];
         all.extend(args.iter().cloned());
         let bins = by_name(b, "UnpackFFT", "new", &all);
-        let demand = by_name(
-            b,
-            "Demand",
-            "kr",
-            &[
-                ("trig", input(trig)),
-                ("reset", input(0.0)),
-                ("demandUGens", input(bins)),
-            ],
-        );
+        let demand = demand(b, trig, bins);
         out(b, "kr", demand);
     })
 }
@@ -1059,6 +1031,21 @@ fn delays() -> Vec<SynthDef> {
             out(b, "ar", read);
         }),
     ]
+}
+
+fn audioinput() -> Vec<SynthDef> {
+    vec![def("audioinput_negative_zero", vec![], |b| {
+        let delayed = delay(
+            b,
+            "DelayN",
+            &[
+                ("in", input(-0.0)),
+                ("maxdelaytime", input(0.2)),
+                ("delaytime", input(0.2)),
+            ],
+        );
+        out(b, "ar", delayed);
+    })]
 }
 
 /// `LinXFade2` of two `SinOsc`, at the rate of `selector`.
@@ -1215,12 +1202,6 @@ fn splayaz() -> Vec<SynthDef> {
     ]
 }
 
-/// `class.selector(args)` into `Out` at the rate of `selector`.
-fn lag_out(b: &mut SynthDefBuilder, class: &str, selector: &str, args: &[(&str, ArgValue)]) {
-    let lagged = by_name(b, class, selector, args);
-    out(b, selector, lagged);
-}
-
 /// A definition of `class.selector` on the argument `name`, at 440, with
 /// these other arguments.
 fn lag_of(
@@ -1233,7 +1214,7 @@ fn lag_of(
     def(def_name, vec![Arg::new(name, 440.0)], |b| {
         let mut all = vec![("in", input(arg(b, name)))];
         all.extend(args.iter().map(|&(name, value)| (name, input(value))));
-        lag_out(b, class, selector, &all);
+        rule_out(b, class, selector, &all);
     })
 }
 
@@ -1244,7 +1225,7 @@ fn lag_of_sine(def_name: &str, class: &'static str, args: &'static [(&str, f64)]
         let sound = sine(b, "ar", 1.0);
         let mut all = vec![("in", input(sound))];
         all.extend(args.iter().map(|&(name, value)| (name, input(value))));
-        lag_out(b, class, "ar", &all);
+        rule_out(b, class, "ar", &all);
     })
 }
 
@@ -1284,7 +1265,7 @@ fn lag() -> Vec<SynthDef> {
 fn lag_folds() -> Vec<SynthDef> {
     vec![
         def("lag_number", vec![], |b| {
-            lag_out(
+            rule_out(
                 b,
                 "Lag",
                 "kr",
@@ -1302,7 +1283,7 @@ fn lag_folds() -> Vec<SynthDef> {
         ),
         lag_of("slew_scalar", "i_freq", "Slew", "kr", &[]),
         def("lag_madd_number", vec![], |b| {
-            lag_out(
+            rule_out(
                 b,
                 "Lag",
                 "kr",
@@ -1316,7 +1297,7 @@ fn lag_folds() -> Vec<SynthDef> {
         }),
         def("lag_madd_scalar", vec![Arg::new("i_x", 1.0)], |b| {
             let x = arg(b, "i_x");
-            lag_out(
+            rule_out(
                 b,
                 "Lag",
                 "kr",
@@ -1340,7 +1321,7 @@ fn lag_folds() -> Vec<SynthDef> {
             vec![Arg::new("a", 1.0), Arg::new("b", 2.0)],
             |b| {
                 let pair = UGenInput::Array(vec![arg(b, "a"), arg(b, "b")]);
-                lag_out(
+                rule_out(
                     b,
                     "Lag",
                     "kr",
@@ -1349,7 +1330,7 @@ fn lag_folds() -> Vec<SynthDef> {
             },
         ),
         def("lag_array_scalar", vec![], |b| {
-            lag_out(
+            rule_out(
                 b,
                 "Lag",
                 "kr",
@@ -1407,7 +1388,11 @@ fn outzeros() -> Vec<SynthDef> {
 }
 
 /// `LocalBuf(frames, channels)`.
-fn local_buf(b: &mut SynthDefBuilder, frames: impl Into<UGenInput>, channels: f64) -> UGenInput {
+pub(super) fn local_buf(
+    b: &mut SynthDefBuilder,
+    frames: impl Into<UGenInput>,
+    channels: impl Into<UGenInput>,
+) -> UGenInput {
     by_name(
         b,
         "LocalBuf",
@@ -1420,7 +1405,7 @@ fn local_buf(b: &mut SynthDefBuilder, frames: impl Into<UGenInput>, channels: f6
 }
 
 /// `FFT(buffer, sound)`.
-fn fft(b: &mut SynthDefBuilder, buffer: UGenInput, sound: UGenInput) -> UGenInput {
+pub(super) fn fft(b: &mut SynthDefBuilder, buffer: UGenInput, sound: UGenInput) -> UGenInput {
     by_name(
         b,
         "FFT",
@@ -1430,7 +1415,7 @@ fn fft(b: &mut SynthDefBuilder, buffer: UGenInput, sound: UGenInput) -> UGenInpu
 }
 
 /// `IFFT(chain)`.
-fn ifft(b: &mut SynthDefBuilder, chain: UGenInput) -> UGenInput {
+pub(super) fn ifft(b: &mut SynthDefBuilder, chain: UGenInput) -> UGenInput {
     by_name(b, "IFFT", "new", &[("buffer", input(chain))])
 }
 
@@ -1566,13 +1551,13 @@ fn poll() -> Vec<SynthDef> {
             poll_of(b, "kr", 10.0.into(), sound, &[]);
         }),
         def("poll_label", vec![], |b| {
-            let trig = by_name(b, "Impulse", "ar", &[("freq", input(2.0))]);
+            let trig = impulse(b, "ar", 2.0);
             let sound = sine(b, "ar", 1.0);
             let args = [("label", text("freq")), ("trigid", input(7.0))];
             poll_of(b, "ar", trig, sound, &args);
         }),
         def("poll_symbol", vec![], |b| {
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(2.0))]);
+            let trig = impulse(b, "kr", 2.0);
             let sound = sine(b, "kr", 1.0);
             poll_of(b, "kr", trig, sound, &[("label", text("amp"))]);
         }),
@@ -1609,7 +1594,7 @@ fn poll() -> Vec<SynthDef> {
 
 fn symbols() -> Vec<SynthDef> {
     vec![def("sendreply_bytes", vec![], |b| {
-        let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+        let trig = impulse(b, "kr", 1.0);
         let sound = sine(b, "kr", 1.0);
         by_name(
             b,
@@ -1675,6 +1660,20 @@ fn bufwr() -> Vec<SynthDef> {
     ]
 }
 
+/// `Demand.kr(trig, 0, values)`.
+pub(super) fn demand(b: &mut SynthDefBuilder, trig: UGenInput, values: UGenInput) -> UGenInput {
+    by_name(
+        b,
+        "Demand",
+        "kr",
+        &[
+            ("trig", input(trig)),
+            ("reset", input(0.0)),
+            ("demandUGens", input(values)),
+        ],
+    )
+}
+
 /// `Dseq(list, inf)`.
 pub(super) fn dseq(b: &mut SynthDefBuilder, list: &[f64]) -> UGenInput {
     by_name(
@@ -1717,7 +1716,7 @@ fn duty() -> Vec<SynthDef> {
         }),
         def("duty_ar", vec![], |b| {
             let dur = dseq(b, &[0.1, 0.2]);
-            let reset = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let reset = impulse(b, "ar", 1.0);
             let level = dseq(b, &[1.0, 2.0]);
             let duty = duty_of(b, "Duty", "ar", dur, reset, level, &[]);
             out(b, "ar", duty);
@@ -1749,7 +1748,11 @@ fn duty() -> Vec<SynthDef> {
 }
 
 /// `Impulse` at the rate of `selector`, of `freq`.
-pub(super) fn impulse(b: &mut SynthDefBuilder, selector: &str, freq: f64) -> UGenInput {
+pub(super) fn impulse(
+    b: &mut SynthDefBuilder,
+    selector: &str,
+    freq: impl Into<UGenInput>,
+) -> UGenInput {
     by_name(b, "Impulse", selector, &[("freq", input(freq))])
 }
 
@@ -1801,12 +1804,7 @@ fn demandenvgen() -> Vec<SynthDef> {
         }),
         def("demandenvgen_named", vec![], |b| {
             demand_env_gen(b, |b| {
-                let gate = by_name(
-                    b,
-                    "NamedControl",
-                    "ar",
-                    &[("name", "g".into()), ("values", input(1.0))],
-                );
+                let gate = ar(b, "g", 1.0);
                 vec![("gate", input(gate))]
             });
         }),
@@ -1828,7 +1826,7 @@ fn peak() -> Vec<SynthDef> {
     vec![
         def("peak_kr_audio", vec![], |b| {
             let sound = sine(b, "ar", 1.0);
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let trig = impulse(b, "kr", 1.0);
             rule_out(
                 b,
                 "Peak",
@@ -1838,7 +1836,7 @@ fn peak() -> Vec<SynthDef> {
         }),
         def("peak_ar", vec![], |b| {
             let sound = sine(b, "ar", 1.0);
-            let trig = by_name(b, "Impulse", "ar", &[("freq", input(2.0))]);
+            let trig = impulse(b, "ar", 2.0);
             rule_out(
                 b,
                 "Peak",
@@ -1859,14 +1857,9 @@ fn peak() -> Vec<SynthDef> {
 
 fn t2k() -> Vec<SynthDef> {
     vec![def("t2k", vec![], |b| {
-        let trig = by_name(b, "Impulse", "ar", &[("freq", input(10.0))]);
+        let trig = impulse(b, "ar", 10.0);
         rule_out(b, "T2K", "kr", &[("in", input(trig))]);
     })]
-}
-
-/// A spec of `Klank` or `Klang`: its parts as arrays of numbers.
-fn spec_of(parts: &[&[f64]]) -> UGenInput {
-    UGenInput::Array(parts.iter().map(|part| array(part)).collect())
 }
 
 /// `Klank.ar(spec, input)`, with these other arguments, into `Out.ar`.
@@ -1876,9 +1869,9 @@ fn klank_out(
     impulses: UGenInput,
     args: &[(&str, ArgValue)],
 ) {
-    let trig = by_name(b, "Impulse", "ar", &[("freq", input(impulses))]);
+    let trig = impulse(b, "ar", impulses);
     let mut all = vec![
-        ("specificationsArrayRef", input(spec_of(parts))),
+        ("specificationsArrayRef", input(spec(parts))),
         ("input", input(trig)),
     ];
     all.extend(args.iter().cloned());
@@ -1920,7 +1913,7 @@ fn klank() -> Vec<SynthDef> {
 
 fn klang() -> Vec<SynthDef> {
     let klang_out = |b: &mut SynthDefBuilder, parts: &[&[f64]], args: &[(&str, ArgValue)]| {
-        let mut all = vec![("specificationsArrayRef", input(spec_of(parts)))];
+        let mut all = vec![("specificationsArrayRef", input(spec(parts)))];
         all.extend(args.iter().cloned());
         let sines = by_name(b, "Klang", "ar", &all);
         out(b, "ar", sines);
@@ -1962,21 +1955,16 @@ fn ping_pong_out(
     out(b, "ar", delayed);
 }
 
-/// `[SinOsc.ar(1), SinOsc.ar(2)]`.
-fn two_sines(b: &mut SynthDefBuilder) -> UGenInput {
-    UGenInput::Array(vec![sine(b, "ar", 1.0), sine(b, "ar", 2.0)])
-}
-
 fn pingpong() -> Vec<SynthDef> {
     vec![
         def("pingpong", vec![], |b| {
             let buffer = local_buf(b, 44100.0, 2.0);
-            let sounds = two_sines(b);
+            let sounds = sines(b, "ar", &[1.0, 2.0]);
             ping_pong_out(b, buffer, sounds, &[("delayTime", input(0.25))]);
         }),
         def("pingpong_rotate", vec![], |b| {
             let buffer = local_buf(b, 44100.0, 2.0);
-            let sounds = two_sines(b);
+            let sounds = sines(b, "ar", &[1.0, 2.0]);
             let args = [
                 ("delayTime", input(0.25)),
                 ("feedback", input(0.5)),
@@ -1997,7 +1985,7 @@ fn pingpong() -> Vec<SynthDef> {
         def("pingpong_ugens", vec![Arg::new("fb", 0.5)], |b| {
             let fb = arg(b, "fb");
             let buffer = local_buf(b, 44100.0, 2.0);
-            let sounds = two_sines(b);
+            let sounds = sines(b, "ar", &[1.0, 2.0]);
             let delay = by_name(
                 b,
                 "SinOsc",
@@ -2012,7 +2000,7 @@ fn pingpong() -> Vec<SynthDef> {
             ping_pong_out(b, buffer, sounds, &args);
         }),
         def("pingpong_bufnum", vec![], |b| {
-            let sounds = two_sines(b);
+            let sounds = sines(b, "ar", &[1.0, 2.0]);
             ping_pong_out(b, 0.0.into(), sounds, &[("delayTime", input(0.25))]);
         }),
     ]
@@ -2118,21 +2106,12 @@ fn nestedwire() -> Vec<SynthDef> {
                 "new",
                 &[("lo", input(0.0)), ("hi", input(1.0))],
             );
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
-            let values = by_name(
-                b,
-                "Demand",
-                "kr",
-                &[
-                    ("trig", input(trig)),
-                    ("reset", input(0.0)),
-                    ("demandUGens", input(UGenInput::Array(vec![pair, white]))),
-                ],
-            );
+            let trig = impulse(b, "kr", 1.0);
+            let values = demand(b, trig, UGenInput::Array(vec![pair, white]));
             out(b, "kr", values);
         }),
         def("nestedwire_dseq", vec![], |b| {
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let trig = impulse(b, "kr", 1.0);
             let list = UGenInput::Array(vec![array(&[1.0, 2.0]), 3.0.into()]);
             let lists = by_name(
                 b,
@@ -2140,16 +2119,7 @@ fn nestedwire() -> Vec<SynthDef> {
                 "new",
                 &[("list", input(list)), ("repeats", input(f64::INFINITY))],
             );
-            let values = by_name(
-                b,
-                "Demand",
-                "kr",
-                &[
-                    ("trig", input(trig)),
-                    ("reset", input(0.0)),
-                    ("demandUGens", input(lists)),
-                ],
-            );
+            let values = demand(b, trig, lists);
             out(b, "kr", values);
         }),
         def("nestedwire_select", vec![], |b| {
@@ -2164,7 +2134,7 @@ fn nestedwire() -> Vec<SynthDef> {
             out(b, "ar", selected);
         }),
         def("nestedwire_twindex", vec![], |b| {
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let trig = impulse(b, "kr", 1.0);
             let weights = UGenInput::Array(vec![array(&[0.2, 0.8]), 0.5.into()]);
             let index = by_name(
                 b,
@@ -2197,27 +2167,22 @@ fn nestedreply() -> Vec<SynthDef> {
                 sines(b, "kr", &[1.0, 2.0]),
                 sines(b, "kr", &[3.0, 4.0]),
             ]);
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let trig = impulse(b, "kr", 1.0);
             reply(b, "kr", trig, "/a", values);
         }),
         def("nestedreply_wrap", vec![], |b| {
-            let trig = by_name(
-                b,
-                "Impulse",
-                "kr",
-                &[("freq", input(array(&[1.0, 2.0, 3.0])))],
-            );
+            let trig = impulse(b, "kr", array(&[1.0, 2.0, 3.0]));
             let values = nested_sines(b, "kr");
             reply(b, "kr", trig, "/b", values);
         }),
         def("nestedreply_first", vec![], |b| {
-            let trig = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
+            let trig = impulse(b, "kr", 1.0);
             let first = sine(b, "kr", 1.0);
             let pair = sines(b, "kr", &[2.0, 3.0]);
             reply(b, "kr", trig, "/c", UGenInput::Array(vec![first, pair]));
         }),
         def("nestedreply_ar", vec![], |b| {
-            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let trig = impulse(b, "ar", 1.0);
             let first = UGenInput::Array(vec![sine(b, "ar", 1.0)]);
             let second = UGenInput::Array(vec![sine(b, "ar", 2.0)]);
             reply(b, "ar", trig, "/d", UGenInput::Array(vec![first, second]));
@@ -2296,7 +2261,7 @@ fn nested_selects() -> Vec<SynthDef> {
             out(b, "ar", mixed);
         }),
         def("nestedpseudo_tchoose", vec![], |b| {
-            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let trig = impulse(b, "ar", 1.0);
             let choices = nested_sines(b, "ar");
             let chosen = by_name(
                 b,
@@ -2307,7 +2272,7 @@ fn nested_selects() -> Vec<SynthDef> {
             out(b, "ar", chosen);
         }),
         def("nestedpseudo_twchoose", vec![], |b| {
-            let trig = by_name(b, "Impulse", "ar", &[("freq", input(1.0))]);
+            let trig = impulse(b, "ar", 1.0);
             let choices = nested_sines(b, "ar");
             let weights = UGenInput::Array(vec![array(&[0.2, 0.8]), 0.5.into()]);
             let chosen = by_name(

@@ -184,7 +184,7 @@ fn definition(name: &str, parameter: &str, variant: &str) -> SynthDef {
 #[test]
 #[ignore = "runs scsynth 3.14.1"]
 fn scsynth_loads_every_golden_graph() {
-    let mut files: Vec<Vec<u8>> = common::NAMES
+    let mut files: Vec<Vec<u8>> = common::names()
         .iter()
         .map(|name| common::written(name))
         .collect();

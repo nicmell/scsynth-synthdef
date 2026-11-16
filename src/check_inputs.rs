@@ -75,7 +75,7 @@ mod tests {
 
     fn output(rate: Rate) -> UGenInput {
         UGenInput::Output(OutputProxy {
-            build: 0,
+            serial: 0,
             ugen: 0,
             output: 0,
             rate,

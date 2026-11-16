@@ -1,4 +1,4 @@
-//! The bodies of `GraphBuilder.sc`: `NamedControl`.
+//! The bodies of `GraphBuilder.sc`: `NamedControl` and `EnvGate`.
 
 use super::{Args, in_out};
 use crate::builder::SynthDefBuilder;
@@ -142,20 +142,13 @@ pub(super) fn named_control(
         "tr" => Some("trigger".to_owned()),
         _ => args.text("rate")?,
     };
-    let name = args
-        .text("name")?
-        .ok_or_else(|| BuildError::MissingArgument {
-            class: CLASS.to_owned(),
-            argument: "name".to_owned(),
-        })?;
+    let name = args.text("name")?.ok_or_else(|| args.missing("name"))?;
     let fixed_lag = matches!(args.selector(), "kr" | "new") && args.boolean("fixedLag")?;
     let mut values = args
         .optional("values")?
         .as_ref()
         .map(Values::of)
         .transpose()?;
-    // sclang reads the default of the spec only for no values, so an
-    // unknown spec fails only then.
     if let (None, Some(spec)) = (&values, args.text("spec")?) {
         let spec = catalog::spec(&spec).ok_or_else(|| bad(format!("no spec is named {spec}")))?;
         values = Some(Values::Number(spec.default));
@@ -341,15 +334,7 @@ fn fixed(
         let control = in_out::controls(builder, "AudioControl", Rate::Audio, numbers)?;
         return in_out::lag(builder, control, lags.input(name)?);
     }
-    let lags = match lags {
-        Lags::Input(UGenInput::Number(lag)) => vec![UGenInput::Number(*lag); numbers.len()],
-        Lags::Array(items) => items
-            .iter()
-            .map(|lag| lag.input(name))
-            .collect::<Result<_, _>>()?,
-        other => vec![other.input(name)?],
-    };
-    in_out::lag_controls(builder, numbers, &lags)
+    in_out::lag_controls(builder, numbers, lags.input(name)?)
 }
 
 /// `control.asArray.reshapeLike(values)`: the outputs in order, in the

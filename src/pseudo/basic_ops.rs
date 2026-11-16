@@ -2,7 +2,7 @@
 //! fold and sort their inputs before they add one.
 
 use super::{Args, lang};
-use crate::builder::{NewUGen, SynthDefBuilder};
+use crate::builder::{NewUGen, SynthDefBuilder, rate_of};
 use crate::error::BuildError;
 use crate::rate::{Rate, least_by_name, sort_by_rate};
 use crate::ugen_input::UGenInput;
@@ -106,10 +106,6 @@ fn add_sum(
     let rate = least_by_name(inputs.iter().map(rate_of)).unwrap_or(Rate::Scalar);
     sort_by_rate(&mut inputs, rate_of);
     builder.add(NewUGen::new(class, rate).inputs(inputs))
-}
-
-fn rate_of(input: &UGenInput) -> Rate {
-    input.rate().unwrap_or(Rate::Scalar)
 }
 
 #[allow(clippy::float_cmp)]
