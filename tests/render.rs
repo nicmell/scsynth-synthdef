@@ -395,7 +395,7 @@ fn render_catalog(catalog: &Value) -> String {
     let mut rendered = String::from(HEADER);
     rendered.push_str("#![allow(clippy::approx_constant, clippy::unreadable_literal)]\n\n");
     rendered.push_str(
-        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, ControlSpec, ConvertEnv,\n    FftSize, InputSlot, Optimize, Outputs, Passthrough, PseudoClass, RateMethod, UGenClass,\n    Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use super::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, ControlSpec, ConvertEnv,\n    FftSize, InputSlot, Optimize, Outputs, Passthrough, PseudoClass, RateMethod, SignalRange,\n    UGenClass, UGenMethod, Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     writeln!(
         rendered,
@@ -464,6 +464,12 @@ fn render_catalog(catalog: &Value) -> String {
             check_inputs(&class["check_inputs"])
         )
         .unwrap();
+        writeln!(
+            rendered,
+            "        signal_range: {},",
+            signal_range(&class["signal_range"])
+        )
+        .unwrap();
         writeln!(rendered, "        methods: &[").unwrap();
         for method in class["methods"].as_array().expect("a list of methods") {
             render_method(&mut rendered, method);
@@ -476,7 +482,47 @@ fn render_catalog(catalog: &Value) -> String {
     render_specs(&mut rendered, catalog);
     render_methods(&mut rendered, catalog, "env_methods", "ENV_METHODS");
     render_methods(&mut rendered, catalog, "pv_methods", "PV_METHODS");
+    render_ugen_methods(&mut rendered, catalog);
     rendered
+}
+
+fn signal_range(value: &Value) -> &'static str {
+    match text(value) {
+        "bipolar" => "SignalRange::Bipolar",
+        "unipolar" => "SignalRange::Unipolar",
+        other => panic!("{other} is no signal range"),
+    }
+}
+
+fn render_ugen_methods(rendered: &mut String, catalog: &Value) {
+    let methods = catalog["ugen_methods"]
+        .as_array()
+        .expect("ugen_methods is a list of methods");
+    writeln!(
+        rendered,
+        "\npub(super) static UGEN_METHODS: [UGenMethod; {}] = [",
+        methods.len()
+    )
+    .unwrap();
+    let class = |value: &Value| match value {
+        Value::Null => "None".to_owned(),
+        other => format!("Some({:?})", text(other)),
+    };
+    for method in methods {
+        writeln!(rendered, "    UGenMethod {{").unwrap();
+        writeln!(rendered, "        method:").unwrap();
+        render_method(rendered, method);
+        writeln!(rendered, "        number: {},", class(&method["number"])).unwrap();
+        writeln!(rendered, "        array: {},", class(&method["array"])).unwrap();
+        writeln!(
+            rendered,
+            "        overrides: {},",
+            strings(&method["overrides"])
+        )
+        .unwrap();
+        writeln!(rendered, "    }},").unwrap();
+    }
+    rendered.push_str("];\n");
 }
 
 fn render_methods(rendered: &mut String, catalog: &Value, key: &str, name: &str) {

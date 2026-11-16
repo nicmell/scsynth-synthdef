@@ -226,7 +226,7 @@ stdin.
   `lang`, in the order of sclang.
 - An array takes the dispatch of fact 11, and a number the method of fact
   10, through the arithmetic of `lang`.
-- `BuildError::BadMethod { selector, reason }` refuses what sclang throws
+- `BuildError::BadMethod { selector, message }` refuses what sclang throws
   on, and the broken definitions of fact 9.
 - A call that fails leaves the build as it was.
 
@@ -281,10 +281,10 @@ eight commands of `CLAUDE.md` green.
 2. `test: the golden files of 0.12, written by sclang 3.14.1`.
 3. `feat: send, with the ranges and the maps`: the tables,
    `signal_range`, `send` for outputs, arrays and numbers, `BadMethod`, and
-   facts 3 to 6. Then the parity of `ugenranges`, `ugenmaps` and
-   `ugenreceivers`.
+   facts 3 to 6. Then the parity of `ugenranges` and `ugenmaps`.
 4. `feat: the other methods of UGen`: facts 7 to 9, and the parity of
-   `ugenlags` and `ugenmisc`.
+   `ugenlags`, `ugenmisc` and `ugenreceivers`, which holds methods of both
+   steps.
 5. `feat: the ranges of Env`: `send_env`, its table, and the parity of
    `envranges`.
 6. `docs: the release of version 0.12`.

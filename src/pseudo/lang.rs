@@ -84,26 +84,32 @@ pub(crate) fn rate(value: &UGenInput) -> Option<Rate> {
 
 /// `x.clip(lo, hi)`: `sc_clip` of a number, a `Clip` at the rate of a UGen,
 /// or `max(lo, min(hi, x))` at demand rate. An array clips element by
-/// element.
+/// element. The primitive of a number fails on bounds that are not numbers.
 pub(crate) fn clip(
     builder: &mut SynthDefBuilder,
     x: UGenInput,
-    lo: f64,
-    hi: f64,
+    lo: UGenInput,
+    hi: UGenInput,
 ) -> Result<UGenInput, BuildError> {
     match x {
-        UGenInput::Number(number) => {
-            let below = if hi < number { hi } else { number };
-            Ok(UGenInput::Number(if below < lo { lo } else { below }))
-        }
+        UGenInput::Number(number) => match (lo, hi) {
+            (UGenInput::Number(lo), UGenInput::Number(hi)) => {
+                let below = if hi < number { hi } else { number };
+                Ok(UGenInput::Number(if below < lo { lo } else { below }))
+            }
+            _ => Err(BuildError::BadMethod {
+                selector: "clip".to_owned(),
+                message: "Primitive '_ClipFloat' failed. Wrong type.".to_owned(),
+            }),
+        },
         UGenInput::Array(items) if !items.is_empty() => items
             .into_iter()
-            .map(|item| clip(builder, item, lo, hi))
+            .map(|item| clip(builder, item, lo.clone(), hi.clone()))
             .collect::<Result<_, _>>()
             .map(UGenInput::Array),
         UGenInput::Output(output) if output.rate() == Rate::Demand => {
-            let below = binary(builder, "min", hi.into(), output.into())?;
-            binary(builder, "max", lo.into(), below)
+            let below = binary(builder, "min", hi, output.into())?;
+            binary(builder, "max", lo, below)
         }
         other => {
             let selector = selector_for_rate(rate(&other).unwrap_or(Rate::Scalar));
@@ -365,6 +371,9 @@ fn number_unary(op: &str, x: f64) -> Option<f64> {
         "sqrt" => x.sqrt(),
         "cos" => x.cos(),
         "sin" => x.sin(),
+        "exp" => x.exp(),
+        "log" => x.ln(),
+        "squared" => x * x,
         _ => return None,
     })
 }
@@ -395,9 +404,14 @@ fn modulo(input: f64, hi: f64) -> f64 {
     (-hi).mul_add((shifted / hi).floor(), shifted)
 }
 
-/// `sc_fold`.
+/// `Float:wrap`: `sc_mod(x - lo, hi - lo) + lo`, in f64.
+pub(crate) fn wrap(x: f64, lo: f64, hi: f64) -> f64 {
+    modulo(x - lo, hi - lo) + lo
+}
+
+/// `sc_fold`, which `Float:fold` and the operator `fold2` compute.
 #[allow(clippy::float_cmp)]
-fn fold(input: f64, lo: f64, hi: f64) -> f64 {
+pub(crate) fn fold(input: f64, lo: f64, hi: f64) -> f64 {
     let x = input - lo;
     if input >= hi {
         let folded = hi + hi - input;
@@ -424,7 +438,7 @@ fn fold(input: f64, lo: f64, hi: f64) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{clip, linlin, moddif, number_binary, number_unary};
+    use super::{clip, fold, linlin, moddif, number_binary, number_unary, wrap};
     use crate::builder::SynthDefBuilder;
     use crate::ugen_input::UGenInput;
     use serde_json::Value;
@@ -440,7 +454,7 @@ mod tests {
     /// libm of another platform can round `pow`, `cos` and `sin` one unit in
     /// the last place away from the libm of the macOS that wrote the table.
     fn same(op: &str, computed: f64, expected: f64) -> bool {
-        let ulps = u64::from(matches!(op, "pow" | "cos" | "sin"));
+        let ulps = u64::from(matches!(op, "pow" | "cos" | "sin" | "exp" | "log"));
         (computed.is_nan() && expected.is_nan())
             || computed.to_bits().abs_diff(expected.to_bits()) <= ulps
     }
@@ -476,7 +490,7 @@ mod tests {
                 "{x}.{op}: {computed}, not {expected}"
             );
         }
-        assert_eq!(rows(&table, "unary").len(), 54);
+        assert_eq!(rows(&table, "unary").len(), 81);
     }
 
     #[test]
@@ -489,7 +503,8 @@ mod tests {
         };
         for row in rows(&table, "clip") {
             let [x, lo, hi, expected] = [0, 1, 2, 3].map(|column| float(&row[column]));
-            let computed = number(clip(&mut builder, x.into(), lo, hi).expect("clip computes"));
+            let computed = clip(&mut builder, x.into(), lo.into(), hi.into());
+            let computed = number(computed.expect("clip computes"));
             assert!(
                 same("clip", computed, expected),
                 "{x}.clip({lo}, {hi}): {computed}"
@@ -505,6 +520,22 @@ mod tests {
             );
         }
         assert_eq!(builder.finish().expect("an empty build").children.len(), 0);
+    }
+
+    #[test]
+    fn fold_and_wrap_of_numbers_compute_as_sclang_computes_them() {
+        let table: Value = serde_json::from_str(TABLE).expect("the table is JSON");
+        for (section, function) in [("fold", fold as fn(f64, f64, f64) -> f64), ("wrap", wrap)] {
+            for row in rows(&table, section) {
+                let [x, lo, hi, expected] = [0, 1, 2, 3].map(|column| float(&row[column]));
+                let computed = function(x, lo, hi);
+                assert!(
+                    same(section, computed, expected),
+                    "{x}.{section}({lo}, {hi}): {computed}"
+                );
+            }
+            assert_eq!(rows(&table, section).len(), 27);
+        }
     }
 
     #[test]

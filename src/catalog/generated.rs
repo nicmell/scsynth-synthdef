@@ -3,8 +3,8 @@
 
 use super::{
     Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, ControlSpec, ConvertEnv,
-    FftSize, InputSlot, Optimize, Outputs, Passthrough, PseudoClass, RateMethod, UGenClass,
-    Wiring,
+    FftSize, InputSlot, Optimize, Outputs, Passthrough, PseudoClass, RateMethod, SignalRange,
+    UGenClass, UGenMethod, Wiring,
 };
 use crate::rate::Rate;
 
@@ -20,6 +20,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -54,6 +55,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear", "UGens>Undocumented"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -116,6 +118,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -130,6 +133,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 0 },
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -144,6 +148,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -208,6 +213,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -272,6 +278,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -336,6 +343,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -416,6 +424,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -499,6 +508,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -561,6 +571,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -619,6 +630,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -679,6 +691,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -700,6 +713,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -738,6 +752,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -776,6 +791,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -814,6 +830,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -828,6 +845,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -866,6 +884,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -905,6 +924,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -943,6 +963,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -982,6 +1003,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1044,6 +1066,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1102,6 +1125,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1141,6 +1165,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1203,6 +1228,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1261,6 +1287,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(2),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1321,6 +1348,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1381,6 +1409,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -1395,6 +1424,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Analysis", "UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -1417,6 +1447,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Analysis", "UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -1456,6 +1487,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1491,6 +1523,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(2),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1551,6 +1584,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -1574,6 +1608,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1634,6 +1669,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -1667,6 +1703,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1723,6 +1760,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1762,6 +1800,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1801,6 +1840,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1840,6 +1880,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -1894,6 +1935,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1933,6 +1975,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -1972,6 +2015,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2011,6 +2055,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2073,6 +2118,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2135,6 +2181,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2197,6 +2244,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -2251,6 +2299,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -2305,6 +2354,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -2359,6 +2409,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -2413,6 +2464,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::AudioAt(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2475,6 +2527,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -2529,6 +2582,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -2583,6 +2637,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::BufWr,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2643,6 +2698,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2705,6 +2761,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2735,6 +2792,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -2749,6 +2807,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2807,6 +2866,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -2841,6 +2901,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2921,6 +2982,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -2977,6 +3039,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3033,6 +3096,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3097,6 +3161,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3161,6 +3226,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3225,6 +3291,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3267,6 +3334,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3295,6 +3363,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -3323,6 +3392,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -3356,6 +3426,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -3389,6 +3460,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3427,6 +3499,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3466,6 +3539,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3506,6 +3580,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3570,6 +3645,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3628,6 +3704,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3667,6 +3744,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3706,6 +3784,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Single-value"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -3760,6 +3839,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -3774,6 +3854,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -3811,6 +3892,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -3847,6 +3929,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -3884,6 +3967,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -3920,6 +4004,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -3955,6 +4040,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear", "UGens>Envelopes"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4015,6 +4101,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear", "UGens>Envelopes"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4077,6 +4164,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(3),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4113,6 +4201,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4175,6 +4264,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4239,6 +4329,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4295,6 +4386,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4355,6 +4447,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4417,6 +4510,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4479,6 +4573,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4541,6 +4636,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4603,6 +4699,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4661,6 +4758,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Demand", "UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4733,6 +4831,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4793,6 +4892,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control", "UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4853,6 +4953,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -4889,6 +4990,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -4926,6 +5028,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -4988,6 +5091,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5046,6 +5150,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5106,6 +5211,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5142,6 +5248,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::AudioFrom(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5177,6 +5284,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5213,6 +5321,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control", "Server>Nodes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -5247,6 +5356,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand", "UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5284,6 +5394,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5319,6 +5430,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5354,6 +5466,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5389,6 +5502,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5424,6 +5538,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5460,6 +5575,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5495,6 +5611,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5517,6 +5634,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5552,6 +5670,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5587,6 +5706,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5610,6 +5730,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5668,6 +5789,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5726,6 +5848,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Duty,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5786,6 +5909,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5822,6 +5946,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5845,6 +5970,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -5880,6 +6006,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5912,6 +6039,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -5948,6 +6076,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6012,6 +6141,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -6047,6 +6177,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6089,6 +6220,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6131,6 +6263,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6173,6 +6306,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -6212,6 +6346,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -6248,6 +6383,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6312,6 +6448,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6372,6 +6509,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -6386,6 +6524,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6466,6 +6605,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6526,6 +6666,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6564,6 +6705,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6628,6 +6770,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -6663,6 +6806,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -6697,6 +6841,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -6731,6 +6876,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6770,6 +6916,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::NInputs(2),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6810,6 +6957,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Filters>Pitch"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6848,6 +6996,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::NInputs(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6893,6 +7042,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6949,6 +7099,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -6987,6 +7138,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7025,6 +7177,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7101,6 +7254,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7181,6 +7335,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7255,6 +7410,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7300,6 +7456,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7344,6 +7501,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7386,6 +7544,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7428,6 +7587,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7484,6 +7644,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7544,6 +7705,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7602,6 +7764,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7660,6 +7823,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Random"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7718,6 +7882,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7758,6 +7923,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7798,6 +7964,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7838,6 +8005,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7874,6 +8042,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7896,6 +8065,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -7956,6 +8126,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8036,6 +8207,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -8071,6 +8243,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8131,6 +8304,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8187,6 +8361,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8221,6 +8396,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8256,6 +8432,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8336,6 +8513,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::NInputs(2),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8368,6 +8546,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -8403,6 +8582,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8463,6 +8643,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8523,6 +8704,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8583,6 +8765,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -8616,6 +8799,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear", "UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8676,6 +8860,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8710,6 +8895,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -8747,6 +8933,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -8783,6 +8970,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8806,6 +8994,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8831,6 +9020,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8889,6 +9079,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -8949,6 +9140,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9007,6 +9199,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9065,6 +9258,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9123,6 +9317,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9181,6 +9376,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9243,6 +9439,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9301,6 +9498,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9359,6 +9557,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9417,6 +9616,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9477,6 +9677,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9539,6 +9740,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9599,6 +9801,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9659,6 +9862,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9719,6 +9923,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9777,6 +9982,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9835,6 +10041,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9895,6 +10102,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -9955,6 +10163,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10017,6 +10226,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10077,6 +10287,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10139,6 +10350,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10175,6 +10387,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -10211,6 +10424,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10273,6 +10487,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10329,6 +10544,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10385,6 +10601,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10427,6 +10644,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10469,6 +10687,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10511,6 +10730,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10571,6 +10791,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10627,6 +10848,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10663,6 +10885,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10703,6 +10926,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10743,6 +10967,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10783,6 +11008,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10845,6 +11071,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10903,6 +11130,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -10939,6 +11167,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::NInputs(2),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -10999,6 +11228,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11063,6 +11293,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -11101,6 +11332,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -11136,6 +11368,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -11158,6 +11391,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11188,6 +11422,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 0 },
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11242,6 +11477,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11304,6 +11540,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11347,6 +11584,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -11383,6 +11621,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -11418,6 +11657,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11478,6 +11718,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -11498,6 +11739,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::AudioAt(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11558,6 +11800,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11622,6 +11865,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11702,6 +11946,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11766,6 +12011,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -11822,6 +12068,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -11858,6 +12105,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -11895,6 +12143,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -11932,6 +12181,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -11955,6 +12205,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -11969,6 +12220,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12029,6 +12281,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -12065,6 +12318,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -12098,6 +12352,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12134,6 +12389,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -12167,6 +12423,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -12200,6 +12457,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -12233,6 +12491,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -12266,6 +12525,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -12299,6 +12559,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -12351,6 +12612,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12392,6 +12654,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12452,6 +12715,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12512,6 +12776,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -12554,6 +12819,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12616,6 +12882,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12678,6 +12945,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12734,6 +13002,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -12757,6 +13026,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -12793,6 +13063,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -12828,6 +13099,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -12865,6 +13137,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -12902,6 +13175,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -12938,6 +13212,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -12973,6 +13248,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -12987,6 +13263,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13023,6 +13300,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13057,6 +13335,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13092,6 +13371,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13127,6 +13407,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13162,6 +13443,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13197,6 +13479,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -13235,6 +13518,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -13275,6 +13559,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13310,6 +13595,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13345,6 +13631,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13380,6 +13667,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13415,6 +13703,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13451,6 +13740,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13486,6 +13776,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13521,6 +13812,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13555,6 +13847,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13591,6 +13884,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13626,6 +13920,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13660,6 +13955,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13695,6 +13991,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13730,6 +14027,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13765,6 +14063,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13801,6 +14100,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13835,6 +14135,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13869,6 +14170,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13905,6 +14207,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13942,6 +14245,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -13979,6 +14283,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -14017,6 +14322,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -14043,6 +14349,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14101,6 +14408,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14161,6 +14469,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14225,6 +14534,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14285,6 +14595,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14343,6 +14654,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14381,6 +14693,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -14416,6 +14729,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -14450,6 +14764,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -14484,6 +14799,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Peak,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14540,6 +14856,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14596,6 +14913,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14658,6 +14976,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14714,6 +15033,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -14758,6 +15078,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Pitch"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14798,6 +15119,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14864,6 +15186,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14905,6 +15228,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -14949,6 +15273,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15009,6 +15334,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15065,6 +15391,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15123,6 +15450,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -15137,6 +15465,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -15151,6 +15480,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15191,6 +15521,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15231,6 +15562,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15271,6 +15603,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15333,6 +15666,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15395,6 +15729,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -15428,6 +15763,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15488,6 +15824,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -15523,6 +15860,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -15577,6 +15915,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15654,6 +15993,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15724,6 +16064,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15780,6 +16121,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15842,6 +16184,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15904,6 +16247,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Ambisonics", "UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(2),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -15962,6 +16306,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Peak,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16018,6 +16363,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Peak,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16074,6 +16420,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis", "UGens>Maths"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16130,6 +16477,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16198,6 +16546,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -16231,6 +16580,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -16264,6 +16614,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16320,6 +16671,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16378,6 +16730,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16458,6 +16811,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16514,6 +16868,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16574,6 +16929,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::AudioFrom(1),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16630,6 +16986,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16666,6 +17023,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16726,6 +17084,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16784,6 +17143,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -16807,6 +17167,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16863,6 +17224,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -16923,6 +17285,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -16958,6 +17321,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -16993,6 +17357,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17053,6 +17418,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic", "UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17113,6 +17479,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17175,6 +17542,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis", "UGens>Filters>Linear", "UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17233,6 +17601,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -17267,6 +17636,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -17301,6 +17671,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -17338,6 +17709,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17374,6 +17746,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17416,6 +17789,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17474,6 +17848,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17513,6 +17888,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17552,6 +17928,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17616,6 +17993,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17657,6 +18035,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ir",
@@ -17690,6 +18069,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -17713,6 +18093,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -17737,6 +18118,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17793,6 +18175,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17853,6 +18236,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Conversion", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17888,6 +18272,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Conversion", "UGens>Triggers"],
         check_inputs: CheckInputs::T2K,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -17922,6 +18307,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -17982,6 +18368,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers", "UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18038,6 +18425,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Duty,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18100,6 +18488,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18158,6 +18547,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18200,6 +18590,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18258,6 +18649,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18316,6 +18708,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18374,6 +18767,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18397,6 +18791,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18451,6 +18846,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18505,6 +18901,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18561,6 +18958,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Unipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18617,6 +19015,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Synth control", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "kr",
@@ -18645,6 +19044,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18707,6 +19107,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18769,6 +19170,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -18791,6 +19193,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -18828,6 +19231,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>FFT", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "new",
@@ -18852,6 +19256,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18890,6 +19295,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -18952,6 +19358,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19016,6 +19423,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19056,6 +19464,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19118,6 +19527,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Deterministic", "UGens>Generators>Stochastic", "UGens>Filters>Pitch"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19188,6 +19598,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: true,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19232,6 +19643,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19288,6 +19700,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
         ],
     },
@@ -19302,6 +19715,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19382,6 +19796,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19442,6 +19857,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::NInputs(2),
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19502,6 +19918,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19566,6 +19983,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 2 },
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -19624,6 +20042,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         cant_alias: false,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
+        signal_range: SignalRange::Bipolar,
         methods: &[
             RateMethod {
                 selector: "ar",
@@ -20463,4 +20882,609 @@ pub(super) static PV_METHODS: [RateMethod; 3] = [
                 ],
                 addable: Addable::Pseudo,
             },
+];
+
+pub(super) static UGEN_METHODS: [UGenMethod; 42] = [
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "range",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &["LFGauss"],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "exprange",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.01)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "curverange",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "curve", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-4.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "unipolar",
+                args: &[
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "bipolar",
+                args: &[
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "linlin",
+                args: &[
+                    ArgSpec { name: "inMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "inMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "clip", kind: ArgKind::Symbol, default: Some(ArgDefault::Symbol("minmax")) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &["DUGen"],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "linexp",
+                args: &[
+                    ArgSpec { name: "inMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "inMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "clip", kind: ArgKind::Symbol, default: Some(ArgDefault::Symbol("minmax")) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &["DUGen"],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "explin",
+                args: &[
+                    ArgSpec { name: "inMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "inMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "clip", kind: ArgKind::Symbol, default: Some(ArgDefault::Symbol("minmax")) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &["DUGen"],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "expexp",
+                args: &[
+                    ArgSpec { name: "inMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "inMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "clip", kind: ArgKind::Symbol, default: Some(ArgDefault::Symbol("minmax")) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &["DUGen"],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "lincurve",
+                args: &[
+                    ArgSpec { name: "inMin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "inMax", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "outMin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "outMax", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "curve", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-4.0)) },
+                    ArgSpec { name: "clip", kind: ArgKind::Symbol, default: Some(ArgDefault::Symbol("minmax")) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "curvelin",
+                args: &[
+                    ArgSpec { name: "inMin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "inMax", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "outMin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "outMax", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "curve", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-4.0)) },
+                    ArgSpec { name: "clip", kind: ArgKind::Symbol, default: Some(ArgDefault::Symbol("minmax")) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "bilin",
+                args: &[
+                    ArgSpec { name: "inCenter", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "inMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "inMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outCenter", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "outMax", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "clip", kind: ArgKind::Symbol, default: Some(ArgDefault::Symbol("minmax")) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "prune",
+                args: &[
+                    ArgSpec { name: "min", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "max", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "type", kind: ArgKind::Symbol, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "clip",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("Float"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "fold",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("Float"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "wrap",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("Float"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "lag",
+                args: &[
+                    ArgSpec { name: "t1", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "t2", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "lag2",
+                args: &[
+                    ArgSpec { name: "t1", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "t2", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "lag3",
+                args: &[
+                    ArgSpec { name: "t1", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "t2", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "lagud",
+                args: &[
+                    ArgSpec { name: "lagTimeU", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "lagTimeD", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "lag2ud",
+                args: &[
+                    ArgSpec { name: "lagTimeU", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "lagTimeD", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "lag3ud",
+                args: &[
+                    ArgSpec { name: "lagTimeU", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "lagTimeD", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "varlag",
+                args: &[
+                    ArgSpec { name: "time", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "curvature", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "warp", kind: ArgKind::Curve, default: Some(ArgDefault::Float(5.0)) },
+                    ArgSpec { name: "start", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "slew",
+                args: &[
+                    ArgSpec { name: "up", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "down", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "blend",
+                args: &[
+                    ArgSpec { name: "that", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "blendFrac", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("Object"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "minNyquist",
+                args: &[
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "degrad",
+                args: &[
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "raddeg",
+                args: &[
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "moddif",
+                args: &[
+                    ArgSpec { name: "that", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mod", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "sanitize",
+                args: &[
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "poll",
+                args: &[
+                    ArgSpec { name: "trig", kind: ArgKind::Signal, default: Some(ArgDefault::Float(10.0)) },
+                    ArgSpec { name: "label", kind: ArgKind::Symbol, default: None },
+                    ArgSpec { name: "trigid", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("Array"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "dpoll",
+                args: &[
+                    ArgSpec { name: "label", kind: ArgKind::Symbol, default: None },
+                    ArgSpec { name: "run", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "trigid", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("Array"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "checkBadValues",
+                args: &[
+                    ArgSpec { name: "id", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "post", kind: ArgKind::Signal, default: Some(ArgDefault::Float(2.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "snap",
+                args: &[
+                    ArgSpec { name: "resolution", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "margin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.05)) },
+                    ArgSpec { name: "strength", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: None,
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "softRound",
+                args: &[
+                    ArgSpec { name: "resolution", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "margin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.05)) },
+                    ArgSpec { name: "strength", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: None,
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "binaryValue",
+                args: &[
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: None,
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "isPositive",
+                args: &[
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "isNegative",
+                args: &[
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "isStrictlyPositive",
+                args: &[
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "|==|",
+                args: &[
+                    ArgSpec { name: "that", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("Object"),
+        array: Some("Object"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "degreeToKey",
+                args: &[
+                    ArgSpec { name: "scale", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "stepsPerOctave", kind: ArgKind::Signal, default: Some(ArgDefault::Float(12.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: Some("SimpleNumber"),
+        array: Some("SequenceableCollection"),
+        overrides: &[],
+    },
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "if",
+                args: &[
+                    ArgSpec { name: "trueUGen", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "falseUGen", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: None,
+        overrides: &[],
+    },
 ];

@@ -134,7 +134,7 @@ try {
 		var binary = [['+', "+"], ['-', "-"], ['*', "*"], ['/', "/"], ['pow', "pow"],
 			['%', "mod"], ['round', "round"], ['trunc', "trunc"], ['roundUp', "roundUp"],
 			['fold2', "fold2"], ['max', "max"], ['min', "min"], ['absdif', "absdif"]];
-		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin];
+		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin, \exp, \log, \squared];
 		var sections = List.new;
 		sections.add("  \"binary\": [\n" ++ binary.collect { |op|
 			values.collect { |a|
@@ -151,6 +151,13 @@ try {
 				"    " ++ row.([x, range[0], range[1], x.clip(range[0], range[1])].collect(bits))
 			}
 		}.flatten.join(",\n") ++ "\n  ]");
+		[\fold, \wrap].do { |op|
+			sections.add("  \"" ++ op ++ "\": [\n" ++ values.collect { |x|
+				[[0.0, 1.0], [-1.0, 1.0], [0.5, 2.0]].collect { |range|
+					"    " ++ row.([x, range[0], range[1], x.perform(op, range[0], range[1])].collect(bits))
+				}
+			}.flatten.join(",\n") ++ "\n  ]");
+		};
 		sections.add("  \"moddif\": [\n" ++ values.collect { |x|
 			[[0.0, 1.0], [1.0, 3.0], [2.0, 3.0]].collect { |pair|
 				"    " ++ row.([x, pair[0], pair[1], x.moddif(pair[0], pair[1])].collect(bits))

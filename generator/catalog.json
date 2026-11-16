@@ -122,6 +122,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Conversion"
       ],
@@ -172,6 +173,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Undocumented"
@@ -316,6 +318,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -335,6 +338,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -357,6 +361,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -522,6 +527,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -687,6 +693,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -851,6 +858,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -1002,6 +1010,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -1193,6 +1202,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -1335,6 +1345,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Bela"
       ],
@@ -1437,6 +1448,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Bela"
       ],
@@ -1556,6 +1568,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -1591,6 +1604,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1673,6 +1687,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1755,6 +1770,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1836,6 +1852,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1858,6 +1875,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1940,6 +1958,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2032,6 +2051,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2114,6 +2134,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2205,6 +2226,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2350,6 +2372,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2455,6 +2478,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2547,6 +2571,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2692,6 +2717,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2795,6 +2821,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -2924,6 +2951,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -3059,6 +3087,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Algebraic"
       ],
@@ -3079,6 +3108,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis",
         "UGens>FFT"
@@ -3119,6 +3149,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis",
         "UGens>FFT"
@@ -3217,6 +3248,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Bela"
       ],
@@ -3273,6 +3305,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -3401,6 +3434,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Algebraic"
       ],
@@ -3443,6 +3477,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -3566,6 +3601,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -3603,6 +3639,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -3684,6 +3721,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3777,6 +3815,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3870,6 +3909,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3963,6 +4003,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4034,6 +4075,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4127,6 +4169,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4219,6 +4262,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4312,6 +4356,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4456,6 +4501,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4599,6 +4645,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4743,6 +4790,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4814,6 +4862,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4884,6 +4933,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Base"
       ],
@@ -4955,6 +5005,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -5026,6 +5077,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -5170,6 +5222,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -5241,6 +5294,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -5311,6 +5365,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -5444,6 +5499,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -5584,6 +5640,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers",
         "UGens>Filters>Linear"
@@ -5641,6 +5698,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -5660,6 +5718,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -5775,6 +5834,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes"
       ],
@@ -5821,6 +5881,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -5981,6 +6042,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -6061,6 +6123,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -6149,6 +6212,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -6314,6 +6378,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -6478,6 +6543,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -6641,6 +6707,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Dynamics"
       ],
@@ -6762,6 +6829,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Dynamics"
       ],
@@ -6845,6 +6913,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control"
       ],
@@ -6888,6 +6957,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -6924,6 +6994,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -6959,6 +7030,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -7037,6 +7109,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -7125,6 +7198,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -7223,6 +7297,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Convolution"
       ],
@@ -7377,6 +7452,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -7481,6 +7557,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -7573,6 +7650,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -7666,6 +7744,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Single-value"
       ],
@@ -7740,6 +7819,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes"
       ],
@@ -7760,6 +7840,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -7838,6 +7919,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Demand"
@@ -7907,6 +7989,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Demand"
@@ -7986,6 +8069,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -8050,6 +8134,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -8105,6 +8190,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Envelopes"
@@ -8230,6 +8316,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Envelopes"
@@ -8374,6 +8461,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -8464,6 +8552,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Conversion"
       ],
@@ -8602,6 +8691,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Delays"
@@ -8753,6 +8843,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Delays"
@@ -8843,6 +8934,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -8965,6 +9057,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -9105,6 +9198,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -9250,6 +9344,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -9394,6 +9489,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -9538,6 +9634,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -9640,6 +9737,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand",
         "UGens>Envelopes"
@@ -9893,6 +9991,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -10013,6 +10112,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control",
         "UGens>Analysis>Amplitude"
@@ -10149,6 +10249,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -10218,6 +10319,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -10295,6 +10397,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Bela"
       ],
@@ -10437,6 +10540,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Bela"
       ],
@@ -10539,6 +10643,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Bela"
       ],
@@ -10658,6 +10763,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -10718,6 +10824,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -10776,6 +10883,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -10843,6 +10951,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control",
         "Server>Nodes"
@@ -10890,6 +10999,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand",
         "UGens>Info"
@@ -10966,6 +11076,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11023,6 +11134,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11080,6 +11192,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11138,6 +11251,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11195,6 +11309,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11264,6 +11379,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand",
         "UGens>Random"
@@ -11322,6 +11438,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11360,6 +11477,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11415,6 +11533,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11469,6 +11588,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11515,6 +11635,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -11617,6 +11738,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -11719,6 +11841,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11854,6 +11977,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -11922,6 +12046,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand",
         "UGens>Random"
@@ -11969,6 +12094,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -12025,6 +12151,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -12095,6 +12222,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Filters>Linear"
@@ -12190,6 +12318,7 @@
       "fft_size": null,
       "convert_env": "array",
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Envelopes"
       ],
@@ -12362,6 +12491,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random"
       ],
@@ -12421,6 +12551,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12544,6 +12675,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12666,6 +12798,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12789,6 +12922,7 @@
       "fft_size": "buf_frames",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -12886,6 +13020,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -12953,6 +13088,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -13115,6 +13251,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -13238,6 +13375,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters"
       ],
@@ -13258,6 +13396,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -13419,6 +13558,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -13538,6 +13678,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -13621,6 +13762,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -13783,6 +13925,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control"
       ],
@@ -13836,6 +13979,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control"
       ],
@@ -13881,6 +14025,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control"
       ],
@@ -13928,6 +14073,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Reverbs"
       ],
@@ -14018,6 +14164,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Reverbs"
       ],
@@ -14117,6 +14264,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Filters>Pitch"
@@ -14198,6 +14346,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Reverbs"
       ],
@@ -14350,6 +14499,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -14446,6 +14596,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -14528,6 +14679,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -14609,6 +14761,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -14887,6 +15040,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -15205,6 +15359,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -15464,6 +15619,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -15611,6 +15767,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15749,6 +15906,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15865,6 +16023,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15983,6 +16142,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -16066,6 +16226,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -16191,6 +16352,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -16296,6 +16458,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -16398,6 +16561,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Random"
@@ -16503,6 +16667,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -16606,6 +16771,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -16708,6 +16874,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -16810,6 +16977,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -16870,6 +17038,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -16906,6 +17075,7 @@
       "fft_size": null,
       "convert_env": "interpolation",
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Envelopes"
       ],
@@ -17021,6 +17191,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -17176,6 +17347,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random"
       ],
@@ -17234,6 +17406,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -17358,6 +17531,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -17444,6 +17618,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -17524,6 +17699,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -17577,6 +17753,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -17736,6 +17913,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -17807,6 +17985,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut",
         "UGens>Triggers"
@@ -17862,6 +18041,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -17982,6 +18162,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -18102,6 +18283,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -18220,6 +18402,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Base"
       ],
@@ -18257,6 +18440,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Maths"
@@ -18381,6 +18565,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Conversion"
       ],
@@ -18428,6 +18613,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>User interaction"
       ],
@@ -18505,6 +18691,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Pitch"
       ],
@@ -18570,6 +18757,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -18615,6 +18803,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Filters>Linear"
@@ -18674,6 +18863,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18778,6 +18968,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -18901,6 +19092,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19004,6 +19196,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19107,6 +19300,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19210,6 +19404,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19312,6 +19507,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19466,6 +19662,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19569,6 +19766,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19672,6 +19870,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19776,6 +19975,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19899,6 +20099,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -20042,6 +20243,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -20166,6 +20368,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -20290,6 +20493,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20414,6 +20618,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20518,6 +20723,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20622,6 +20828,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20755,6 +20962,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20888,6 +21096,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters"
       ],
@@ -21041,6 +21250,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -21174,6 +21384,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters"
       ],
@@ -21326,6 +21537,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control"
       ],
@@ -21386,6 +21598,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -21451,6 +21664,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters"
       ],
@@ -21601,6 +21815,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -21695,6 +21910,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -21791,6 +22007,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21914,6 +22131,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22036,6 +22254,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22159,6 +22378,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -22282,6 +22502,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -22377,6 +22598,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Dynamics"
       ],
@@ -22446,6 +22668,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22549,6 +22772,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22651,6 +22875,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22753,6 +22978,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -22909,6 +23135,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -23022,6 +23249,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random"
       ],
@@ -23089,6 +23317,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -23216,6 +23445,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Envelopes"
       ],
@@ -23378,6 +23608,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Envelopes"
       ],
@@ -23466,6 +23697,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes"
       ],
@@ -23523,6 +23755,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -23565,6 +23798,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -23626,6 +23860,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -23696,6 +23931,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -23839,6 +24075,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -23970,6 +24207,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -24036,6 +24274,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis"
       ],
@@ -24090,6 +24329,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -24212,6 +24452,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -24240,6 +24481,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -24365,6 +24607,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -24527,6 +24770,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -24690,6 +24934,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters"
       ],
@@ -24848,6 +25093,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -24942,6 +25188,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>User interaction"
       ],
@@ -25009,6 +25256,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>User interaction"
       ],
@@ -25087,6 +25335,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>User interaction"
       ],
@@ -25164,6 +25413,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -25210,6 +25460,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Base"
       ],
@@ -25229,6 +25480,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Bela"
       ],
@@ -25351,6 +25603,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random"
       ],
@@ -25419,6 +25672,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -25455,6 +25709,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Dynamics"
       ],
@@ -25523,6 +25778,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -25559,6 +25815,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -25595,6 +25852,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -25631,6 +25889,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -25667,6 +25926,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -25703,6 +25963,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -25755,6 +26016,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -25817,6 +26079,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -25942,6 +26205,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -26064,6 +26328,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis"
       ],
@@ -26190,6 +26455,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -26329,6 +26595,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -26468,6 +26735,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -26554,6 +26822,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Base"
       ],
@@ -26596,6 +26865,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -26666,6 +26936,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -26721,6 +26992,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -26798,6 +27070,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -26875,6 +27148,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -26940,6 +27214,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -26996,6 +27271,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27017,6 +27293,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27085,6 +27362,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27133,6 +27411,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27189,6 +27468,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27244,6 +27524,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27302,6 +27583,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27357,6 +27639,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27444,6 +27727,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27552,6 +27836,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27609,6 +27894,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27667,6 +27953,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27725,6 +28012,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27782,6 +28070,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27847,6 +28136,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27904,6 +28194,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -27960,6 +28251,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28007,6 +28299,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28074,6 +28367,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28131,6 +28425,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28179,6 +28474,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28235,6 +28531,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28291,6 +28588,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28346,6 +28644,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28412,6 +28711,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28460,6 +28760,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28507,6 +28808,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28574,6 +28876,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28649,6 +28952,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28726,6 +29030,7 @@
       "fft_size": "chain",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28811,6 +29116,7 @@
       "fft_size": "input",
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -28872,6 +29178,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -28986,6 +29293,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -29124,6 +29432,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -29284,6 +29593,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -29422,6 +29732,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -29537,6 +29848,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -29613,6 +29925,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control"
       ],
@@ -29666,6 +29979,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control"
       ],
@@ -29711,6 +30025,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control",
         "UGens>Undocumented"
@@ -29757,6 +30072,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -29851,6 +30167,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -29945,6 +30262,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers",
         "UGens>Buffer"
@@ -30101,6 +30419,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -30182,6 +30501,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Pitch"
       ],
@@ -30330,6 +30650,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Pitch"
       ],
@@ -30432,6 +30753,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -30614,6 +30936,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Delays"
       ],
@@ -30725,6 +31048,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -30829,6 +31153,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -30951,6 +31276,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -31045,6 +31371,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -31160,6 +31487,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes"
       ],
@@ -31179,6 +31507,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens"
       ],
@@ -31200,6 +31529,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -31303,6 +31633,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -31405,6 +31736,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -31509,6 +31841,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -31653,6 +31986,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -31796,6 +32130,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -31834,6 +32169,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -31964,6 +32300,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random"
       ],
@@ -32022,6 +32359,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic",
         "UGens>Random"
@@ -32098,6 +32436,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic",
         "UGens>Random"
@@ -32230,6 +32569,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -32464,6 +32804,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -32552,6 +32893,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -32696,6 +33038,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -32839,6 +33182,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Ambisonics",
         "UGens>Multichannel>Panners"
@@ -32950,6 +33294,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -33045,6 +33390,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -33139,6 +33485,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis",
         "UGens>Maths"
@@ -33232,6 +33579,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -33435,6 +33783,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -33471,6 +33820,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -33506,6 +33856,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -33600,6 +33951,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -33703,6 +34055,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -33862,6 +34215,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Undocumented"
@@ -33955,6 +34309,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -34085,6 +34440,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -34174,6 +34530,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -34275,6 +34632,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -34403,6 +34761,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -34514,6 +34873,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes"
       ],
@@ -34559,6 +34919,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -34655,6 +35016,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -34775,6 +35137,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -34829,6 +35192,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -34883,6 +35247,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -35006,6 +35371,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Generators>Chaotic"
@@ -35131,6 +35497,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -35283,6 +35650,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis",
         "UGens>Filters>Linear",
@@ -35387,6 +35755,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -35432,6 +35801,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -35477,6 +35847,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT"
       ],
@@ -35552,6 +35923,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -35650,6 +36022,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -35790,6 +36163,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -35907,6 +36281,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -35999,6 +36374,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -36090,6 +36466,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -36261,6 +36638,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -36369,6 +36747,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Info"
       ],
@@ -36404,6 +36783,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Algebraic"
       ],
@@ -36445,6 +36825,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Algebraic"
       ],
@@ -36491,6 +36872,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -36586,6 +36968,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -36710,6 +37093,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Conversion",
         "UGens>Triggers"
@@ -36770,6 +37154,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Conversion",
         "UGens>Triggers"
@@ -36818,6 +37203,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -36954,6 +37340,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Triggers",
         "UGens>Delays"
@@ -37050,6 +37437,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Demand"
       ],
@@ -37204,6 +37592,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -37320,6 +37709,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -37442,6 +37832,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -37557,6 +37948,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -37672,6 +38064,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -37781,6 +38174,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Delays>Buffer"
@@ -37829,6 +38223,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -37903,6 +38298,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -37978,6 +38374,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -38072,6 +38469,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "unipolar",
       "categories": [
         "UGens>Triggers"
       ],
@@ -38168,6 +38566,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Synth control",
         "UGens>Undocumented"
@@ -38213,6 +38612,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -38358,6 +38758,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -38501,6 +38902,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Algebraic"
       ],
@@ -38538,6 +38940,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT",
         "UGens>Demand"
@@ -38611,6 +39014,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>FFT",
         "UGens>Demand"
@@ -38661,6 +39065,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -38742,6 +39147,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -38881,6 +39287,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -39041,6 +39448,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -39168,6 +39576,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -39311,6 +39720,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Generators>Stochastic",
@@ -39548,6 +39958,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": true,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -39686,6 +40097,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -39766,6 +40178,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "Undocumented classes"
       ],
@@ -39786,6 +40199,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Maths"
       ],
@@ -39947,6 +40361,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Buffer"
       ],
@@ -40065,6 +40480,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -40196,6 +40612,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Envelopes"
       ],
@@ -40359,6 +40776,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>InOut"
       ],
@@ -40461,6 +40879,7 @@
       "fft_size": null,
       "convert_env": null,
       "cant_alias": false,
+      "signal_range": "bipolar",
       "categories": [
         "UGens>Analysis>Pitch"
       ],
@@ -42325,6 +42744,1002 @@
         }
       ],
       "addable": "pseudo"
+    }
+  ],
+  "ugen_methods": [
+    {
+      "selector": "range",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": [
+        "LFGauss"
+      ]
+    },
+    {
+      "selector": "exprange",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0.01
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "curverange",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "curve",
+          "kind": "signal",
+          "default": {
+            "float": -4
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "unipolar",
+      "args": [
+        {
+          "name": "mul",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "bipolar",
+      "args": [
+        {
+          "name": "mul",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "linlin",
+      "args": [
+        {
+          "name": "inMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "inMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "clip",
+          "kind": "symbol",
+          "default": {
+            "symbol": "minmax"
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": [
+        "DUGen"
+      ]
+    },
+    {
+      "selector": "linexp",
+      "args": [
+        {
+          "name": "inMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "inMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "clip",
+          "kind": "symbol",
+          "default": {
+            "symbol": "minmax"
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": [
+        "DUGen"
+      ]
+    },
+    {
+      "selector": "explin",
+      "args": [
+        {
+          "name": "inMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "inMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "clip",
+          "kind": "symbol",
+          "default": {
+            "symbol": "minmax"
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": [
+        "DUGen"
+      ]
+    },
+    {
+      "selector": "expexp",
+      "args": [
+        {
+          "name": "inMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "inMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "clip",
+          "kind": "symbol",
+          "default": {
+            "symbol": "minmax"
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": [
+        "DUGen"
+      ]
+    },
+    {
+      "selector": "lincurve",
+      "args": [
+        {
+          "name": "inMin",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "inMax",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "outMin",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "outMax",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "curve",
+          "kind": "signal",
+          "default": {
+            "float": -4
+          }
+        },
+        {
+          "name": "clip",
+          "kind": "symbol",
+          "default": {
+            "symbol": "minmax"
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "curvelin",
+      "args": [
+        {
+          "name": "inMin",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "inMax",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "outMin",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "outMax",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "curve",
+          "kind": "signal",
+          "default": {
+            "float": -4
+          }
+        },
+        {
+          "name": "clip",
+          "kind": "symbol",
+          "default": {
+            "symbol": "minmax"
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "bilin",
+      "args": [
+        {
+          "name": "inCenter",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "inMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "inMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outCenter",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "outMax",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "clip",
+          "kind": "symbol",
+          "default": {
+            "symbol": "minmax"
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "prune",
+      "args": [
+        {
+          "name": "min",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "max",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "type",
+          "kind": "symbol",
+          "default": null
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "clip",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "Float",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "fold",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "Float",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "wrap",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "Float",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "lag",
+      "args": [
+        {
+          "name": "t1",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "t2",
+          "kind": "signal",
+          "default": null
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "lag2",
+      "args": [
+        {
+          "name": "t1",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "t2",
+          "kind": "signal",
+          "default": null
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "lag3",
+      "args": [
+        {
+          "name": "t1",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "t2",
+          "kind": "signal",
+          "default": null
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "lagud",
+      "args": [
+        {
+          "name": "lagTimeU",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "lagTimeD",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "lag2ud",
+      "args": [
+        {
+          "name": "lagTimeU",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "lagTimeD",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "lag3ud",
+      "args": [
+        {
+          "name": "lagTimeU",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "lagTimeD",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "varlag",
+      "args": [
+        {
+          "name": "time",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "curvature",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "warp",
+          "kind": "curve",
+          "default": {
+            "float": 5
+          }
+        },
+        {
+          "name": "start",
+          "kind": "signal",
+          "default": null
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "slew",
+      "args": [
+        {
+          "name": "up",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "down",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "blend",
+      "args": [
+        {
+          "name": "that",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "blendFrac",
+          "kind": "signal",
+          "default": {
+            "float": 0.5
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "Object",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "minNyquist",
+      "args": [],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "degrad",
+      "args": [],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "raddeg",
+      "args": [],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "moddif",
+      "args": [
+        {
+          "name": "that",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "mod",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "sanitize",
+      "args": [],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "poll",
+      "args": [
+        {
+          "name": "trig",
+          "kind": "signal",
+          "default": {
+            "float": 10
+          }
+        },
+        {
+          "name": "label",
+          "kind": "symbol",
+          "default": null
+        },
+        {
+          "name": "trigid",
+          "kind": "signal",
+          "default": {
+            "float": -1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "Array",
+      "overrides": []
+    },
+    {
+      "selector": "dpoll",
+      "args": [
+        {
+          "name": "label",
+          "kind": "symbol",
+          "default": null
+        },
+        {
+          "name": "run",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "trigid",
+          "kind": "signal",
+          "default": {
+            "float": -1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": "Array",
+      "overrides": []
+    },
+    {
+      "selector": "checkBadValues",
+      "args": [
+        {
+          "name": "id",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "post",
+          "kind": "signal",
+          "default": {
+            "float": 2
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "snap",
+      "args": [
+        {
+          "name": "resolution",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "margin",
+          "kind": "signal",
+          "default": {
+            "float": 0.050000000000000003
+          }
+        },
+        {
+          "name": "strength",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": null,
+      "overrides": []
+    },
+    {
+      "selector": "softRound",
+      "args": [
+        {
+          "name": "resolution",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "margin",
+          "kind": "signal",
+          "default": {
+            "float": 0.050000000000000003
+          }
+        },
+        {
+          "name": "strength",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": null,
+      "overrides": []
+    },
+    {
+      "selector": "binaryValue",
+      "args": [],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": null,
+      "overrides": []
+    },
+    {
+      "selector": "isPositive",
+      "args": [],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "isNegative",
+      "args": [],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "isStrictlyPositive",
+      "args": [],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "|==|",
+      "args": [
+        {
+          "name": "that",
+          "kind": "signal",
+          "default": null
+        }
+      ],
+      "addable": "pseudo",
+      "number": "Object",
+      "array": "Object",
+      "overrides": []
+    },
+    {
+      "selector": "degreeToKey",
+      "args": [
+        {
+          "name": "scale",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "stepsPerOctave",
+          "kind": "signal",
+          "default": {
+            "float": 12
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": "SimpleNumber",
+      "array": "SequenceableCollection",
+      "overrides": []
+    },
+    {
+      "selector": "if",
+      "args": [
+        {
+          "name": "trueUGen",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "falseUGen",
+          "kind": "signal",
+          "default": null
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": null,
+      "overrides": []
     }
   ]
 }

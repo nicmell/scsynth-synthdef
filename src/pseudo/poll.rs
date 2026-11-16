@@ -1,6 +1,6 @@
 //! The bodies of `Poll.sc`.
 
-use super::{Args, lang};
+use super::{Args, lang, sclang_class};
 use crate::builder::{NewUGen, SynthDefBuilder, symbol_codes};
 use crate::catalog;
 use crate::check_inputs;
@@ -69,29 +69,4 @@ fn new_poll(
         })?;
     }
     builder.add(NewUGen::new("Poll", rate).inputs(inputs))
-}
-
-/// The class of `input` in sclang, for a default label: `Integer` for a whole
-/// number in the range of an Integer, `Float` for another number,
-/// `OutputProxy` for an output of a `MultiOutUGen`, and else the class of
-/// the UGen of the output.
-fn sclang_class(builder: &SynthDefBuilder, input: &UGenInput) -> String {
-    match *input {
-        UGenInput::Number(number)
-            if number.fract() == 0.0 && number.abs() <= f64::from(i32::MAX) =>
-        {
-            "Integer".to_owned()
-        }
-        UGenInput::Number(_) => "Float".to_owned(),
-        ref output => {
-            let class = builder.class_of(output).unwrap_or("UGen");
-            let multi = catalog::lookup(class)
-                .is_some_and(|ugen| ugen.superclasses.contains(&"MultiOutUGen"));
-            if multi {
-                "OutputProxy".to_owned()
-            } else {
-                class.to_owned()
-            }
-        }
-    }
 }
