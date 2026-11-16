@@ -10,7 +10,7 @@ use scsynth_synthdef::{Version, read_def_file, write_def_file, write_def_file_ol
 #[test]
 fn every_golden_file_writes_back_to_its_bytes() {
     let files = common::golden_files();
-    assert_eq!(files.len(), 89, "{files:?}");
+    assert_eq!(files.len(), 95, "{files:?}");
     for path in files {
         let bytes = fs::read(&path).expect("a golden file reads");
         let file = read_def_file(&bytes).unwrap_or_else(|error| panic!("{path:?}: {error}"));

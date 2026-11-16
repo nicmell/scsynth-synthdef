@@ -1347,6 +1347,261 @@ try {
 		].do { |case| refused.(case[0], case[1]) };
 	}.value;
 
+	// The methods of UGen that build graphs, of 0.12, in functions of their
+	// own for the same reason. One more function holds them: six more in the
+	// function of the try overflow its selector table (measured).
+	{
+		{
+			writeCases.("ugenranges", [
+				[\ugenranges_bipolar, { Out.kr(0, SinOsc.kr(1).range(200, 800)) }],
+				[\ugenranges_unipolar, { Out.kr(0, LFPulse.kr(1).range(200, 800)) }],
+				// MouseY inherits the signalRange of MouseX.
+				[\ugenranges_inherited, { Out.kr(0, MouseY.kr.range(2, 4)) }],
+				// An OutputProxy and an operator are bipolar.
+				[\ugenranges_proxy, { Out.kr(0, Pan2.kr(LFPulse.kr(1))[0].range(2, 4)) }],
+				[\ugenranges_operator, { Out.kr(0, LFPulse.kr(1).neg.range(2, 4)) }],
+				[\ugenranges_defaults, { Out.ar(0, SinOsc.ar.range) }],
+				[\ugenranges_ugen, { Out.ar(0, SinOsc.ar.range(\lo.kr(2), \hi.kr(4))) }],
+				[\ugenranges_array, { Out.kr(0, SinOsc.kr(1).range(0, [1, 2])) }],
+				[\ugenranges_demand, {
+					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).range(0, 10)))
+				}],
+				[\ugenranges_exprange, { Out.kr(0, SinOsc.kr(1).exprange(20, 20000)) }],
+				[\ugenranges_exprange_unipolar, { Out.kr(0, LFPulse.kr(1).exprange(20, 20000)) }],
+				[\ugenranges_curverange, { Out.kr(0, SinOsc.kr(1).curverange(0, 1, -4)) }],
+				[\ugenranges_curverange_unipolar, { Out.kr(0, LFPulse.kr(1).curverange(2, 4, 2)) }],
+				[\ugenranges_curverange_ugen, { Out.kr(0, SinOsc.kr(1).curverange(0, 1, \c.kr(-4))) }],
+				[\ugenranges_unipolar_method, { Out.kr(0, SinOsc.kr(1).unipolar(2)) }],
+				[\ugenranges_bipolar_method, { Out.kr(0, LFPulse.kr(1).bipolar(2)) }],
+				[\ugenranges_bipolar_ugen, { Out.kr(0, SinOsc.kr(1).bipolar(\m.kr(2))) }],
+				// LFGauss has a range of its own, from the least value of its width.
+				[\ugenranges_gauss, { Out.ar(0, LFGauss.ar(0.01, 0.1).range(2, 4)) }],
+				[\ugenranges_gauss_ugen, { Out.ar(0, LFGauss.ar(0.01, \w.kr(0.1)).range(2, 4)) }],
+				[\ugenranges_gauss_exprange, { Out.ar(0, LFGauss.ar(0.01, 0.1).exprange(2, 4)) }],
+				// The messages that a method sends go to the class of the receiver.
+				[\ugenranges_gauss_unipolar, { Out.ar(0, LFGauss.ar(0.01, 0.1).unipolar(2)) }],
+				[\ugenranges_demand_exprange, {
+					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).exprange(2, 4)))
+				}]
+			]);
+		}.value;
+		{
+			var demand = { |func| Out.kr(0, Demand.kr(Impulse.kr(1), 0, func.(Dseq([1, 2], inf)))) };
+			writeCases.("ugenmaps", [
+				[\ugenmaps_linlin, { Out.kr(0, SinOsc.kr(1).linlin(-1, 1, 200, 800)) }],
+				[\ugenmaps_linlin_audio, { Out.ar(0, SinOsc.ar.linlin(-1, 1, 200, 800)) }],
+				[\ugenmaps_linlin_min, { Out.kr(0, SinOsc.kr(1).linlin(-1, 1, 200, 800, \min)) }],
+				[\ugenmaps_linlin_max, { Out.kr(0, SinOsc.kr(1).linlin(-1, 1, 200, 800, \max)) }],
+				[\ugenmaps_linlin_none, { Out.kr(0, SinOsc.kr(1).linlin(-1, 1, 200, 800, nil)) }],
+				[\ugenmaps_linlin_ugen, { Out.kr(0, SinOsc.kr(1).linlin(\a.kr(-1), 1, 200, \b.kr(800))) }],
+				[\ugenmaps_linexp, { Out.kr(0, SinOsc.kr(1).linexp(-1, 1, 20, 20000)) }],
+				[\ugenmaps_linexp_audio, { Out.ar(0, SinOsc.ar.linexp(-1, 1, 20, 20000, \min)) }],
+				[\ugenmaps_explin, { Out.kr(0, LFPulse.kr(1).explin(0.01, 1, 0, 1)) }],
+				[\ugenmaps_expexp, { Out.kr(0, LFPulse.kr(1).expexp(0.01, 1, 20, 20000)) }],
+				[\ugenmaps_lincurve, { Out.kr(0, SinOsc.kr(1).lincurve(-1, 1, 0, 1, -4)) }],
+				// A curve under 0.125 is linlin.
+				[\ugenmaps_lincurve_small, { Out.kr(0, SinOsc.kr(1).lincurve(-1, 1, 0, 1, 0.1)) }],
+				[\ugenmaps_lincurve_defaults, { Out.kr(0, SinOsc.kr(1).lincurve) }],
+				[\ugenmaps_lincurve_ugen, { Out.kr(0, SinOsc.kr(1).lincurve(-1, 1, 0, 1, \c.kr(-4))) }],
+				[\ugenmaps_lincurve_audio, { Out.ar(0, SinOsc.ar.lincurve(-1, 1, 0, 1, \c.kr(-4))) }],
+				[\ugenmaps_curvelin, { Out.kr(0, SinOsc.kr(1).curvelin(-1, 1, 0, 1, -4)) }],
+				[\ugenmaps_curvelin_small, { Out.kr(0, SinOsc.kr(1).curvelin(-1, 1, 0, 1, 0.1)) }],
+				[\ugenmaps_curvelin_ugen, { Out.kr(0, SinOsc.kr(1).curvelin(-1, 1, 0, 1, \c.kr(-4))) }],
+				[\ugenmaps_bilin, { Out.kr(0, SinOsc.kr(1).bilin(0, -1, 1, 0.2, 0, 1)) }],
+				[\ugenmaps_bilin_audio, { Out.ar(0, SinOsc.ar.bilin(0, -1, 1, 0.2, 0, 1, \max)) }],
+				[\ugenmaps_prune, {
+					Out.kr(0, [SinOsc.kr(1).prune(0, 1, \minmax), SinOsc.kr(2).prune(0, 1, \min),
+						SinOsc.kr(3).prune(0, 1, \max), SinOsc.kr(4).prune(0, 1)])
+				}],
+				// Clip, Fold and Wrap answer ir.
+				[\ugenmaps_clip, {
+					Out.kr(0, [SinOsc.kr(1).clip(0, 0.5), Rand(0, 2).clip, SinOsc.kr(2).clip(\lo.kr(0), 1)])
+				}],
+				[\ugenmaps_clip_audio, { Out.ar(0, SinOsc.ar.clip(-0.5, 0.5)) }],
+				[\ugenmaps_clip_demand, { demand.({ |d| d.clip(0, 1) }) }],
+				[\ugenmaps_fold, {
+					Out.kr(0, [SinOsc.kr(1).fold(0, 0.5), Rand(0, 2).fold(0, 1), SinOsc.kr(2).fold])
+				}],
+				[\ugenmaps_fold_audio, { Out.ar(0, SinOsc.ar.fold(-0.5, 0.5)) }],
+				[\ugenmaps_wrap, {
+					Out.kr(0, [SinOsc.kr(1).wrap(0, 0.5), Rand(0, 2).wrap, SinOsc.kr(2).wrap])
+				}],
+				[\ugenmaps_wrap_audio, { Out.ar(0, SinOsc.ar.wrap(-0.5, 0.5)) }],
+				// DUGen has linlin, linexp, explin and expexp of its own. Its expexp
+				// passes clip / inMin as the type of prune.
+				[\ugenmaps_demand_linlin, { demand.({ |d| d.linlin(0, 2, 2, 4) }) }],
+				[\ugenmaps_demand_linexp, { demand.({ |d| d.linexp(0, 2, 2, 4) }) }],
+				[\ugenmaps_demand_explin, { demand.({ |d| d.explin(1, 2, 2, 4) }) }],
+				[\ugenmaps_demand_expexp, { demand.({ |d| d.expexp(1, 2, 2, 4) }) }],
+				[\ugenmaps_demand_lincurve, { demand.({ |d| d.lincurve(0, 2, 2, 4, -4) }) }],
+				[\ugenmaps_demand_lincurve_small, { demand.({ |d| d.lincurve(0, 2, 2, 4, 0.1) }) }]
+			]);
+		}.value;
+		{
+			writeCases.("ugenlags", [
+				[\ugenlags_lag, { Out.kr(0, \x.kr(1).lag(0.2)) }],
+				[\ugenlags_lag_defaults, { Out.kr(0, SinOsc.kr(1).lag) }],
+				// No passthrough: a lag of 0 adds its Lag.
+				[\ugenlags_lag_zero, { Out.kr(0, \x.kr(1).lag(0)) }],
+				[\ugenlags_lag_ud, { Out.kr(0, \x.kr(1).lag(0.1, 0.2)) }],
+				[\ugenlags_lag2, { Out.kr(0, [\x.kr(1).lag2(0.1), \y.kr(1).lag2(0.1, 0.2)]) }],
+				[\ugenlags_lag3, { Out.kr(0, [\x.kr(1).lag3(0.1), \y.kr(1).lag3(0.1, 0.2)]) }],
+				[\ugenlags_lagud, {
+					Out.kr(0, [\x.kr(1).lagud, \y.kr(1).lag2ud(0.1, 0.3), \z.kr(1).lag3ud(0, 0)])
+				}],
+				[\ugenlags_audio, { Out.ar(0, SinOsc.ar.lag(0.01)) }],
+				// At the rate of the receiver, scalar and demand too.
+				[\ugenlags_scalar, { Out.kr(0, Rand(0, 1).lag(0.1)) }],
+				[\ugenlags_demand, { Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).lag(0.1))) }],
+				[\ugenlags_varlag, { Out.kr(0, \x.kr(1).varlag(0.2, 2)) }],
+				[\ugenlags_varlag_defaults, { Out.kr(0, \x.kr(1).varlag) }],
+				[\ugenlags_varlag_zero, { Out.kr(0, \x.kr(1).varlag(0)) }],
+				[\ugenlags_varlag_start, { Out.kr(0, \x.kr(1).varlag(0.2, 0, \lin, 0.5)) }],
+				[\ugenlags_slew, { Out.kr(0, [SinOsc.kr(1).slew, SinOsc.kr(2).slew(2, 3)]) }],
+				[\ugenlags_slew_audio, { Out.ar(0, SinOsc.ar.slew(100, 100)) }],
+				[\ugenlags_ugen_time, { Out.kr(0, \x.kr(1).lag(\t.kr(0.1))) }],
+				[\ugenlags_array_time, { Out.kr(0, \x.kr(1).lag([0.1, 0.2])) }],
+				[\ugenlags_varlag_audio, { Out.ar(0, SinOsc.ar.varlag(0.2)) }]
+			]);
+		}.value;
+		{
+			var demand = { |func| Out.kr(0, Demand.kr(Impulse.kr(1), 0, func.(Dseq([1, 2], inf)))) };
+			writeCases.("ugenmisc", [
+				[\ugenmisc_blend, { Out.kr(0, SinOsc.kr(1).blend(SinOsc.kr(2), 0.25)) }],
+				[\ugenmisc_blend_audio, { Out.ar(0, SinOsc.ar.blend(SinOsc.ar(2))) }],
+				[\ugenmisc_blend_number, { Out.kr(0, SinOsc.kr(1).blend(0.5, 0.25)) }],
+				[\ugenmisc_blend_ugen, { Out.kr(0, SinOsc.kr(1).blend(SinOsc.kr(2), \f.kr(0.5))) }],
+				[\ugenmisc_minnyquist, { Out.kr(0, \f.kr(1000).minNyquist) }],
+				[\ugenmisc_degrad, { Out.kr(0, [SinOsc.kr(1).degrad, SinOsc.kr(2).raddeg]) }],
+				[\ugenmisc_moddif, {
+					Out.kr(0, [SinOsc.kr(1).moddif(0.5), Rand(0, 1).moddif]);
+					Out.ar(0, SinOsc.ar.moddif(0.5, 2))
+				}],
+				[\ugenmisc_moddif_demand, { demand.({ |d| d.moddif(1, 3) }) }],
+				[\ugenmisc_sanitize, { Out.kr(0, SinOsc.kr(1).sanitize); Out.ar(0, SinOsc.ar.sanitize) }],
+				[\ugenmisc_poll, { Out.kr(0, SinOsc.kr(1).poll) }],
+				[\ugenmisc_poll_args, { Out.kr(0, SinOsc.kr(1).poll(Impulse.kr(2), "x", 3)) }],
+				[\ugenmisc_dpoll, { demand.({ |d| d.dpoll }) }],
+				[\ugenmisc_checkbadvalues, {
+					Out.kr(0, SinOsc.kr(1).checkBadValues);
+					Out.ar(0, SinOsc.ar.checkBadValues(1, 0))
+				}],
+				// At scalar or demand rate it adds nothing.
+				[\ugenmisc_checkbadvalues_scalar, { Out.kr(0, Rand(0, 1).checkBadValues) }],
+				[\ugenmisc_checkbadvalues_demand, { demand.({ |d| d.checkBadValues }) }],
+				[\ugenmisc_snap, { Out.kr(0, [SinOsc.kr(1).snap, SinOsc.kr(2).softRound(0.5, 0.1, 0.5)]) }],
+				[\ugenmisc_snap_scalar, { Out.kr(0, Rand(0, 1).snap) }],
+				[\ugenmisc_snap_demand, { demand.({ |d| d.snap }) }],
+				[\ugenmisc_binaryvalue, { Out.kr(0, SinOsc.kr(1).binaryValue) }],
+				[\ugenmisc_signs, {
+					Out.kr(0, [SinOsc.kr(1).isPositive, SinOsc.kr(2).isNegative,
+						SinOsc.kr(3).isStrictlyPositive])
+				}],
+				[\ugenmisc_lazy_equals, { Out.kr(0, SinOsc.kr(1) |==| 0.5) }],
+				[\ugenmisc_degreetokey, { Out.kr(0, SinOsc.kr(1).degreeToKey(0)) }],
+				[\ugenmisc_degreetokey_audio, { Out.kr(0, SinOsc.ar.degreeToKey(0, 7)) }],
+				[\ugenmisc_if, { Out.kr(0, (SinOsc.kr(1) > 0).if(200, 400)) }],
+				[\ugenmisc_if_ugen, { Out.kr(0, (SinOsc.kr(1) > 0).if(SinOsc.kr(2), 400)) }],
+				[\ugenmisc_snap_audio, { Out.ar(0, SinOsc.ar.snap(0.5)) }]
+			]);
+		}.value;
+		{
+			writeCases.("ugenreceivers", [
+				// An array: a flop of the receiver and the arguments.
+				[\ugenreceivers_range, { Out.kr(0, [SinOsc.kr(1), LFPulse.kr(1)].range(0, [1, 2])) }],
+				[\ugenreceivers_wraps, { Out.kr(0, [SinOsc.kr(1)].range(0, [1, 2, 3])) }],
+				[\ugenreceivers_nested, {
+					Out.kr(0, [[SinOsc.kr(1), SinOsc.kr(2)], SinOsc.kr(3)].range(2, 4).flat)
+				}],
+				[\ugenreceivers_number, { Out.kr(0, [SinOsc.kr(1), 0.5].lag(0.2)) }],
+				[\ugenreceivers_linlin, { Out.kr(0, [SinOsc.kr(1), 0.25].linlin(0, 1, 200, 800)) }],
+				[\ugenreceivers_unary, {
+					Out.kr(0, [SinOsc.kr(1), 0.5].degrad ++ [SinOsc.kr(2), LFSaw.kr(2)].isPositive)
+				}],
+				[\ugenreceivers_lazy_equals, { Out.kr(0, [SinOsc.kr(1), SinOsc.kr(2)] |==| SinOsc.kr(3)) }],
+				[\ugenreceivers_minnyquist, { Out.kr(0, [\f.kr(1000), \g.kr(2000)].minNyquist) }],
+				[\ugenreceivers_poll, { Out.kr(0, [SinOsc.kr(1), SinOsc.kr(2)].poll) }],
+				[\ugenreceivers_dpoll, {
+					Out.kr(0, Demand.kr(Impulse.kr(1), 0, [Dseq([1, 2], inf), Dseq([3, 4], inf)].dpoll))
+				}],
+				[\ugenreceivers_degreetokey, { Out.kr(0, [SinOsc.kr(1), SinOsc.kr(2)].degreeToKey(0)) }],
+				[\ugenreceivers_checkbadvalues, {
+					Out.kr(0, [SinOsc.kr(1), SinOsc.kr(2)].checkBadValues(0, [1, 2]))
+				}],
+				[\ugenreceivers_sanitize, { Out.kr(0, [SinOsc.kr(1), SinOsc.kr(2)].sanitize) }],
+				// A number: the methods of Float, SimpleNumber and Object.
+				[\ugenreceivers_numbers, {
+					Out.kr(0, [0.25.linlin(0, 1, 200, 800), 0.5.linexp(0, 1, 20, 20000),
+						0.5.explin(0.01, 1, 0, 1), 0.5.expexp(0.01, 1, 20, 20000),
+						0.5.lincurve(0, 1, 0, 1, -4), 0.5.curvelin(0, 1, 0, 1, -4),
+						0.75.bilin(0.5, 0, 1, 0.2, 0, 1), 0.25.bilin(0.5, 0, 1, 0.2, 0, 1)])
+				}],
+				[\ugenreceivers_clips, {
+					Out.kr(0, [1.5.linlin(0, 1, 200, 800), -0.5.linlin(0, 1, 2, 4, \max),
+						1.5.clip(0, 1), 1.5.fold(0, 1), 1.5.wrap(0, 1), 0.5.lincurve(0, 1, 0, 1, 0.0001)])
+				}],
+				[\ugenreceivers_number_ugen, { Out.kr(0, 0.5.linlin(0, 1, \lo.kr(200), 800)) }],
+				[\ugenreceivers_number_misc, {
+					Out.kr(0, [0.5.lag(0.1), 0.5.varlag(0.1), 0.5.blend(1, 0.25), 90.degrad, 1.raddeg,
+						0.5.moddif(0.9), 0.97.snap, 0.97.softRound, -0.5.binaryValue,
+						2.5.degreeToKey([0, 2, 4, 5, 7, 9, 11])])
+				}],
+				[\ugenreceivers_number_blend, { Out.kr(0, 0.5.blend(SinOsc.kr(1), 0.25)) }],
+				[\ugenreceivers_number_poll, { Out.kr(0, 0.5.poll) }],
+				[\ugenreceivers_number_lazy_equals, { Out.kr(0, 0.5 |==| SinOsc.kr(1)) }]
+			]);
+		}.value;
+		{
+			var env = Env([0, 1, 0.5], [1, 1]);
+			writeCases.("envranges", [
+				[\envranges_range, { Out.kr(0, EnvGen.kr(env.range(2, 4))) }],
+				[\envranges_exprange, { Out.kr(0, EnvGen.kr(env.exprange(0.01, 1))) }],
+				[\envranges_curverange, { Out.kr(0, EnvGen.kr(env.curverange(0, 1, -4))) }],
+				[\envranges_defaults, { Out.kr(0, EnvGen.kr(Env.perc.range)) }],
+				[\envranges_ugen, { Out.kr(0, EnvGen.kr(env.range(\lo.kr(2), 4))) }],
+				[\envranges_adsr, { Out.kr(0, EnvGen.kr(Env.adsr.range(2, 4), \gate.kr(1))) }]
+			]);
+			[
+				[\refused_range_number, { Out.kr(0, 0.5.range(0, 1)) }],
+				[\refused_fold_demand, {
+					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).fold(0, 1)))
+				}],
+				[\refused_wrap_demand, {
+					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).wrap(0, 1)))
+				}],
+				[\refused_blend_demand, {
+					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).blend(1)))
+				}],
+				[\refused_blend_demand_that, { Out.kr(0, SinOsc.kr(1).blend(Dseq([1, 2], inf))) }],
+				// XFade2 takes two inputs at audio rate, so the branch of that at audio
+				// rate always throws.
+				[\refused_blend_control_that, { Out.ar(0, SinOsc.ar.blend(SinOsc.kr(2))) }],
+				[\refused_blend_audio_that, { Out.ar(0, SinOsc.kr(2).blend(SinOsc.ar, 0.25)) }],
+				// Changed.kr refuses an input at scalar rate.
+				[\refused_varlag_scalar, { Out.kr(0, Rand(0, 1).varlag(0.2)) }],
+				[\refused_clip_number_ugen, { Out.kr(0, 0.5.clip(0, \hi.kr(1))) }],
+				[\refused_ispositive_number, { Out.kr(0, 0.5.isPositive) }],
+				[\refused_lazy_equals_numbers, { Out.kr(0, 0.5 |==| 0.5) }],
+				[\refused_snap_array, { Out.kr(0, [SinOsc.kr(1)].snap) }],
+				[\refused_linlin_number_test, { Out.kr(0, 0.5.linlin(\lo.kr(0), 1, 2, 4)) }],
+				[\refused_env_range_ugen, {
+					Out.kr(0, EnvGen.kr(Env([0, \l.kr(1), 0], [1, 1]).range(2, 4)))
+				}],
+				// Broken: these write no Out.
+				[\refused_blend_scalar, { Out.kr(0, Rand(0, 1).blend(Rand(0, 1))) }],
+				[\refused_sanitize_scalar, { Out.kr(0, Rand(0, 1).sanitize) }],
+				[\refused_sanitize_demand, {
+					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).sanitize))
+				}],
+				[\refused_lincurve_scalar, { Out.kr(0, Rand(0, 1).lincurve(curve: \c.kr(1))) }],
+				[\refused_curvelin_demand, {
+					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).curvelin(curve: \c.kr(1))))
+				}],
+				[\refused_bilin_scalar, { Out.kr(0, Rand(0, 1).bilin(0.5, 0, 1, 0.2, 0, 1)) }]
+			].do { |case| refused.(case[0], case[1]) };
+		}.value;
+	}.value;
+
 	writeArithmetic.();
 
 	"fixtures.scd: wrote % golden files to %".format(written, fixtures).postln;
