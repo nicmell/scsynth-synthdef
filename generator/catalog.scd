@@ -8,11 +8,8 @@
 //
 // SC_SOURCE names the clone of SuperCollider, ~/Projects/supercollider by
 // default. The script reads its files at the tag Version-3.14.1, whatever is
-// checked out. It exits with 1 if sclang is not 3.14.1, if a class or a
-// method comes from outside the core class library, if sclang and the
-// sources disagree on an operator, or if a table below misses an entry. It
-// also exits with 1 if a plugin sets the flag of aliasing in another way
-// than its two macros, or for a class outside the core.
+// checked out. It exits with 1 when a check fails, and the section "The
+// catalogue" of the README tells the checks.
 (
 var root = thisProcess.nowExecutingPath.dirname.dirname;
 var source = "SC_SOURCE".getenv ? "~/Projects/supercollider".standardizePath;
@@ -462,6 +459,7 @@ var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, co
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansionOf, wiring;
 var testPassthrough, testSilence, testAudioTogether;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
+var entryFor, number, requireEntries, describeMethods;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
 var classes, pseudoClasses, specs, envs, ranges, pvs, ugens, addable = 0, methods = 0, pseudo = 0;
 var helpDir, json;
@@ -592,6 +590,40 @@ try {
 	};
 
 	// The class that owns a class method.
+	// The entry of `table` for the method `selector` of `owner`, and for the
+	// argument `name` when there is one.
+	entryFor = { |table, owner, selector, name|
+		table.detect { |entry|
+			entry[0] == owner.name and: { entry[1] == selector }
+				and: { name.isNil or: { entry[2] == name } }
+		}
+	};
+	// A number of JSON, with nan and the infinities as text.
+	number = { |value|
+		case
+			{ value.isNaN } { "nan" }
+			{ value == inf } { "inf" }
+			{ value == -inf } { "-inf" }
+			{ value }
+	};
+	// Each of `methods` needs an entry in `table` or in `others`.
+	requireEntries = { |methods, prefix, table, others, tableName, othersName|
+		methods.do { |method|
+			if (table.includes(method.name).not
+				and: { others.any { |entry| entry[0] == method.name }.not }) {
+				fail.("%% needs an entry in % or %".format(prefix, method.name, tableName, othersName));
+			};
+		};
+	};
+	// The methods `selectors` of `owner`, which `find` finds, with their
+	// arguments, for a body of the crate.
+	describeMethods = { |owner, selectors, find, noun|
+		selectors.collect { |selector|
+			var method = find.(selector);
+			if (method.isNil) { fail.("% has no % %".format(owner.name, noun, selector)) };
+			describeArgs.(owner, selector, method, owner)[1] ++ [\addable -> "pseudo"]
+		}
+	};
 	methodOwner = { |method| method.ownerClass.name.asString.drop(5).asSymbol.asClass };
 
 	// The UGen class that owns a class method, or nil for Object and the like.
@@ -604,14 +636,8 @@ try {
 
 	kindsOf = { |owner, selector, names|
 		names.collect { |name|
-			var entry = argumentKinds.detect { |entry|
-				entry[0] == owner.name and: { entry[1] == selector } and: { entry[2] == name }
-			};
-			var named = { |table|
-				table.any { |entry|
-					entry[0] == owner.name and: { entry[1] == selector } and: { entry[2] == name }
-				}
-			};
+			var entry = entryFor.(argumentKinds, owner, selector, name);
+			var named = { |table| entryFor.(table, owner, selector, name).notNil };
 			case
 			{ entry.notNil } { entry[3] }
 			{ named.(audioRateInputs) } { \audio }
@@ -1066,17 +1092,10 @@ try {
 						{ value.isNil } { nil }
 						{ value === true or: { value === false } } { [\bool -> value] }
 						{ value.isKindOf(Symbol) } { [\symbol -> value] }
-						{ value.isString } { [\string -> value] }
 						{ value.isKindOf(ArrayedCollection) and: { value.every(_.isNumber) } } {
 							[\floats -> value]
 						}
-						{ value.isNumber } {
-							[\float -> case
-								{ value.isNaN } { "nan" }
-								{ value == inf } { "inf" }
-								{ value == -inf } { "-inf" }
-								{ value }]
-						}
+						{ value.isNumber } { [\float -> number.(value)] }
 						{ fail.("%.% % has the default %".format(class, selector, name, value)) }
 				]
 			}
@@ -1089,11 +1108,9 @@ try {
 		var owner = ugenOwner.(method);
 		var described = describeArgs.(class, selector, method, owner);
 		var names = (method.argNames ? []).drop(1).asArray;
-		var through = passthroughs.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
-		var silent = silentZeros.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
-		var together = audioTogether.detect { |entry|
-			entry[0] == owner.name and: { entry[1] == selector }
-		};
+		var through = entryFor.(passthroughs, owner, selector);
+		var silent = entryFor.(silentZeros, owner, selector);
+		var together = entryFor.(audioTogether, owner, selector);
 		var wired, input, zero, position, positions, refusal;
 		methods = methods + 1;
 		if (bodies.includes(class.name)) {
@@ -1290,13 +1307,6 @@ try {
 	// has specs.
 	specs = Spec.specs.keys.asArray.sort.collect { |name|
 		var spec = Spec.specs[name], warp;
-		var number = { |value|
-			case
-				{ value.isNaN } { "nan" }
-				{ value == inf } { "inf" }
-				{ value == -inf } { "-inf" }
-				{ value }
-		};
 		if (spec.class != ControlSpec) {
 			fail.("the spec % is a %, not a ControlSpec".format(name, spec.class));
 		};
@@ -1314,57 +1324,29 @@ try {
 			\units -> spec.units
 		]
 	};
-	// The class methods of Env that make an envelope, with their arguments.
-	Env.class.methods.do { |method|
-		if (envMethods.includes(method.name).not
-			and: { notEnvMethods.any { |entry| entry[0] == method.name }.not }) {
-			fail.("Env.% needs an entry in envMethods or notEnvMethods".format(method.name));
-		};
-	};
-	// The instance methods of PV_ChainUGen that take a function, with their
-	// arguments.
-	PV_ChainUGen.methods.do { |method|
-		if (pvMethods.includes(method.name).not
-			and: { notPvMethods.any { |entry| entry[0] == method.name }.not }) {
-			fail.("PV_ChainUGen:% needs an entry in pvMethods or notPvMethods".format(method.name));
-		};
-	};
-	pvs = pvMethods.collect { |selector|
-		var method = PV_ChainUGen.findMethod(selector);
-		if (method.isNil) { fail.("PV_ChainUGen has no method %".format(selector)) };
-		describeArgs.(PV_ChainUGen, selector, method, PV_ChainUGen)[1] ++ [\addable -> "pseudo"]
-	};
-	// The instance methods of UGen that build graphs, with their arguments,
+	// The class methods of Env that make an envelope, the instance methods of
+	// PV_ChainUGen that take a function, and the instance methods of UGen
+	// that build graphs, with their arguments. For the methods of UGen, also
 	// the classes whose methods a Float and an Array answer, and the
 	// subclasses of UGen with a method of their own.
-	UGen.methods.do { |method|
-		if (ugenMethods.includes(method.name).not
-			and: { notUgenMethods.any { |entry| entry[0] == method.name }.not }) {
-			fail.("UGen:% needs an entry in ugenMethods or notUgenMethods".format(method.name));
-		};
-	};
-	ugens = ugenMethods.collect { |selector|
-		var method = UGen.findMethod(selector);
+	requireEntries.(Env.class.methods, "Env.", envMethods, notEnvMethods, "envMethods", "notEnvMethods");
+	requireEntries.(PV_ChainUGen.methods, "PV_ChainUGen:", pvMethods, notPvMethods,
+		"pvMethods", "notPvMethods");
+	requireEntries.(UGen.methods, "UGen:", ugenMethods, notUgenMethods,
+		"ugenMethods", "notUgenMethods");
+	pvs = describeMethods.(PV_ChainUGen, pvMethods, PV_ChainUGen.findMethod(_), "method");
+	ugens = describeMethods.(UGen, ugenMethods, UGen.findMethod(_), "method").collect { |entry, index|
+		var selector = ugenMethods[index];
 		var owner = { |class| class.findRespondingMethodFor(selector) !? { |found| found.ownerClass.name } };
 		var overrides = UGen.allSubclasses.collect(owner).reject { |name| name == \UGen };
-		if (method.isNil) { fail.("UGen has no method %".format(selector)) };
-		describeArgs.(UGen, selector, method, UGen)[1] ++ [
-			\addable -> "pseudo",
+		entry ++ [
 			\number -> owner.(Float),
 			\array -> owner.(Array),
 			\overrides -> overrides.asSet.asArray.sort
 		]
 	};
-	envs = envMethods.collect { |selector|
-		var method = Env.class.findMethod(selector);
-		if (method.isNil) { fail.("Env has no class method %".format(selector)) };
-		describeArgs.(Env, selector, method, Env)[1] ++ [\addable -> "pseudo"]
-	};
-	ranges = envRanges.collect { |selector|
-		var method = Env.findMethod(selector);
-		if (method.isNil) { fail.("Env has no method %".format(selector)) };
-		describeArgs.(Env, selector, method, Env)[1] ++ [\addable -> "pseudo"]
-	};
+	envs = describeMethods.(Env, envMethods, Env.class.findMethod(_), "class method");
+	ranges = describeMethods.(Env, envRanges, Env.findMethod(_), "method");
 
 	json = toJSON.([
 		\sclang -> Main.version,

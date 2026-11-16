@@ -135,6 +135,7 @@ try {
 			['%', "mod"], ['round', "round"], ['trunc', "trunc"], ['roundUp', "roundUp"],
 			['fold2', "fold2"], ['max', "max"], ['min', "min"], ['absdif', "absdif"]];
 		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin, \exp, \log, \squared, \sign];
+		var ranges = [[0.0, 1.0], [-1.0, 1.0], [0.5, 2.0]];
 		var sections = List.new;
 		sections.add("  \"binary\": [\n" ++ binary.collect { |op|
 			values.collect { |a|
@@ -146,28 +147,18 @@ try {
 		sections.add("  \"unary\": [\n" ++ unary.collect { |op|
 			values.collect { |a| "    " ++ row.([op.asString, bits.(a), bits.(a.perform(op))]) }
 		}.flatten.join(",\n") ++ "\n  ]");
-		sections.add("  \"clip\": [\n" ++ values.collect { |x|
-			[[0.0, 1.0], [-1.0, 1.0], [0.5, 2.0]].collect { |range|
-				"    " ++ row.([x, range[0], range[1], x.clip(range[0], range[1])].collect(bits))
-			}
-		}.flatten.join(",\n") ++ "\n  ]");
-		[\fold, \wrap].do { |op|
+		[
+			[\clip, ranges], [\fold, ranges], [\wrap, ranges],
+			[\moddif, [[0.0, 1.0], [1.0, 3.0], [2.0, 3.0]]],
+			[\linlin, [[0.0, 1.0, -1.0, 1.0], [-1.0, 1.0, 0.0, 10.0]]]
+		].do { |entry|
+			var op = entry[0];
 			sections.add("  \"" ++ op ++ "\": [\n" ++ values.collect { |x|
-				[[0.0, 1.0], [-1.0, 1.0], [0.5, 2.0]].collect { |range|
-					"    " ++ row.([x, range[0], range[1], x.perform(op, range[0], range[1])].collect(bits))
+				entry[1].collect { |args|
+					"    " ++ row.(([x] ++ args ++ [x.perform(op, *args)]).collect(bits))
 				}
 			}.flatten.join(",\n") ++ "\n  ]");
 		};
-		sections.add("  \"moddif\": [\n" ++ values.collect { |x|
-			[[0.0, 1.0], [1.0, 3.0], [2.0, 3.0]].collect { |pair|
-				"    " ++ row.([x, pair[0], pair[1], x.moddif(pair[0], pair[1])].collect(bits))
-			}
-		}.flatten.join(",\n") ++ "\n  ]");
-		sections.add("  \"linlin\": [\n" ++ values.collect { |x|
-			[[0.0, 1.0, -1.0, 1.0], [-1.0, 1.0, 0.0, 10.0]].collect { |range|
-				"    " ++ row.(([x] ++ range ++ [x.linlin(*range)]).collect(bits))
-			}
-		}.flatten.join(",\n") ++ "\n  ]");
 		File.use(fixtures +/+ "arithmetic.json", "w", { |file|
 			file.write("{\n" ++ sections.join(",\n") ++ "\n}\n");
 		});
@@ -1358,6 +1349,7 @@ try {
 	// own for the same reason. One more function holds them: six more in the
 	// function of the try overflow its selector table (measured).
 	{
+		var demand = { |func| Out.kr(0, Demand.kr(Impulse.kr(1), 0, func.(Dseq([1, 2], inf)))) };
 		{
 			writeCases.("ugenranges", [
 				[\ugenranges_bipolar, { Out.kr(0, SinOsc.kr(1).range(200, 800)) }],
@@ -1370,9 +1362,7 @@ try {
 				[\ugenranges_defaults, { Out.ar(0, SinOsc.ar.range) }],
 				[\ugenranges_ugen, { Out.ar(0, SinOsc.ar.range(\lo.kr(2), \hi.kr(4))) }],
 				[\ugenranges_array, { Out.kr(0, SinOsc.kr(1).range(0, [1, 2])) }],
-				[\ugenranges_demand, {
-					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).range(0, 10)))
-				}],
+				[\ugenranges_demand, { demand.({ |d| d.range(0, 10) }) }],
 				[\ugenranges_exprange, { Out.kr(0, SinOsc.kr(1).exprange(20, 20000)) }],
 				[\ugenranges_exprange_unipolar, { Out.kr(0, LFPulse.kr(1).exprange(20, 20000)) }],
 				[\ugenranges_curverange, { Out.kr(0, SinOsc.kr(1).curverange(0, 1, -4)) }],
@@ -1387,13 +1377,10 @@ try {
 				[\ugenranges_gauss_exprange, { Out.ar(0, LFGauss.ar(0.01, 0.1).exprange(2, 4)) }],
 				// The messages that a method sends go to the class of the receiver.
 				[\ugenranges_gauss_unipolar, { Out.ar(0, LFGauss.ar(0.01, 0.1).unipolar(2)) }],
-				[\ugenranges_demand_exprange, {
-					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).exprange(2, 4)))
-				}]
+				[\ugenranges_demand_exprange, { demand.({ |d| d.exprange(2, 4) }) }]
 			]);
 		}.value;
 		{
-			var demand = { |func| Out.kr(0, Demand.kr(Impulse.kr(1), 0, func.(Dseq([1, 2], inf)))) };
 			writeCases.("ugenmaps", [
 				[\ugenmaps_linlin, { Out.kr(0, SinOsc.kr(1).linlin(-1, 1, 200, 800)) }],
 				[\ugenmaps_linlin_audio, { Out.ar(0, SinOsc.ar.linlin(-1, 1, 200, 800)) }],
@@ -1459,7 +1446,7 @@ try {
 				[\ugenlags_audio, { Out.ar(0, SinOsc.ar.lag(0.01)) }],
 				// At the rate of the receiver, scalar and demand too.
 				[\ugenlags_scalar, { Out.kr(0, Rand(0, 1).lag(0.1)) }],
-				[\ugenlags_demand, { Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).lag(0.1))) }],
+				[\ugenlags_demand, { demand.({ |d| d.lag(0.1) }) }],
 				[\ugenlags_varlag, { Out.kr(0, \x.kr(1).varlag(0.2, 2)) }],
 				[\ugenlags_varlag_defaults, { Out.kr(0, \x.kr(1).varlag) }],
 				[\ugenlags_varlag_zero, { Out.kr(0, \x.kr(1).varlag(0)) }],
@@ -1472,7 +1459,6 @@ try {
 			]);
 		}.value;
 		{
-			var demand = { |func| Out.kr(0, Demand.kr(Impulse.kr(1), 0, func.(Dseq([1, 2], inf)))) };
 			writeCases.("ugenmisc", [
 				[\ugenmisc_blend, { Out.kr(0, SinOsc.kr(1).blend(SinOsc.kr(2), 0.25)) }],
 				[\ugenmisc_blend_audio, { Out.ar(0, SinOsc.ar.blend(SinOsc.ar(2))) }],
@@ -1570,15 +1556,9 @@ try {
 			]);
 			[
 				[\refused_range_number, { Out.kr(0, 0.5.range(0, 1)) }],
-				[\refused_fold_demand, {
-					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).fold(0, 1)))
-				}],
-				[\refused_wrap_demand, {
-					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).wrap(0, 1)))
-				}],
-				[\refused_blend_demand, {
-					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).blend(1)))
-				}],
+				[\refused_fold_demand, { demand.({ |d| d.fold(0, 1) }) }],
+				[\refused_wrap_demand, { demand.({ |d| d.wrap(0, 1) }) }],
+				[\refused_blend_demand, { demand.({ |d| d.blend(1) }) }],
 				[\refused_blend_demand_that, { Out.kr(0, SinOsc.kr(1).blend(Dseq([1, 2], inf))) }],
 				// XFade2 takes two inputs at audio rate, so the branch of that at audio
 				// rate always throws.
@@ -1597,13 +1577,9 @@ try {
 				// Broken: these write no Out.
 				[\refused_blend_scalar, { Out.kr(0, Rand(0, 1).blend(Rand(0, 1))) }],
 				[\refused_sanitize_scalar, { Out.kr(0, Rand(0, 1).sanitize) }],
-				[\refused_sanitize_demand, {
-					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).sanitize))
-				}],
+				[\refused_sanitize_demand, { demand.({ |d| d.sanitize }) }],
 				[\refused_lincurve_scalar, { Out.kr(0, Rand(0, 1).lincurve(curve: \c.kr(1))) }],
-				[\refused_curvelin_demand, {
-					Out.kr(0, Demand.kr(Impulse.kr(1), 0, Dseq([1, 2], inf).curvelin(curve: \c.kr(1))))
-				}],
+				[\refused_curvelin_demand, { demand.({ |d| d.curvelin(curve: \c.kr(1)) }) }],
 				[\refused_bilin_scalar, { Out.kr(0, Rand(0, 1).bilin(0.5, 0, 1, 0.2, 0, 1)) }]
 			].do { |case| refused.(case[0], case[1]) };
 		}.value;
