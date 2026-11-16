@@ -1,8 +1,8 @@
 // generator/probes.scd: the probes that measure the UGen classes in sclang
-// 3.14.1, for generator/catalog.scd. The file answers a function of the
-// tables of a catalogue, and that function answers an Event of the functions
-// that the script calls. The section "The catalogue" of the README tells the
-// checks.
+// 3.14.1, for generator/catalog.scd and generator/sc3_plugins/catalog.scd.
+// The file answers a function of the tables of a catalogue, and that
+// function answers an Event of the functions that the scripts call. The
+// section "The catalogue" of the README tells the checks.
 { |tables|
 	var fail = tables[\fail];
 	var argumentKinds = tables[\argumentKinds];
@@ -13,6 +13,8 @@
 	var passthroughs = tables[\passthroughs];
 	var silentZeros = tables[\silentZeros];
 	var audioTogether = tables[\audioTogether];
+	// The classes whose methods are not addable, and why, by name.
+	var refused = tables[\refused] ? ();
 
 	// An argument whose name holds one of these words needs an entry in argumentKinds.
 	var arrayWords = ["array", "list", "values", "ugens", "envelope", "weights",
@@ -247,7 +249,14 @@
 					def.initBuild;
 					arguments = values.value;
 					before = def.children.size;
-					class.performList(selector, arguments);
+					// A variable list of arguments takes the elements of its
+					// array, as sclang passes them.
+					class.performList(selector,
+						if (class.class.findRespondingMethodFor(selector).varArgs) {
+							arguments.drop(-1) ++ arguments.last.asArray
+						} {
+							arguments
+						});
 					[nil, def.children.drop(before), arguments]
 				}.value;
 			} { |exception|
@@ -693,7 +702,11 @@
 		var together = entryFor.(audioTogether, owner, selector);
 		var wired, input, zero, position, positions, refusal;
 		stats[\methods] = stats[\methods] + 1;
-		if (bodies.includes(class.name)) {
+		case
+		{ refused[class.name].notNil } {
+			described[1] ++ [\addable -> false, \reason -> refused[class.name]]
+		}
+		{ bodies.includes(class.name) } {
 			refusal = probe.(class, selector, numberValues.(described[0], [], []))[0];
 			if (refusal.isString and: { refusal.contains("not valid for this subclass") }) {
 				described[1] ++ [\addable -> false, \reason -> refusal]
@@ -814,30 +827,70 @@
 	};
 
 	// The units of the plugin file at `path` that take buffers for their
-	// outputs before they free those of their inputs: the names inside the two
-	// macros that set kUnitDef_CantAliasInputsToOutputs.
+	// outputs before they free those of their inputs, as names. A plugin sets
+	// kUnitDef_CantAliasInputsToOutputs through the two macros of the
+	// interface table, or through a macro of its own file. A FAUST plugin
+	// passes the flag to fDefineUnit, under the name of its metadata. The flag
+	// anywhere else fails the scan.
 	scanCantAlias = { |path, text|
+		var flag = "kUnitDef_CantAliasInputsToOutputs";
+		var macros = ["DefineSimpleCantAliasUnit(", "DefineDtorCantAliasUnit("];
+		var names = List.new, cut, start, stop, name;
+		// `text` without the characters from `from` to `to`.
+		cut = { |from, to| text.copyRange(0, from - 1) ++ text.copyRange(to + 1, text.size - 1) };
 		if (text.find("CantAlias").notNil) {
 			text = stripComments.(text);
-			if (text.find("kUnitDef_CantAliasInputsToOutputs").notNil) {
-				fail.("% sets kUnitDef_CantAliasInputsToOutputs itself".format(path));
+			start = text.find("#define ");
+			while { start.notNil } {
+				// A definition goes on through each line that ends with a backslash.
+				stop = text.find("\n", offset: start) ? text.size;
+				while { stop < text.size and: { text.copyRange(start, stop - 1).stripWhiteSpace.last == $\\ } } {
+					stop = text.find("\n", offset: stop + 1) ? text.size;
+				};
+				if (text.copyRange(start, stop - 1).find(flag).notNil) {
+					macros = macros.add(text.copyRange(start + 8, text.find("(", offset: start))
+						.stripWhiteSpace);
+					text = cut.(start, stop - 1);
+					start = text.find("#define ", offset: start);
+				} {
+					start = text.find("#define ", offset: stop);
+				};
 			};
-			["DefineSimpleCantAliasUnit(", "DefineDtorCantAliasUnit("].do { |macro|
-				var start = text.find(macro), stop;
+			start = text.find("fDefineUnit");
+			while { start.notNil } {
+				stop = text.find(";", offset: start) ? (text.size - 1);
+				if (text.copyRange(start, stop).find(flag).notNil) {
+					name = text.find("declare(\"name\", \"");
+					if (name.isNil) {
+						fail.("% passes % to fDefineUnit, and its metadata has no name".format(path, flag));
+					};
+					names.add(text.copyRange(name + 17, text.find("\"", offset: name + 17) - 1).asSymbol);
+					text = cut.(start, stop);
+					start = text.find("fDefineUnit", offset: start);
+				} {
+					start = text.find("fDefineUnit", offset: stop);
+				};
+			};
+			if (text.find(flag).notNil) {
+				fail.("% sets % in another way".format(path, flag));
+			};
+			macros.do { |macro|
+				start = text.find(macro);
 				while { start.notNil } {
 					stop = text.find(")", offset: start);
-					cantAlias.add(text.copyRange(start + macro.size, stop - 1)
-						.stripWhiteSpace.asSymbol);
+					names.add(text.copyRange(start + macro.size, stop - 1).stripWhiteSpace.asSymbol);
 					start = text.find(macro, offset: stop);
 				};
 			};
 		};
+		cantAlias.addAll(names);
+		names
 	};
 
 	(
-		stats: stats, cantAlias: cantAlias, stripComments: stripComments, toJSON: toJSON,
-		number: number, requireEntries: requireEntries, describeMethods: describeMethods,
-		describeClass: describeClass, describePseudoClass: describePseudoClass,
-		scanCantAlias: scanCantAlias
+		stats: stats, cantAlias: cantAlias, checkRules: checkRules, stripComments: stripComments,
+		toJSON: toJSON, number: number, requireEntries: requireEntries,
+		describeMethods: describeMethods, describeClass: describeClass,
+		describePseudoClass: describePseudoClass, scanCantAlias: scanCantAlias
 	)
 }
