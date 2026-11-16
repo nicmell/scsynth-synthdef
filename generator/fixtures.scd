@@ -1207,6 +1207,81 @@ try {
 		].do { |case| refused.(case[0], case[1]) };
 	}.value;
 
+	// The K2A of DemandEnvGen.ar and the count of wire buffers, of 0.10, in a
+	// function of its own for the same reason.
+	{
+		writeCases.("demandenvgen", [
+			[\demandenvgen_gate, {
+				Out.ar(0, DemandEnvGen.ar(Dseq([0, 1], inf), 0.1, gate: Impulse.ar(1)))
+			}],
+			[\demandenvgen_reset, {
+				Out.ar(0, DemandEnvGen.ar(Dseq([0, 1], inf), 0.1, reset: Impulse.ar(1)))
+			}],
+			[\demandenvgen_both, {
+				Out.ar(0, DemandEnvGen.ar(Dseq([0, 1], inf), 0.1,
+					gate: Impulse.ar(1), reset: Impulse.ar(2)))
+			}],
+			[\demandenvgen_control, {
+				Out.ar(0, DemandEnvGen.ar(Dseq([0, 1], inf), 0.1, gate: Impulse.kr(1)))
+			}],
+			// The rate of an array is its least by name, audio here: one K2A of
+			// reset, then two DemandEnvGen.
+			[\demandenvgen_mixed, {
+				Out.ar(0, DemandEnvGen.ar(Dseq([0, 1], inf), 0.1, gate: [Impulse.ar(1), 1]))
+			}],
+			[\demandenvgen_resets, {
+				Out.ar(0, DemandEnvGen.ar(Dseq([0, 1], inf), 0.1,
+					gate: Impulse.ar(1), reset: [Impulse.kr(1), Impulse.kr(2)]))
+			}],
+			[\demandenvgen_named, {
+				Out.ar(0, DemandEnvGen.ar(Dseq([0, 1], inf), 0.1, gate: \g.ar(1)))
+			}]
+		]);
+		writeCases.("wirebufs", [
+			// The output takes the buffer that its input frees.
+			[\wirebufs_chain, { Out.ar(0, LPF.ar(SinOsc.ar, 1000)) }],
+			[\wirebufs_square, { var s = SinOsc.ar; Out.ar(0, s * s) }],
+			[\wirebufs_pan2, { Out.ar(0, Pan2.ar(SinOsc.ar)) }],
+			[\wirebufs_control, { Out.kr(0, SinOsc.kr) }],
+			// The graph that -w 8 refuses in the measures of sc-app3.
+			[\wirebufs_sixteen, { Out.ar(0, SinOsc.ar(Array.series(16, 100, 100))) }],
+			// A demand-rate UGen keeps the buffer of an audio input.
+			[\wirebufs_demand_audio, { Out.ar(0, Duty.ar(0.1, 0, Dseq([SinOsc.ar(1), 0], inf))) }],
+			[\wirebufs_demand_control, {
+				Out.ar(0, Duty.ar(0.1, 0, Dseq([SinOsc.kr(1), 0], inf)))
+			}],
+			// An output that nothing reads keeps its buffer.
+			[\wirebufs_unread, {
+				var p = Pan2.ar(SinOsc.ar);
+				Out.ar(0, p[0]);
+				Out.ar(1, SinOsc.ar(2) * SinOsc.ar(3))
+			}],
+			// The units that cannot alias their inputs to their outputs, each with
+			// an audio input, and PlayBuf without one.
+			[\wirebufs_playbuf, { Out.ar(0, PlayBuf.ar(1, 0, SinOsc.ar)) }],
+			[\wirebufs_playbuf_control, { Out.ar(0, PlayBuf.ar(1, 0)) }],
+			[\wirebufs_tgrains, { Out.ar(0, TGrains.ar(2, Impulse.ar(10), 0)) }],
+			[\wirebufs_demand, { Out.ar(0, Demand.ar(Impulse.ar(10), 0, Dseq([1, 2], inf))) }],
+			[\wirebufs_duty, { Out.ar(0, Duty.ar(0.1, Impulse.ar(1), Dseq([1, 2], inf))) }],
+			[\wirebufs_tduty, { Out.ar(0, TDuty.ar(0.1, Impulse.ar(1), Dseq([1, 2], inf))) }],
+			[\wirebufs_demandenvgen, {
+				Out.ar(0, DemandEnvGen.ar(Dseq([0, 1], inf), 0.1, gate: Impulse.ar(1)))
+			}],
+			[\wirebufs_grainin, { Out.ar(0, GrainIn.ar(2, Impulse.ar(10), 0.1, SinOsc.ar)) }],
+			[\wirebufs_grainsin, { Out.ar(0, GrainSin.ar(2, Impulse.ar(10))) }],
+			[\wirebufs_grainfm, { Out.ar(0, GrainFM.ar(2, Impulse.ar(10))) }],
+			[\wirebufs_grainbuf, { Out.ar(0, GrainBuf.ar(2, Impulse.ar(10), 0.1, 0)) }],
+			[\wirebufs_warp1, { Out.ar(0, Warp1.ar(1, 0, SinOsc.ar)) }],
+			[\wirebufs_balance2, { Out.ar(0, Balance2.ar(SinOsc.ar, SinOsc.ar(2))) }],
+			[\wirebufs_panb2, { Out.ar(0, PanB2.ar(SinOsc.ar)) }],
+			[\wirebufs_panaz, { Out.ar(0, PanAz.ar(2, SinOsc.ar)) }],
+			[\wirebufs_decodeb2, {
+				Out.ar(0, DecodeB2.ar(2, SinOsc.ar, SinOsc.ar(2), SinOsc.ar(3)))
+			}],
+			[\wirebufs_partconv, { Out.ar(0, PartConv.ar(SinOsc.ar, 2048, 0)) }]
+		]);
+	}.value;
+
 	writeArithmetic.();
 
 	"fixtures.scd: wrote % golden files to %".format(written, fixtures).postln;
