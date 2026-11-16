@@ -10,7 +10,9 @@
 // default. The script reads its files at the tag Version-3.14.1, whatever is
 // checked out. It exits with 1 if sclang is not 3.14.1, if a class or a
 // method comes from outside the core class library, if sclang and the
-// sources disagree on an operator, or if a table below misses an entry.
+// sources disagree on an operator, or if a table below misses an entry. It
+// also exits with 1 if a plugin sets the flag of aliasing in another way
+// than its two macros, or for a class outside the core.
 (
 var root = thisProcess.nowExecutingPath.dirname.dirname;
 var source = "SC_SOURCE".getenv ? "~/Projects/supercollider".standardizePath;
@@ -262,6 +264,12 @@ var silentZeros = [
 	[\LocalOut, \ar, \channelsArray],
 	[\XOut, \ar, \channelsArray]
 ];
+// The arguments that go to audio rate together before multiNew: when one of
+// them is at audio rate, K2A.ar takes each other one, in order. By the class
+// that owns the method. testAudioTogether tests each entry.
+var audioTogether = [
+	[\DemandEnvGen, \ar, [\gate, \reset]]
+];
 
 // An argument whose name holds one of these words needs an entry above.
 var arrayWords = ["array", "list", "values", "ugens", "envelope", "weights",
@@ -350,10 +358,11 @@ var notEnvMethods = [
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansionOf, wiring;
-var testPassthrough, testSilence;
+var testPassthrough, testSilence, testAudioTogether;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
 var classes, pseudoClasses, specs, envs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
+var cantAlias = List.new;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -901,6 +910,38 @@ try {
 		};
 	};
 
+	// Fails unless the entry of audioTogether holds: with one of its arguments
+	// at audio rate, a K2A at audio rate takes each other number, in order,
+	// and the instance takes the K2A. With all of them at audio rate, the
+	// method makes the instance alone.
+	testAudioTogether = { |class, selector, kinds, positions|
+		var holds = positions.every { |position|
+			var created = probe.(class, selector,
+				valuesAt.(kinds, position, { audio.(position) }))[1];
+			var others = positions.reject { |other| other == position };
+			created.size == (others.size + 1)
+				and: { created.last.class === class }
+				and: {
+					others.every { |other, index|
+						var converted = created[index];
+						converted.class === K2A and: { converted.rate == \audio }
+							and: { converted.inputs[0] == signal.(other) }
+							and: { created.last.inputs.includes(converted) }
+					}
+				}
+		} and: {
+			var created = probe.(class, selector, {
+				var arguments = numberValues.(kinds, [], []).value;
+				positions.do { |position| arguments.put(position, audio.(position)) };
+				arguments
+			})[1];
+			created.size == 1 and: { created[0].class === class }
+		};
+		if (holds.not) {
+			fail.("the audio rate of %.% does not go together".format(class.name, selector));
+		};
+	};
+
 	// The kinds of the arguments of a method, with the kinds of `owner`, and
 	// the method as associations: its selector and its arguments.
 	describeArgs = { |class, selector, method, owner|
@@ -947,7 +988,10 @@ try {
 		var names = (method.argNames ? []).drop(1).asArray;
 		var through = passthroughs.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
 		var silent = silentZeros.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
-		var wired, input, zero, position, refusal;
+		var together = audioTogether.detect { |entry|
+			entry[0] == owner.name and: { entry[1] == selector }
+		};
+		var wired, input, zero, position, positions, refusal;
 		methods = methods + 1;
 		if (bodies.includes(class.name)) {
 			refusal = probe.(class, selector, numberValues.(described[0], [], []))[0];
@@ -972,6 +1016,11 @@ try {
 				position = names.indexOf(silent[2]);
 				testSilence.(class, selector, described[0], position);
 				wired = wired ++ [\silence -> position];
+			};
+			if (together.notNil and: { wired.isString.not }) {
+				positions = together[2].collect { |name| names.indexOf(name) };
+				testAudioTogether.(class, selector, described[0], positions);
+				wired = wired ++ [\audio_together -> positions];
 			};
 			if (wired.isString and: { wired.contains("creates no instance") }
 				and: { census.includes(class.name).not }) {
@@ -1040,6 +1089,7 @@ try {
 			\width_first -> kindOf.(WidthFirstUGen),
 			\fft_size -> (fftSize !? { fftRules[fftSize.ownerClass.name] }),
 			\convert_env -> (convertEnvOwner !? { convertEnvRules[convertEnvOwner] }),
+			\cant_alias -> cantAlias.includes(class.name),
 			\categories -> (doc !? { doc.categories } ? []),
 			\check_inputs -> ([\rule -> rule[0]] ++ switch (rule[0])
 				{ \n_inputs } { [\count -> rule[1]] }
@@ -1087,6 +1137,36 @@ try {
 			and: { [\ar, \kr].any { |selector| class.class.findRespondingMethodFor(selector).notNil } }
 			and: { census.includes(class.name).not }) {
 			fail.("% answers ar or kr, and the census does not name it".format(class.name));
+		};
+	};
+
+	// The units that take buffers for their outputs before they free those of
+	// their inputs: the names inside the two macros that set
+	// kUnitDef_CantAliasInputsToOutputs, in the plugins at the tag.
+	"git -C % ls-tree -r --name-only Version-3.14.1 server/plugins/".format(source.shellQuote)
+		.unixCmdGetStdOut.split($\n).reject(_.isEmpty).do { |path|
+			var text = show.(path);
+			if (text.find("CantAlias").notNil) {
+				text = stripComments.(text);
+				if (text.find("kUnitDef_CantAliasInputsToOutputs").notNil) {
+					fail.("% sets kUnitDef_CantAliasInputsToOutputs itself".format(path));
+				};
+				["DefineSimpleCantAliasUnit(", "DefineDtorCantAliasUnit("].do { |macro|
+					var start = text.find(macro), stop;
+					while { start.notNil } {
+						stop = text.find(")", offset: start);
+						cantAlias.add(text.copyRange(start + macro.size, stop - 1)
+							.stripWhiteSpace.asSymbol);
+						start = text.find(macro, offset: stop);
+					};
+				};
+			};
+		};
+	if (cantAlias.isEmpty) { fail.("no plugin of % defines a unit that cannot alias".format(source)) };
+	cantAlias.do { |name|
+		var class = name.asClass;
+		if (class.isNil or: { (class.superclasses ? []).includes(UGen).not } or: { core.(class).not }) {
+			fail.("the plugins define %, which is no UGen class of the core".format(name));
 		};
 	};
 
@@ -1149,9 +1229,10 @@ try {
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
-		++ "% pseudo-UGen methods, % classes outside UGen, % specs, % methods of Env")
+		++ "% pseudo-UGen methods, % classes outside UGen, % specs, % methods of Env, "
+		++ "% units that cannot alias")
 		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
-			pseudoClasses.size, specs.size, envs.size).postln;
+			pseudoClasses.size, specs.size, envs.size, cantAlias.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;

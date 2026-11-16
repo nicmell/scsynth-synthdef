@@ -14,11 +14,13 @@ mod rate;
 mod synth_def;
 mod topo;
 mod ugen_input;
+mod wire_buffers;
 
 pub use builder::{Arg, ArgRate, NewUGen, SynthDefBuilder};
 pub use env::{Curve, Env};
 pub use error::{
     BuildError, CountKind, LimitError, LimitErrorKind, NameKind, ReadError, ReadErrorKind,
+    WireBufferError,
 };
 pub use file::{DefFile, Version, read_def_file, write_def_file, write_def_file_old};
 pub use rate::Rate;

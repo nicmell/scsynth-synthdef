@@ -113,7 +113,7 @@ fn fits(count: usize, max: usize, what: CountKind) -> Result<(), LimitErrorKind>
     Ok(())
 }
 
-fn to_usize(index: u32) -> usize {
+pub(crate) fn to_usize(index: u32) -> usize {
     usize::try_from(index).unwrap_or(usize::MAX)
 }
 

@@ -44,6 +44,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "symbols" => symbols(),
         "bufwr" => bufwr(),
         "duty" => duty(),
+        "demandenvgen" => demandenvgen(),
         "peak" => peak(),
         "t2k" => t2k(),
         "klank" => klank(),
@@ -1675,7 +1676,7 @@ fn bufwr() -> Vec<SynthDef> {
 }
 
 /// `Dseq(list, inf)`.
-fn dseq(b: &mut SynthDefBuilder, list: &[f64]) -> UGenInput {
+pub(super) fn dseq(b: &mut SynthDefBuilder, list: &[f64]) -> UGenInput {
     by_name(
         b,
         "Dseq",
@@ -1747,8 +1748,78 @@ fn duty() -> Vec<SynthDef> {
     ]
 }
 
+/// `Impulse` at the rate of `selector`, of `freq`.
+pub(super) fn impulse(b: &mut SynthDefBuilder, selector: &str, freq: f64) -> UGenInput {
+    by_name(b, "Impulse", selector, &[("freq", input(freq))])
+}
+
+/// `DemandEnvGen.ar(Dseq([0, 1], inf), 0.1, ...)` into `Out.ar`, with the
+/// arguments that `rest` makes after the `Dseq`.
+pub(super) fn demand_env_gen(
+    b: &mut SynthDefBuilder,
+    rest: impl FnOnce(&mut SynthDefBuilder) -> Vec<(&'static str, ArgValue)>,
+) {
+    let level = dseq(b, &[0.0, 1.0]);
+    let mut args = vec![("level", input(level)), ("dur", input(0.1))];
+    args.extend(rest(b));
+    rule_out(b, "DemandEnvGen", "ar", &args);
+}
+
+fn demandenvgen() -> Vec<SynthDef> {
+    vec![
+        def("demandenvgen_gate", vec![], |b| {
+            demand_env_gen(b, |b| vec![("gate", input(impulse(b, "ar", 1.0)))]);
+        }),
+        def("demandenvgen_reset", vec![], |b| {
+            demand_env_gen(b, |b| vec![("reset", input(impulse(b, "ar", 1.0)))]);
+        }),
+        def("demandenvgen_both", vec![], |b| {
+            demand_env_gen(b, |b| {
+                let gate = impulse(b, "ar", 1.0);
+                let reset = impulse(b, "ar", 2.0);
+                vec![("gate", input(gate)), ("reset", input(reset))]
+            });
+        }),
+        def("demandenvgen_control", vec![], |b| {
+            demand_env_gen(b, |b| vec![("gate", input(impulse(b, "kr", 1.0)))]);
+        }),
+        def("demandenvgen_mixed", vec![], |b| {
+            demand_env_gen(b, |b| {
+                let gate = impulse(b, "ar", 1.0);
+                vec![("gate", input(UGenInput::Array(vec![gate, 1.0.into()])))]
+            });
+        }),
+        def("demandenvgen_resets", vec![], |b| {
+            demand_env_gen(b, |b| {
+                let gate = impulse(b, "ar", 1.0);
+                let resets = vec![impulse(b, "kr", 1.0), impulse(b, "kr", 2.0)];
+                vec![
+                    ("gate", input(gate)),
+                    ("reset", input(UGenInput::Array(resets))),
+                ]
+            });
+        }),
+        def("demandenvgen_named", vec![], |b| {
+            demand_env_gen(b, |b| {
+                let gate = by_name(
+                    b,
+                    "NamedControl",
+                    "ar",
+                    &[("name", "g".into()), ("values", input(1.0))],
+                );
+                vec![("gate", input(gate))]
+            });
+        }),
+    ]
+}
+
 /// `class.selector(args)` into `Out` at the rate of `selector`.
-fn rule_out(b: &mut SynthDefBuilder, class: &str, selector: &str, args: &[(&str, ArgValue)]) {
+pub(super) fn rule_out(
+    b: &mut SynthDefBuilder,
+    class: &str,
+    selector: &str,
+    args: &[(&str, ArgValue)],
+) {
     let result = by_name(b, class, selector, args);
     out(b, selector, result);
 }

@@ -6,13 +6,15 @@ mod controls;
 mod envelopes;
 mod optimize;
 mod pseudo;
+mod wire_buffers;
 
+use std::collections::BTreeMap;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use scsynth_synthdef::{
-    Arg, ArgRate, ArgValue, NewUGen, Rate, SynthDef, SynthDefBuilder, UGenInput, write_def_file,
-    write_def_file_old,
+    Arg, ArgRate, ArgValue, NewUGen, Rate, SynthDef, SynthDefBuilder, UGenInput, read_def_file,
+    write_def_file, write_def_file_old,
 };
 
 /// The golden files that the builder reproduces.
@@ -101,6 +103,8 @@ pub const NAMES: &[&str] = &[
     "ienv",
     "varlag",
     "envgate",
+    "demandenvgen",
+    "wirebufs",
 ];
 
 /// The bytes of a golden file.
@@ -109,6 +113,54 @@ pub fn golden(name: &str) -> Vec<u8> {
         .join("tests/fixtures")
         .join(format!("{name}.scsyndef"));
     fs::read(path).expect("the golden file reads")
+}
+
+/// The paths of all the golden files, sorted.
+pub fn golden_files() -> Vec<PathBuf> {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
+    let mut files: Vec<PathBuf> = fs::read_dir(root)
+        .expect("the folder of golden files")
+        .map(|entry| {
+            entry
+                .expect("an entry of the folder of golden files")
+                .path()
+        })
+        .filter(|path| path.extension().is_some_and(|ext| ext == "scsyndef"))
+        .collect();
+    files.sort();
+    files
+}
+
+/// The count of wire buffers of each definition of each golden file, by the
+/// name of the file and the name of the definition.
+pub fn golden_wire_buffers() -> BTreeMap<String, BTreeMap<String, usize>> {
+    golden_files()
+        .iter()
+        .map(|path| {
+            let bytes = fs::read(path).expect("a golden file reads");
+            let file =
+                read_def_file(&bytes).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+            let mut counts = BTreeMap::new();
+            for def in file.synth_defs {
+                let count = def
+                    .wire_buffers()
+                    .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+                let name = def.name.clone();
+                assert!(
+                    counts.insert(def.name, count).is_none(),
+                    "{}: two definitions named {name}",
+                    path.display()
+                );
+            }
+            let stem = path.file_stem().expect("a file name").to_string_lossy();
+            (stem.into_owned(), counts)
+        })
+        .collect()
+}
+
+/// The file of the counts of wire buffers that scsynth 3.14.1 confirmed.
+pub fn wire_buffers_fixture() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/wire_buffers.json")
 }
 
 /// The definitions of a golden file: those of 0.1 built with `add`, and
@@ -155,6 +207,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "optimize" | "deadcode" | "pvcopy" => optimize::definitions(name),
         "controlugens" | "defwrap" | "specs" | "namedcontrol" => controls::definitions(name),
         "env" | "ienv" | "varlag" | "envgate" => envelopes::definitions(name),
+        "wirebufs" => wire_buffers::definitions(),
         _ => pseudo::definitions(name),
     }
 }

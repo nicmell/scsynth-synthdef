@@ -27,6 +27,11 @@ pub struct UGenClass {
     /// How `convertEnv` takes an `Env` as the envelope of the class. `None`
     /// for a class without `convertEnv`.
     pub convert_env: Option<ConvertEnv>,
+    /// Whether the plugin of the unit sets `kUnitDef_CantAliasInputsToOutputs`,
+    /// so that the unit takes buffers for its outputs before it frees those of
+    /// its inputs, in the count of
+    /// [`SynthDef::wire_buffers`](crate::SynthDef::wire_buffers).
+    pub cant_alias: bool,
     /// The categories of the class in the help of SuperCollider, such as
     /// `UGens>Generators>Deterministic`.
     pub categories: &'static [&'static str],
@@ -176,6 +181,10 @@ pub struct Wiring {
     /// The position of the argument that goes through `asAudioRateInput`
     /// before the expansion, as the input of a delay at audio rate.
     pub audio_input: Option<usize>,
+    /// The positions of the arguments that go to audio rate together before
+    /// the expansion, as the `gate` and the `reset` of `DemandEnvGen.ar`:
+    /// when one of them is at audio rate, `K2A.ar` takes each other one.
+    pub audio_together: Option<&'static [usize]>,
     /// Whether the method multiplies the result of the expansion by its
     /// argument `level`, as `LinXFade2` does.
     pub level: bool,
@@ -556,6 +565,55 @@ mod tests {
             .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.audio_input.is_some()))
             .count();
         assert_eq!(converted, 19);
+    }
+
+    #[test]
+    fn the_units_that_cannot_alias_are_the_18_of_the_plugins() {
+        // Fact 2 of the plan of 0.10.
+        let flagged: Vec<&str> = all()
+            .iter()
+            .filter(|class| class.cant_alias)
+            .map(|class| class.name)
+            .collect();
+        assert_eq!(
+            flagged,
+            [
+                "Balance2",
+                "BeatTrack",
+                "BeatTrack2",
+                "DecodeB2",
+                "Demand",
+                "DemandEnvGen",
+                "Duty",
+                "GrainBuf",
+                "GrainFM",
+                "GrainIn",
+                "GrainSin",
+                "PanAz",
+                "PanB2",
+                "PartConv",
+                "PlayBuf",
+                "TDuty",
+                "TGrains",
+                "Warp1",
+            ]
+        );
+    }
+
+    #[test]
+    fn demand_env_gen_ar_takes_its_gate_and_reset_to_audio_rate_together() {
+        // Fact 6 of the plan of 0.10.
+        assert_eq!(
+            wiring("DemandEnvGen", "ar").audio_together,
+            Some(&[4, 5][..])
+        );
+        assert_eq!(wiring("DemandEnvGen", "kr").audio_together, None);
+        let together = all()
+            .iter()
+            .flat_map(|class| class.methods)
+            .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.audio_together.is_some()))
+            .count();
+        assert_eq!(together, 1);
     }
 
     #[test]
