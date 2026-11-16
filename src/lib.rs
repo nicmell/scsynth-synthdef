@@ -11,6 +11,8 @@ pub mod operator;
 mod optimize;
 mod pseudo;
 mod rate;
+#[cfg(feature = "sc3-plugins")]
+pub mod sc3_plugins;
 mod synth_def;
 mod topo;
 mod ugen_input;

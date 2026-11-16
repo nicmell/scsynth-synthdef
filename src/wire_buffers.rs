@@ -17,7 +17,7 @@ impl SynthDef {
     ///
     /// [`WireBufferError::Limit`] for a definition that breaks a limit of
     /// scsynth, and [`WireBufferError::UnknownUGen`] for a UGen whose class
-    /// the catalogue does not hold.
+    /// no catalogue of the crate holds.
     pub fn wire_buffers(&self) -> Result<usize, WireBufferError> {
         limits::check(self, Version::V2).map_err(WireBufferError::Limit)?;
         let mut readers: Vec<Vec<usize>> = self
@@ -32,11 +32,10 @@ impl SynthDef {
         }
         let (mut in_use, mut most) = (0, 0);
         for (position, ugen) in self.children.iter().enumerate() {
-            let class =
-                catalog::lookup(&ugen.name).ok_or_else(|| WireBufferError::UnknownUGen {
-                    ugen: position,
-                    name: ugen.name.clone(),
-                })?;
+            let class = catalog::find(&ugen.name).ok_or_else(|| WireBufferError::UnknownUGen {
+                ugen: position,
+                name: ugen.name.clone(),
+            })?;
             let outputs = ugen
                 .outputs
                 .iter()

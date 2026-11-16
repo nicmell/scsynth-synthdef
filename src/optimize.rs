@@ -612,7 +612,7 @@ impl Graph {
     /// `fftSize` of the chain of `node`, as a new `BufFrames`, for a copy of
     /// `chain`.
     fn fft_size(&mut self, chain: usize, node: usize) -> Result<usize, BuildError> {
-        let rule = catalog::lookup(&self.nodes[node].name).and_then(|class| class.fft_size);
+        let rule = catalog::find(&self.nodes[node].name).and_then(|class| class.fft_size);
         match (rule, self.nodes[node].inputs.first()) {
             (Some(FftSize::BufFrames), Some(&buffer)) => {
                 let frames = ugen("BufFrames", Rate::Scalar, vec![buffer]);
@@ -642,13 +642,13 @@ impl Graph {
 }
 
 fn optimize_of(name: &str) -> Optimize {
-    catalog::lookup(name).map_or(Optimize::Nothing, |class| class.optimize)
+    catalog::find(name).map_or(Optimize::Nothing, |class| class.optimize)
 }
 
 /// Whether the class `name` is `kind` or a subclass of it, as `isKindOf`
 /// tests it.
 fn is_kind_of(name: &str, kind: &str) -> bool {
-    catalog::lookup(name)
+    catalog::find(name)
         .is_some_and(|class| class.name == kind || class.superclasses.contains(&kind))
 }
 

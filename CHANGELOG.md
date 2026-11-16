@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.14.0 (2026-11-16)
+
+The UGens of sc3-plugins 3.14.0, in a catalogue of their own behind the
+feature `sc3-plugins`.
+
+### Added
+
+- The feature `sc3-plugins` and the module `sc3_plugins`: `lookup`, `all`,
+  `pseudo_lookup` and `pseudo_all`, with the types of `catalog`. It holds
+  the 491 UGen classes of sc3-plugins 3.14.0, the version of the class
+  files of the installed folder `SC3plugins`. See
+  [sc3-plugins](README.md#sc3-plugins).
+- With the feature, `SynthDefBuilder::ugen` adds 635 of their 679 rate
+  methods, and the bodies of `Greyhole.ar`, `JPverb.ar` and `NHHall.ar`.
+  `SynthDef::wire_buffers` counts their units, 176 of which cannot alias.
+- `generator/sc3_plugins/catalog.scd` measures the classes with the probes
+  of the core, now in `generator/probes.scd`. It also checks the class
+  files of the folder against the tag `Version-3.14.0`, and the rule of
+  `checkInputs` of every class.
+- `generator/sc3_plugins/fixtures.scd` writes the golden files of
+  `tests/fixtures/sc3_plugins`. `methods.scsyndef` holds one definition for
+  each addable method, and the crate writes its bytes. scsynth 3.14.1
+  loads each one at its count of wire buffers, with the plugins of
+  sc3-plugins.
+
+### Changed
+
+- The probes test that a method of a UGen with outputs applies `madd`
+  once. `StkFlute.kr` of sc3-plugins applies it twice, so `ugen` refuses
+  it. Every addable method of the core passes.
+- The helpers of NRT of the acceptance tests move to
+  `tests/common/nrt.rs`, and the writers of the golden files to
+  `generator/goldens.scd`.
+
 ## 0.13.0 (2026-11-16)
 
 The fixes of a review of version 0.12, simplifications that keep every

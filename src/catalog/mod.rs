@@ -1,13 +1,16 @@
 //! The catalogue of the UGens of the core class library of SuperCollider
 //! 3.14.1, and of its pseudo-UGens outside `UGen`: what each class takes and
-//! gives, as `generator/catalog.scd` measured it in sclang.
+//! gives, as `generator/catalog.scd` measured it in sclang. With the feature
+//! `sc3-plugins`, the module `sc3_plugins` holds the classes of sc3-plugins.
 
 #[rustfmt::skip]
 mod generated;
 
 use crate::rate::Rate;
+#[cfg(feature = "sc3-plugins")]
+use crate::sc3_plugins::{lookup as plugin_lookup, pseudo_lookup as plugin_pseudo_lookup};
 
-/// A UGen class of the core class library.
+/// A UGen class of the core class library, or of sc3-plugins.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[non_exhaustive]
 pub struct UGenClass {
@@ -409,7 +412,11 @@ fn by_selector(methods: &'static [RateMethod], selector: &str) -> Option<&'stati
     methods.iter().find(|method| method.selector == selector)
 }
 
-fn by_name<T>(items: &'static [T], name: &str, key: fn(&T) -> &str) -> Option<&'static T> {
+pub(crate) fn by_name<T>(
+    items: &'static [T],
+    name: &str,
+    key: fn(&T) -> &str,
+) -> Option<&'static T> {
     let position = items.binary_search_by(|item| key(item).cmp(name)).ok()?;
     items.get(position)
 }
@@ -422,6 +429,28 @@ fn doc_url(class: &str) -> String {
 #[must_use]
 pub fn lookup(name: &str) -> Option<&'static UGenClass> {
     by_name(all(), name, |class| class.name)
+}
+
+/// The class with this name, of the core or, with the feature
+/// `sc3-plugins`, of sc3-plugins.
+pub(crate) fn find(name: &str) -> Option<&'static UGenClass> {
+    lookup(name).or_else(|| plugin_lookup(name))
+}
+
+/// The pseudo-UGen class outside `UGen` with this name, of the core or,
+/// with the feature `sc3-plugins`, of sc3-plugins.
+pub(crate) fn find_pseudo(name: &str) -> Option<&'static PseudoClass> {
+    pseudo_lookup(name).or_else(|| plugin_pseudo_lookup(name))
+}
+
+#[cfg(not(feature = "sc3-plugins"))]
+fn plugin_lookup(_: &str) -> Option<&'static UGenClass> {
+    None
+}
+
+#[cfg(not(feature = "sc3-plugins"))]
+fn plugin_pseudo_lookup(_: &str) -> Option<&'static PseudoClass> {
+    None
 }
 
 /// All the classes, sorted by name.
