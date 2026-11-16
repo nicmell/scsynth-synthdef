@@ -17,6 +17,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "ugenmisc" => [misc(), checks(), more_misc()].concat(),
         "ugenreceivers" => [arrays(), numbers()].concat(),
         "envranges" => env_ranges(),
+        "pollarrays" => poll_arrays(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1097,6 +1098,85 @@ fn ranged_out(
     all.extend(gate.map(|gate| ("gate", input(gate))));
     let generated = by_name(b, "EnvGen", "kr", &all);
     out(b, "kr", generated);
+}
+
+/// The cases of `pollarrays`: `Array:poll` and `Array:dpoll` with arrays
+/// among their arguments, and `Poll.new` of nested arrays.
+fn poll_arrays() -> Vec<SynthDef> {
+    let two_sines = |b: &mut SynthDefBuilder| {
+        let first = sine(b, "kr", 1.0);
+        let second = sine(b, "kr", 2.0);
+        UGenInput::Array(vec![first, second])
+    };
+    let nested = |b: &mut SynthDefBuilder| {
+        let first = sine(b, "ar", 1.0);
+        let second = sine(b, "kr", 2.0);
+        let third = sine(b, "kr", 3.0);
+        UGenInput::Array(vec![UGenInput::Array(vec![first, second]), third])
+    };
+    let polled_out = |b: &mut SynthDefBuilder, args: &[(&str, ArgValue)]| {
+        let pair = two_sines(b);
+        let r = send(b, pair, "poll", args);
+        out(b, "kr", r);
+    };
+    vec![
+        def("pollarrays_trig", vec![], |b| {
+            let pair = two_sines(b);
+            let trigs = vec![impulse(b, "kr", 1.0), impulse(b, "kr", 2.0)];
+            let r = send(b, pair, "poll", &[("trig", input(trigs))]);
+            out(b, "kr", r);
+        }),
+        def("pollarrays_three", vec![], |b| {
+            polled_out(b, &[("trig", input(array(&[1.0, 2.0, 3.0])))]);
+        }),
+        def("pollarrays_trigid", vec![], |b| {
+            polled_out(b, &[("trigid", input(array(&[1.0, 2.0])))]);
+        }),
+        def("pollarrays_label", vec![], |b| {
+            let label = ArgValue::Text("x".to_owned());
+            polled_out(b, &[("trig", input(5.0)), ("label", label)]);
+        }),
+        def("pollarrays_nested", vec![], |b| {
+            let receiver = nested(b);
+            send(b, receiver, "poll", &[]);
+        }),
+        def("pollarrays_new_nested", vec![], |b| {
+            let polled = nested(b);
+            let args = [("trig", input(10.0)), ("in", input(polled))];
+            by_name(b, "Poll", "new", &args);
+        }),
+        def("pollarrays_new_trigs", vec![], |b| {
+            let polled = nested(b);
+            let args = [("trig", input(array(&[1.0, 2.0]))), ("in", input(polled))];
+            by_name(b, "Poll", "new", &args);
+        }),
+        def("pollarrays_dpoll_run", vec![], |b| {
+            let sequences = vec![dseq(b, &[1.0, 2.0]), dseq(b, &[3.0])];
+            dpolled_out(b, sequences, &[("run", input(array(&[1.0, 0.0])))]);
+        }),
+        def("pollarrays_dpoll_trigid", vec![], |b| {
+            let sequences = vec![dseq(b, &[1.0, 2.0]), dseq(b, &[3.0])];
+            dpolled_out(b, sequences, &[("trigid", input(array(&[7.0, 8.0])))]);
+        }),
+        def("pollarrays_dpoll_nested", vec![], |b| {
+            let inner = UGenInput::Array(vec![dseq(b, &[1.0, 2.0]), dseq(b, &[3.0])]);
+            let sequences = vec![inner, dseq(b, &[4.0])];
+            dpolled_out(b, sequences, &[]);
+        }),
+    ]
+}
+
+/// `Out.kr(0, Demand.kr(Impulse.kr(1), 0, sequences.dpoll(args)))`.
+fn dpolled_out(b: &mut SynthDefBuilder, sequences: Vec<UGenInput>, args: &[(&str, ArgValue)]) {
+    let trig = impulse(b, "kr", 1.0);
+    let polled = send(b, sequences, "dpoll", args);
+    let args = [
+        ("trig", input(trig)),
+        ("reset", input(0.0)),
+        ("demandUGens", input(polled)),
+    ];
+    let demand = by_name(b, "Demand", "kr", &args);
+    out(b, "kr", demand);
 }
 
 /// The cases of `envranges`.

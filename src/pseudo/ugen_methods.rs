@@ -1343,7 +1343,8 @@ fn dpoll(
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
     let label = args.text("label")?;
-    dpoll_with(builder, this, args, label)
+    let (run, trigid) = (args.value("run")?, args.value("trigid")?);
+    dpoll_with(builder, this, label, run, trigid)
 }
 
 /// `Dpoll(this, label, run, trigid)`, with the label of `Dpoll:new1`,
@@ -1351,40 +1352,55 @@ fn dpoll(
 fn dpoll_with(
     builder: &mut SynthDefBuilder,
     this: UGenInput,
-    args: &Args,
     label: Option<String>,
+    run: ArgValue,
+    trigid: ArgValue,
 ) -> Result<UGenInput, BuildError> {
     let label = label.unwrap_or_else(|| format!("DemandUGen({})", sclang_class(builder, &this)));
     let given = [
         ("in", this.into()),
         ("label", ArgValue::Text(label)),
-        ("run", args.value("run")?),
-        ("trigid", args.value("trigid")?),
+        ("run", run),
+        ("trigid", trigid),
     ];
     builder.ugen("Dpoll", "new", &given)
 }
 
-/// `Array:poll` and `dpoll`: the label `UGen Array [i]` for each element
-/// when `label` is nil, as `Poll` and `Dpoll` expand an array of labels.
+/// `Array:poll` and `dpoll`: one `Poll(trig, this, label, trigid)` or
+/// `Dpoll(this, label, run, trigid)`, so that the arrays among the
+/// arguments lace with the elements, as `multiNewList` laces them. A nil
+/// label is `UGen Array [i]` for the element `i`.
 fn array_poll(
     builder: &mut SynthDefBuilder,
     receiver: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    let label = args.text("label")?;
-    let elements = super::elements(receiver);
-    let mut results = Vec::with_capacity(elements.len());
-    for (index, element) in elements.into_iter().enumerate() {
-        let label = label
-            .clone()
-            .or_else(|| Some(format!("UGen Array [{index}]")));
-        results.push(if args.selector() == "poll" {
-            poll_with(builder, element, args, label)?
-        } else {
-            dpoll_with(builder, element, args, label)?
-        });
+    let size = super::elements(receiver.clone()).len();
+    let labels = args.text("label")?.map_or_else(
+        || {
+            (0..size)
+                .map(|index| format!("UGen Array [{index}]"))
+                .collect()
+        },
+        |label| vec![label],
+    );
+    if args.selector() == "poll" {
+        let values = [args.input("trig")?, receiver.clone(), args.input("trigid")?];
+        super::poll::polls(builder, None, &values, &labels)?;
+        return Ok(receiver);
     }
-    Ok(UGenInput::Array(results))
+    let columns = [receiver, args.input("run")?, args.input("trigid")?];
+    let rows = super::elements(crate::env::flop(&columns));
+    rows.into_iter()
+        .enumerate()
+        .map(|(index, row)| {
+            let row = super::elements(row);
+            let label = labels.get(index % labels.len().max(1)).cloned();
+            let (run, trigid) = (row[1].clone().into(), row[2].clone().into());
+            dpoll_with(builder, row[0].clone(), label, run, trigid)
+        })
+        .collect::<Result<_, _>>()
+        .map(UGenInput::Array)
 }
 
 /// `UGen:checkBadValues`: a `CheckBadValues` by the `methodSelectorForRate`

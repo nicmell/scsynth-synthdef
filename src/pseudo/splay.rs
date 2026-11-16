@@ -10,21 +10,19 @@ use crate::ugen_input::{ArgValue, UGenInput};
 /// `level`, `center`, `levelComp` and each element of `inArray`, then
 /// `new1` for each instance.
 pub(super) fn splay(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {
-    let level_comp = args.value("levelComp")?;
+    let level_comp = level_comp(args)?;
     let mut names = vec!["spread", "level", "center"];
     let mut values = vec![
         args.input("spread")?,
         args.input("level")?,
         args.input("center")?,
     ];
-    let comp_expands = match &level_comp {
-        ArgValue::Input(input) => {
-            names.push("levelComp");
-            values.push(input.clone());
-            true
-        }
-        ArgValue::Bool(_) => false,
-        _ => return Err(args.wrong_kind("levelComp", "a boolean, a number or an output")),
+    let comp_expands = if let ArgValue::Input(input) = &level_comp {
+        names.push("levelComp");
+        values.push(input.clone());
+        true
+    } else {
+        false
     };
     for input in args.array("inArray")? {
         names.push("inArray");
@@ -92,7 +90,7 @@ pub(super) fn splay_az(
         resamp1(builder, &[low, high], n)?
     };
     let selector = args.selector();
-    let comp = level_comp_new(builder, &args.value("levelComp")?, selector == "ar", n)?;
+    let comp = level_comp_new(builder, &level_comp(args)?, selector == "ar", n)?;
     let level = lang::binary(builder, "*", args.input("level")?, comp)?;
     let pans = builder.ugen(
         "PanAz",
@@ -169,6 +167,15 @@ fn flop(rows: &[UGenInput]) -> Vec<Vec<UGenInput>> {
                 .collect()
         })
         .collect()
+}
+
+/// The `levelComp` of `args`: a boolean, a number or an output. `LevelComp`
+/// clips any other value, which sclang 3.14.1 throws on.
+fn level_comp(args: &Args) -> Result<ArgValue, BuildError> {
+    match args.value("levelComp")? {
+        value @ (ArgValue::Bool(_) | ArgValue::Input(_)) => Ok(value),
+        _ => Err(args.wrong_kind("levelComp", "a boolean, a number or an output")),
+    }
 }
 
 /// `LevelComp.new`: the factor of the level of `n` inputs. `true` gives the

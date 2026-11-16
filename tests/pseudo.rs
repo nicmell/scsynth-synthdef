@@ -268,6 +268,27 @@ fn the_second_wave_refuses_what_sclang_refuses() {
 }
 
 #[test]
+fn splay_and_splay_az_refuse_a_text_level_comp() {
+    // refused_splay_levelcomp_text and refused_splayaz_levelcomp_text.
+    for (class, selector) in [("Splay", "ar"), ("SplayAz", "kr")] {
+        let mut b = builder();
+        let pair = input(vec![1.0.into(), 2.0.into()]);
+        let mut args = vec![
+            ("inArray", pair),
+            ("levelComp", ArgValue::Text("abc".to_owned())),
+        ];
+        if class == "SplayAz" {
+            args.push(("numChans", input(2.0)));
+        }
+        let refused = b.ugen(class, selector, &args);
+        assert!(
+            matches!(&refused, Err(BuildError::WrongKind { argument, .. }) if argument == "levelComp"),
+            "{class}: {refused:?}"
+        );
+    }
+}
+
+#[test]
 fn splay_az_refuses_to_blend_a_spread_at_scalar_or_demand_rate() {
     // At scalar rate, sclang builds the LinXFade2 of `blend` outside the
     // graph (fact 10 of the plan of 0.3).

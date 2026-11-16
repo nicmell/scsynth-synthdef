@@ -1,35 +1,53 @@
 //! The bodies of `Poll.sc`.
 
-use super::{Args, lang, sclang_class};
+use super::{Args, elements, lang, sclang_class};
 use crate::builder::{NewUGen, SynthDefBuilder, symbol_codes};
 use crate::catalog;
 use crate::check_inputs;
+use crate::env::flop;
 use crate::error::BuildError;
 use crate::rate::Rate;
 use crate::ugen_input::UGenInput;
 
-/// `Poll.ar`, `Poll.kr` and `Poll.new`: a `Poll` for each instance of
-/// `trig`, `in` and `trigid`, with the label left out of the expansion. The
-/// call gives back `in`.
+/// `Poll.ar`, `Poll.kr` and `Poll.new`, with one label. The call gives back
+/// `in`.
 pub(super) fn poll(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {
     let input = args.input("in")?;
+    let rate = match args.selector() {
+        "ar" => Some(Rate::Audio),
+        "kr" => Some(Rate::Control),
+        _ => None,
+    };
     let label = args.text("label")?;
     let values = [args.input("trig")?, input.clone(), args.input("trigid")?];
-    builder.expand(
-        "Poll",
-        &["trig", "in", "trigid"],
-        &values,
-        true,
-        &mut |builder, instance| {
-            let rate = match args.selector() {
-                "ar" => Rate::Audio,
-                "kr" => Rate::Control,
-                _ => lang::rate(&instance[1]).unwrap_or(Rate::Scalar),
-            };
-            new_poll(builder, rate, instance, label.as_deref())
-        },
-    )?;
+    polls(builder, rate, &values, label.as_slice())?;
     Ok(input)
+}
+
+/// The `Poll`s of `trig`, `in` and `trigid`: one level of `multiNewList`,
+/// then a `Poll` for each instance of each row. A row runs at `rate`, or for
+/// `Poll.new` at the rate of its element of `in`, which sclang takes before
+/// the expansion. The label of a row wraps over `labels`, and without one
+/// each `Poll` gets the label of `Poll:new1`.
+pub(super) fn polls(
+    builder: &mut SynthDefBuilder,
+    rate: Option<Rate>,
+    values: &[UGenInput; 3],
+    labels: &[String],
+) -> Result<(), BuildError> {
+    for (index, row) in elements(flop(values)).into_iter().enumerate() {
+        let row = elements(row);
+        let rate = rate.unwrap_or_else(|| lang::rate(&row[1]).unwrap_or(Rate::Scalar));
+        let label = labels.get(index % labels.len().max(1)).map(String::as_str);
+        builder.expand(
+            "Poll",
+            &["trig", "in", "trigid"],
+            &row,
+            true,
+            &mut |builder, instance| new_poll(builder, rate, instance, label),
+        )?;
+    }
+    Ok(())
 }
 
 /// `Poll:new1` for one instance of `trig`, `in` and `trigid`: the default
