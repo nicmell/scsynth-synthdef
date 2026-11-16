@@ -27,25 +27,44 @@ pub(super) fn var_lag(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGen
     if lang::rate(&input) == Some(Rate::Scalar) || time == UGenInput::Number(0.0) {
         return builder.madd(input, mul, add);
     }
+    let wire = [input, time, args.input("curvature")?];
+    let start = args.optional("start")?;
+    let lagged = var_lag_new(builder, args.selector(), wire, args.curve("warp")?, start)?;
+    builder.madd(lagged, mul, add)
+}
+
+/// `VarLag.multiNew`: the expansion of `in`, `time` and `curvature` of
+/// `wire`, the warp and the start, then `new1` of each instance with the
+/// selector of its rate, `ar` or `kr`.
+pub(super) fn var_lag_new(
+    builder: &mut SynthDefBuilder,
+    selector: &str,
+    wire: [UGenInput; 3],
+    warp: Curve,
+    start: Option<UGenInput>,
+) -> Result<UGenInput, BuildError> {
     let mut warps = Vec::new();
-    let warp = leaves(args.curve("warp")?, &mut warps);
+    let warp = leaves(warp, &mut warps);
     let mut names = vec!["in", "time", "curvature", "warp"];
-    let mut values = vec![input, time, args.input("curvature")?, warp];
-    if let Some(start) = args.optional("start")? {
+    let mut values = Vec::from(wire);
+    values.push(warp);
+    if let Some(start) = start {
         names.push("start");
         values.push(start);
     }
-    let selector = args.selector();
-    let lagged = builder.expand("VarLag", &names, &values, true, &mut |builder, instance| {
+    builder.expand("VarLag", &names, &values, true, &mut |builder, instance| {
         let warp = match instance[3] {
             UGenInput::Number(index) => warps.get(super::count_to_usize(index)),
             _ => None,
         };
-        let warp = warp.ok_or_else(|| args.wrong_kind("warp", "a curve"))?;
+        let warp = warp.ok_or_else(|| BuildError::WrongKind {
+            class: "VarLag".to_owned(),
+            argument: "warp".to_owned(),
+            expected: "a curve",
+        })?;
         let start = instance.get(4).unwrap_or(&instance[0]).clone();
         new1(builder, selector, &instance[..3], warp, start)
-    })?;
-    builder.madd(lagged, mul, add)
+    })
 }
 
 /// The curve in its shape, each leaf replaced by its index in `warps`.

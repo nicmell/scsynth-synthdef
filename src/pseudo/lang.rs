@@ -363,6 +363,7 @@ fn quantize(x: f64, quant: f64, round: impl Fn(f64) -> f64) -> f64 {
 }
 
 /// A unary operator on a Float, as `doSpecialUnaryArithMsg` computes it.
+#[allow(clippy::float_cmp)]
 fn number_unary(op: &str, x: f64) -> Option<f64> {
     Some(match op {
         "neg" => -x,
@@ -374,6 +375,15 @@ fn number_unary(op: &str, x: f64) -> Option<f64> {
         "exp" => x.exp(),
         "log" => x.ln(),
         "squared" => x * x,
+        "sign" => {
+            if x > 0.0 {
+                1.0
+            } else if x == 0.0 {
+                0.0
+            } else {
+                -1.0
+            }
+        }
         _ => return None,
     })
 }
@@ -490,7 +500,7 @@ mod tests {
                 "{x}.{op}: {computed}, not {expected}"
             );
         }
-        assert_eq!(rows(&table, "unary").len(), 81);
+        assert_eq!(rows(&table, "unary").len(), 90);
     }
 
     #[test]

@@ -13,6 +13,9 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
     match name {
         "ugenranges" => [ranges(), other_ranges()].concat(),
         "ugenmaps" => [maps(), curves(), bilins(), clips()].concat(),
+        "ugenlags" => [lags(), varlags()].concat(),
+        "ugenmisc" => [misc(), checks(), more_misc()].concat(),
+        "ugenreceivers" => [arrays(), numbers()].concat(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -507,4 +510,564 @@ fn clips() -> Vec<SynthDef> {
         }));
     }
     defs
+}
+
+/// The arguments `t1` and, if given, `t2` of `lag`.
+fn times(t1: impl Into<UGenInput>, t2: Option<f64>) -> Vec<(&'static str, ArgValue)> {
+    let mut args = vec![("t1", input(t1))];
+    args.extend(t2.map(|t2| ("t2", input(t2))));
+    args
+}
+
+/// The cases of `ugenlags` of the lag family, from `ugenlags_lag` to
+/// `ugenlags_demand`.
+fn lags() -> Vec<SynthDef> {
+    vec![
+        def("ugenlags_lag", vec![], |b| {
+            let x = kr(b, "x", 1.0);
+            let r = send(b, x, "lag", &times(0.2, None));
+            out(b, "kr", r);
+        }),
+        def("ugenlags_lag_defaults", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let r = send(b, s, "lag", &[]);
+            out(b, "kr", r);
+        }),
+        def("ugenlags_lag_zero", vec![], |b| {
+            let x = kr(b, "x", 1.0);
+            let r = send(b, x, "lag", &times(0.0, None));
+            out(b, "kr", r);
+        }),
+        def("ugenlags_lag_ud", vec![], |b| {
+            let x = kr(b, "x", 1.0);
+            let r = send(b, x, "lag", &times(0.1, Some(0.2)));
+            out(b, "kr", r);
+        }),
+        def("ugenlags_lag2", vec![], |b| two_lags(b, "lag2")),
+        def("ugenlags_lag3", vec![], |b| two_lags(b, "lag3")),
+        def("ugenlags_lagud", vec![], |b| {
+            let up_down = |up: f64, down: f64| [("lagTimeU", input(up)), ("lagTimeD", input(down))];
+            let x = kr(b, "x", 1.0);
+            let first = send(b, x, "lagud", &[]);
+            let y = kr(b, "y", 1.0);
+            let second = send(b, y, "lag2ud", &up_down(0.1, 0.3));
+            let z = kr(b, "z", 1.0);
+            let third = send(b, z, "lag3ud", &up_down(0.0, 0.0));
+            out(b, "kr", UGenInput::Array(vec![first, second, third]));
+        }),
+        def("ugenlags_audio", vec![], |b| {
+            let s = sine(b, "ar", 440.0);
+            let r = send(b, s, "lag", &times(0.01, None));
+            out(b, "ar", r);
+        }),
+        def("ugenlags_scalar", vec![], |b| {
+            let r = rand(b, 0.0, 1.0);
+            let lagged = send(b, r, "lag", &times(0.1, None));
+            out(b, "kr", lagged);
+        }),
+        def("ugenlags_demand", vec![], |b| {
+            demand_out(b, |b, d| send(b, d, "lag", &times(0.1, None)));
+        }),
+    ]
+}
+
+/// `Out.kr(0, [\x.kr(1).selector(0.1), \y.kr(1).selector(0.1, 0.2)])`.
+fn two_lags(b: &mut SynthDefBuilder, selector: &str) {
+    let x = kr(b, "x", 1.0);
+    let first = send(b, x, selector, &times(0.1, None));
+    let y = kr(b, "y", 1.0);
+    let second = send(b, y, selector, &times(0.1, Some(0.2)));
+    out(b, "kr", UGenInput::Array(vec![first, second]));
+}
+
+/// The cases of `ugenlags` of `varlag`, `slew` and the times, from
+/// `ugenlags_varlag` to `ugenlags_varlag_audio`.
+fn varlags() -> Vec<SynthDef> {
+    let varlag = |b: &mut SynthDefBuilder, args: &[(&str, ArgValue)]| {
+        let x = kr(b, "x", 1.0);
+        let r = send(b, x, "varlag", args);
+        out(b, "kr", r);
+    };
+    vec![
+        def("ugenlags_varlag", vec![], |b| {
+            varlag(b, &[("time", input(0.2)), ("curvature", input(2.0))]);
+        }),
+        def("ugenlags_varlag_defaults", vec![], |b| varlag(b, &[])),
+        def("ugenlags_varlag_zero", vec![], |b| {
+            varlag(b, &[("time", input(0.0))]);
+        }),
+        def("ugenlags_varlag_start", vec![], |b| {
+            let args = [
+                ("time", input(0.2)),
+                ("curvature", input(0.0)),
+                ("warp", ArgValue::from("lin")),
+                ("start", input(0.5)),
+            ];
+            varlag(b, &args);
+        }),
+        def("ugenlags_slew", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let first = send(b, s, "slew", &[]);
+            let s = sine(b, "kr", 2.0);
+            let second = send(b, s, "slew", &[("up", input(2.0)), ("down", input(3.0))]);
+            out(b, "kr", UGenInput::Array(vec![first, second]));
+        }),
+        def("ugenlags_slew_audio", vec![], |b| {
+            let s = sine(b, "ar", 440.0);
+            let r = send(
+                b,
+                s,
+                "slew",
+                &[("up", input(100.0)), ("down", input(100.0))],
+            );
+            out(b, "ar", r);
+        }),
+        def("ugenlags_ugen_time", vec![], |b| {
+            let x = kr(b, "x", 1.0);
+            let t = kr(b, "t", 0.1);
+            let r = send(b, x, "lag", &times(t, None));
+            out(b, "kr", r);
+        }),
+        def("ugenlags_array_time", vec![], |b| {
+            let x = kr(b, "x", 1.0);
+            let r = send(b, x, "lag", &times(array(&[0.1, 0.2]), None));
+            out(b, "kr", r);
+        }),
+        def("ugenlags_varlag_audio", vec![], |b| {
+            let s = sine(b, "ar", 440.0);
+            let r = send(b, s, "varlag", &[("time", input(0.2))]);
+            out(b, "ar", r);
+        }),
+    ]
+}
+
+/// The cases of `ugenmisc` from `ugenmisc_blend` to `ugenmisc_dpoll`.
+fn misc() -> Vec<SynthDef> {
+    let blend =
+        |that: UGenInput, frac: UGenInput| [("that", input(that)), ("blendFrac", input(frac))];
+    vec![
+        def("ugenmisc_blend", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let that = sine(b, "kr", 2.0);
+            let r = send(b, s, "blend", &blend(that, 0.25.into()));
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_blend_audio", vec![], |b| {
+            let s = sine(b, "ar", 440.0);
+            let that = sine(b, "ar", 2.0);
+            let r = send(b, s, "blend", &[("that", input(that))]);
+            out(b, "ar", r);
+        }),
+        def("ugenmisc_blend_number", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let r = send(b, s, "blend", &blend(0.5.into(), 0.25.into()));
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_blend_ugen", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let that = sine(b, "kr", 2.0);
+            let frac = kr(b, "f", 0.5);
+            let r = send(b, s, "blend", &blend(that, frac));
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_minnyquist", vec![], |b| {
+            let f = kr(b, "f", 1000.0);
+            let r = send(b, f, "minNyquist", &[]);
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_degrad", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let first = send(b, s, "degrad", &[]);
+            let s = sine(b, "kr", 2.0);
+            let second = send(b, s, "raddeg", &[]);
+            out(b, "kr", UGenInput::Array(vec![first, second]));
+        }),
+        def("ugenmisc_moddif", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let first = send(b, s, "moddif", &[("that", input(0.5))]);
+            let r = rand(b, 0.0, 1.0);
+            let second = send(b, r, "moddif", &[]);
+            out(b, "kr", UGenInput::Array(vec![first, second]));
+            let s = sine(b, "ar", 440.0);
+            let third = send(b, s, "moddif", &[("that", input(0.5)), ("mod", input(2.0))]);
+            out(b, "ar", third);
+        }),
+        def("ugenmisc_moddif_demand", vec![], |b| {
+            let args = [("that", input(1.0)), ("mod", input(3.0))];
+            demand_out(b, |b, d| send(b, d, "moddif", &args));
+        }),
+        def("ugenmisc_sanitize", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let first = send(b, s, "sanitize", &[]);
+            out(b, "kr", first);
+            let s = sine(b, "ar", 440.0);
+            let second = send(b, s, "sanitize", &[]);
+            out(b, "ar", second);
+        }),
+        def("ugenmisc_poll", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let r = send(b, s, "poll", &[]);
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_poll_args", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let trig = impulse(b, "kr", 2.0);
+            let args = [
+                ("trig", input(trig)),
+                ("label", ArgValue::from("x")),
+                ("trigid", input(3.0)),
+            ];
+            let r = send(b, s, "poll", &args);
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_dpoll", vec![], |b| {
+            demand_out(b, |b, d| send(b, d, "dpoll", &[]));
+        }),
+    ]
+}
+
+/// The cases of `ugenmisc` from `ugenmisc_checkbadvalues` to
+/// `ugenmisc_snap_demand`.
+fn checks() -> Vec<SynthDef> {
+    vec![
+        def("ugenmisc_checkbadvalues", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let first = send(b, s, "checkBadValues", &[]);
+            out(b, "kr", first);
+            let s = sine(b, "ar", 440.0);
+            let second = send(
+                b,
+                s,
+                "checkBadValues",
+                &[("id", input(1.0)), ("post", input(0.0))],
+            );
+            out(b, "ar", second);
+        }),
+        def("ugenmisc_checkbadvalues_scalar", vec![], |b| {
+            let r = rand(b, 0.0, 1.0);
+            let checked = send(b, r, "checkBadValues", &[]);
+            out(b, "kr", checked);
+        }),
+        def("ugenmisc_checkbadvalues_demand", vec![], |b| {
+            demand_out(b, |b, d| send(b, d, "checkBadValues", &[]));
+        }),
+        def("ugenmisc_snap", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let first = send(b, s, "snap", &[]);
+            let s = sine(b, "kr", 2.0);
+            let args = [
+                ("resolution", input(0.5)),
+                ("margin", input(0.1)),
+                ("strength", input(0.5)),
+            ];
+            let second = send(b, s, "softRound", &args);
+            out(b, "kr", UGenInput::Array(vec![first, second]));
+        }),
+        def("ugenmisc_snap_scalar", vec![], |b| {
+            let r = rand(b, 0.0, 1.0);
+            let snapped = send(b, r, "snap", &[]);
+            out(b, "kr", snapped);
+        }),
+        def("ugenmisc_snap_demand", vec![], |b| {
+            demand_out(b, |b, d| send(b, d, "snap", &[]));
+        }),
+    ]
+}
+
+/// The cases of `ugenmisc` from `ugenmisc_binaryvalue` to
+/// `ugenmisc_snap_audio`.
+fn more_misc() -> Vec<SynthDef> {
+    let one = |selector: &'static str, args: &'static [(&'static str, f64)]| {
+        move |b: &mut SynthDefBuilder| {
+            let s = sine(b, "kr", 1.0);
+            let args: Vec<(&str, ArgValue)> = args
+                .iter()
+                .map(|&(name, value)| (name, input(value)))
+                .collect();
+            let r = send(b, s, selector, &args);
+            out(b, "kr", r);
+        }
+    };
+    vec![
+        def("ugenmisc_binaryvalue", vec![], one("binaryValue", &[])),
+        def("ugenmisc_signs", vec![], |b| {
+            let signs = ["isPositive", "isNegative", "isStrictlyPositive"]
+                .into_iter()
+                .zip(1..=3)
+                .map(|(selector, freq)| {
+                    let s = sine(b, "kr", f64::from(freq));
+                    send(b, s, selector, &[])
+                })
+                .collect();
+            out(b, "kr", UGenInput::Array(signs));
+        }),
+        def(
+            "ugenmisc_lazy_equals",
+            vec![],
+            one("|==|", &[("that", 0.5)]),
+        ),
+        def(
+            "ugenmisc_degreetokey",
+            vec![],
+            one("degreeToKey", &[("scale", 0.0)]),
+        ),
+        def("ugenmisc_degreetokey_audio", vec![], |b| {
+            let s = sine(b, "ar", 440.0);
+            let args = [("scale", input(0.0)), ("stepsPerOctave", input(7.0))];
+            let r = send(b, s, "degreeToKey", &args);
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_if", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let test = b.binary_op(">", s, 0.0).unwrap();
+            let r = send(
+                b,
+                test,
+                "if",
+                &[("trueUGen", input(200.0)), ("falseUGen", input(400.0))],
+            );
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_if_ugen", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let test = b.binary_op(">", s, 0.0).unwrap();
+            let truth = sine(b, "kr", 2.0);
+            let r = send(
+                b,
+                test,
+                "if",
+                &[("trueUGen", input(truth)), ("falseUGen", input(400.0))],
+            );
+            out(b, "kr", r);
+        }),
+        def("ugenmisc_snap_audio", vec![], |b| {
+            let s = sine(b, "ar", 440.0);
+            let r = send(b, s, "snap", &[("resolution", input(0.5))]);
+            out(b, "ar", r);
+        }),
+    ]
+}
+
+/// The elements of a nested array, in order, as `flat` gives them.
+fn flat(input: UGenInput) -> Vec<UGenInput> {
+    match input {
+        UGenInput::Array(items) => items.into_iter().flat_map(flat).collect(),
+        other => vec![other],
+    }
+}
+
+/// The cases of `ugenreceivers` with an array, from `ugenreceivers_range` to
+/// `ugenreceivers_sanitize`.
+fn arrays() -> Vec<SynthDef> {
+    let two_sines = |b: &mut SynthDefBuilder| {
+        let first = sine(b, "kr", 1.0);
+        let second = sine(b, "kr", 2.0);
+        UGenInput::Array(vec![first, second])
+    };
+    vec![
+        def("ugenreceivers_range", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let p = pulse(b, "kr", 1.0);
+            let r = send(b, vec![s, p], "range", &lo_hi(0.0, array(&[1.0, 2.0])));
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_wraps", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let r = send(b, vec![s], "range", &lo_hi(0.0, array(&[1.0, 2.0, 3.0])));
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_nested", vec![], |b| {
+            let inner = two_sines(b);
+            let third = sine(b, "kr", 3.0);
+            let r = send(b, vec![inner, third], "range", &lo_hi(2.0, 4.0));
+            out(b, "kr", UGenInput::Array(flat(r)));
+        }),
+        def("ugenreceivers_number", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let r = send(b, vec![s, 0.5.into()], "lag", &times(0.2, None));
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_linlin", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let r = send(
+                b,
+                vec![s, 0.25.into()],
+                "linlin",
+                &map([0.0, 1.0, 200.0, 800.0]),
+            );
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_unary", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let first = send(b, vec![s, 0.5.into()], "degrad", &[]);
+            let s = sine(b, "kr", 2.0);
+            let saw = by_name(b, "LFSaw", "kr", &[("freq", input(2.0))]);
+            let second = send(b, vec![s, saw], "isPositive", &[]);
+            out(
+                b,
+                "kr",
+                UGenInput::Array([flat(first), flat(second)].concat()),
+            );
+        }),
+        def("ugenreceivers_lazy_equals", vec![], |b| {
+            let pair = two_sines(b);
+            let third = sine(b, "kr", 3.0);
+            let r = send(b, pair, "|==|", &[("that", input(third))]);
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_minnyquist", vec![], |b| {
+            let f = kr(b, "f", 1000.0);
+            let g = kr(b, "g", 2000.0);
+            let r = send(b, vec![f, g], "minNyquist", &[]);
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_poll", vec![], |b| {
+            let pair = two_sines(b);
+            let r = send(b, pair, "poll", &[]);
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_dpoll", vec![], |b| {
+            let trig = impulse(b, "kr", 1.0);
+            let first = dseq(b, &[1.0, 2.0]);
+            let second = dseq(b, &[3.0, 4.0]);
+            let polled = send(b, vec![first, second], "dpoll", &[]);
+            let args = [
+                ("trig", input(trig)),
+                ("reset", input(0.0)),
+                ("demandUGens", input(polled)),
+            ];
+            let demand = by_name(b, "Demand", "kr", &args);
+            out(b, "kr", demand);
+        }),
+        def("ugenreceivers_degreetokey", vec![], |b| {
+            let pair = two_sines(b);
+            let r = send(b, pair, "degreeToKey", &[("scale", input(0.0))]);
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_checkbadvalues", vec![], |b| {
+            let pair = two_sines(b);
+            let args = [("id", input(0.0)), ("post", input(array(&[1.0, 2.0])))];
+            let r = send(b, pair, "checkBadValues", &args);
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_sanitize", vec![], |b| {
+            let pair = two_sines(b);
+            let r = send(b, pair, "sanitize", &[]);
+            out(b, "kr", r);
+        }),
+    ]
+}
+
+/// `number.selector(args)`, which computes a number or adds UGens.
+fn number(b: &mut SynthDefBuilder, x: f64, selector: &str, args: &[(&str, ArgValue)]) -> UGenInput {
+    send(b, x, selector, args)
+}
+
+/// The arguments `inMin`, `inMax`, `outMin` and `outMax`, then `curve`.
+fn curve_map(ranges: [f64; 4], curve: f64) -> Vec<(&'static str, ArgValue)> {
+    map_with(ranges, &[("curve", input(curve))])
+}
+
+/// The cases of `ugenreceivers` with a number, from `ugenreceivers_numbers`
+/// to `ugenreceivers_number_lazy_equals`.
+fn numbers() -> Vec<SynthDef> {
+    vec![
+        def("ugenreceivers_numbers", vec![], |b| {
+            let values = vec![
+                number(b, 0.25, "linlin", &map([0.0, 1.0, 200.0, 800.0])),
+                number(b, 0.5, "linexp", &map([0.0, 1.0, 20.0, 20000.0])),
+                number(b, 0.5, "explin", &map([0.01, 1.0, 0.0, 1.0])),
+                number(b, 0.5, "expexp", &map([0.01, 1.0, 20.0, 20000.0])),
+                number(b, 0.5, "lincurve", &curve_map([0.0, 1.0, 0.0, 1.0], -4.0)),
+                number(b, 0.5, "curvelin", &curve_map([0.0, 1.0, 0.0, 1.0], -4.0)),
+                number(b, 0.75, "bilin", &bilin_numbers()),
+                number(b, 0.25, "bilin", &bilin_numbers()),
+            ];
+            out(b, "kr", UGenInput::Array(values));
+        }),
+        def("ugenreceivers_clips", vec![], |b| {
+            let values = vec![
+                number(b, 1.5, "linlin", &map([0.0, 1.0, 200.0, 800.0])),
+                number(
+                    b,
+                    -0.5,
+                    "linlin",
+                    &map_with([0.0, 1.0, 2.0, 4.0], &[("clip", ArgValue::from("max"))]),
+                ),
+                number(b, 1.5, "clip", &lo_hi(0.0, 1.0)),
+                number(b, 1.5, "fold", &lo_hi(0.0, 1.0)),
+                number(b, 1.5, "wrap", &lo_hi(0.0, 1.0)),
+                number(b, 0.5, "lincurve", &curve_map([0.0, 1.0, 0.0, 1.0], 0.0001)),
+            ];
+            out(b, "kr", UGenInput::Array(values));
+        }),
+        def("ugenreceivers_number_ugen", vec![], |b| {
+            let low = kr(b, "lo", 200.0);
+            let args = [
+                ("inMin", input(0.0)),
+                ("inMax", input(1.0)),
+                ("outMin", input(low)),
+                ("outMax", input(800.0)),
+            ];
+            let r = number(b, 0.5, "linlin", &args);
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_number_misc", vec![], |b| {
+            let scale = array(&[0.0, 2.0, 4.0, 5.0, 7.0, 9.0, 11.0]);
+            let values = vec![
+                number(b, 0.5, "lag", &times(0.1, None)),
+                number(b, 0.5, "varlag", &[("time", input(0.1))]),
+                number(
+                    b,
+                    0.5,
+                    "blend",
+                    &[("that", input(1.0)), ("blendFrac", input(0.25))],
+                ),
+                number(b, 90.0, "degrad", &[]),
+                number(b, 1.0, "raddeg", &[]),
+                number(b, 0.5, "moddif", &[("that", input(0.9))]),
+                number(b, 0.97, "snap", &[]),
+                number(b, 0.97, "softRound", &[]),
+                number(b, -0.5, "binaryValue", &[]),
+                number(b, 2.5, "degreeToKey", &[("scale", input(scale))]),
+            ];
+            out(b, "kr", UGenInput::Array(values));
+        }),
+        def("ugenreceivers_number_blend", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let r = number(
+                b,
+                0.5,
+                "blend",
+                &[("that", input(s)), ("blendFrac", input(0.25))],
+            );
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_number_poll", vec![], |b| {
+            let r = number(b, 0.5, "poll", &[]);
+            out(b, "kr", r);
+        }),
+        def("ugenreceivers_number_lazy_equals", vec![], |b| {
+            let s = sine(b, "kr", 1.0);
+            let r = number(b, 0.5, "|==|", &[("that", input(s))]);
+            out(b, "kr", r);
+        }),
+    ]
+}
+
+/// The arguments of `bilin(0.5, 0, 1, 0.2, 0, 1)`.
+fn bilin_numbers() -> Vec<(&'static str, ArgValue)> {
+    let names = [
+        "inCenter",
+        "inMin",
+        "inMax",
+        "outCenter",
+        "outMin",
+        "outMax",
+    ];
+    names
+        .into_iter()
+        .zip([0.5, 0.0, 1.0, 0.2, 0.0, 1.0])
+        .map(|(name, value)| (name, input(value)))
+        .collect()
 }

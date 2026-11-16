@@ -15,6 +15,8 @@ type Body = fn(&mut SynthDefBuilder, UGenInput, &Args) -> Result<UGenInput, Buil
 
 /// The body of each method, by the class that owns it and its selector.
 static BODIES: &[(&str, &str, Body)] = &[
+    ("Array", "dpoll", array_poll),
+    ("Array", "poll", array_poll),
     ("DUGen", "expexp", demand_expexp),
     ("DUGen", "explin", explin),
     ("DUGen", "linexp", demand_linexp),
@@ -23,8 +25,16 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("Float", "fold", number_fold),
     ("Float", "wrap", number_wrap),
     ("LFGauss", "range", lf_gauss_range),
+    ("Object", "blend", number_blend),
+    ("Object", "|==|", object_lazy_equals),
     ("SequenceableCollection", "bilin", multi_channel_perform),
     ("SequenceableCollection", "bipolar", multi_channel_perform),
+    ("SequenceableCollection", "blend", multi_channel_perform),
+    (
+        "SequenceableCollection",
+        "checkBadValues",
+        multi_channel_perform,
+    ),
     ("SequenceableCollection", "clip", multi_channel_perform),
     ("SequenceableCollection", "curvelin", multi_channel_perform),
     (
@@ -32,40 +42,102 @@ static BODIES: &[(&str, &str, Body)] = &[
         "curverange",
         multi_channel_perform,
     ),
+    ("SequenceableCollection", "degrad", collect),
+    ("SequenceableCollection", "degreeToKey", collect),
     ("SequenceableCollection", "expexp", multi_channel_perform),
     ("SequenceableCollection", "explin", multi_channel_perform),
     ("SequenceableCollection", "exprange", multi_channel_perform),
     ("SequenceableCollection", "fold", multi_channel_perform),
+    ("SequenceableCollection", "isNegative", collect),
+    ("SequenceableCollection", "isPositive", collect),
+    ("SequenceableCollection", "isStrictlyPositive", collect),
+    ("SequenceableCollection", "lag", multi_channel_perform),
+    ("SequenceableCollection", "lag2", multi_channel_perform),
+    ("SequenceableCollection", "lag2ud", multi_channel_perform),
+    ("SequenceableCollection", "lag3", multi_channel_perform),
+    ("SequenceableCollection", "lag3ud", multi_channel_perform),
+    ("SequenceableCollection", "lagud", multi_channel_perform),
     ("SequenceableCollection", "lincurve", multi_channel_perform),
     ("SequenceableCollection", "linexp", multi_channel_perform),
     ("SequenceableCollection", "linlin", multi_channel_perform),
+    ("SequenceableCollection", "minNyquist", min_nyquist),
+    ("SequenceableCollection", "moddif", multi_channel_perform),
     ("SequenceableCollection", "prune", multi_channel_perform),
+    ("SequenceableCollection", "raddeg", collect),
     ("SequenceableCollection", "range", multi_channel_perform),
+    ("SequenceableCollection", "sanitize", multi_channel_perform),
+    ("SequenceableCollection", "slew", multi_channel_perform),
     ("SequenceableCollection", "unipolar", multi_channel_perform),
+    ("SequenceableCollection", "varlag", multi_channel_perform),
     ("SequenceableCollection", "wrap", multi_channel_perform),
     ("SimpleNumber", "bilin", number_bilin),
+    ("SimpleNumber", "binaryValue", binary_value),
     ("SimpleNumber", "curvelin", number_curvelin),
+    ("SimpleNumber", "degrad", degrad),
+    ("SimpleNumber", "degreeToKey", number_degree_to_key),
     ("SimpleNumber", "expexp", number_expexp),
     ("SimpleNumber", "explin", number_explin),
+    ("SimpleNumber", "isNegative", number_boolean),
+    ("SimpleNumber", "isPositive", number_boolean),
+    ("SimpleNumber", "isStrictlyPositive", number_boolean),
+    ("SimpleNumber", "lag", number_itself),
+    ("SimpleNumber", "lag2", number_itself),
+    ("SimpleNumber", "lag2ud", number_itself),
+    ("SimpleNumber", "lag3", number_itself),
+    ("SimpleNumber", "lag3ud", number_itself),
+    ("SimpleNumber", "lagud", number_itself),
     ("SimpleNumber", "lincurve", number_lincurve),
     ("SimpleNumber", "linexp", number_linexp),
     ("SimpleNumber", "linlin", number_linlin),
+    ("SimpleNumber", "moddif", number_moddif),
+    ("SimpleNumber", "poll", poll),
+    ("SimpleNumber", "raddeg", raddeg),
+    ("SimpleNumber", "slew", number_itself),
+    ("SimpleNumber", "snap", number_snap),
+    ("SimpleNumber", "softRound", number_snap),
+    ("SimpleNumber", "varlag", number_itself),
     ("UGen", "bilin", bilin),
+    ("UGen", "binaryValue", binary_value),
     ("UGen", "bipolar", bipolar),
+    ("UGen", "blend", blend),
+    ("UGen", "checkBadValues", check_bad_values),
     ("UGen", "clip", clip),
     ("UGen", "curvelin", curvelin),
     ("UGen", "curverange", curverange),
+    ("UGen", "degrad", degrad),
+    ("UGen", "degreeToKey", degree_to_key),
+    ("UGen", "dpoll", dpoll),
     ("UGen", "expexp", expexp),
     ("UGen", "explin", explin),
     ("UGen", "exprange", exprange),
     ("UGen", "fold", fold),
+    ("UGen", "if", ugen_if),
+    ("UGen", "isNegative", signs),
+    ("UGen", "isPositive", signs),
+    ("UGen", "isStrictlyPositive", signs),
+    ("UGen", "lag", lag),
+    ("UGen", "lag2", lag),
+    ("UGen", "lag2ud", lag_ud),
+    ("UGen", "lag3", lag),
+    ("UGen", "lag3ud", lag_ud),
+    ("UGen", "lagud", lag_ud),
     ("UGen", "lincurve", lincurve),
     ("UGen", "linexp", linexp),
     ("UGen", "linlin", linlin),
+    ("UGen", "minNyquist", min_nyquist),
+    ("UGen", "moddif", moddif),
+    ("UGen", "poll", poll),
     ("UGen", "prune", prune),
+    ("UGen", "raddeg", raddeg),
     ("UGen", "range", range),
+    ("UGen", "sanitize", sanitize),
+    ("UGen", "slew", slew),
+    ("UGen", "snap", snap),
+    ("UGen", "softRound", snap),
     ("UGen", "unipolar", unipolar),
+    ("UGen", "varlag", varlag),
     ("UGen", "wrap", wrap),
+    ("UGen", "|==|", lazy_equals),
 ];
 
 /// Sends the message of `method` to `receiver`, with the values of its
@@ -222,16 +294,20 @@ fn multi_new(
     })
 }
 
-/// The `methodSelectorForRate` of the receiver for a `Select`. At scalar or
-/// demand rate it names a method that `Select` does not have as a UGen, and
-/// sclang writes the definition without its `Out`.
-fn select_selector(this: &UGenInput, selector: &str) -> Result<&'static str, BuildError> {
+/// The `methodSelectorForRate` of the receiver for a method of `class`, `ar`
+/// or `kr`. At scalar or demand rate it names a method that `class` does not
+/// have as a UGen, and sclang writes the definition without its `Out`.
+fn rate_selector(
+    this: &UGenInput,
+    selector: &str,
+    class: &str,
+) -> Result<&'static str, BuildError> {
     match rate_of(this) {
         Rate::Audio => Ok("ar"),
         Rate::Control => Ok("kr"),
         rate => Err(bad_method(
             selector,
-            &format!("Select has no method for the rate {rate:?}, so sclang loses the Out"),
+            &format!("{class} has no method for the rate {rate:?}, so sclang loses the Out"),
         )),
     }
 }
@@ -513,7 +589,7 @@ fn curve_select(
     if rate_of(&curve) == Rate::Scalar {
         return Ok(result);
     }
-    let selector = select_selector(&this, args.selector())?;
+    let selector = rate_selector(&this, args.selector(), "Select")?;
     let magnitude = lang::unary(builder, "abs", curve)?;
     let which = lang::binary(builder, ">=", magnitude, 0.125.into())?;
     let linear = send_linlin(builder, this, args)?;
@@ -534,7 +610,7 @@ fn bilin(
     this: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    let selector = select_selector(&this, "bilin")?;
+    let selector = rate_selector(&this, "bilin", "Select")?;
     let in_center = args.input("inCenter")?;
     let which = lang::binary(builder, "<", this.clone(), in_center.clone())?;
     let clip = args.text("clip")?.map(ArgValue::Text);
@@ -1014,4 +1090,537 @@ fn multi_channel_perform(
         results.push(send_message(builder, element, args.selector(), values)?);
     }
     Ok(UGenInput::Array(results))
+}
+
+/// `SequenceableCollection:performUnaryOp` and `degreeToKey`: the message to
+/// each element, with the same arguments.
+fn collect(
+    builder: &mut SynthDefBuilder,
+    receiver: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    super::elements(receiver)
+        .into_iter()
+        .map(|element| send_message(builder, element, args.selector(), args.values.clone()))
+        .collect::<Result<_, _>>()
+        .map(UGenInput::Array)
+}
+
+/// The lag family of `SimpleNumber`, which gives the number.
+#[allow(clippy::unnecessary_wraps)]
+fn number_itself(
+    _builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    _args: &Args,
+) -> Result<UGenInput, BuildError> {
+    Ok(this)
+}
+
+/// `UGen:lag`, `lag2` and `lag3`: `Lag`, `Lag2` or `Lag3` of `t1` at the
+/// rate of the receiver, or the `UD` class of `t1` and `t2` when `t2` is
+/// given.
+fn lag(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let (single, both) = match args.selector() {
+        "lag" => ("Lag", "LagUD"),
+        "lag2" => ("Lag2", "Lag2UD"),
+        _ => ("Lag3", "Lag3UD"),
+    };
+    let rate = rate_of(&this);
+    let up = args.input("t1")?;
+    match args.optional("t2")? {
+        None => multi_new(builder, single, rate, &["in", "lagTime"], &[this, up]),
+        Some(down) => multi_new(
+            builder,
+            both,
+            rate,
+            &["in", "lagTimeU", "lagTimeD"],
+            &[this, up, down],
+        ),
+    }
+}
+
+/// `UGen:lagud`, `lag2ud` and `lag3ud`: the `UD` class at the rate of the
+/// receiver.
+fn lag_ud(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let class = match args.selector() {
+        "lagud" => "LagUD",
+        "lag2ud" => "Lag2UD",
+        _ => "Lag3UD",
+    };
+    let (up, down) = (args.input("lagTimeU")?, args.input("lagTimeD")?);
+    let rate = rate_of(&this);
+    multi_new(
+        builder,
+        class,
+        rate,
+        &["in", "lagTimeU", "lagTimeD"],
+        &[this, up, down],
+    )
+}
+
+/// `UGen:varlag`: the `VarLag.multiNew` of 0.9 at the rate of the receiver,
+/// without the passthrough of `VarLag.kr`. Its `new1` takes `ar` at audio
+/// rate and `kr` at any other.
+fn varlag(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let selector = if rate_of(&this) == Rate::Audio {
+        "ar"
+    } else {
+        "kr"
+    };
+    let wire = [this, args.input("time")?, args.input("curvature")?];
+    let start = args.optional("start")?;
+    super::filter::var_lag_new(builder, selector, wire, args.curve("warp")?, start)
+}
+
+/// `UGen:slew`: a `Slew` at the rate of the receiver.
+fn slew(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let (up, down) = (args.input("up")?, args.input("down")?);
+    let rate = rate_of(&this);
+    multi_new(
+        builder,
+        "Slew",
+        rate,
+        &["in", "up", "dn"],
+        &[this, up, down],
+    )
+}
+
+/// `UGen:blend`: `XFade2.ar` when the receiver or `that` runs at audio rate,
+/// else `LinXFade2`, with the pan of `blendFrac.linlin(0, 1, -1, 1)`. sclang
+/// does not implement it at demand rate.
+fn blend(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let that = args.input("that")?;
+    let (own, other) = (rate_of(&this), rate_of(&that));
+    if own == Rate::Demand || other == Rate::Demand {
+        return Err(bad_method("blend", "NotYetImplementedError at demand rate"));
+    }
+    let given = [0.0, 1.0, -1.0, 1.0].map(|value| Some(ArgValue::from(value)));
+    let pan = send_message(builder, args.input("blendFrac")?, "linlin", given.to_vec())?;
+    let (class, selector, a, b, pan) = if own == Rate::Audio {
+        ("XFade2", "ar", this, that, pan)
+    } else if other == Rate::Audio {
+        let pan = lang::unary(builder, "neg", pan)?;
+        ("XFade2", "ar", that, this, pan)
+    } else {
+        let selector = rate_selector(&this, "blend", "LinXFade2")?;
+        ("LinXFade2", selector, this, that, pan)
+    };
+    builder.ugen(
+        class,
+        selector,
+        &[("inA", a.into()), ("inB", b.into()), ("pan", pan.into())],
+    )
+}
+
+/// `Object:blend`: `this + (blendFrac * (that - this))`.
+fn number_blend(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let difference = lang::binary(builder, "-", args.input("that")?, this.clone())?;
+    let scaled = lang::binary(builder, "*", args.input("blendFrac")?, difference)?;
+    lang::binary(builder, "+", this, scaled)
+}
+
+/// `minNyquist`: `min(this, SampleRate.ir * 0.5)`, for a UGen and for an
+/// array.
+fn min_nyquist(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    _args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let rate = builder.ugen("SampleRate", "ir", &[])?;
+    let half = lang::binary(builder, "*", rate, 0.5.into())?;
+    lang::binary(builder, "min", this, half)
+}
+
+/// `degrad`: `this * 0.01745329251994329547`, for a UGen and for a number.
+fn degrad(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    _args: &Args,
+) -> Result<UGenInput, BuildError> {
+    lang::binary(builder, "*", this, 0.017_453_292_519_943_295.into())
+}
+
+/// `raddeg`: `this * 57.29577951308232286465`, for a UGen and for a number.
+fn raddeg(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    _args: &Args,
+) -> Result<UGenInput, BuildError> {
+    lang::binary(builder, "*", this, 57.295_779_513_082_32.into())
+}
+
+/// `UGen:moddif`: a `ModDif` at the rate of the receiver.
+fn moddif(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let (that, modulus) = (args.input("that")?, args.input("mod")?);
+    let rate = rate_of(&this);
+    multi_new(
+        builder,
+        "ModDif",
+        rate,
+        &["x", "y", "mod"],
+        &[this, that, modulus],
+    )
+}
+
+/// `SimpleNumber:moddif`.
+fn number_moddif(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    lang::moddif(builder, this, args.input("that")?, args.input("mod")?)
+}
+
+/// `UGen:sanitize`: a `Sanitize` by the `methodSelectorForRate` of the
+/// receiver.
+fn sanitize(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    _args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let selector = rate_selector(&this, "sanitize", "Sanitize")?;
+    builder.ugen("Sanitize", selector, &[("in", this.into())])
+}
+
+/// `poll`: `Poll(trig, this, label, trigid)`, for a UGen and for a number.
+fn poll(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let label = args.text("label")?;
+    poll_with(builder, this, args, label)
+}
+
+/// `Poll(trig, this, label, trigid)`.
+fn poll_with(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+    label: Option<String>,
+) -> Result<UGenInput, BuildError> {
+    let mut given = vec![
+        ("trig", args.value("trig")?),
+        ("in", this.into()),
+        ("trigid", args.value("trigid")?),
+    ];
+    given.extend(label.map(|label| ("label", ArgValue::Text(label))));
+    builder.ugen("Poll", "new", &given)
+}
+
+/// `UGen:dpoll`: `Dpoll(this, label, run, trigid)`.
+fn dpoll(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let label = args.text("label")?;
+    dpoll_with(builder, this, args, label)
+}
+
+/// `Dpoll(this, label, run, trigid)`, with the label of `Dpoll:new1`,
+/// "DemandUGen(class)", for a nil label.
+fn dpoll_with(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+    label: Option<String>,
+) -> Result<UGenInput, BuildError> {
+    let label = label.unwrap_or_else(|| format!("DemandUGen({})", sclang_class(builder, &this)));
+    let given = [
+        ("in", this.into()),
+        ("label", ArgValue::Text(label)),
+        ("run", args.value("run")?),
+        ("trigid", args.value("trigid")?),
+    ];
+    builder.ugen("Dpoll", "new", &given)
+}
+
+/// `Array:poll` and `dpoll`: the label "UGen Array [i]" for each element
+/// when `label` is nil, as `Poll` and `Dpoll` expand an array of labels.
+fn array_poll(
+    builder: &mut SynthDefBuilder,
+    receiver: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let label = args.text("label")?;
+    let elements = super::elements(receiver);
+    let mut results = Vec::with_capacity(elements.len());
+    for (index, element) in elements.into_iter().enumerate() {
+        let label = label
+            .clone()
+            .or_else(|| Some(format!("UGen Array [{index}]")));
+        results.push(if args.selector() == "poll" {
+            poll_with(builder, element, args, label)?
+        } else {
+            dpoll_with(builder, element, args, label)?
+        });
+    }
+    Ok(UGenInput::Array(results))
+}
+
+/// `UGen:checkBadValues`: a `CheckBadValues` by the `methodSelectorForRate`
+/// of the receiver, and nothing at scalar or demand rate, where that names a
+/// method that `CheckBadValues` does not have as a UGen. It gives back the
+/// receiver.
+fn check_bad_values(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let selector = match rate_of(&this) {
+        Rate::Audio => "ar",
+        Rate::Control => "kr",
+        _ => return Ok(this),
+    };
+    let given = [
+        ("in", this.clone().into()),
+        ("id", args.value("id")?),
+        ("post", args.value("post")?),
+    ];
+    builder.ugen("CheckBadValues", selector, &given)?;
+    Ok(this)
+}
+
+/// `UGen:snap` and `softRound`: a `Select` at the rate of the receiver, by
+/// `abs(diff) < margin` or `abs(diff) > margin`, of the receiver and the
+/// receiver moved by `strength * diff` toward `round(this, resolution)`.
+fn snap(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let op = if args.selector() == "snap" { "<" } else { ">" };
+    let round = lang::binary(builder, "round", this.clone(), args.input("resolution")?)?;
+    let difference = lang::binary(builder, "-", round, this.clone())?;
+    let size = lang::unary(builder, "abs", difference.clone())?;
+    let which = lang::binary(builder, op, size, args.input("margin")?)?;
+    let scaled = lang::binary(builder, "*", args.input("strength")?, difference)?;
+    let moved = lang::binary(builder, "+", this.clone(), scaled)?;
+    let rate = rate_of(&this);
+    multi_new(
+        builder,
+        "Select",
+        rate,
+        &["which", "array", "array"],
+        &[which, this, moved],
+    )
+}
+
+/// `SimpleNumber:snap` and `softRound`: the number moved by
+/// `strength * diff`, if `abs(diff) < margin`, or `> margin`.
+fn number_snap(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let selector = args.selector();
+    let round = lang::binary(builder, "round", this.clone(), args.input("resolution")?)?;
+    let difference = lang::binary(builder, "-", round, this.clone())?;
+    let UGenInput::Number(size) = lang::unary(builder, "abs", difference.clone())? else {
+        return Err(bad_method(selector, "Non Boolean in test."));
+    };
+    let close = if selector == "snap" {
+        compared(selector, size, &args.input("margin")?, |size, margin| {
+            size < margin
+        })?
+    } else {
+        compared(selector, size, &args.input("margin")?, |size, margin| {
+            size > margin
+        })?
+    };
+    if !close {
+        return Ok(this);
+    }
+    let scaled = lang::binary(builder, "*", args.input("strength")?, difference)?;
+    lang::binary(builder, "+", this, scaled)
+}
+
+/// `binaryValue`: `this.sign.max(0)`, for a UGen and for a number.
+fn binary_value(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    _args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let sign = lang::unary(builder, "sign", this)?;
+    lang::binary(builder, "max", sign, 0.0.into())
+}
+
+/// `UGen:isPositive`, `isNegative` and `isStrictlyPositive`: `this >= 0`,
+/// `this < 0` and `this > 0`.
+fn signs(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let op = match args.selector() {
+        "isPositive" => ">=",
+        "isNegative" => "<",
+        _ => ">",
+    };
+    lang::binary(builder, op, this, 0.0.into())
+}
+
+/// The methods of `SimpleNumber` that give a Boolean, which no UGen takes as
+/// an input.
+fn number_boolean(
+    _builder: &mut SynthDefBuilder,
+    _this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    Err(bad_method(
+        args.selector(),
+        "a number gives a Boolean, which no UGen takes",
+    ))
+}
+
+/// `UGen:|==|`: `this == that`, as a `BinaryOpUGen`.
+fn lazy_equals(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    lang::binary(builder, "==", this, args.input("that")?)
+}
+
+/// `Object:|==|`: `that.prReverseLazyEquals(this)`. For an output `that`, it
+/// is `that == this`. Anything else gives a Boolean, which no UGen takes.
+fn object_lazy_equals(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    match args.input("that")? {
+        that @ UGenInput::Output(_) => lang::binary(builder, "==", that, this),
+        _ => Err(bad_method(
+            "|==|",
+            "it compares two values that are no UGens, which gives a Boolean",
+        )),
+    }
+}
+
+/// `UGen:degreeToKey`: always a `DegreeToKey.kr`, with `scale` as its
+/// buffer.
+fn degree_to_key(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let given = [
+        ("bufnum", args.value("scale")?),
+        ("in", this.into()),
+        ("octave", args.value("stepsPerOctave")?),
+    ];
+    builder.ugen("DegreeToKey", "kr", &given)
+}
+
+/// `SimpleNumber:degreeToKey`: the `performDegreeToKey` of an array `scale`,
+/// at the degree `this.round` and with the accidental
+/// `(this - degree) * 10`.
+#[allow(clippy::float_cmp, clippy::needless_pass_by_value)]
+fn number_degree_to_key(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let UGenInput::Number(x) = this else {
+        return Err(bad_method("degreeToKey", "the receiver is not a number"));
+    };
+    let UGenInput::Array(scale) = args.input("scale")? else {
+        return Err(bad_method(
+            "degreeToKey",
+            "performDegreeToKey is not understood by a scale that is no array",
+        ));
+    };
+    if scale.is_empty() {
+        return Err(bad_method("degreeToKey", "the scale is an empty array"));
+    }
+    let degree = (x + 0.5).floor();
+    let accidental = (x - degree) * 10.0;
+    let size = f64::from(u32::try_from(scale.len()).unwrap_or(u32::MAX));
+    let octave = (degree / size).floor();
+    let index = degree - octave * size;
+    let steps = args.input("stepsPerOctave")?;
+    let octaves = lang::binary(builder, "*", steps.clone(), octave.into())?;
+    let base = lang::binary(
+        builder,
+        "+",
+        octaves,
+        scale[super::count_to_usize(index)].clone(),
+    )?;
+    if accidental == 0.0 {
+        return Ok(base);
+    }
+    let ratio = lang::binary(builder, "/", steps, 12.0.into())?;
+    let shift = lang::binary(builder, "*", accidental.into(), ratio)?;
+    lang::binary(builder, "+", base, shift)
+}
+
+/// `UGen:if`: `(this * (trueUGen - falseUGen)) + falseUGen`.
+fn ugen_if(
+    builder: &mut SynthDefBuilder,
+    this: UGenInput,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let falsity = args.input("falseUGen")?;
+    let difference = lang::binary(builder, "-", args.input("trueUGen")?, falsity.clone())?;
+    let product = lang::binary(builder, "*", this, difference)?;
+    lang::binary(builder, "+", product, falsity)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::BODIES;
+    use crate::catalog;
+
+    #[test]
+    fn each_method_that_a_receiver_answers_has_a_body_and_each_body_its_method() {
+        let mut methods: Vec<(&str, &str)> = catalog::ugen_methods()
+            .iter()
+            .flat_map(|method| {
+                let selector = method.method.selector;
+                std::iter::once("UGen")
+                    .chain(method.number)
+                    .chain(method.array)
+                    .chain(method.overrides.iter().copied())
+                    .map(move |owner| (owner, selector))
+            })
+            .collect();
+        methods.sort_unstable();
+        methods.dedup();
+        let mut bodies: Vec<(&str, &str)> = BODIES
+            .iter()
+            .map(|&(owner, selector, _)| (owner, selector))
+            .collect();
+        bodies.sort_unstable();
+        assert_eq!(methods, bodies);
+    }
 }

@@ -134,7 +134,7 @@ try {
 		var binary = [['+', "+"], ['-', "-"], ['*', "*"], ['/', "/"], ['pow', "pow"],
 			['%', "mod"], ['round', "round"], ['trunc', "trunc"], ['roundUp', "roundUp"],
 			['fold2', "fold2"], ['max', "max"], ['min', "min"], ['absdif', "absdif"]];
-		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin, \exp, \log, \squared];
+		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin, \exp, \log, \squared, \sign];
 		var sections = List.new;
 		sections.add("  \"binary\": [\n" ++ binary.collect { |op|
 			values.collect { |a|

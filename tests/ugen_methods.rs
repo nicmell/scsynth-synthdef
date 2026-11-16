@@ -135,3 +135,106 @@ fn send_refuses_a_selector_that_builds_no_graph() {
         assert_eq!(bad(&error), Some(selector), "{error}");
     }
 }
+
+/// The class that a `CheckInputs` names, or none for another error.
+fn checked(error: &BuildError) -> Option<&str> {
+    match error {
+        BuildError::CheckInputs { class, .. } => Some(class),
+        _ => None,
+    }
+}
+
+/// `SinOsc` at the rate of `selector`.
+fn sine(builder: &mut SynthDefBuilder, selector: &str, freq: f64) -> UGenInput {
+    builder
+        .ugen("SinOsc", selector, &[("freq", freq.into())])
+        .unwrap()
+}
+
+#[test]
+fn blend_refuses_a_receiver_or_a_that_at_demand_rate() {
+    // refused_blend_demand and refused_blend_demand_that.
+    let mut builder = builder();
+    let sequence = dseq(&mut builder);
+    let error = builder
+        .send(sequence.clone(), "blend", &[("that", 1.0.into())])
+        .unwrap_err();
+    assert_eq!(bad(&error), Some("blend"), "{error}");
+    let sound = sine(&mut builder, "kr", 1.0);
+    let error = builder
+        .send(sound, "blend", &[("that", sequence.into())])
+        .unwrap_err();
+    assert_eq!(bad(&error), Some("blend"), "{error}");
+}
+
+#[test]
+fn blend_takes_xfade2_only_for_two_inputs_at_audio_rate() {
+    // refused_blend_control_that and refused_blend_audio_that.
+    let mut builder = builder();
+    let audio = sine(&mut builder, "ar", 440.0);
+    let control = sine(&mut builder, "kr", 2.0);
+    let pairs = [(audio.clone(), control.clone()), (control, audio)];
+    for (this, that) in pairs {
+        let error = builder
+            .send(this, "blend", &[("that", that.into())])
+            .unwrap_err();
+        assert_eq!(checked(&error), Some("XFade2"), "{error}");
+    }
+}
+
+#[test]
+fn blend_and_sanitize_refuse_a_receiver_at_scalar_rate() {
+    // refused_blend_scalar and refused_sanitize_scalar.
+    let mut builder = builder();
+    let value = rand(&mut builder);
+    let that = rand(&mut builder);
+    let error = builder
+        .send(value.clone(), "blend", &[("that", that.into())])
+        .unwrap_err();
+    assert_eq!(bad(&error), Some("blend"), "{error}");
+    let error = builder.send(value, "sanitize", &[]).unwrap_err();
+    assert_eq!(bad(&error), Some("sanitize"), "{error}");
+}
+
+#[test]
+fn sanitize_refuses_a_receiver_at_demand_rate() {
+    // refused_sanitize_demand.
+    let mut builder = builder();
+    let sequence = dseq(&mut builder);
+    let error = builder.send(sequence, "sanitize", &[]).unwrap_err();
+    assert_eq!(bad(&error), Some("sanitize"), "{error}");
+}
+
+#[test]
+fn varlag_refuses_a_receiver_at_scalar_rate() {
+    // refused_varlag_scalar: the Changed.kr of VarLag runs an HPZ1.
+    let mut builder = builder();
+    let value = rand(&mut builder);
+    let error = builder
+        .send(value, "varlag", &[("time", 0.2.into())])
+        .unwrap_err();
+    assert_eq!(checked(&error), Some("HPZ1"), "{error}");
+}
+
+#[test]
+fn a_number_gives_booleans_that_no_ugen_takes() {
+    // refused_ispositive_number and refused_lazy_equals_numbers.
+    let mut builder = builder();
+    let error = builder.send(0.5, "isPositive", &[]).unwrap_err();
+    assert_eq!(bad(&error), Some("isPositive"), "{error}");
+    let error = builder
+        .send(0.5, "|==|", &[("that", 0.5.into())])
+        .unwrap_err();
+    assert_eq!(bad(&error), Some("|==|"), "{error}");
+}
+
+#[test]
+fn an_array_does_not_understand_snap() {
+    // refused_snap_array.
+    let mut builder = builder();
+    let sound = sine(&mut builder, "kr", 1.0);
+    let error = builder
+        .send(UGenInput::Array(vec![sound]), "snap", &[])
+        .unwrap_err();
+    assert_eq!(bad(&error), Some("snap"), "{error}");
+}
