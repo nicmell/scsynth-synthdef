@@ -100657,30 +100657,8 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "control",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            },
-            {
-              "arg": 2
-            },
-            {
-              "arg": 3
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "control"
-            ]
-          },
-          "special_index": 0,
-          "madd": true,
-          "nested_expansion": true
+          "addable": false,
+          "reason": "the method applies madd otherwise than once"
         }
       ]
     },

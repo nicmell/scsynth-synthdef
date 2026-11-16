@@ -14,7 +14,7 @@ their own, as the core has, in a folder of its own under `src/`.
 - A cargo feature `sc3-plugins`, off by default, adds the module
   `sc3_plugins`. It holds the 491 UGen classes of sc3-plugins 3.14.0, as
   probes in sclang 3.14.1 measure them.
-- `ugen` adds the 636 rate methods of these classes that a wiring
+- `ugen` adds the 635 rate methods of these classes that a wiring
   describes, of 679. It also builds three pseudo-UGens: `Greyhole`,
   `JPverb` and `NHHall`.
 - Golden files that sclang writes check each addable method byte for byte.
@@ -91,12 +91,16 @@ tags.
    classes. It also adds 31 methods to core classes. One of them builds a
    graph: `UGen:circleRamp`. The other 30 are helpers of the language,
    such as `SimpleNumber:gaussian`.
-4. The probes of `generator/catalog.scd` find a wiring for 642 of the 679
+4. The probes of `generator/catalog.scd` find a wiring for 641 of the 679
    rate methods. They need 60 more entries of `argumentKinds`, and a probe
    that spreads a variable list of arguments, as sclang passes it
    (`LADSPA.ar`). The core has no method with such a list. 481 classes
    have rate methods, and 10 abstract classes have none. Every class has
-   categories in its help. Of the 37 other methods:
+   categories in its help. Of the 38 other methods:
+   - `StkFlute.kr` applies `madd` twice. A probe now tests that each
+     method of a UGen with outputs applies `madd` once: with `mul` 0.5 and
+     `add` 0.25, it makes the UGens that one `madd` of its result makes.
+     The 581 addable methods of the core pass.
    - 9 methods of 8 classes create no instance of their class:
      `FFTCentroid.kr`, `OnsetsDS.kr`, `PV_DiffMags.new`, `PanX2D.ar` and
      `kr`, `Rotate.ar`, `SoftClipAmp.ar`, `Tilt.ar` and `Tumble.ar`.

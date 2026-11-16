@@ -62,7 +62,7 @@ mod tests {
                 Addable::No(_) => 2,
             }] += 1;
         }
-        assert_eq!(counts, [636, 1, 42]);
+        assert_eq!(counts, [635, 1, 43]);
         let pseudo: Vec<&str> = pseudo_all().iter().map(|class| class.name).collect();
         assert_eq!(pseudo, ["Greyhole", "JPverb"]);
     }

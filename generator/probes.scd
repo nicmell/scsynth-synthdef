@@ -99,6 +99,7 @@
 	var methodOwner, ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues;
 	var controlValues, same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf;
 	var arrayExpansionOf, wiring, testPassthrough, testSilence, testAudioTogether;
+	var maddValues, maddOnce;
 	var describeArgs, describeMethod, describePseudoClass, describeClass, scanCantAlias;
 
 	// C and C++ without their comments. A string literal stays as it is.
@@ -235,28 +236,29 @@
 	};
 
 	// Calls a method in a build of its own. `values` makes the arguments
-	// inside the build. Answers the error, or nil, the new UGens and the
-	// arguments. The call runs in a Routine: when sclang 3.14.1 catches an
+	// inside the build, and `after`, when there is one, takes the result.
+	// Answers the error, or nil, the new UGens and the arguments. The call runs in a Routine: when sclang 3.14.1 catches an
 	// error thrown while it evaluates the arguments of a send such as
 	// `SinOsc.ar(nil.foo)`, it corrupts the frames of the caller (measured).
-	probe = { |class, selector, values|
+	probe = { |class, selector, values, after|
 		var outcome = Routine {
 			var result;
 			try {
 				result = {
 					var def = SynthDef.newCopyArgs(name: \probe, metadata: (), children: Array(64));
-					var arguments, before;
+					var arguments, before, made;
 					def.initBuild;
 					arguments = values.value;
 					before = def.children.size;
 					// A variable list of arguments takes the elements of its
 					// array, as sclang passes them.
-					class.performList(selector,
+					made = class.performList(selector,
 						if (class.class.findRespondingMethodFor(selector).varArgs) {
 							arguments.drop(-1) ++ arguments.last.asArray
 						} {
 							arguments
 						});
+					after.value(made);
 					[nil, def.children.drop(before), arguments]
 				}.value;
 			} { |exception|
@@ -387,6 +389,29 @@
 				.collect { |ugen| ugen.class.name })
 		}
 		{ instances[0] }
+	};
+
+	// The values of numberValues, with `mul` and `add` in place of 1 and 0.
+	maddValues = { |kinds, mul, add|
+		var values = numberValues.(kinds, [], []);
+		{
+			var arguments = values.value;
+			kinds.do { |kind, position|
+				if (kind == \mul) { arguments.put(position, mul) };
+				if (kind == \add) { arguments.put(position, add) };
+			};
+			arguments
+		}
+	};
+
+	// Whether the method of a UGen with outputs applies madd once: with mul
+	// 0.5 and add 0.25, it makes the UGens that one madd of its result makes,
+	// at their rates.
+	maddOnce = { |class, selector, kinds|
+		var shape = { |result| result[1].collect { |ugen| [ugen.class, ugen.rate] } };
+		var once = probe.(class, selector, maddValues.(kinds, 1.0, 0.0), _.madd(0.5, 0.25));
+		var given = probe.(class, selector, maddValues.(kinds, 0.5, 0.25));
+		once[0].isNil and: { given[0].isNil } and: { shape.(once) == shape.(given) }
 	};
 
 	// The values of numberValues, with `value` at `position`. A function makes
@@ -561,6 +586,12 @@
 				{ outputs.asSet.size > 1 and: { dependence.notEmpty } } { "the outputs have several rates" }
 				{ (expansion = expansionOf.(class, selector, kinds, slots, dependence)).isString } {
 					expansion
+				}
+				{
+					outputs.notEmpty and: { kinds.includes(\mul) or: { kinds.includes(\add) } }
+					and: { maddOnce.(class, selector, kinds).not }
+				} {
+					"the method applies madd otherwise than once"
 				}
 				{
 					[
