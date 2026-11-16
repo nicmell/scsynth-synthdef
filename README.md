@@ -721,8 +721,9 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
   the class.
 - `catalog::env_range` and `catalog::env_ranges` give `range`, `exprange`
   and `curverange` of `Env`, with their arguments.
-- A `RateMethod` is `ar`, `kr`, `ir`, `tr` or `new`. It has its arguments,
-  each with a kind and a default, and an `Addable`.
+- A `RateMethod` is a rate method, such as `ar`, `kr`, `ir`, `tr` or
+  `new`, or one of the methods above. It has its arguments, each with a
+  kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
   holds the rate, the slot of each input, the outputs, the special index,
   whether `mul` and `add` apply, and whether a nested array expands again.

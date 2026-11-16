@@ -2,7 +2,7 @@
 //! UGens of a build: the copies of PV chains of `addCopiesIfNeeded`, then
 //! `optimizeGraph`.
 
-use crate::builder::{Node, Source, can_be_mul_add};
+use crate::builder::{BINARY_OP, MUL_ADD, Node, Source, UNARY_OP, can_be_mul_add};
 use crate::catalog::{self, FftSize, Optimize};
 use crate::error::BuildError;
 use crate::operator;
@@ -103,11 +103,8 @@ type Rewrite = fn(&mut Graph, usize, (Source, Source)) -> Fusion;
 /// The replacement of a rewrite, and the UGen that it fuses.
 type Fusion = Result<Option<(usize, usize)>, BuildError>;
 
-const BINARY_OP: &str = "BinaryOpUGen";
-const UNARY_OP: &str = "UnaryOpUGen";
 const SUM3: &str = "Sum3";
 const SUM4: &str = "Sum4";
-const MUL_ADD: &str = "MulAdd";
 
 /// The UGens after the rewrites, in the order of the children of sclang.
 /// Each input and each width-first antecedent is a position in this order.
@@ -161,7 +158,7 @@ impl Graph {
         let mut next = 0;
         while let Some(&chain) = self.width_first_order.get(next) {
             next += 1;
-            if !is_pv_chain(&self.nodes[chain].name) {
+            if !is_kind_of(&self.nodes[chain].name, "PV_ChainUGen") {
                 continue;
             }
             let readers = self.readers_of_chain(chain);
@@ -227,7 +224,6 @@ impl Graph {
         self.arrays = Vec::with_capacity(count);
         for &child in self.children.iter().flatten() {
             let mut items = std::mem::take(&mut readers[child]);
-            items.sort_by_key(|&reader| self.slots[reader]);
             items.dedup();
             self.readers[child] = Some(self.arrays.len());
             self.arrays.push(Readers::new(items));
@@ -266,7 +262,7 @@ impl Graph {
                     input: input + 1,
                 });
                 if let Source::Output { ugen, .. } = source {
-                    if !is_multi_out(&self.nodes[ugen].name) {
+                    if !is_kind_of(&self.nodes[ugen].name, "MultiOutUGen") {
                         if let Some(array) = self.readers[ugen] {
                             self.arrays[array].remove(node);
                         }
@@ -404,8 +400,9 @@ impl Graph {
         Ok(self.push(ugen(class, rate, inputs), Vec::new(), false))
     }
 
-    /// `MulAdd.new1` of a rewrite: a new node, outside the children. A `mul`
-    /// of 0, 1 or -1 and an `add` of 0 fold, which refuses.
+    /// `MulAdd.new1` of a rewrite, for inputs that `canBeMulAdd` takes in
+    /// this order: a new node, outside the children. A `mul` of 0, 1 or -1
+    /// and an `add` of 0 fold, which refuses.
     fn mul_add(
         &mut self,
         this: usize,
@@ -414,21 +411,12 @@ impl Graph {
         add: Source,
     ) -> Result<usize, BuildError> {
         let folds = [-1.0, 0.0, 1.0].iter().any(|&value| is_number(mul, value));
-        let rates = [self.rate(input), self.rate(mul), self.rate(add)];
-        let inputs = if folds || is_number(add, 0.0) {
-            None
-        } else if can_be_mul_add(rates[0], rates[1], rates[2]) {
-            Some(vec![input, mul, add])
-        } else if can_be_mul_add(rates[1], rates[0], rates[2]) {
-            Some(vec![mul, input, add])
-        } else {
-            None
-        };
-        let Some(inputs) = inputs else {
+        if folds || is_number(add, 0.0) {
             return Err(finish_build(&self.nodes[this].name, FOLDED));
-        };
-        let rate = least_by_name(rates).unwrap_or(Rate::Scalar);
-        Ok(self.push(ugen(MUL_ADD, rate, inputs), Vec::new(), false))
+        }
+        let rate = least_by_name([input, mul, add].map(|source| self.rate(source)));
+        let node = ugen(MUL_ADD, rate.unwrap_or(Rate::Scalar), vec![input, mul, add]);
+        Ok(self.push(node, Vec::new(), false))
     }
 
     /// The operator `-` of sclang, or `BinaryOpUGen.new` of `+`, in a
@@ -459,8 +447,8 @@ impl Graph {
     /// `deleted`. A full array loses the replacement (fact 7 of the plan of
     /// 0.7).
     fn adopt(&mut self, this: usize, replacement: usize, deleted: usize) {
-        for input in self.nodes[replacement].inputs.clone() {
-            let Source::Output { ugen, .. } = input else {
+        for input in &self.nodes[replacement].inputs {
+            let Source::Output { ugen, .. } = *input else {
                 continue;
             };
             let Some(array) = self.readers[ugen] else {
@@ -668,10 +656,11 @@ fn optimize_of(name: &str) -> Optimize {
     catalog::lookup(name).map_or(Optimize::Nothing, |class| class.optimize)
 }
 
-fn is_multi_out(name: &str) -> bool {
-    catalog::lookup(name).is_some_and(|class| {
-        class.name == "MultiOutUGen" || class.superclasses.contains(&"MultiOutUGen")
-    })
+/// Whether the class `name` is `kind` or a subclass of it, as `isKindOf`
+/// tests it.
+fn is_kind_of(name: &str, kind: &str) -> bool {
+    catalog::lookup(name)
+        .is_some_and(|class| class.name == kind || class.superclasses.contains(&kind))
 }
 
 /// Whether `source` is the number `number`, as `==` compares them in
@@ -700,12 +689,6 @@ fn output(ugen: usize) -> Source {
 
 fn reads(input: Source, ugen: usize) -> bool {
     matches!(input, Source::Output { ugen: source, .. } if source == ugen)
-}
-
-fn is_pv_chain(name: &str) -> bool {
-    catalog::lookup(name).is_some_and(|class| {
-        class.name == "PV_ChainUGen" || class.superclasses.contains(&"PV_ChainUGen")
-    })
 }
 
 fn finish_build(ugen: &str, message: &str) -> BuildError {

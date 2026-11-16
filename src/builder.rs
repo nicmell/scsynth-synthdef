@@ -91,16 +91,16 @@ impl Arg {
         self
     }
 
-    fn group(&self) -> Group {
+    fn group(&self) -> ArgRate {
         let prefix = |prefix: &[u8]| self.name.as_bytes().starts_with(prefix);
         if self.rate == Some(ArgRate::Ir) || prefix(b"i_") {
-            Group::Scalar
+            ArgRate::Ir
         } else if self.rate == Some(ArgRate::Tr) || prefix(b"t_") {
-            Group::Trigger
+            ArgRate::Tr
         } else if self.rate == Some(ArgRate::Ar) || prefix(b"a_") {
-            Group::Audio
+            ArgRate::Ar
         } else {
-            Group::Control
+            ArgRate::Kr
         }
     }
 
@@ -112,15 +112,6 @@ impl Arg {
             .map(|i| self.lags[i % self.lags.len()])
             .collect()
     }
-}
-
-/// The groups of `buildControls`, in the order in which it builds them.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Group {
-    Scalar,
-    Trigger,
-    Audio,
-    Control,
 }
 
 /// A UGen to add with [`SynthDefBuilder::add`], at the level of `UGen:new1`
@@ -273,13 +264,13 @@ impl SynthDefBuilder {
             if arg.lags.iter().any(|lag| lag.is_nan()) {
                 return Err(BuildError::NanLag(arg.name.clone()));
             }
-            if arg.group() != Group::Control && arg.lags.iter().any(|&lag| lag != 0.0) {
+            if arg.group() != ArgRate::Kr && arg.lags.iter().any(|&lag| lag != 0.0) {
                 return Err(BuildError::LagOnNonControl(arg.name.clone()));
             }
         }
         let mut arguments = vec![UGenInput::Array(Vec::new()); args.len()];
         let mut indices = vec![0; args.len()];
-        for group in [Group::Scalar, Group::Trigger, Group::Audio, Group::Control] {
+        for group in [ArgRate::Ir, ArgRate::Tr, ArgRate::Ar, ArgRate::Kr] {
             let members: Vec<usize> = (0..args.len())
                 .filter(|&position| args[position].group() == group)
                 .collect();
@@ -298,11 +289,7 @@ impl SynthDefBuilder {
             let mut outputs = self.add_controls(group, &values, &lags)?.into_iter();
             for &position in &members {
                 let arg = &args[position];
-                let proxies: Vec<UGenInput> = outputs
-                    .by_ref()
-                    .take(arg.values.len())
-                    .map(UGenInput::Output)
-                    .collect();
+                let proxies: Vec<UGenInput> = outputs.by_ref().take(arg.values.len()).collect();
                 arguments[position] = if arg.array {
                     UGenInput::Array(proxies)
                 } else {
@@ -314,12 +301,8 @@ impl SynthDefBuilder {
             }
         }
         for (position, arg) in args.into_iter().enumerate() {
-            self.sizes.push(Some(arg.values.len()));
-            self.control_names.push(ControlName {
-                name: arg.name,
-                index: to_u32(indices[position]),
-            });
-            self.last_name = Some(self.control_names.len() - 1);
+            let size = arg.values.len();
+            self.push_name(arg.name, indices[position], Some(size));
         }
         Ok(arguments)
     }
@@ -348,12 +331,7 @@ impl SynthDefBuilder {
     pub fn control_names(&mut self, names: &[&str]) {
         let index = self.controls.len();
         for (offset, name) in names.iter().enumerate() {
-            self.control_names.push(ControlName {
-                name: (*name).to_owned(),
-                index: to_u32(index + offset),
-            });
-            self.sizes.push(None);
-            self.last_name = Some(self.control_names.len() - 1);
+            self.push_name((*name).to_owned(), index + offset, None);
         }
     }
 
@@ -824,7 +802,7 @@ impl SynthDefBuilder {
                     control: (*control).to_owned(),
                 });
             };
-            let start = to_usize(self.control_names[position].index);
+            let start = limits::to_usize(self.control_names[position].index);
             let room = controls.len().saturating_sub(start);
             let size = self.sizes[position].unwrap_or(0).min(room);
             if control_values.len() > size {
@@ -985,13 +963,11 @@ impl SynthDefBuilder {
             values[position] = ArgValue::Input(env.as_array()?);
             return Ok(None);
         }
-        let env = env.clone();
-        let channels = pseudo::elements(pseudo::env::array_for_interpolation(self, &env)?);
+        let channels = pseudo::elements(pseudo::env::array_for_interpolation(self, env)?);
         if let [channel] = channels.as_slice() {
             values[position] = ArgValue::Input(channel.clone());
             return Ok(None);
         }
-        values[position] = ArgValue::Input(UGenInput::Array(channels.clone()));
         Ok(Some((position, ArrayPart::Instances(channels))))
     }
 
@@ -1008,24 +984,27 @@ impl SynthDefBuilder {
 
     fn add_controls(
         &mut self,
-        group: Group,
+        group: ArgRate,
         values: &[f64],
         lags: &[f64],
-    ) -> Result<Vec<OutputProxy>, BuildError> {
-        match group {
-            Group::Scalar => self.add_control("Control", Rate::Scalar, values, &[]),
-            Group::Trigger => self.add_control("TrigControl", Rate::Control, values, &[]),
-            Group::Audio => self.add_control("AudioControl", Rate::Audio, values, &[]),
-            Group::Control if lags.iter().any(|&lag| lag != 0.0) => {
+    ) -> Result<Vec<UGenInput>, BuildError> {
+        let (name, rate) = match group {
+            ArgRate::Ir => ("Control", Rate::Scalar),
+            ArgRate::Tr => ("TrigControl", Rate::Control),
+            ArgRate::Ar => ("AudioControl", Rate::Audio),
+            ArgRate::Kr if lags.iter().any(|&lag| lag != 0.0) => {
                 let mut outputs = Vec::with_capacity(values.len());
                 for (values, lags) in values.chunks(16).zip(lags.chunks(16)) {
                     let lags: Vec<UGenInput> = lags.iter().map(|&lag| lag.into()).collect();
-                    outputs.extend(self.add_control("LagControl", Rate::Control, values, &lags)?);
+                    let control = self.add_control("LagControl", Rate::Control, values, lags)?;
+                    outputs.extend(pseudo::elements(control));
                 }
-                Ok(outputs)
+                return Ok(outputs);
             }
-            Group::Control => self.add_control("Control", Rate::Control, values, &[]),
-        }
+            ArgRate::Kr => ("Control", Rate::Control),
+        };
+        let control = self.add_control(name, rate, values, Vec::new())?;
+        Ok(pseudo::elements(control))
     }
 
     fn add_control(
@@ -1033,41 +1012,33 @@ impl SynthDefBuilder {
         name: &str,
         rate: Rate,
         values: &[f64],
-        lags: &[UGenInput],
-    ) -> Result<Vec<OutputProxy>, BuildError> {
+        lags: Vec<UGenInput>,
+    ) -> Result<UGenInput, BuildError> {
         let special_index = i16::try_from(self.controls.len())
             .map_err(|_| BuildError::TooManyParameters(self.controls.len()))?;
-        let mut inputs = Vec::with_capacity(lags.len());
-        for (input, lag) in lags.iter().enumerate() {
-            inputs.push(self.source(name, input, lag)?);
-        }
+        let control = NewUGen::new(name, rate)
+            .inputs(lags)
+            .outputs(vec![rate; values.len()])
+            .special_index(special_index);
+        let outputs = self.add(control)?;
         self.controls.extend_from_slice(values);
-        let index = self.push(Node {
-            name: name.to_owned(),
-            rate,
-            inputs,
-            outputs: vec![rate; values.len()],
-            special_index,
-            width_first_before: self.width_first.len(),
-        });
-        Ok((0..values.len())
-            .map(|output| OutputProxy {
-                serial: self.serials[index],
-                ugen: index,
-                output: to_u32(output),
-                rate,
-            })
-            .collect())
+        Ok(outputs)
     }
 
     /// Names the next parameter, with a default of `size` values, as
     /// `addIr`, `addKr`, `addTr` and `addAr` do for a `NamedControl`.
     pub(crate) fn add_control_name(&mut self, name: &str, size: usize) {
+        self.push_name(name.to_owned(), self.controls.len(), Some(size));
+    }
+
+    /// Names the parameter `index`, with a default of `size` values, and
+    /// makes it the last name.
+    fn push_name(&mut self, name: String, index: usize, size: Option<usize>) {
         self.control_names.push(ControlName {
-            name: name.to_owned(),
-            index: to_u32(self.controls.len()),
+            name,
+            index: to_u32(index),
         });
-        self.sizes.push(Some(size));
+        self.sizes.push(size);
         self.last_name = Some(self.control_names.len() - 1);
     }
 
@@ -1092,13 +1063,13 @@ impl SynthDefBuilder {
         values: &[f64],
         lags: &[UGenInput],
     ) -> Result<UGenInput, BuildError> {
-        self.add_control(class, rate, values, lags)?;
+        let outputs = self.add_control(class, rate, values, lags.to_vec())?;
         if matches!(class, "Control" | "TrigControl") {
             if let Some(size @ None) = self.last_name.and_then(|name| self.sizes.get_mut(name)) {
                 *size = Some(values.len());
             }
         }
-        Ok(self.outputs_of(self.children.len() - 1))
+        Ok(outputs)
     }
 
     /// Runs `build`, and gives back the build as it was if it fails: its
@@ -1168,7 +1139,7 @@ impl SynthDefBuilder {
                 serial: self.serials[ugen],
                 ugen,
                 output,
-                rate: self.children[ugen].outputs[to_usize(output)],
+                rate: self.children[ugen].outputs[limits::to_usize(output)],
             }),
         })
     }
@@ -1471,9 +1442,9 @@ impl SynthDefBuilder {
     }
 }
 
-const UNARY_OP: &str = "UnaryOpUGen";
-const BINARY_OP: &str = "BinaryOpUGen";
-const MUL_ADD: &str = "MulAdd";
+pub(crate) const UNARY_OP: &str = "UnaryOpUGen";
+pub(crate) const BINARY_OP: &str = "BinaryOpUGen";
+pub(crate) const MUL_ADD: &str = "MulAdd";
 
 /// The rate of a number or an output, which is all that an expansion leaves.
 pub(crate) fn rate_of(value: &UGenInput) -> Rate {
@@ -1636,8 +1607,6 @@ fn bind_arguments(
         .collect()
 }
 
-/// The value of each argument of `method`: the one that `args` gives by
-/// name, or the default, or none for a nil default.
 /// The instance method of `PV_ChainUGen` with this selector, and its
 /// arguments bound by name. `func` takes no value by name: the closure of
 /// the call takes its place.
@@ -1659,6 +1628,8 @@ fn pv_values(
     Ok((method, bind_optional("PV_ChainUGen", method, args)?))
 }
 
+/// The value of each argument of `method`: the one that `args` gives by
+/// name, or the default, or none for a nil default.
 pub(crate) fn bind_optional(
     class: &str,
     method: &RateMethod,
@@ -1851,7 +1822,7 @@ fn wire_outputs(
 /// The inputs of a symbol, as sclang writes them: its size, then each byte
 /// as `Char:ascii` gives it, from -128 to 127.
 pub(crate) fn symbol_codes(text: &str) -> Vec<UGenInput> {
-    let mut codes = vec![UGenInput::from(f64::from(to_u32(text.len())))];
+    let mut codes = vec![pseudo::number(text.len())];
     codes.extend(
         text.bytes()
             .map(|byte| UGenInput::from(f64::from(i8::from_ne_bytes([byte])))),
@@ -1873,10 +1844,6 @@ pub(crate) fn count_to_usize(count: f64) -> usize {
 
 fn to_u32(value: usize) -> u32 {
     u32::try_from(value).unwrap_or(u32::MAX)
-}
-
-fn to_usize(value: u32) -> usize {
-    usize::try_from(value).unwrap_or(usize::MAX)
 }
 
 #[cfg(test)]

@@ -5,8 +5,7 @@ use std::collections::BTreeSet;
 /// The order in which sclang writes the UGens, as indices of creation.
 ///
 /// `antecedents[u]` holds the UGens that UGen `u` waits for: the sources of
-/// its inputs, and the width-first UGens created before it. Each holds a
-/// lower index than `u`.
+/// its inputs, and the width-first UGens created before it.
 pub(crate) fn sort(antecedents: &[Vec<usize>]) -> Vec<usize> {
     let mut waiting: Vec<BTreeSet<usize>> = antecedents
         .iter()
