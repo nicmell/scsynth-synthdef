@@ -842,7 +842,10 @@ impl SynthDefBuilder {
             graph.set_input(max.node, 0, count);
         }
         graph.optimize_graph()?;
-        let Rewritten { nodes, width_first } = graph.into_rewritten();
+        let Rewritten {
+            mut nodes,
+            width_first,
+        } = graph.into_rewritten()?;
         let mut constants = Vec::new();
         let mut constant_index = BTreeMap::new();
         for node in &nodes {
@@ -877,9 +880,9 @@ impl SynthDefBuilder {
         let children = order
             .iter()
             .map(|&ugen| {
-                let node = &nodes[ugen];
+                let node = &mut nodes[ugen];
                 UGen {
-                    name: node.name.clone(),
+                    name: std::mem::take(&mut node.name),
                     rate: node.rate,
                     inputs: node
                         .inputs
@@ -894,7 +897,7 @@ impl SynthDefBuilder {
                             },
                         })
                         .collect(),
-                    outputs: node.outputs.clone(),
+                    outputs: std::mem::take(&mut node.outputs),
                     special_index: node.special_index,
                 }
             })
@@ -1238,15 +1241,15 @@ impl SynthDefBuilder {
         wiring: Wiring,
         values: &[ArgValue],
     ) -> Result<UGenInput, BuildError> {
-        let inputs = wire_inputs(class, method, wiring, values)?;
-        let outputs = wire_outputs(class, method, wiring, values)?;
-        self.add_checked(
-            ugen_class,
-            NewUGen::new(class, wiring.rate)
-                .inputs(inputs)
-                .outputs(outputs)
-                .special_index(wiring.special_index),
-        )
+        let ugen = NewUGen {
+            name: class.to_owned(),
+            rate: wiring.rate,
+            inputs: wire_inputs(class, method, wiring, values)?,
+            outputs: wire_outputs(class, method, wiring, values)?,
+            special_index: wiring.special_index,
+            width_first: false,
+        };
+        self.add_checked(ugen_class, ugen)
     }
 
     /// Adds `ugen` of `class` after the rule of its `checkInputs`, with the
@@ -1421,23 +1424,17 @@ impl SynthDefBuilder {
     }
 
     fn outputs_of(&self, index: usize) -> UGenInput {
-        let mut outputs: Vec<UGenInput> = self.children[index]
-            .outputs
-            .iter()
-            .enumerate()
-            .map(|(output, &rate)| {
-                UGenInput::Output(OutputProxy {
-                    serial: self.serials[index],
-                    ugen: index,
-                    output: to_u32(output),
-                    rate,
-                })
+        let output = |(output, &rate): (usize, &Rate)| {
+            UGenInput::Output(OutputProxy {
+                serial: self.serials[index],
+                ugen: index,
+                output: to_u32(output),
+                rate,
             })
-            .collect();
-        if outputs.len() == 1 {
-            outputs.remove(0)
-        } else {
-            UGenInput::Array(outputs)
+        };
+        match self.children[index].outputs.as_slice() {
+            [rate] => output((0, rate)),
+            outputs => UGenInput::Array(outputs.iter().enumerate().map(output).collect()),
         }
     }
 }

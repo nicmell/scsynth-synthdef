@@ -193,7 +193,7 @@ impl Graph {
         while let Some(step) = steps.pop() {
             self.step(step, &mut steps)?;
         }
-        self.check_reads()
+        Ok(())
     }
 
     /// The `descendants` of `initTopoSort`: the readers of the outputs of
@@ -488,30 +488,6 @@ impl Graph {
         }
     }
 
-    /// A kept UGen that reads a removed UGen refuses: sclang 3.14.1 then
-    /// drops UGens from the definition (fact 7 of the plan of 0.7).
-    fn check_reads(&self) -> Result<(), BuildError> {
-        let mut kept = vec![false; self.nodes.len()];
-        for &child in self.children.iter().flatten() {
-            kept[child] = true;
-        }
-        for &child in self.children.iter().flatten() {
-            for input in &self.nodes[child].inputs {
-                if let Source::Output { ugen, .. } = *input {
-                    if !kept[ugen] {
-                        let message = format!(
-                            "optimizeGraph of sclang 3.14.1 removes it while {} reads it, so \
-                             sclang drops UGens",
-                            self.nodes[child].name
-                        );
-                        return Err(finish_build(&self.nodes[ugen].name, &message));
-                    }
-                }
-            }
-        }
-        Ok(())
-    }
-
     /// The UGen of `source` when it is of the kind `fused` and only one UGen
     /// reads it.
     fn fusable(&self, source: Source, fused: Fused) -> Option<usize> {
@@ -543,40 +519,53 @@ impl Graph {
         }
     }
 
-    /// The UGens in the order of the children, without the removed ones.
-    pub(crate) fn into_rewritten(self) -> Rewritten {
+    /// The UGens in the order of the children, without the removed ones. A
+    /// kept UGen that reads a removed UGen refuses: sclang 3.14.1 then drops
+    /// UGens from the definition (fact 7 of the plan of 0.7).
+    pub(crate) fn into_rewritten(self) -> Result<Rewritten, BuildError> {
         let order: Vec<usize> = self.children.iter().flatten().copied().collect();
         let mut position = vec![usize::MAX; self.nodes.len()];
         for (at, &node) in order.iter().enumerate() {
             position[node] = at;
         }
-        let at = |source: Source| match source {
-            Source::Output { ugen, output } => Source::Output {
-                ugen: position[ugen],
-                output,
-            },
-            number @ Source::Number(_) => number,
-        };
-        Rewritten {
-            width_first: order
-                .iter()
-                .map(|&node| {
-                    self.antecedents[node]
-                        .iter()
-                        .map(|&antecedent| position[antecedent])
-                        .filter(|&at| at != usize::MAX)
-                        .collect()
-                })
-                .collect(),
-            nodes: order
-                .iter()
-                .map(|&node| {
-                    let mut node = self.nodes[node].clone();
-                    node.inputs = node.inputs.into_iter().map(at).collect();
-                    node
-                })
-                .collect(),
+        for &child in &order {
+            for input in &self.nodes[child].inputs {
+                if let Source::Output { ugen, .. } = *input {
+                    if position[ugen] == usize::MAX {
+                        let message = format!(
+                            "optimizeGraph of sclang 3.14.1 removes it while {} reads it, so \
+                             sclang drops UGens",
+                            self.nodes[child].name
+                        );
+                        return Err(finish_build(&self.nodes[ugen].name, &message));
+                    }
+                }
+            }
         }
+        let width_first = order
+            .iter()
+            .map(|&node| {
+                self.antecedents[node]
+                    .iter()
+                    .map(|&antecedent| position[antecedent])
+                    .filter(|&at| at != usize::MAX)
+                    .collect()
+            })
+            .collect();
+        let mut nodes: Vec<Option<Node>> = self.nodes.into_iter().map(Some).collect();
+        let nodes = order
+            .iter()
+            .filter_map(|&node| nodes[node].take())
+            .map(|mut node| {
+                for input in &mut node.inputs {
+                    if let Source::Output { ugen, .. } = input {
+                        *ugen = position[*ugen];
+                    }
+                }
+                node
+            })
+            .collect();
+        Ok(Rewritten { nodes, width_first })
     }
 
     /// The readers that `addCopiesIfNeeded` copies a chain for: the
