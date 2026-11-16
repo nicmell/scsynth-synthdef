@@ -30,7 +30,7 @@ pub(crate) use fft_unpacking::{pvcalc, pvcalc2, pvcollect};
 pub(crate) use graph_builder::NamedEntry;
 pub(crate) use ugen_methods::send;
 
-use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize};
+use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize, whole_count};
 use crate::catalog::{self, RateMethod};
 use crate::env::Curve;
 use crate::error::BuildError;
@@ -53,12 +53,7 @@ impl Args {
 
     /// The value of the argument `name`.
     pub(crate) fn value(&self, name: &str) -> Result<ArgValue, BuildError> {
-        self.slot(name)?
-            .clone()
-            .ok_or_else(|| BuildError::MissingArgument {
-                class: self.class.to_owned(),
-                argument: name.to_owned(),
-            })
+        self.slot(name)?.clone().ok_or_else(|| self.missing(name))
     }
 
     /// The input of the argument `name`: a number, an output, or an array of
@@ -100,8 +95,7 @@ impl Args {
     /// of one, as `asArray` makes it.
     pub(crate) fn array(&self, name: &str) -> Result<Vec<UGenInput>, BuildError> {
         match self.value(name)? {
-            ArgValue::Input(UGenInput::Array(items)) => Ok(items),
-            ArgValue::Input(input) => Ok(vec![input]),
+            ArgValue::Input(input) => Ok(elements(input)),
             _ => Err(self.wrong_kind(name, "an array")),
         }
     }
@@ -119,11 +113,7 @@ impl Args {
     /// The curve of the argument `name`: a curve, a text as a shape, or an
     /// input as values.
     pub(crate) fn curve(&self, name: &str) -> Result<Curve, BuildError> {
-        self.optional_curve(name)?
-            .ok_or_else(|| BuildError::MissingArgument {
-                class: self.class.to_owned(),
-                argument: name.to_owned(),
-            })
+        self.optional_curve(name)?.ok_or_else(|| self.missing(name))
     }
 
     /// The curve of the argument `name`, or none for an argument whose
@@ -150,12 +140,16 @@ impl Args {
     /// expansion takes it: a whole number from 1.
     pub(crate) fn count_of(&self, name: &str, value: &UGenInput) -> Result<usize, BuildError> {
         match *value {
-            UGenInput::Number(count)
-                if count >= 1.0 && count.fract() == 0.0 && count <= f64::from(u16::MAX) =>
-            {
-                Ok(count_to_usize(count))
-            }
-            _ => Err(self.bad_count(name)),
+            UGenInput::Number(count) => whole_count(count),
+            _ => None,
+        }
+        .ok_or_else(|| self.bad_count(name))
+    }
+
+    pub(crate) fn missing(&self, name: &str) -> BuildError {
+        BuildError::MissingArgument {
+            class: self.class.to_owned(),
+            argument: name.to_owned(),
         }
     }
 
@@ -193,15 +187,15 @@ type Body = fn(&mut SynthDefBuilder, &Args) -> Result<UGenInput, BuildError>;
 /// The body of each method that the catalogue marks `Addable::Pseudo`, by
 /// class and selector.
 static BODIES: &[(&str, &str, Body)] = &[
-    ("AudioControl", "ar", in_out::audio_control_ar),
-    ("BHiPass4", "ar", beq_suite::b_hi_pass4),
-    ("BLowPass4", "ar", beq_suite::b_low_pass4),
+    ("AudioControl", "ar", in_out::control),
+    ("BHiPass4", "ar", beq_suite::b_pass4),
+    ("BLowPass4", "ar", beq_suite::b_pass4),
     ("BeatTrack", "kr", machine_listening::beat_track),
     ("Changed", "ar", filter::changed),
     ("Changed", "kr", filter::changed),
     ("CompanderD", "ar", compander::compander_d),
-    ("Control", "ir", in_out::control_ir),
-    ("Control", "kr", in_out::control_kr),
+    ("Control", "ir", in_out::control),
+    ("Control", "kr", in_out::control),
     ("Dstutter", "new", demand::dstutter),
     ("DynKlang", "ar", fsin_osc::dyn_klang),
     ("DynKlang", "kr", fsin_osc::dyn_klang),
@@ -209,14 +203,14 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("DynKlank", "kr", fsin_osc::dyn_klank),
     ("EnvGate", "new", graph_builder::env_gate),
     ("HilbertFIR", "ar", hilbert::hilbert_fir),
-    ("Klang", "ar", fsin_osc::klang),
+    ("Klang", "ar", fsin_osc::klank),
     ("Klank", "ar", fsin_osc::klank),
     ("LagControl", "ar", in_out::lag_control_ar),
     ("LagControl", "kr", in_out::lag_control_kr),
-    ("LinLin", "ar", line::lin_lin_ar),
-    ("LinLin", "kr", line::lin_lin_kr),
-    ("LinSelectX", "ar", osc::lin_select_x),
-    ("LinSelectX", "kr", osc::lin_select_x),
+    ("LinLin", "ar", line::lin_lin),
+    ("LinLin", "kr", line::lin_lin),
+    ("LinSelectX", "ar", osc::select_x),
+    ("LinSelectX", "kr", osc::select_x),
     ("LocalBuf", "new", buf_io::local_buf),
     ("LocalIn", "ar", in_out::local_in),
     ("LocalIn", "kr", in_out::local_in),
@@ -255,8 +249,8 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("TWChoose", "ar", osc::tw_choose),
     ("TWChoose", "kr", osc::tw_choose),
     ("Tap", "ar", buf_io::tap),
-    ("TrigControl", "ir", in_out::trig_control_ir),
-    ("TrigControl", "kr", in_out::trig_control_kr),
+    ("TrigControl", "ir", in_out::control),
+    ("TrigControl", "kr", in_out::control),
     ("UnpackFFT", "new", fft_unpacking::unpack_fft),
     ("VarLag", "ar", filter::var_lag),
     ("VarLag", "kr", filter::var_lag),
@@ -269,15 +263,7 @@ pub(crate) fn build(
     method: &'static RateMethod,
     values: Vec<Option<ArgValue>>,
 ) -> Result<UGenInput, BuildError> {
-    let body = BODIES
-        .iter()
-        .find(|(name, selector, _)| *name == class && *selector == method.selector)
-        .map(|&(_, _, body)| body)
-        .ok_or_else(|| BuildError::NotAddable {
-            class: class.to_owned(),
-            selector: method.selector.to_owned(),
-            reason: "the crate has no body for the method".to_owned(),
-        })?;
+    let body = body_of(BODIES, class, method.selector)?;
     body(
         builder,
         &Args {
@@ -286,6 +272,23 @@ pub(crate) fn build(
             values,
         },
     )
+}
+
+/// The body of the method `selector` of `class` in `bodies`.
+fn body_of<B: Copy>(
+    bodies: &[(&str, &str, B)],
+    class: &str,
+    selector: &str,
+) -> Result<B, BuildError> {
+    bodies
+        .iter()
+        .find(|&&(name, method, _)| name == class && method == selector)
+        .map(|&(_, _, body)| body)
+        .ok_or_else(|| BuildError::NotAddable {
+            class: class.to_owned(),
+            selector: selector.to_owned(),
+            reason: "the crate has no body for the method".to_owned(),
+        })
 }
 
 /// The elements of an array, or the value itself as an array of one.
@@ -324,7 +327,12 @@ pub(crate) fn multi_new(
 
 /// A number of elements as a number of sclang.
 pub(crate) fn number(count: usize) -> UGenInput {
-    UGenInput::Number(f64::from(u32::try_from(count).unwrap_or(u32::MAX)))
+    UGenInput::Number(float(count))
+}
+
+/// A number of elements as a Float of sclang.
+pub(crate) fn float(count: usize) -> f64 {
+    f64::from(u32::try_from(count).unwrap_or(u32::MAX))
 }
 
 /// The class of `input` in sclang: `Integer` for a whole number in the

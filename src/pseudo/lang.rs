@@ -281,8 +281,8 @@ fn modulo(input: f64, hi: f64) -> f64 {
     if hi == 0.0 {
         return 0.0;
     }
-    // sclang 3.14.1 for macOS on arm64 computes `in - hi * floor(in / hi)`
-    // with one fused multiply-add: 1000 % 3.7 is 0.9999999999999067.
+    // One fused multiply-add, as sclang 3.14.1 on arm64 computes it (see the
+    // README and tests/fixtures/arithmetic.json).
     (-hi).mul_add((shifted / hi).floor(), shifted)
 }
 

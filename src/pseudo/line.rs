@@ -5,34 +5,17 @@ use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
 use crate::ugen_input::UGenInput;
 
-/// The scale and the offset of `LinLin`, from the ranges.
-fn scale_offset(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<(UGenInput, UGenInput), BuildError> {
+/// `LinLin.ar`, `MulAdd(in, scale, offset)`, and `LinLin.kr`,
+/// `in * scale + offset`, with the scale and the offset of the ranges.
+pub(super) fn lin_lin(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGenInput, BuildError> {
     let span = lang::binary(builder, "-", args.input("dsthi")?, args.input("dstlo")?)?;
     let range = lang::binary(builder, "-", args.input("srchi")?, args.input("srclo")?)?;
     let scale = lang::binary(builder, "/", span, range)?;
     let shift = lang::binary(builder, "*", scale.clone(), args.input("srclo")?)?;
     let offset = lang::binary(builder, "-", args.input("dstlo")?, shift)?;
-    Ok((scale, offset))
-}
-
-/// `LinLin.ar`: `MulAdd(in, scale, offset)`.
-pub(super) fn lin_lin_ar(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    let (scale, offset) = scale_offset(builder, args)?;
-    builder.madd(args.input("in")?, scale, offset)
-}
-
-/// `LinLin.kr`: `in * scale + offset`.
-pub(super) fn lin_lin_kr(
-    builder: &mut SynthDefBuilder,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    let (scale, offset) = scale_offset(builder, args)?;
+    if args.selector() == "ar" {
+        return builder.madd(args.input("in")?, scale, offset);
+    }
     let product = lang::binary(builder, "*", args.input("in")?, scale)?;
     lang::binary(builder, "+", product, offset)
 }

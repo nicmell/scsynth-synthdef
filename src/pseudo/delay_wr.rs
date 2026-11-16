@@ -1,7 +1,7 @@
 //! The bodies of `DelayWr.sc`.
 
 use super::ugen_methods::send_message;
-use super::{Args, elements, lang, number};
+use super::{Args, elements, float, lang, number};
 use crate::builder::{SynthDefBuilder, count_to_usize};
 use crate::error::BuildError;
 use crate::ugen_input::{ArgValue, UGenInput};
@@ -81,10 +81,7 @@ pub(super) fn ping_pong(
 
 /// `Array:rotate(n)`: element i moves to `sc_mod(i + n, size)`.
 fn rotated(mut items: Vec<UGenInput>, n: f64) -> Vec<UGenInput> {
-    let size = items.len();
-    if size > 0 {
-        let size_f64 = f64::from(u32::try_from(size).unwrap_or(u32::MAX));
-        items.rotate_right(count_to_usize(n.rem_euclid(size_f64)));
-    }
+    let size = float(items.len());
+    items.rotate_right(count_to_usize(n.rem_euclid(size)));
     items
 }

@@ -2,7 +2,7 @@
 //! makes an envelope, the ranges of an envelope, and the array of
 //! `asArrayForInterpolation`.
 
-use super::{Args, elements, lang, number};
+use super::{Args, elements, float, lang, number};
 use crate::builder::SynthDefBuilder;
 use crate::catalog::RateMethod;
 use crate::env::{Curve, Env, bad, curve_value, flop, shape_number};
@@ -17,21 +17,21 @@ const MINUS_100_DB: f64 = 1e-5;
 type Body = fn(&mut SynthDefBuilder, &Args) -> Result<Env, BuildError>;
 
 /// The body of each class method of `Env` that makes an envelope.
-static BODIES: &[(&str, Body)] = &[
-    ("adsr", adsr),
-    ("asr", asr),
-    ("circle", circle),
-    ("cutoff", cutoff),
-    ("dadsr", dadsr),
-    ("linen", linen),
-    ("new", new),
-    ("newClear", new_clear),
-    ("pairs", pairs),
-    ("perc", perc),
-    ("sine", sine),
-    ("step", step),
-    ("triangle", triangle),
-    ("xyc", xyc),
+static BODIES: &[(&str, &str, Body)] = &[
+    ("Env", "adsr", adsr),
+    ("Env", "asr", asr),
+    ("Env", "circle", circle),
+    ("Env", "cutoff", cutoff),
+    ("Env", "dadsr", dadsr),
+    ("Env", "linen", linen),
+    ("Env", "new", new),
+    ("Env", "newClear", new_clear),
+    ("Env", "pairs", pairs),
+    ("Env", "perc", perc),
+    ("Env", "sine", sine),
+    ("Env", "step", step),
+    ("Env", "triangle", triangle),
+    ("Env", "xyc", xyc),
 ];
 
 /// `Env:range`, `exprange` and `curverange`: a copy of the envelope, with its
@@ -94,15 +94,7 @@ pub(crate) fn build(
     method: &'static RateMethod,
     values: Vec<Option<ArgValue>>,
 ) -> Result<Env, BuildError> {
-    let body = BODIES
-        .iter()
-        .find(|(selector, _)| *selector == method.selector)
-        .map(|&(_, body)| body)
-        .ok_or_else(|| BuildError::NotAddable {
-            class: "Env".to_owned(),
-            selector: method.selector.to_owned(),
-            reason: "the crate has no body for the method".to_owned(),
-        })?;
+    let body = super::body_of(BODIES, "Env", method.selector)?;
     body(
         builder,
         &Args {
@@ -491,7 +483,7 @@ fn circle(builder: &mut SynthDefBuilder, args: &Args) -> Result<Env, BuildError>
         levels: circled_levels,
         times: circled_times,
         curves: Curve::Array(circled_curves),
-        release_node: Some(f64::from(u32::try_from(release_node).unwrap_or(u32::MAX))),
+        release_node: Some(float(release_node)),
         loop_node: Some(0.0),
         offset: zero(),
     })

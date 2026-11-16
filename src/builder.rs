@@ -1476,7 +1476,7 @@ const BINARY_OP: &str = "BinaryOpUGen";
 const MUL_ADD: &str = "MulAdd";
 
 /// The rate of a number or an output, which is all that an expansion leaves.
-fn rate_of(value: &UGenInput) -> Rate {
+pub(crate) fn rate_of(value: &UGenInput) -> Rate {
     value.rate().unwrap_or(Rate::Scalar)
 }
 
@@ -1829,11 +1829,9 @@ fn wire_outputs(
     match wiring.outputs {
         Outputs::Fixed(rates) => Ok(rates.to_vec()),
         Outputs::Arg { arg, rate } => match values[arg] {
-            ArgValue::Input(UGenInput::Number(count))
-                if count >= 1.0 && count.fract() == 0.0 && count <= f64::from(u16::MAX) =>
-            {
-                Ok(vec![rate; count_to_usize(count)])
-            }
+            ArgValue::Input(UGenInput::Number(count)) => whole_count(count)
+                .map(|count| vec![rate; count])
+                .ok_or_else(|| bad_count(class, method, arg)),
             _ => Err(bad_count(class, method, arg)),
         },
         Outputs::ArraySize { arg, rate } => match &values[arg] {
@@ -1859,6 +1857,12 @@ pub(crate) fn symbol_codes(text: &str) -> Vec<UGenInput> {
             .map(|byte| UGenInput::from(f64::from(i8::from_ne_bytes([byte])))),
     );
     codes
+}
+
+/// `count` as a count of outputs: a whole number from 1 to `u16::MAX`.
+pub(crate) fn whole_count(count: f64) -> Option<usize> {
+    (count >= 1.0 && count.fract() == 0.0 && count <= f64::from(u16::MAX))
+        .then(|| count_to_usize(count))
 }
 
 /// A whole number from 1 to `u16::MAX`, as a count of outputs.

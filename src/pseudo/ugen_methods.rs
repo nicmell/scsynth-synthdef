@@ -162,15 +162,7 @@ pub(crate) fn send(
             .ok_or_else(|| bad_method(selector, "an Array does not understand the message"))?,
         UGenInput::Output(_) => owner_of(builder, &receiver, method),
     };
-    let body = BODIES
-        .iter()
-        .find(|&&(class, name, _)| class == owner && name == selector)
-        .map(|&(_, _, body)| body)
-        .ok_or_else(|| BuildError::NotAddable {
-            class: owner.to_owned(),
-            selector: selector.to_owned(),
-            reason: "the crate has no body for the method".to_owned(),
-        })?;
+    let body = super::body_of(BODIES, owner, selector)?;
     let args = Args {
         class: owner,
         method: &method.method,
@@ -997,8 +989,8 @@ fn lag_ud(
     )
 }
 
-/// `UGen:varlag`: the `VarLag.multiNew` of 0.9 at the rate of the receiver,
-/// without the passthrough of `VarLag.kr`. Its `new1` takes `ar` at audio
+/// `UGen:varlag`: `VarLag.multiNew` (`filter::var_lag_new`) at the rate of
+/// the receiver, without the passthrough of `VarLag.kr`. Its `new1` takes `ar` at audio
 /// rate and `kr` at any other.
 fn varlag(
     builder: &mut SynthDefBuilder,
@@ -1399,7 +1391,7 @@ fn number_degree_to_key(
     }
     let degree = (x + 0.5).floor();
     let accidental = (x - degree) * 10.0;
-    let size = f64::from(u32::try_from(scale.len()).unwrap_or(u32::MAX));
+    let size = super::float(scale.len());
     let octave = (degree / size).floor();
     let index = degree - octave * size;
     let steps = args.input("stepsPerOctave")?;

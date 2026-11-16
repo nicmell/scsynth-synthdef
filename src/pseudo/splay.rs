@@ -2,8 +2,9 @@
 
 use super::mix::mix;
 use super::ugen_methods::send_message;
-use super::{Args, elements, lang, number};
+use super::{Args, elements, float, lang, number};
 use crate::builder::SynthDefBuilder;
+use crate::env::flop;
 use crate::error::BuildError;
 use crate::rate::Rate;
 use crate::ugen_input::{ArgValue, UGenInput};
@@ -107,8 +108,8 @@ pub(super) fn splay_az(
         ],
     )?;
     let mut channels = Vec::new();
-    for channel in flop(&elements(pans)) {
-        channels.push(mix(builder, &channel)?);
+    for channel in elements(flop(&elements(pans))) {
+        channels.push(mix(builder, &elements(channel))?);
     }
     Ok(UGenInput::Array(channels))
 }
@@ -165,33 +166,6 @@ fn clip_at(values: &[UGenInput], position: f64) -> UGenInput {
     values[index.min(values.len() - 1)].clone()
 }
 
-fn float(count: usize) -> f64 {
-    f64::from(u32::try_from(count).unwrap_or(u32::MAX))
-}
-
-/// `flop`: the transpose of an array of arrays, where a value that is not an
-/// array counts as an array of one.
-fn flop(rows: &[UGenInput]) -> Vec<Vec<UGenInput>> {
-    let width = rows
-        .iter()
-        .map(|row| match row {
-            UGenInput::Array(items) => items.len(),
-            _ => 1,
-        })
-        .max()
-        .unwrap_or(0);
-    (0..width)
-        .map(|column| {
-            rows.iter()
-                .map(|row| match row {
-                    UGenInput::Array(items) => items[column % items.len()].clone(),
-                    other => other.clone(),
-                })
-                .collect()
-        })
-        .collect()
-}
-
 /// The `levelComp` of `args`: a boolean, a number or an output. `LevelComp`
 /// clips any other value, which sclang 3.14.1 throws on.
 fn level_comp(args: &Args) -> Result<ArgValue, BuildError> {
@@ -210,17 +184,11 @@ fn level_comp_new(
     audio: bool,
     n: usize,
 ) -> Result<UGenInput, BuildError> {
+    let reciprocal = lang::unary(builder, "reciprocal", number(n))?;
     match level_comp {
-        ArgValue::Bool(true) => {
-            let reciprocal = lang::unary(builder, "reciprocal", number(n))?;
-            if audio {
-                lang::unary(builder, "sqrt", reciprocal)
-            } else {
-                Ok(reciprocal)
-            }
-        }
+        ArgValue::Bool(true) if audio => lang::unary(builder, "sqrt", reciprocal),
+        ArgValue::Bool(true) => Ok(reciprocal),
         ArgValue::Input(exponent) => {
-            let reciprocal = lang::unary(builder, "reciprocal", number(n))?;
             let bounds = vec![Some(ArgValue::from(0.0)), Some(ArgValue::from(1.0))];
             let clipped = send_message(builder, exponent.clone(), "clip", bounds)?;
             lang::binary(builder, "pow", reciprocal, clipped)
