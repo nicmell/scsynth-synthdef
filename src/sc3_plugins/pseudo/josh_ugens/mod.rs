@@ -2,8 +2,17 @@
 
 pub(super) mod ambisonics;
 pub(super) mod biquad_eq;
+pub(super) mod feedback;
+pub(super) mod free_verb1;
 pub(super) mod joshfilts;
+pub(super) mod lpc_synth;
+pub(super) mod pan_x;
+pub(super) mod phaser;
+pub(super) mod sc2_compat;
 pub(super) mod uhj;
+pub(super) mod vocode;
+pub(super) mod vocoder;
+pub(super) mod warp_overlap;
 
 use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;

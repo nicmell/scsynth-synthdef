@@ -1,7 +1,7 @@
 //! The pseudo-UGens of the plugin `NHUGens`: `NHHall.sc`.
 
-use crate::builder::{NewUGen, SynthDefBuilder};
-use crate::catalog;
+use super::multi_new;
+use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
 use crate::pseudo::Args;
 use crate::rate::Rate;
@@ -33,12 +33,5 @@ pub(super) fn nh_hall(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGen
         names.push(name);
         inputs.push(args.input(name)?);
     }
-    let class =
-        catalog::find("NHHall").ok_or_else(|| BuildError::UnknownClass("NHHall".to_owned()))?;
-    builder.expand("NHHall", &names, &inputs, true, &mut |builder, instance| {
-        let ugen = NewUGen::new("NHHall", Rate::Audio)
-            .inputs(instance.to_vec())
-            .outputs([Rate::Audio, Rate::Audio]);
-        builder.add_checked(class, ugen)
-    })
+    multi_new(builder, ("NHHall", Rate::Audio), &names, &inputs, 2)
 }

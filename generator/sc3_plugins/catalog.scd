@@ -98,11 +98,13 @@ var argumentKinds = [
 	[\StkInst, \ar, \args, \array],
 	[\TGrains2, \ar, \numChannels, \count],
 	[\TGrains3, \ar, \numChannels, \count],
+	[\TapN, \ar, \numChannels, \count],
 	[\TextVU, \ar, \label, \symbol],
 	[\TextVU, \kr, \label, \symbol],
 	[\TextVU, \new, \label, \symbol],
 	[\VBAP, \ar, \numChans, \count],
 	[\VBAP, \kr, \numChans, \count],
+	[\WarpOverlap, \ar, \numChans, \count],
 	[\WarpZ, \ar, \numChannels, \count],
 	[\ZHPF, \ar, \damping, \array],
 	[\ZLPF, \ar, \damping, \array]
@@ -145,9 +147,10 @@ var checkRules = (
 // outside UGen that answers ar or kr, and each UGen class whose methods
 // create no instance of the class. The crate has a body for each method of a
 // class of bodies.
-var bodies = [\BFFreeVerb, \BFGVerb, \BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \BtoUHJ, \Greyhole,
-	\HighShelf, \JPverb, \LRHPF, \LRLPF, \LowShelf, \NHHall, \Notch, \RBJHighShelf, \RBJLowShelf,
-	\RBJNotch, \Rotate, \Tilt, \Tumble, \UHJtoB, \ZHPF, \ZLPF];
+var bodies = [\BFFreeVerb, \BFGVerb, \BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \BtoUHJ, \DelayWr,
+	\Feedback, \FreeVerb1, \Greyhole, \HighShelf, \JPverb, \LPCSynth, \LPCVals, \LRHPF, \LRLPF,
+	\LowShelf, \NHHall, \Notch, \PanX2D, \Phaser, \RBJHighShelf, \RBJLowShelf, \RBJNotch, \Rotate,
+	\TapN, \Tilt, \Tumble, \UHJtoB, \Vocode, \VocodeBand, \Vocoder, \WarpOverlap, \ZHPF, \ZLPF];
 // The classes of the census without a body, and why.
 var leftOut = [
 	[\AutoTrack, "no body yet"],
@@ -156,23 +159,13 @@ var leftOut = [
 	[\BFEncode, "computes with objects of the language, such as ZPoint"],
 	[\BhobTone, "calls HiShelf, which no class defines"],
 	[\CheapVerb, "draws rand of the language at each build"],
-	[\DelayWr, "no body yet"],
 	[\FFTCentroid, "no body yet"],
-	[\Feedback, "no body yet"],
-	[\FreeVerb1, "no body yet"],
 	[\OnsetsDS, "deprecated, and gives a Function"],
 	[\PV_DiffMags, "no body yet"],
-	[\PanX2D, "no body yet"],
-	[\Phaser, "no body yet"],
 	[\PulseDPW, "no body yet"],
 	[\Reflections, "computes with objects of the language, such as ZPoint"],
 	[\SoftClipAmp, "no body yet"],
-	[\StkBowedI, "no body yet"],
-	[\TapN, "no body yet"],
-	[\Vocode, "no body yet"],
-	[\VocodeBand, "no body yet"],
-	[\Vocoder, "no body yet"],
-	[\WarpOverlap, "no body yet"]
+	[\StkBowedI, "no body yet"]
 ];
 var census = bodies ++ leftOut.collect(_.first);
 

@@ -204,6 +204,7 @@ fn number_binary(op: &str, x: f64, y: f64) -> Option<f64> {
         "roundUp" => quantize(x, y, f64::ceil),
         "trunc" => quantize(x, y, f64::floor),
         "fold2" => fold(x, -y, y),
+        "wrap2" => wrap_range(x, -y, y),
         "max" => {
             if x > y {
                 x
@@ -294,6 +295,33 @@ fn modulo(input: f64, hi: f64) -> f64 {
     (-hi).mul_add((shifted / hi).floor(), shifted)
 }
 
+/// `sc_wrap` of `SC_InlineBinaryOp.h`, which the operator `wrap2` of a
+/// Float computes as `sc_wrap(x, -y, y)`.
+#[allow(clippy::float_cmp)]
+fn wrap_range(input: f64, lo: f64, hi: f64) -> f64 {
+    let range = hi - lo;
+    let shifted = if input >= hi {
+        let shifted = input - range;
+        if shifted < hi {
+            return shifted;
+        }
+        shifted
+    } else if input < lo {
+        let shifted = input + range;
+        if shifted >= lo {
+            return shifted;
+        }
+        shifted
+    } else {
+        return input;
+    };
+    if hi == lo {
+        return lo;
+    }
+    // Fused, as in `modulo`.
+    (-range).mul_add(((shifted - lo) / range).floor(), shifted)
+}
+
 /// `Float:wrap`: `sc_mod(x - lo, hi - lo) + lo`, in f64.
 pub(crate) fn wrap(x: f64, lo: f64, hi: f64) -> f64 {
     modulo(x - lo, hi - lo) + lo
@@ -378,7 +406,7 @@ mod tests {
                 "{x} {op} {y}: {computed}, not {expected}"
             );
         }
-        assert_eq!(rows(&table, "binary").len(), 1053);
+        assert_eq!(rows(&table, "binary").len(), 1134);
     }
 
     #[test]

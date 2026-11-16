@@ -82549,8 +82549,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, the method also creates [BinaryOpUGen, BinaryOpUGen]"
+          "addable": "pseudo"
         }
       ]
     },
@@ -82589,8 +82588,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, the method also creates [BinaryOpUGen, BinaryOpUGen]"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -82606,8 +82604,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, the method also creates [BinaryOpUGen, BinaryOpUGen]"
+          "addable": "pseudo"
         }
       ]
     },
@@ -93737,8 +93734,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -93794,8 +93790,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -106335,6 +106330,157 @@
       ]
     },
     {
+      "name": "DelayWr",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Feedback",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "feedbackpct",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "delayTime",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": {
+                "float": -1
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "FreeVerb1",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "revTime",
+              "kind": "signal",
+              "default": {
+                "float": 3
+              }
+            },
+            {
+              "name": "hfDamping",
+              "kind": "signal",
+              "default": {
+                "float": 0.995
+              }
+            },
+            {
+              "name": "numTaps",
+              "kind": "signal",
+              "default": {
+                "float": 10
+              }
+            },
+            {
+              "name": "numCombs",
+              "kind": "signal",
+              "default": {
+                "float": 8
+              }
+            },
+            {
+              "name": "numAllpasses",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "tapScale",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "combScale",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "allpassScale",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "Greyhole",
       "categories": [
         "UGens>Delays"
@@ -106753,6 +106899,83 @@
       ]
     },
     {
+      "name": "Phaser",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "phase",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "phase",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "RBJHighShelf",
       "categories": [
         "Undocumented classes",
@@ -106911,6 +107134,54 @@
       ]
     },
     {
+      "name": "TapN",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "numChannels",
+              "kind": "count",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "delaytime",
+              "kind": "signal",
+              "default": {
+                "float": 0.20000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "UHJtoB",
       "categories": [
         "Undocumented classes",
@@ -106929,6 +107200,318 @@
               "name": "rightsig",
               "kind": "signal",
               "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Vocode",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "src",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "harm",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "noise",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "anabwscale",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "outbw",
+              "kind": "signal",
+              "default": {
+                "float": 0.01
+              }
+            },
+            {
+              "name": "freqmul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "VocodeBand",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "src",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "band",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "harm",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "noise",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "anabwscale",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "outbw",
+              "kind": "signal",
+              "default": {
+                "float": 0.01
+              }
+            },
+            {
+              "name": "freqmul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Vocoder",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "car",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "mod",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "num",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "low",
+              "kind": "signal",
+              "default": {
+                "float": 100
+              }
+            },
+            {
+              "name": "high",
+              "kind": "signal",
+              "default": {
+                "float": 5000
+              }
+            },
+            {
+              "name": "q",
+              "kind": "signal",
+              "default": {
+                "float": 0.02
+              }
+            },
+            {
+              "name": "hpf",
+              "kind": "signal",
+              "default": {
+                "float": 5000
+              }
+            },
+            {
+              "name": "hpfscal",
+              "kind": "signal",
+              "default": {
+                "float": 0.050000000000000003
+              }
+            },
+            {
+              "name": "outscal",
+              "kind": "signal",
+              "default": {
+                "float": 25
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "WarpOverlap",
+      "categories": [
+        "Libraries>JoshUGens"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "numChans",
+              "kind": "count",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "buffer",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "overlaps",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "starttime",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "stretch",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "harm",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "windowsize",
+              "kind": "signal",
+              "default": {
+                "float": 6
+              }
+            },
+            {
+              "name": "step",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "warpwindowsize",
+              "kind": "signal",
+              "default": {
+                "float": 0.11
+              }
+            },
+            {
+              "name": "warpwindowoverlaps",
+              "kind": "signal",
+              "default": {
+                "float": 8
+              }
+            },
+            {
+              "name": "warpwindowran",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
             }
           ],
           "addable": "pseudo"

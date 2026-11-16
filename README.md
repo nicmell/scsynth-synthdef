@@ -292,8 +292,8 @@ that `levelComp` gives two inputs at audio rate: the square root of 1/2.
   give a number, in f64, as sclang computes its Floats. An array goes
   element by element. Anything else goes to `binary_op` and `unary_op`.
 - `tests/fixtures/arithmetic.json` tests each operator against sclang
-  3.14.1 for macOS on arm64. That sclang computes `%` and `fold2` of Floats
-  with one fused multiply-add, and so does the crate.
+  3.14.1 for macOS on arm64. That sclang computes `%`, `fold2` and `wrap2`
+  of Floats with one fused multiply-add, and so does the crate.
 - The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `CompanderD`,
   `Dstutter`, `DynKlang`, `DynKlank`, `HilbertFIR`, `LinLin`, `LinSelectX`,
   `Mix`, `MultiTap` and `NumChannels`.
@@ -851,7 +851,7 @@ inputs: the definition needs four wire buffers.
   folder `SC3plugins` of the Extensions holds its class files.
   `Version-3.14.1` changes `VBAPSpeakerArray` alone, which builds no UGen,
   so the catalogue serves both.
-- 635 of the 679 rate methods are addable with a wiring, and four have a
+- 635 of the 679 rate methods are addable with a wiring, and nine have a
   body. [Pseudo-UGens of sc3-plugins](#pseudo-ugens-of-sc3-plugins) lists
   the bodies.
 - Most rules of `checkInputs` are those of the core. The 96 HOA classes
@@ -903,8 +903,28 @@ do.
 - `JoshUGens`: `BtoUHJ.ar` and `UHJtoB.ar` mix the channels with their
   shifts by 90 degrees, as the two chains of six `FOS` of `Shift90.filt`
   give them.
+- `JoshUGens`: `Phaser.ar` and `Phaser.kr` wrap an `LFSaw` with `wrap2`.
+  `PanX2D.ar` and `PanX2D.kr` put a `PanX` on each channel of a `PanX`.
+- `JoshUGens`: `LPCSynth.ar`, `LPCVals.ar` and `LPCVals.kr` clip
+  `pointer` between 0 and 1. An `LPCVals` has three outputs.
+- `JoshUGens`: `Feedback.ar`, `TapN.ar` and `DelayWr.ar` read and write a
+  buffer with `PlayBuf` and `RecordBuf`. Nothing reads the `Impulse` that
+  `Feedback` builds.
+- `JoshUGens`: `FreeVerb1.ar` builds the taps of a `DelayL`, then a chain
+  of `CombL` and a chain of `AllpassN`. Each comb sums the taps again, and
+  nothing reads its `OnePole`.
+- `JoshUGens`: `Vocode.ar` and `VocodeBand.ar` filter `src` in 19 bands,
+  and `Vocoder.ar` in `num + 1` bands. `WarpOverlap.ar` sums `overlaps`
+  grains of `Warp1`.
 - `BhobUGens`: `BhobLoShelf.ar` and `BhobHiShelf.ar` mix `in` with an
   allpass `FOS`. Their arguments have no defaults.
+
+These arguments set counts of the language, and must be numbers:
+`numTaps`, `numCombs` and `numAllpasses` of `FreeVerb1`, `num` of
+`Vocoder`, `band` of `VocodeBand` and `overlaps` of `WarpOverlap`.
+`numTaps` and `numAllpasses` above 0 must be whole. `band` can also be an
+array of numbers. A count of `do` or `Array.fill` runs the floor of a
+Float, and the crate refuses a count above 65535.
 
 These bodies take the elements of an array as sclang destructures it, as
 in `#a, b = Rotate2.ar(x, y, angle)`. When an argument is an array, the
@@ -929,8 +949,7 @@ refuses an output as an order too.
   `UGen '<name>' not installed.`.
 - `StkFlute.kr` applies `madd` twice.
 - These methods create no instance of their class: `FFTCentroid.kr`,
-  `OnsetsDS.kr`, `PV_DiffMags.new`, `PanX2D.ar` and `PanX2D.kr`. So does
-  `SoftClipAmp.ar`.
+  `OnsetsDS.kr`, `PV_DiffMags.new` and `SoftClipAmp.ar`.
 - They put the size of an array before it: `FeatureSave.kr`,
   `FFTSubbandFlatness.kr`, `FFTSubbandPower.kr`, `MatchingPResynth.ar`
   and `MatchingPResynth.kr`.
@@ -938,8 +957,7 @@ refuses an output as an order too.
   `MatchingP.kr` and `NearestN.kr`. `SOMRd.ar`, `SOMRd.kr` and
   `SpectralEntropy.kr` test numbers.
 - They compute their inputs: `DbufTag.new`, `Dtag.new` and `Dfsm.new`
-  from rules, `FM7.ar` from two matrices, and `LPCSynth.ar`, `LPCVals.ar`
-  and `LPCVals.kr` from a clip of `pointer`.
+  from rules, and `FM7.ar` from two matrices.
 - `Dneuromodule.ar` and `Dneuromodule.kr` put a `Duty` around
   `Dneuromodule.new`, which takes its arrays and its count in its own way.
 - `TextVU.ar`, `TextVU.kr` and `TextVU.new` work as `Poll` does.
@@ -1082,7 +1100,13 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - The default label of `Poll` for a whole number names `Integer`. sclang
   names `Float` for a Float such as 440.0.
 - A whole Float as `rotate` of `PingPong`, such as 2.0: `Array:rotate` of
-  sclang takes only an Integer, and the crate takes it.
+  sclang takes only an Integer, and the crate takes it. The same goes for
+  `numTaps` and `numAllpasses` of `FreeVerb1`, for which `copyRange`
+  takes only an Integer.
+- A count of `do` or `Array.fill` above 65535, as the `num` of `Vocoder`
+  or the `overlaps` of `WarpOverlap`: sclang builds that many bands or
+  grains, and the crate refuses the count.
+- A `Ref` as an argument of `WarpOverlap`: the crate has no `Ref`.
 - Two numbers: `unary_op` and `binary_op` make a UGen of them, as
   `UnaryOpUGen.new` and `BinaryOpUGen.new` do. The operators of sclang
   compute them instead, as `2 * 3` gives 6. The crate cannot copy that.
@@ -1141,7 +1165,7 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 This is not in version 0.14, the next item of value for sc-app3:
 
 1. The bodies of the other pseudo-UGens of sc3-plugins, such as
-   `FreeVerb1` and `Vocoder`, and of the methods above that do more than
+   `PulseDPW` and `StkBowedI`, and of the methods above that do more than
    `new1`.
 
 Of sc3-plugins, the crate also leaves out ATK, whose classes come with the

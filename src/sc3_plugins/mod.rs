@@ -62,7 +62,7 @@ mod tests {
                 Addable::No(_) => 2,
             }] += 1;
         }
-        assert_eq!(counts, [635, 4, 40]);
+        assert_eq!(counts, [635, 9, 35]);
         assert!(
             pseudo_all()
                 .windows(2)
