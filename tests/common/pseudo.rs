@@ -1676,7 +1676,7 @@ fn bufwr() -> Vec<SynthDef> {
 }
 
 /// `Dseq(list, inf)`.
-fn dseq(b: &mut SynthDefBuilder, list: &[f64]) -> UGenInput {
+pub(super) fn dseq(b: &mut SynthDefBuilder, list: &[f64]) -> UGenInput {
     by_name(
         b,
         "Dseq",
@@ -1749,13 +1749,13 @@ fn duty() -> Vec<SynthDef> {
 }
 
 /// `Impulse` at the rate of `selector`, of `freq`.
-fn impulse(b: &mut SynthDefBuilder, selector: &str, freq: f64) -> UGenInput {
+pub(super) fn impulse(b: &mut SynthDefBuilder, selector: &str, freq: f64) -> UGenInput {
     by_name(b, "Impulse", selector, &[("freq", input(freq))])
 }
 
 /// `DemandEnvGen.ar(Dseq([0, 1], inf), 0.1, ...)` into `Out.ar`, with the
 /// arguments that `rest` makes after the `Dseq`.
-fn demand_env_gen(
+pub(super) fn demand_env_gen(
     b: &mut SynthDefBuilder,
     rest: impl FnOnce(&mut SynthDefBuilder) -> Vec<(&'static str, ArgValue)>,
 ) {
@@ -1814,7 +1814,12 @@ fn demandenvgen() -> Vec<SynthDef> {
 }
 
 /// `class.selector(args)` into `Out` at the rate of `selector`.
-fn rule_out(b: &mut SynthDefBuilder, class: &str, selector: &str, args: &[(&str, ArgValue)]) {
+pub(super) fn rule_out(
+    b: &mut SynthDefBuilder,
+    class: &str,
+    selector: &str,
+    args: &[(&str, ArgValue)],
+) {
     let result = by_name(b, class, selector, args);
     out(b, selector, result);
 }

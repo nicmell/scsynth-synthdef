@@ -17,6 +17,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -50,6 +51,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear", "UGens>Undocumented"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -111,6 +113,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -124,6 +127,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 0 },
         methods: &[
@@ -137,6 +141,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -200,6 +205,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -263,6 +269,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -326,6 +333,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -405,6 +413,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -487,6 +496,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -548,6 +558,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -605,6 +616,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -664,6 +676,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -684,6 +697,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -721,6 +735,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -758,6 +773,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -795,6 +811,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -808,6 +825,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -845,6 +863,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -883,6 +902,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -920,6 +940,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -958,6 +979,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -1019,6 +1041,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -1076,6 +1099,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>BEQSuite"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -1114,6 +1138,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -1175,6 +1200,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -1232,6 +1258,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -1291,6 +1318,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1350,6 +1378,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1363,6 +1392,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Analysis", "UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1384,6 +1414,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Analysis", "UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1422,6 +1453,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -1456,6 +1488,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -1515,6 +1548,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1537,6 +1571,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1596,6 +1631,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1628,6 +1664,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1683,6 +1720,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1721,6 +1759,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1759,6 +1798,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1797,6 +1837,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1850,6 +1891,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1888,6 +1930,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1926,6 +1969,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -1964,6 +2008,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2025,6 +2070,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2086,6 +2132,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2147,6 +2194,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2200,6 +2248,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2253,6 +2302,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2306,6 +2356,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2359,6 +2410,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::AudioAt(1),
         methods: &[
@@ -2420,6 +2472,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2473,6 +2526,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2526,6 +2580,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::BufWr,
         methods: &[
@@ -2585,6 +2640,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2646,6 +2702,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -2675,6 +2732,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2688,6 +2746,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -2745,6 +2804,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2778,6 +2838,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -2857,6 +2918,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2912,6 +2974,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -2967,6 +3030,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3030,6 +3094,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3093,6 +3158,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3156,6 +3222,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3197,6 +3264,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3224,6 +3292,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3251,6 +3320,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3283,6 +3353,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3315,6 +3386,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3352,6 +3424,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3390,6 +3463,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3429,6 +3503,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3492,6 +3567,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3549,6 +3625,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3587,6 +3664,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3625,6 +3703,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Single-value"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3678,6 +3757,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3691,6 +3771,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3727,6 +3808,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3762,6 +3844,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3798,6 +3881,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3833,6 +3917,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -3867,6 +3952,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear", "UGens>Envelopes"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -3926,6 +4012,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear", "UGens>Envelopes"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -3987,6 +4074,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(3),
         methods: &[
@@ -4022,6 +4110,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4083,6 +4172,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4146,6 +4236,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4201,6 +4292,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -4260,6 +4352,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -4321,6 +4414,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4382,6 +4476,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4443,6 +4538,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4504,6 +4600,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -4561,6 +4658,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Demand", "UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4632,6 +4730,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4691,6 +4790,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control", "UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -4750,6 +4850,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4785,6 +4886,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4821,6 +4923,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4882,6 +4985,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4939,6 +5043,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -4998,6 +5103,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5033,6 +5139,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::AudioFrom(1),
         methods: &[
@@ -5067,6 +5174,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5102,6 +5210,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control", "Server>Nodes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5135,6 +5244,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand", "UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5171,6 +5281,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5205,6 +5316,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5239,6 +5351,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5273,6 +5386,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5307,6 +5421,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5342,6 +5457,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5376,6 +5492,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5397,6 +5514,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5431,6 +5549,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5465,6 +5584,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5487,6 +5607,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5544,6 +5665,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5601,6 +5723,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Duty,
         methods: &[
@@ -5660,6 +5783,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5695,6 +5819,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5717,6 +5842,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5751,6 +5877,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5782,6 +5909,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5817,6 +5945,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: Some(ConvertEnv::Array),
+        cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5880,6 +6009,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5914,6 +6044,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5955,6 +6086,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -5996,6 +6128,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6037,6 +6170,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::BufFrames),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6075,6 +6209,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6110,6 +6245,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -6173,6 +6309,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6232,6 +6369,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -6245,6 +6383,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -6324,6 +6463,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6383,6 +6523,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6420,6 +6561,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -6483,6 +6625,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6517,6 +6660,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6550,6 +6694,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6583,6 +6728,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -6621,6 +6767,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -6660,6 +6807,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Filters>Pitch"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6697,6 +6845,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Reverbs"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -6741,6 +6890,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6796,6 +6946,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6833,6 +6984,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6870,6 +7022,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -6945,6 +7098,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7024,6 +7178,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7097,6 +7252,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7141,6 +7297,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7184,6 +7341,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7225,6 +7383,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7266,6 +7425,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7321,6 +7481,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -7380,6 +7541,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -7437,6 +7599,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -7494,6 +7657,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Random"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -7551,6 +7715,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7590,6 +7755,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7629,6 +7795,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7668,6 +7835,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7703,6 +7871,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7724,6 +7893,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: Some(ConvertEnv::Interpolation),
+        cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7783,6 +7953,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7862,6 +8033,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7896,6 +8068,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -7955,6 +8128,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8010,6 +8184,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8043,6 +8218,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8077,6 +8253,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -8156,6 +8333,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -8187,6 +8365,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8221,6 +8400,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8280,6 +8460,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8339,6 +8520,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8398,6 +8580,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8430,6 +8613,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear", "UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -8489,6 +8673,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Conversion"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8522,6 +8707,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8558,6 +8744,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8593,6 +8780,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8615,6 +8803,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic", "UGens>Filters>Linear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8639,6 +8828,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8696,6 +8886,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8755,6 +8946,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8812,6 +9004,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8869,6 +9062,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8926,6 +9120,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -8983,6 +9178,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9044,6 +9240,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9101,6 +9298,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9158,6 +9356,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9215,6 +9414,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9274,6 +9474,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9335,6 +9536,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9394,6 +9596,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9453,6 +9656,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9512,6 +9716,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9569,6 +9774,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9626,6 +9832,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9685,6 +9892,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9744,6 +9952,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9805,6 +10014,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9864,6 +10074,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -9925,6 +10136,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9960,6 +10172,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -9995,6 +10208,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -10056,6 +10270,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10111,6 +10326,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10166,6 +10382,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10207,6 +10424,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10248,6 +10466,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10289,6 +10508,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -10348,6 +10568,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10403,6 +10624,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10438,6 +10660,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10477,6 +10700,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10516,6 +10740,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10555,6 +10780,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -10616,6 +10842,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -10673,6 +10900,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10708,6 +10936,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -10767,6 +10996,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10830,6 +11060,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10867,6 +11098,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10901,6 +11133,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10922,6 +11155,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -10951,6 +11185,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 0 },
         methods: &[
@@ -11004,6 +11239,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11065,6 +11301,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11107,6 +11344,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11142,6 +11380,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11176,6 +11415,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11235,6 +11475,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11254,6 +11495,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::AudioAt(1),
         methods: &[
@@ -11313,6 +11555,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -11376,6 +11619,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11455,6 +11699,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -11518,6 +11763,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11573,6 +11819,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11608,6 +11855,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11644,6 +11892,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>User interaction"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11680,6 +11929,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11702,6 +11952,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11715,6 +11966,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Bela"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11774,6 +12026,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11809,6 +12062,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11841,6 +12095,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Dynamics"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11876,6 +12131,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11908,6 +12164,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11940,6 +12197,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -11972,6 +12230,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12004,6 +12263,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12036,6 +12296,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12087,6 +12348,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -12127,6 +12389,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -12186,6 +12449,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -12245,6 +12509,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12286,6 +12551,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12347,6 +12613,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12408,6 +12675,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -12463,6 +12731,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Base"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12485,6 +12754,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12520,6 +12790,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12554,6 +12825,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12590,6 +12862,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12626,6 +12899,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12661,6 +12935,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12695,6 +12970,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12708,6 +12984,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12743,6 +13020,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12776,6 +13054,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12810,6 +13089,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12844,6 +13124,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12878,6 +13159,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12912,6 +13194,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12949,6 +13232,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -12988,6 +13272,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13022,6 +13307,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13056,6 +13342,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13090,6 +13377,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13124,6 +13412,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13159,6 +13448,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13193,6 +13483,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13227,6 +13518,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13260,6 +13552,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13295,6 +13588,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13329,6 +13623,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13362,6 +13657,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13396,6 +13692,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13430,6 +13727,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13464,6 +13762,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13499,6 +13798,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13532,6 +13832,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13565,6 +13866,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13600,6 +13902,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13636,6 +13939,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13672,6 +13976,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Chain),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13709,6 +14014,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: Some(FftSize::Input),
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -13734,6 +14040,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -13791,6 +14098,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -13850,6 +14158,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -13913,6 +14222,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -13972,6 +14282,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Multichannel>Ambisonics"],
         check_inputs: CheckInputs::NInputs(1),
         methods: &[
@@ -14029,6 +14340,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14066,6 +14378,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14100,6 +14413,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14133,6 +14447,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14166,6 +14481,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Peak,
         methods: &[
@@ -14221,6 +14537,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14276,6 +14593,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14337,6 +14655,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14392,6 +14711,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14435,6 +14755,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Pitch"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14474,6 +14795,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14539,6 +14861,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Delays"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14579,6 +14902,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14622,6 +14946,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14681,6 +15006,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14736,6 +15062,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14793,6 +15120,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14806,6 +15134,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14819,6 +15148,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14858,6 +15188,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14897,6 +15228,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -14936,6 +15268,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -14997,6 +15330,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15058,6 +15392,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15090,6 +15425,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15149,6 +15485,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15183,6 +15520,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15236,6 +15574,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic", "UGens>Random"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15312,6 +15651,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15381,6 +15721,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -15436,6 +15777,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15497,6 +15839,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15558,6 +15901,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Ambisonics", "UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -15615,6 +15959,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Peak,
         methods: &[
@@ -15670,6 +16015,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::Peak,
         methods: &[
@@ -15725,6 +16071,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis", "UGens>Maths"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15780,6 +16127,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -15847,6 +16195,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15879,6 +16228,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -15911,6 +16261,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -15966,6 +16317,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16023,6 +16375,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -16102,6 +16455,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16157,6 +16511,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16216,6 +16571,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::AudioFrom(1),
         methods: &[
@@ -16271,6 +16627,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Amplitude"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16306,6 +16663,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16365,6 +16723,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16422,6 +16781,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16444,6 +16804,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16499,6 +16860,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16558,6 +16920,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16592,6 +16955,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 1 },
         methods: &[
@@ -16626,6 +16990,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16685,6 +17050,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic", "UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16744,6 +17110,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16805,6 +17172,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis", "UGens>Filters>Linear", "UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -16862,6 +17230,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16895,6 +17264,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16928,6 +17298,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16964,6 +17335,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -16999,6 +17371,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Panners"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17040,6 +17413,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17097,6 +17471,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17135,6 +17510,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Chaotic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17173,6 +17549,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -17236,6 +17613,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT", "UGens>Convolution"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17276,6 +17654,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Info"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17308,6 +17687,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17330,6 +17710,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17353,6 +17734,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17408,6 +17790,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17467,6 +17850,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Conversion", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17501,6 +17885,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Conversion", "UGens>Triggers"],
         check_inputs: CheckInputs::T2K,
         methods: &[
@@ -17534,6 +17919,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Nonlinear", "UGens>Generators>PhysicalModels"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17593,6 +17979,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers", "UGens>Delays"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -17648,6 +18035,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Demand"],
         check_inputs: CheckInputs::Duty,
         methods: &[
@@ -17709,6 +18097,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17766,6 +18155,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17807,6 +18197,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17864,6 +18255,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17921,6 +18313,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Random", "UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -17978,6 +18371,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer", "UGens>Delays>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18000,6 +18394,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -18053,6 +18448,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18106,6 +18502,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18161,6 +18558,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Triggers"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18216,6 +18614,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Synth control", "UGens>Undocumented"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18243,6 +18642,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -18304,6 +18704,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -18365,6 +18766,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Algebraic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18386,6 +18788,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18422,6 +18825,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>FFT", "UGens>Demand"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18445,6 +18849,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut", "UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18482,6 +18887,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18543,6 +18949,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18606,6 +19013,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Filters>Linear"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[
@@ -18645,6 +19053,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18706,6 +19115,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Deterministic", "UGens>Generators>Stochastic", "UGens>Filters>Pitch"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18775,6 +19185,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: true,
         categories: &["UGens>Buffer", "UGens>Generators>Granular"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18818,6 +19229,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Generators>Stochastic"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18873,6 +19285,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: true,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["Undocumented classes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -18886,6 +19299,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Maths"],
         check_inputs: CheckInputs::SameRateAsFirstInputIfAudio,
         methods: &[
@@ -18965,6 +19379,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Buffer"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -19024,6 +19439,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Multichannel>Select"],
         check_inputs: CheckInputs::NInputs(2),
         methods: &[
@@ -19083,6 +19499,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Envelopes"],
         check_inputs: CheckInputs::Valid,
         methods: &[
@@ -19146,6 +19563,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>InOut"],
         check_inputs: CheckInputs::AbstractOut { fixed: 2 },
         methods: &[
@@ -19203,6 +19621,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
         is_width_first: false,
         fft_size: None,
         convert_env: None,
+        cant_alias: false,
         categories: &["UGens>Analysis>Pitch"],
         check_inputs: CheckInputs::SameRateAsFirstInput,
         methods: &[

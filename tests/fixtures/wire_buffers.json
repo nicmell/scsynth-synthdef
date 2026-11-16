@@ -1,0 +1,597 @@
+{
+  "beattrack": {
+    "beattrack_auto": 1,
+    "beattrack_chain": 1
+  },
+  "bhipass4": {
+    "bhipass4": 1
+  },
+  "blowpass4": {
+    "blowpass4": 1,
+    "blowpass4_ugens": 1
+  },
+  "bufwr": {
+    "bufwr_ar": 3,
+    "bufwr_kr": 0
+  },
+  "changed": {
+    "changed_ar": 1,
+    "changed_array": 0,
+    "changed_kr": 0
+  },
+  "companderd": {
+    "companderd": 2,
+    "companderd_number": 1
+  },
+  "constants": {
+    "constants": 0
+  },
+  "controlugens": {
+    "controlugens_after_arg": 1,
+    "controlugens_audio_names": 1,
+    "controlugens_names": 2,
+    "controlugens_names_ir": 2,
+    "controlugens_names_long": 1,
+    "controlugens_names_short": 2,
+    "controlugens_names_trig": 2,
+    "controlugens_nested": 4,
+    "controlugens_trig_ir": 1,
+    "controlugens_trig_names": 1,
+    "controlugens_unnamed": 2,
+    "controlugens_variant": 2,
+    "lagcontrol_ar": 1,
+    "lagcontrol_ar_two": 2,
+    "lagcontrol_arg_lag": 2,
+    "lagcontrol_names": 2,
+    "lagcontrol_nested": 4,
+    "lagcontrol_number": 2,
+    "lagcontrol_seventeen": 0,
+    "lagcontrol_two": 2
+  },
+  "deadcode": {
+    "deadcode_arg": 1,
+    "deadcode_chain": 1,
+    "deadcode_constant": 1,
+    "deadcode_detectsilence": 2,
+    "deadcode_proxy": 2,
+    "deadcode_readers": 1,
+    "deadcode_revisit": 1,
+    "deadcode_revisit_swapped": 1
+  },
+  "defwrap": {
+    "defwrap_arg": 1,
+    "defwrap_names": 2,
+    "defwrap_prepend": 1,
+    "defwrap_rates": 1,
+    "defwrap_same_name": 1,
+    "defwrap_twice": 2,
+    "defwrap_variant": 1,
+    "prepend": 1,
+    "prepend_array": 1
+  },
+  "delays": {
+    "allpassc_zero": 1,
+    "bufcombn_array": 2,
+    "bufdelayc_audio": 1,
+    "combl_number": 1,
+    "delayn_kr_input": 1,
+    "delayn_mul": 1,
+    "deltapwr": 1
+  },
+  "demand": {
+    "demand": 0
+  },
+  "demandenvgen": {
+    "demandenvgen_both": 3,
+    "demandenvgen_control": 1,
+    "demandenvgen_gate": 3,
+    "demandenvgen_mixed": 3,
+    "demandenvgen_named": 3,
+    "demandenvgen_reset": 3,
+    "demandenvgen_resets": 4
+  },
+  "dstutter": {
+    "dstutter": 0
+  },
+  "duty": {
+    "duty_ar": 2,
+    "duty_demand_reset": 0,
+    "duty_kr": 0,
+    "duty_number": 0,
+    "tduty_ar": 1
+  },
+  "dynklang": {
+    "dynklang_2": 2,
+    "dynklang_amps": 2,
+    "dynklang_kr": 0
+  },
+  "dynklank": {
+    "dynklank_2": 2,
+    "dynklank_3": 3,
+    "dynklank_amps": 2,
+    "dynklank_expand": 3,
+    "dynklank_kr": 0,
+    "dynklank_scale": 2
+  },
+  "empty_array": {
+    "empty_array": 0
+  },
+  "env": {
+    "env_adsr": 0,
+    "env_adsr_bias": 0,
+    "env_adsr_ugens": 0,
+    "env_ar": 1,
+    "env_asr": 0,
+    "env_circle": 0,
+    "env_curve_ugen": 0,
+    "env_curves": 0,
+    "env_cutoff": 0,
+    "env_cutoff_exp": 0,
+    "env_dadsr": 0,
+    "env_default": 0,
+    "env_delay": 0,
+    "env_kr": 0,
+    "env_linen": 0,
+    "env_multi": 0,
+    "env_multi_curve": 0,
+    "env_new": 0,
+    "env_new_clear": 0,
+    "env_new_clear_none": 0,
+    "env_new_clear_none_two": 0,
+    "env_new_clear_two": 0,
+    "env_nodes": 0,
+    "env_one_level": 0,
+    "env_pairs": 0,
+    "env_perc": 0,
+    "env_perc_args": 0,
+    "env_shape_names": 0,
+    "env_shapes": 0,
+    "env_sine": 0,
+    "env_step": 0,
+    "env_triangle": 0,
+    "env_ugen_level": 0,
+    "env_wrap_times": 0,
+    "env_xyc": 0
+  },
+  "envgate": {
+    "envgate_args": 1,
+    "envgate_level": 1,
+    "envgate_markup": 1,
+    "envgate_new": 1,
+    "envgate_twice": 2
+  },
+  "envgen": {
+    "envgen": 1
+  },
+  "fft": {
+    "fft": 2
+  },
+  "folds": {
+    "folds": 6
+  },
+  "hilbertfir": {
+    "hilbertfir": 2
+  },
+  "ienv": {
+    "ienv_madd": 1,
+    "ienv_multi": 0,
+    "ienv_multi_index": 0,
+    "ienv_new": 0,
+    "ienv_offset": 0,
+    "ienv_ugen_time_numbers": 0,
+    "ienv_ugen_times": 0,
+    "ienv_xyc": 0
+  },
+  "in_buses": {
+    "in_buses": 3
+  },
+  "klang": {
+    "klang_3": 1,
+    "klang_default": 1,
+    "klang_scale": 1
+  },
+  "klank": {
+    "klank_3": 1,
+    "klank_amps": 1,
+    "klank_expand": 2,
+    "klank_scale": 1,
+    "klank_times": 1,
+    "klank_wrap": 1
+  },
+  "lag": {
+    "lag2_kr": 0,
+    "lag2ud_ar": 1,
+    "lag3_ar": 1,
+    "lag3ud_kr": 0,
+    "lag_ar": 1,
+    "lag_array": 0,
+    "lag_array_scalar": 0,
+    "lag_kr": 0,
+    "lag_madd": 0,
+    "lag_madd_number": 0,
+    "lag_madd_scalar": 0,
+    "lag_number": 0,
+    "lag_scalar": 0,
+    "lag_zero": 0,
+    "lagud_kr": 0,
+    "lagud_zero": 0,
+    "ramp_kr": 0,
+    "slew_ar": 1,
+    "slew_kr": 0,
+    "slew_scalar": 0
+  },
+  "lags17": {
+    "lags17": 0
+  },
+  "linlin": {
+    "linlin_ar": 1,
+    "linlin_kr": 0,
+    "linlin_numbers": 0,
+    "linlin_ugens": 0
+  },
+  "linselectx": {
+    "linselectx_ar": 4,
+    "linselectx_kr": 0
+  },
+  "linxfade2": {
+    "linxfade2_level": 2,
+    "linxfade2_one": 0,
+    "linxfade2_ugen": 2
+  },
+  "localbuf": {
+    "localbuf_array": 2,
+    "localbuf_channels": 2,
+    "localbuf_fft": 1,
+    "localbuf_two": 2
+  },
+  "localin": {
+    "localin_ar": 4,
+    "localin_default": 3,
+    "localin_kr": 0,
+    "localin_zero": 2
+  },
+  "madd_numbers": {
+    "madd_numbers": 1
+  },
+  "mix": {
+    "mix_1": 1,
+    "mix_2": 2,
+    "mix_3": 3,
+    "mix_4": 4,
+    "mix_5": 4,
+    "mix_9": 5,
+    "mix_ar": 1,
+    "mix_ar_number": 1,
+    "mix_kr": 1,
+    "mix_kr_number": 0,
+    "mix_nested": 5,
+    "mix_numbers": 0,
+    "mix_rates3": 1,
+    "mix_rates4": 2
+  },
+  "mul": {
+    "mul": 1
+  },
+  "mul_add": {
+    "mul_add": 1
+  },
+  "mul_array": {
+    "mul_array": 3
+  },
+  "mul_expanded": {
+    "mul_expanded": 2
+  },
+  "mul_ops": {
+    "mul_ops": 1
+  },
+  "mul_swap": {
+    "mul_swap": 1
+  },
+  "multi_out": {
+    "multi_out": 3
+  },
+  "multitap": {
+    "multitap": 3,
+    "multitap_levels": 4
+  },
+  "namedcontrol": {
+    "namedcontrol_after_arg": 1,
+    "namedcontrol_ar_lag": 1,
+    "namedcontrol_ar_lag_ugen": 1,
+    "namedcontrol_arg_name": 2,
+    "namedcontrol_array": 2,
+    "namedcontrol_control_names": 2,
+    "namedcontrol_fixed_ugen": 1,
+    "namedcontrol_ir_lag": 1,
+    "namedcontrol_ir_lag_ugen": 1,
+    "namedcontrol_lag": 1,
+    "namedcontrol_lag_array": 2,
+    "namedcontrol_lag_mixed": 2,
+    "namedcontrol_lag_one_for_two": 2,
+    "namedcontrol_lag_seventeen": 0,
+    "namedcontrol_lag_then_none": 2,
+    "namedcontrol_lag_twice": 2,
+    "namedcontrol_lag_ugen": 1,
+    "namedcontrol_lag_ugen_twice": 2,
+    "namedcontrol_lag_ugen_two_values": 2,
+    "namedcontrol_lag_ugens": 2,
+    "namedcontrol_lag_ugens_one_value": 2,
+    "namedcontrol_lag_zero": 1,
+    "namedcontrol_markup": 1,
+    "namedcontrol_nested": 4,
+    "namedcontrol_new": 1,
+    "namedcontrol_no_value": 1,
+    "namedcontrol_none_then_lag": 2,
+    "namedcontrol_one": 1,
+    "namedcontrol_one_value": 1,
+    "namedcontrol_prefix_lag": 2,
+    "namedcontrol_prefix_rate": 2,
+    "namedcontrol_prefixes": 2,
+    "namedcontrol_rates": 2,
+    "namedcontrol_spec": 2,
+    "namedcontrol_tr_lag_ugen": 1,
+    "namedcontrol_twice": 2,
+    "namedcontrol_ugen_then_fixed": 2,
+    "namedcontrol_variant": 2,
+    "namedcontrol_wrap": 2
+  },
+  "nested": {
+    "nested": 4
+  },
+  "nestedenv": {
+    "nestedenv_gates": 3,
+    "nestedenv_two": 0
+  },
+  "nestedout": {
+    "nestedout_bus": 3,
+    "nestedout_deep": 4,
+    "nestedout_kr": 0,
+    "nestedout_pan2": 4,
+    "nestedout_two": 3,
+    "nestedout_x": 3,
+    "nestedout_zeros": 2
+  },
+  "nestedpseudo": {
+    "nestedpseudo_linselectx": 0,
+    "nestedpseudo_localin": 4,
+    "nestedpseudo_multitap": 6,
+    "nestedpseudo_multitap_times": 4,
+    "nestedpseudo_numchannels": 3,
+    "nestedpseudo_pingpong": 7,
+    "nestedpseudo_selectx": 5,
+    "nestedpseudo_selectxfocus": 3,
+    "nestedpseudo_splayaz": 7,
+    "nestedpseudo_tchoose": 4,
+    "nestedpseudo_twchoose": 5
+  },
+  "nestedreply": {
+    "nestedreply_ar": 2,
+    "nestedreply_first": 0,
+    "nestedreply_two": 0,
+    "nestedreply_wrap": 0
+  },
+  "nestedwire": {
+    "nestedwire_bufwr": 4,
+    "nestedwire_demand": 0,
+    "nestedwire_dseq": 0,
+    "nestedwire_recordbuf": 3,
+    "nestedwire_select": 3,
+    "nestedwire_twindex": 0
+  },
+  "numchannels": {
+    "numchannels_cut": 2,
+    "numchannels_dup": 1,
+    "numchannels_mix": 3,
+    "numchannels_one": 1
+  },
+  "old": {
+    "old": 1
+  },
+  "operators": {
+    "operators": 4
+  },
+  "optimize": {
+    "optimize_addneg": 2,
+    "optimize_args": 1,
+    "optimize_demand": 0,
+    "optimize_kr_audio": 1,
+    "optimize_muladd": 1,
+    "optimize_muladd_kr": 0,
+    "optimize_muladd_right": 1,
+    "optimize_muladd_swap": 1,
+    "optimize_negadd": 2,
+    "optimize_shared": 2,
+    "optimize_subneg": 3,
+    "optimize_sum3": 3,
+    "optimize_sum3_right": 3,
+    "optimize_sum4": 4,
+    "optimize_sum5": 4,
+    "optimize_twice": 2
+  },
+  "outzeros": {
+    "outzeros_kr": 0,
+    "outzeros_negative": 2,
+    "outzeros_offset": 1,
+    "outzeros_one": 1,
+    "outzeros_replace": 2,
+    "outzeros_two": 2,
+    "outzeros_x": 2
+  },
+  "pair": {
+    "pair": 2
+  },
+  "peak": {
+    "peak_ar": 2,
+    "peak_kr_audio": 1,
+    "runningmax_kr": 0,
+    "runningmin_ar": 1
+  },
+  "pingpong": {
+    "pingpong": 6,
+    "pingpong_bufnum": 6,
+    "pingpong_negative": 8,
+    "pingpong_rotate": 6,
+    "pingpong_ugens": 6
+  },
+  "pmosc": {
+    "pmosc_ar": 1,
+    "pmosc_kr": 0
+  },
+  "poll": {
+    "poll_bytes": 0,
+    "poll_float": 0,
+    "poll_integer": 0,
+    "poll_kr": 0,
+    "poll_label": 2,
+    "poll_new": 0,
+    "poll_new_scalar": 0,
+    "poll_out": 2,
+    "poll_proxy": 0,
+    "poll_symbol": 0
+  },
+  "pvcopy": {
+    "pvcopy_analysis": 1,
+    "pvcopy_buffer": 3,
+    "pvcopy_deep": 2,
+    "pvcopy_slots": 2,
+    "pvcopy_three": 3
+  },
+  "rates": {
+    "rates": 3
+  },
+  "selectx": {
+    "selectx_ar": 4,
+    "selectx_kr": 0
+  },
+  "selectxfocus": {
+    "selectxfocus": 3,
+    "selectxfocus_number": 0,
+    "selectxfocus_wrap": 3
+  },
+  "sendreply": {
+    "sendreply": 0
+  },
+  "silent": {
+    "silent_1": 1,
+    "silent_2": 1
+  },
+  "sine": {
+    "sine": 1
+  },
+  "sort": {
+    "sort": 2
+  },
+  "soundin": {
+    "soundin_0": 1,
+    "soundin_01": 2,
+    "soundin_02": 2,
+    "soundin_mul": 1,
+    "soundin_ugen": 1
+  },
+  "specs": {
+    "specs_args": 0
+  },
+  "splay": {
+    "splay_2": 4,
+    "splay_3": 6,
+    "splay_center": 4,
+    "splay_kr": 0,
+    "splay_level": 4,
+    "splay_levelcomp_false": 4,
+    "splay_levelcomp_number": 4,
+    "splay_levelcomp_ugen": 4,
+    "splay_mono": 4,
+    "splay_nested": 6,
+    "splay_spread": 6
+  },
+  "splayaz": {
+    "splayaz_3": 13,
+    "splayaz_audio_center": 7,
+    "splayaz_center": 5,
+    "splayaz_kr": 0,
+    "splayaz_mono": 3,
+    "splayaz_spread": 13
+  },
+  "sum": {
+    "sum3_array": 4,
+    "sum3_fold": 2,
+    "sum4_fold": 2
+  },
+  "symbols": {
+    "sendreply_bytes": 0
+  },
+  "t2k": {
+    "t2k": 1
+  },
+  "tap": {
+    "tap_1": 1,
+    "tap_2": 2
+  },
+  "tchoose": {
+    "tchoose_ar": 4,
+    "tchoose_kr": 0
+  },
+  "twchoose": {
+    "twchoose_ar": 3,
+    "twchoose_kr": 0
+  },
+  "two_defs": {
+    "first": 0,
+    "second": 0
+  },
+  "unpackfft": {
+    "unpackfft": 1,
+    "unpackfft_default": 1
+  },
+  "variant": {
+    "variant": 1
+  },
+  "varlag": {
+    "varlag_ar": 3,
+    "varlag_array": 0,
+    "varlag_array_warp": 0,
+    "varlag_exp": 3,
+    "varlag_kr": 0,
+    "varlag_lin": 0,
+    "varlag_madd": 0,
+    "varlag_one": 0,
+    "varlag_scalar": 0,
+    "varlag_start": 0,
+    "varlag_three": 0,
+    "varlag_time_zero": 0,
+    "varlag_ugen_warp": 0
+  },
+  "voices": {
+    "voices": 4
+  },
+  "wirebufs": {
+    "wirebufs_balance2": 4,
+    "wirebufs_chain": 1,
+    "wirebufs_control": 0,
+    "wirebufs_decodeb2": 5,
+    "wirebufs_demand": 2,
+    "wirebufs_demand_audio": 2,
+    "wirebufs_demand_control": 1,
+    "wirebufs_demandenvgen": 3,
+    "wirebufs_duty": 2,
+    "wirebufs_grainbuf": 3,
+    "wirebufs_grainfm": 3,
+    "wirebufs_grainin": 4,
+    "wirebufs_grainsin": 3,
+    "wirebufs_pan2": 2,
+    "wirebufs_panaz": 3,
+    "wirebufs_panb2": 4,
+    "wirebufs_partconv": 2,
+    "wirebufs_playbuf": 2,
+    "wirebufs_playbuf_control": 1,
+    "wirebufs_sixteen": 16,
+    "wirebufs_square": 1,
+    "wirebufs_tduty": 2,
+    "wirebufs_tgrains": 3,
+    "wirebufs_unread": 3,
+    "wirebufs_warp1": 2
+  },
+  "wrap": {
+    "wrap": 3
+  }
+}

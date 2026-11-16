@@ -445,6 +445,14 @@ fn render_catalog(catalog: &Value) -> String {
         .unwrap();
         writeln!(
             rendered,
+            "        cant_alias: {},",
+            class["cant_alias"]
+                .as_bool()
+                .expect("cant_alias is a boolean")
+        )
+        .unwrap();
+        writeln!(
+            rendered,
             "        categories: {},",
             strings(&class["categories"])
         )

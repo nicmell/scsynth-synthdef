@@ -277,6 +277,38 @@ impl fmt::Display for LimitError {
 
 impl std::error::Error for LimitError {}
 
+/// Why the crate does not count the wire buffers of a definition.
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum WireBufferError {
+    /// The definition breaks a limit of scsynth or an invariant of the
+    /// format.
+    Limit(LimitError),
+    /// A UGen whose class the catalogue does not hold. The count needs the
+    /// flag that its plugin sets.
+    #[non_exhaustive]
+    UnknownUGen {
+        /// The position of the UGen among the children.
+        ugen: usize,
+        /// The name of the UGen.
+        name: String,
+    },
+}
+
+impl fmt::Display for WireBufferError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Limit(error) => write!(f, "{error}"),
+            Self::UnknownUGen { ugen, name } => write!(
+                f,
+                "UGen {ugen} '{name}' is not in the catalogue, so the crate cannot count the wire buffers"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for WireBufferError {}
+
 impl NameKind {
     fn noun(self) -> &'static str {
         match self {

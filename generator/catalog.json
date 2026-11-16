@@ -121,6 +121,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Conversion"
       ],
@@ -170,6 +171,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Undocumented"
@@ -313,6 +315,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -331,6 +334,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -352,6 +356,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -516,6 +521,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -680,6 +686,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -843,6 +850,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -993,6 +1001,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -1183,6 +1192,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -1324,6 +1334,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Bela"
       ],
@@ -1425,6 +1436,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Bela"
       ],
@@ -1543,6 +1555,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -1577,6 +1590,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1658,6 +1672,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1739,6 +1754,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1819,6 +1835,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1840,6 +1857,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -1921,6 +1939,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2012,6 +2031,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2093,6 +2113,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2183,6 +2204,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2327,6 +2349,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2431,6 +2454,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>BEQSuite"
       ],
@@ -2522,6 +2546,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2666,6 +2691,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -2768,6 +2794,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -2896,6 +2923,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -3030,6 +3058,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -3049,6 +3078,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Analysis",
         "UGens>FFT"
@@ -3088,6 +3118,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Analysis",
         "UGens>FFT"
@@ -3185,6 +3216,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Bela"
       ],
@@ -3240,6 +3272,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -3367,6 +3400,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -3408,6 +3442,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -3530,6 +3565,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -3566,6 +3602,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -3646,6 +3683,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3738,6 +3776,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3830,6 +3869,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -3922,6 +3962,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -3992,6 +4033,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4084,6 +4126,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4175,6 +4218,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4267,6 +4311,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4410,6 +4455,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4552,6 +4598,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays>Buffer"
       ],
@@ -4695,6 +4742,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4765,6 +4813,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4834,6 +4883,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Base"
       ],
@@ -4904,6 +4954,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -4974,6 +5025,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -5117,6 +5169,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -5187,6 +5240,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer>Info"
       ],
@@ -5256,6 +5310,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -5388,6 +5443,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -5527,6 +5583,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers",
         "UGens>Filters>Linear"
@@ -5583,6 +5640,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -5601,6 +5659,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -5715,6 +5774,7 @@
       "width_first": true,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes"
       ],
@@ -5760,6 +5820,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -5919,6 +5980,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -5998,6 +6060,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -6085,6 +6148,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -6249,6 +6313,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -6412,6 +6477,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -6574,6 +6640,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Dynamics"
       ],
@@ -6694,6 +6761,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Dynamics"
       ],
@@ -6776,6 +6844,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control"
       ],
@@ -6818,6 +6887,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -6853,6 +6923,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -6887,6 +6958,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -6964,6 +7036,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -7051,6 +7124,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -7148,6 +7222,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Convolution"
       ],
@@ -7301,6 +7376,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -7404,6 +7480,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -7495,6 +7572,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -7587,6 +7665,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Single-value"
       ],
@@ -7660,6 +7739,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes"
       ],
@@ -7679,6 +7759,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -7756,6 +7837,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer",
         "UGens>Demand"
@@ -7824,6 +7906,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer",
         "UGens>Demand"
@@ -7902,6 +7985,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -7965,6 +8049,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -8019,6 +8104,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Envelopes"
@@ -8143,6 +8229,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Envelopes"
@@ -8286,6 +8373,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -8375,6 +8463,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Conversion"
       ],
@@ -8512,6 +8601,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer",
         "UGens>Delays"
@@ -8662,6 +8752,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer",
         "UGens>Delays"
@@ -8751,6 +8842,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -8872,6 +8964,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -9011,6 +9104,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -9155,6 +9249,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -9298,6 +9393,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -9441,6 +9537,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Demand"
       ],
@@ -9542,6 +9639,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Demand",
         "UGens>Envelopes"
@@ -9794,6 +9892,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -9913,6 +10012,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control",
         "UGens>Analysis>Amplitude"
@@ -10048,6 +10148,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -10116,6 +10217,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -10192,6 +10294,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Bela"
       ],
@@ -10333,6 +10436,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Bela"
       ],
@@ -10434,6 +10538,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Bela"
       ],
@@ -10552,6 +10657,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -10611,6 +10717,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -10668,6 +10775,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -10734,6 +10842,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control",
         "Server>Nodes"
@@ -10780,6 +10889,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand",
         "UGens>Info"
@@ -10855,6 +10965,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -10911,6 +11022,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -10967,6 +11079,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11024,6 +11137,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11080,6 +11194,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11148,6 +11263,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand",
         "UGens>Random"
@@ -11205,6 +11321,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11242,6 +11359,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11296,6 +11414,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11349,6 +11468,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11394,6 +11514,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -11495,6 +11616,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -11596,6 +11718,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Demand"
       ],
@@ -11730,6 +11853,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11797,6 +11921,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand",
         "UGens>Random"
@@ -11843,6 +11968,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Demand"
       ],
@@ -11898,6 +12024,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -11967,6 +12094,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Filters>Linear"
@@ -12061,6 +12189,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": "array",
+      "cant_alias": false,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -12232,6 +12361,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random"
       ],
@@ -12290,6 +12420,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12412,6 +12543,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12533,6 +12665,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -12655,6 +12788,7 @@
       "width_first": true,
       "fft_size": "buf_frames",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -12751,6 +12885,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -12817,6 +12952,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -12978,6 +13114,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -13100,6 +13237,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters"
       ],
@@ -13119,6 +13257,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -13279,6 +13418,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -13397,6 +13537,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -13479,6 +13620,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -13640,6 +13782,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control"
       ],
@@ -13692,6 +13835,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control"
       ],
@@ -13736,6 +13880,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control"
       ],
@@ -13782,6 +13927,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Reverbs"
       ],
@@ -13871,6 +14017,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Reverbs"
       ],
@@ -13969,6 +14116,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Filters>Pitch"
@@ -14049,6 +14197,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Reverbs"
       ],
@@ -14200,6 +14349,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -14295,6 +14445,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -14376,6 +14527,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -14456,6 +14608,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -14733,6 +14886,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -15050,6 +15204,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -15308,6 +15463,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -15454,6 +15610,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15591,6 +15748,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15706,6 +15864,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Generators>Granular"
       ],
@@ -15823,6 +15982,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -15905,6 +16065,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -16029,6 +16190,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -16133,6 +16295,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -16234,6 +16397,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Random"
@@ -16338,6 +16502,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -16440,6 +16605,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -16541,6 +16707,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -16642,6 +16809,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -16701,6 +16869,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -16736,6 +16905,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": "interpolation",
+      "cant_alias": false,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -16850,6 +17020,7 @@
       "width_first": true,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -17004,6 +17175,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random"
       ],
@@ -17061,6 +17233,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -17184,6 +17357,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -17269,6 +17443,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -17348,6 +17523,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -17400,6 +17576,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -17558,6 +17735,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -17628,6 +17806,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut",
         "UGens>Triggers"
@@ -17682,6 +17861,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -17801,6 +17981,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -17920,6 +18101,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -18037,6 +18219,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Base"
       ],
@@ -18073,6 +18256,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear",
         "UGens>Maths"
@@ -18196,6 +18380,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Conversion"
       ],
@@ -18242,6 +18427,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>User interaction"
       ],
@@ -18318,6 +18504,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Pitch"
       ],
@@ -18382,6 +18569,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -18426,6 +18614,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Filters>Linear"
@@ -18484,6 +18673,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18587,6 +18777,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -18709,6 +18900,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18811,6 +19003,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -18913,6 +19106,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19015,6 +19209,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19116,6 +19311,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19269,6 +19465,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19371,6 +19568,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19473,6 +19671,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -19576,6 +19775,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19698,6 +19898,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19840,6 +20041,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -19963,6 +20165,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -20086,6 +20289,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20209,6 +20413,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20312,6 +20517,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20415,6 +20621,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20547,6 +20754,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20679,6 +20887,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters"
       ],
@@ -20831,6 +21040,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -20963,6 +21173,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters"
       ],
@@ -21114,6 +21325,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control"
       ],
@@ -21173,6 +21385,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -21237,6 +21450,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters"
       ],
@@ -21386,6 +21600,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -21479,6 +21694,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -21574,6 +21790,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21696,6 +21913,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21817,6 +22035,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -21939,6 +22158,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -22061,6 +22281,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -22155,6 +22376,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Dynamics"
       ],
@@ -22223,6 +22445,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22325,6 +22548,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22426,6 +22650,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -22527,6 +22752,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -22682,6 +22908,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -22794,6 +23021,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random"
       ],
@@ -22860,6 +23088,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -22986,6 +23215,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -23147,6 +23377,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -23234,6 +23465,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes"
       ],
@@ -23290,6 +23522,7 @@
       "width_first": true,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -23331,6 +23564,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -23391,6 +23625,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -23460,6 +23695,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -23602,6 +23838,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -23732,6 +23969,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -23797,6 +24035,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis"
       ],
@@ -23850,6 +24089,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -23971,6 +24211,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -23998,6 +24239,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -24122,6 +24364,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -24283,6 +24526,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -24445,6 +24689,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters"
       ],
@@ -24602,6 +24847,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -24695,6 +24941,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>User interaction"
       ],
@@ -24761,6 +25008,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>User interaction"
       ],
@@ -24838,6 +25086,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>User interaction"
       ],
@@ -24914,6 +25163,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -24959,6 +25209,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Base"
       ],
@@ -24977,6 +25228,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Bela"
       ],
@@ -25098,6 +25350,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random"
       ],
@@ -25165,6 +25418,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -25200,6 +25454,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Dynamics"
       ],
@@ -25267,6 +25522,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -25302,6 +25558,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -25337,6 +25594,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -25372,6 +25630,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -25407,6 +25666,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -25442,6 +25702,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -25493,6 +25754,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -25554,6 +25816,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -25678,6 +25941,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -25799,6 +26063,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis"
       ],
@@ -25924,6 +26189,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -26062,6 +26328,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -26200,6 +26467,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -26285,6 +26553,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Base"
       ],
@@ -26326,6 +26595,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -26395,6 +26665,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26449,6 +26720,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26525,6 +26797,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26601,6 +26874,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26665,6 +26939,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26720,6 +26995,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26740,6 +27016,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26807,6 +27084,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26854,6 +27132,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26909,6 +27188,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -26963,6 +27243,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27020,6 +27301,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27074,6 +27356,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27160,6 +27443,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27267,6 +27551,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27323,6 +27608,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27380,6 +27666,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27437,6 +27724,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27493,6 +27781,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27557,6 +27846,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27613,6 +27903,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27668,6 +27959,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27714,6 +28006,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27780,6 +28073,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27836,6 +28130,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27883,6 +28178,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27938,6 +28234,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -27993,6 +28290,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28047,6 +28345,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28112,6 +28411,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28159,6 +28459,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28205,6 +28506,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28271,6 +28573,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28345,6 +28648,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28421,6 +28725,7 @@
       "width_first": true,
       "fft_size": "chain",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28505,6 +28810,7 @@
       "width_first": true,
       "fft_size": "input",
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -28566,6 +28872,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -28679,6 +28986,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -28816,6 +29124,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -28975,6 +29284,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -29112,6 +29422,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Multichannel>Ambisonics"
       ],
@@ -29226,6 +29537,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -29301,6 +29613,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control"
       ],
@@ -29353,6 +29666,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control"
       ],
@@ -29397,6 +29711,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control",
         "UGens>Undocumented"
@@ -29442,6 +29757,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -29535,6 +29851,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -29628,6 +29945,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers",
         "UGens>Buffer"
@@ -29783,6 +30101,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -29863,6 +30182,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Pitch"
       ],
@@ -30010,6 +30330,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Pitch"
       ],
@@ -30111,6 +30432,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Buffer"
       ],
@@ -30292,6 +30614,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Delays"
       ],
@@ -30402,6 +30725,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -30505,6 +30829,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -30626,6 +30951,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -30719,6 +31045,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -30833,6 +31160,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes"
       ],
@@ -30851,6 +31179,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens"
       ],
@@ -30871,6 +31200,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -30973,6 +31303,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -31074,6 +31405,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -31177,6 +31509,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -31320,6 +31653,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -31462,6 +31796,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -31499,6 +31834,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -31628,6 +31964,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random"
       ],
@@ -31685,6 +32022,7 @@
       "width_first": true,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic",
         "UGens>Random"
@@ -31760,6 +32098,7 @@
       "width_first": true,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic",
         "UGens>Random"
@@ -31891,6 +32230,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -32124,6 +32464,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -32211,6 +32552,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -32354,6 +32696,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -32496,6 +32839,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Ambisonics",
         "UGens>Multichannel>Panners"
@@ -32606,6 +32950,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -32700,6 +33045,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -32793,6 +33139,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis",
         "UGens>Maths"
@@ -32885,6 +33232,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -33087,6 +33435,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -33122,6 +33471,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -33156,6 +33506,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -33249,6 +33600,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -33351,6 +33703,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -33509,6 +33862,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer",
         "UGens>Undocumented"
@@ -33601,6 +33955,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes",
         "UGens>Undocumented"
@@ -33730,6 +34085,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -33818,6 +34174,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Amplitude"
       ],
@@ -33918,6 +34275,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -34045,6 +34403,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -34155,6 +34514,7 @@
       "width_first": true,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes"
       ],
@@ -34199,6 +34559,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -34294,6 +34655,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -34413,6 +34775,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -34466,6 +34829,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -34519,6 +34883,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -34641,6 +35006,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Generators>Chaotic"
@@ -34765,6 +35131,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear"
       ],
@@ -34916,6 +35283,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis",
         "UGens>Filters>Linear",
@@ -35019,6 +35387,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -35063,6 +35432,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -35107,6 +35477,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT"
       ],
@@ -35181,6 +35552,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -35278,6 +35650,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Panners"
       ],
@@ -35417,6 +35790,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -35533,6 +35907,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -35624,6 +35999,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Chaotic"
       ],
@@ -35714,6 +36090,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -35884,6 +36261,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT",
         "UGens>Convolution"
@@ -35991,6 +36369,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Info"
       ],
@@ -36025,6 +36404,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -36065,6 +36445,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -36110,6 +36491,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -36204,6 +36586,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -36327,6 +36710,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Conversion",
         "UGens>Triggers"
@@ -36386,6 +36770,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Conversion",
         "UGens>Triggers"
@@ -36433,6 +36818,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Nonlinear",
         "UGens>Generators>PhysicalModels"
@@ -36568,6 +36954,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers",
         "UGens>Delays"
@@ -36663,6 +37050,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Demand"
       ],
@@ -36816,6 +37204,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -36931,6 +37320,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -37052,6 +37442,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -37166,6 +37557,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -37280,6 +37672,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Random",
         "UGens>Triggers"
@@ -37388,6 +37781,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer",
         "UGens>Delays>Buffer"
@@ -37435,6 +37829,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -37508,6 +37903,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -37582,6 +37978,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -37675,6 +38072,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Triggers"
       ],
@@ -37770,6 +38168,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Synth control",
         "UGens>Undocumented"
@@ -37814,6 +38213,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -37958,6 +38358,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -38100,6 +38501,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Algebraic"
       ],
@@ -38136,6 +38538,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT",
         "UGens>Demand"
@@ -38208,6 +38611,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>FFT",
         "UGens>Demand"
@@ -38257,6 +38661,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut",
         "UGens>Buffer"
@@ -38337,6 +38742,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -38475,6 +38881,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -38634,6 +39041,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Filters>Linear"
       ],
@@ -38760,6 +39168,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic"
       ],
@@ -38902,6 +39311,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Deterministic",
         "UGens>Generators>Stochastic",
@@ -39138,6 +39548,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": true,
       "categories": [
         "UGens>Buffer",
         "UGens>Generators>Granular"
@@ -39275,6 +39686,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Generators>Stochastic"
       ],
@@ -39354,6 +39766,7 @@
       "width_first": true,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "Undocumented classes"
       ],
@@ -39373,6 +39786,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Maths"
       ],
@@ -39533,6 +39947,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Buffer"
       ],
@@ -39650,6 +40065,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Multichannel>Select"
       ],
@@ -39780,6 +40196,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Envelopes"
       ],
@@ -39942,6 +40359,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>InOut"
       ],
@@ -40043,6 +40461,7 @@
       "width_first": false,
       "fft_size": null,
       "convert_env": null,
+      "cant_alias": false,
       "categories": [
         "UGens>Analysis>Pitch"
       ],
