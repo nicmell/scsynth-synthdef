@@ -5,7 +5,8 @@ graph of UGens the way sclang compiles a `SynthDef`, into the
 [SynthDef file format](https://doc.sccode.org/Reference/Synth-Definition-File-Format.html)
 (`SCgf`). scsynth loads these bytes with `/d_recv`. The crate reads them
 back, strictly. It carries a catalogue of the UGens of the core class
-library.
+library. With the feature `sc3-plugins`, it carries one of sc3-plugins too
+(see [sc3-plugins](#sc3-plugins)).
 
 ```rust
 use scsynth_synthdef::{Arg, SynthDefBuilder, read_def_file};
@@ -690,7 +691,8 @@ compare.
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
-of SuperCollider 3.14.1. sc3-plugins are not in it. `catalog::lookup` gives
+of SuperCollider 3.14.1. The classes of sc3-plugins are in a module of
+their own (see [sc3-plugins](#sc3-plugins)). `catalog::lookup` gives
 a class by name, and `catalog::all` gives all of them, sorted by name.
 `catalog::pseudo_lookup` and `catalog::pseudo_all` give the pseudo-UGen
 classes outside `UGen` that the crate builds, such as `LinLin`.
@@ -745,6 +747,9 @@ addable. The input of a delay at audio rate takes distinct audio-rate
 outputs instead, and `level` of `LinXFade2` takes 1. The input of the Lag
 family takes a control-rate output, so that the method makes an instance.
 More calls find whether a count or an array sets the number of outputs.
+A method of a UGen with outputs that takes `mul` or `add` must apply
+`madd` once: with `mul` 0.5 and `add` 0.25, it makes the UGens that one
+`madd` of its result makes.
 Then, on each argument that expands, an array of two elements must make
 two instances, instance i with element i. An array inside an array must
 make three. Last, the array argument takes `[[e0, e1], e2]`, then
@@ -806,6 +811,99 @@ it.
   `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar` and `InRect.kr`.
 - So do `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new` and
   `UnaryOpUGen.new`. Some of these do not exist.
+
+## sc3-plugins
+
+With the feature `sc3-plugins`, the module `sc3_plugins` holds the 491
+UGen classes of sc3-plugins 3.14.0, the plugins that many installations of
+SuperCollider add to the core. `ugen` adds them as it adds the classes of
+`catalog`. `sc3_plugins::lookup` gives a class by name, and
+`sc3_plugins::all` gives all of them, sorted by name.
+`sc3_plugins::pseudo_lookup` and `sc3_plugins::pseudo_all` give `Greyhole`
+and `JPverb`. The classes have the types of `catalog`, and no name is in
+both catalogues.
+
+```rust
+# #[cfg(feature = "sc3-plugins")]
+# {
+use scsynth_synthdef::{SynthDefBuilder, UGenInput};
+
+// SynthDef(\verb, { Out.ar(0, JPverb.ar(SinOsc.ar([220, 330], 0, 0.1), 3)) })
+let mut builder = SynthDefBuilder::new("verb", vec![])?;
+let freqs = UGenInput::Array(vec![220.0.into(), 330.0.into()]);
+let args = [("freq", freqs.into()), ("mul", 0.1.into())];
+let pair = builder.ugen("SinOsc", "ar", &args)?;
+let wet = builder.ugen("JPverb", "ar", &[("in", pair.into()), ("t60", 3.0.into())])?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", wet.into())])?;
+let def = builder.finish()?;
+assert!(def.children.iter().any(|ugen| ugen.name == "JPverbRaw"));
+assert_eq!(def.wire_buffers()?, 4);
+# }
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+`JPverb` gives the two channels to `JPverbRaw`. That unit cannot alias, so
+it takes the buffers of its two outputs before it frees those of its two
+inputs: the definition needs four wire buffers.
+
+- The reference is the tag `Version-3.14.0` of sc3-plugins. The installed
+  folder `SC3plugins` of the Extensions holds its class files.
+  `Version-3.14.1` changes `VBAPSpeakerArray` alone, which builds no UGen,
+  so the catalogue serves both.
+- 635 of the 679 rate methods are addable with a wiring. `Greyhole.ar`,
+  `JPverb.ar` and `NHHall.ar` have a body. `Greyhole` and `JPverb` call
+  their raw class on the first and the last channel of `in`. `NHHall`
+  takes an array of two channels.
+- Most rules of `checkInputs` are those of the core. The 96 HOA classes
+  ask for audio rate on their first n inputs at audio rate, n from 1 to
+  121. `BFGrainPanner` and its subclasses ask for it on input 2.
+- 176 units of sc3-plugins with a class set
+  `kUnitDef_CantAliasInputsToOutputs`, such as `GreyholeRaw`, `JPverbRaw`
+  and the HOA classes. `SynthDef::wire_buffers` counts them.
+- The feature adds 258 KB to a release wasm32 build, and 28.5 KB after
+  gzip. The core catalogue takes 102 KB, and 17 KB after gzip. The 96
+  HOA classes hold two thirds of the arguments.
+
+`generator/sc3_plugins/catalog.scd` measured each method with the probes of
+`generator/catalog.scd`, in sclang 3.14.1 with the core class library and
+the installed folder. It fails unless each class file of the folder is the
+file of the tag. A table names the rule of `checkInputs` of each owner
+outside HOA, and the script measures the n of each HOA class. Then it
+gives the instances of every class inputs at audio and at control rate,
+and their `checkInputs` must give the verdict of the crate. The script
+also reads the C++ files of the plugins at the tag. A unit can set the
+flag through the two macros of the core, through a macro of its own file,
+or, in a FAUST plugin, in its call of `fDefineUnit`. If a unit sets the
+flag in another way, or has no class outside ATK and three names of a
+table, the script fails.
+
+### Methods of sc3-plugins that `ugen` refuses
+
+`tests/readme.rs` keeps this list equal to the catalogue of sc3-plugins.
+
+- No plugin of sc3-plugins 3.14.0 defines the unit of `BlitB3D.ar`,
+  `CQ_Diff.kr`, `Clipper32.ar` or `FFTSubbandFlux.kr`. Neither does one
+  define that of `RMAFoodChainL.ar`, `RegaliaMitraEQ.ar` or
+  `RosslerResL.ar`. sclang writes them, and scsynth refuses them with
+  `UGen '<name>' not installed.`.
+- `StkFlute.kr` applies `madd` twice.
+- These methods create no instance of their class: `FFTCentroid.kr`,
+  `OnsetsDS.kr`, `PV_DiffMags.new`, `PanX2D.ar` and `PanX2D.kr`. So do
+  `Rotate.ar`, `SoftClipAmp.ar`, `Tilt.ar` and `Tumble.ar`.
+- They put the size of an array before it: `FeatureSave.kr`,
+  `FFTSubbandFlatness.kr`, `FFTSubbandPower.kr`, `MatchingPResynth.ar`
+  and `MatchingPResynth.kr`.
+- Their outputs come from a count in another way: `MatchingP.ar`,
+  `MatchingP.kr` and `NearestN.kr`. `SOMRd.ar`, `SOMRd.kr` and
+  `SpectralEntropy.kr` test numbers.
+- They compute their inputs: `DbufTag.new`, `Dtag.new` and `Dfsm.new`
+  from rules, `FM7.ar` from two matrices, and `LPCSynth.ar`, `LPCVals.ar`
+  and `LPCVals.kr` from a clip of `pointer`.
+- `Dneuromodule.ar` and `Dneuromodule.kr` put a `Duty` around
+  `Dneuromodule.new`, which takes its arrays and its count in its own way.
+- `TextVU.ar`, `TextVU.kr` and `TextVU.new` work as `Poll` does.
+  `StkGlobals.ar` and `Getenv.new` write the codes of a text without its
+  size first.
 
 ## Strictness
 
@@ -888,9 +986,9 @@ scsynth walks the UGens in file order:
 - A demand-rate UGen frees no buffer.
 - An output that nothing reads keeps its buffer to the end.
 
-A UGen whose class the catalogue does not hold gives
+A UGen whose class no catalogue of the crate holds gives
 `WireBufferError::UnknownUGen`, because the count needs the flag of its
-plugin. A definition that breaks a limit gives `WireBufferError::Limit`.
+plugin. With the feature `sc3-plugins`, the classes of sc3-plugins count. A definition that breaks a limit gives `WireBufferError::Limit`.
 
 ### Traps
 
@@ -999,9 +1097,18 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-This is not in version 0.13, the next item of value for sc-app3:
+This is not in version 0.14, the next item of value for sc-app3:
 
-1. sc3-plugins
+1. The bodies of the other pseudo-UGens of sc3-plugins, such as `Notch`,
+   `BLPF` and `FreeVerb1`, and of the methods above that do more than
+   `new1`.
+
+Of sc3-plugins, the crate also leaves out ATK, whose classes come with the
+quark `atk-sc3`. `CheapVerb` draws `rand` of the language at each build.
+`BF`, `BFDecode`, `BFEncode` and `Reflections` compute with objects of the
+language, such as `ZPoint`. `BhobTone` calls `HiShelf`, which no class
+defines. `OnsetsDS` is deprecated, and gives a Function. `UGen:circleRamp`
+has no body yet.
 
 Also left out: the view of `SynthDesc`, with its inputs, outputs and
 metadata, the specs included. So are the pseudo-UGens `AudioIn` and
@@ -1017,8 +1124,8 @@ objects of the language, such as `@` and `asComplex`. It also leaves out
 
 ## Tests
 
-`cargo test --all-features` runs every test but the acceptance test. It
-needs no SuperCollider. `tests/readme.rs` checks the list of methods that
+`cargo test --all-features` runs every test but the acceptance tests. It
+needs no SuperCollider. `tests/readme.rs` checks the lists of methods that
 `ugen` refuses.
 
 The golden files in `tests/fixtures` are definitions that sclang 3.14.1
@@ -1039,6 +1146,22 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 - `tests/fixtures/arithmetic.json` holds operands and results of the
   operators that sclang computes on Floats, as the bits of each f64.
 - `~/.bin/sclang` changes the directory, so the paths must be absolute.
+- `generator/goldens.scd` holds the writers of both fixtures scripts.
+
+The golden files of sc3-plugins are in `tests/fixtures/sc3_plugins`, and
+`tests/sc3_plugins` tests them with the feature. `methods.scsyndef` holds
+one definition for each addable method, which the crate builds from the
+catalogue alone. `generator/sc3_plugins/fixtures.scd` writes the files
+again:
+
+```sh
+sclang -l "$PWD/generator/sc3_plugins/sclang_conf.yaml" \
+  "$PWD/generator/sc3_plugins/fixtures.scd"
+```
+
+`generator/sc3_plugins/sclang_conf.yaml` compiles the core class library
+and the folder `SC3plugins` of the Extensions, without the other
+extensions and without quarks.
 
 `generator/catalog.json` holds the catalogue and the tables of the
 operators. The operators come from `Opcodes.h` and `initSpecialSelectors`
@@ -1051,9 +1174,21 @@ SC_SOURCE=~/Projects/supercollider \
 sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/catalog.scd"
 ```
 
-`tests/render.rs` renders the JSON into `src/operator/generated.rs` and
-`src/catalog/generated.rs`. If a committed file differs, the test fails.
-With `SCSYNTH_SYNTHDEF_BLESS=1` set, it writes the file instead.
+`generator/sc3_plugins/catalog.scd` writes
+`generator/sc3_plugins/catalog.json`, the catalogue of sc3-plugins. It
+reads the sources of sc3-plugins at the tag `Version-3.14.0`:
+
+```sh
+SC3_PLUGINS_SOURCE=~/Projects/sc3-plugins \
+sclang -l "$PWD/generator/sc3_plugins/sclang_conf.yaml" \
+  "$PWD/generator/sc3_plugins/catalog.scd"
+```
+
+Both scripts load `generator/probes.scd`, which measures the classes.
+`tests/render.rs` renders the JSON into `src/operator/generated.rs`,
+`src/catalog/generated.rs` and `src/sc3_plugins/generated.rs`. If a
+committed file differs, the test fails. With `SCSYNTH_SYNTHDEF_BLESS=1`
+set, it writes the file instead.
 
 `tests/scsynth.rs` sends definitions of the crate to scsynth 3.14.1. It is
 ignored by default:
@@ -1083,8 +1218,29 @@ cargo test --test scsynth -- --ignored
   mode, scsynth 3.14.1 crashes on `/s_new` of a definition with an
   `AudioControl`.
 
+`tests/sc3_plugins` has acceptance tests of its own, with the plugins of
+sc3-plugins. They are ignored by default too:
+
+```sh
+cargo test --features sc3-plugins --test sc3_plugins -- --ignored
+```
+
+- `SCSYNTH_SC3_PLUGINS` names the folder of these plugins, by default the
+  folder `SC3plugins` of the Extensions. `-U` takes it after the plugins of
+  the bundle.
+- scsynth must load every golden definition of sc3-plugins, at the most
+  wire buffers that one of them needs. It must refuse the 7 classes
+  without a unit with `UGen '<name>' not installed.`.
+- Each golden definition loads at a `-w` equal to its count of wire
+  buffers, and scsynth refuses it at one less. With
+  `SCSYNTH_SYNTHDEF_BLESS=1` set, the test writes
+  `tests/fixtures/sc3_plugins/wire_buffers.json`.
+
 ## Features
 
+- `sc3-plugins`: the module `sc3_plugins`. `ugen`, the bodies and
+  `SynthDef::wire_buffers` take the classes of sc3-plugins (see
+  [sc3-plugins](#sc3-plugins)).
 - `serde`: `Serialize` and `Deserialize` for the types of a definition and
   of a file. A `Rate` is its name in lowercase, such as `"audio"`.
   `serde_json` writes a NaN or an infinite float as `null`, and does not

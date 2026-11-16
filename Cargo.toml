@@ -1,10 +1,10 @@
 [package]
 name = "scsynth-synthdef"
-version = "0.13.0"
+version = "0.14.0"
 edition = "2024"
 rust-version = "1.85"
 authors = ["nicmell"]
-description = "The synth definitions of SuperCollider: a compiler of UGen graphs into the SynthDef file format (SCgf), as sclang compiles them, a strict reader of that format, and a catalogue of the core UGens."
+description = "The synth definitions of SuperCollider: a compiler of UGen graphs into the SynthDef file format (SCgf), as sclang compiles them, a strict reader of that format, and catalogues of the core UGens and of sc3-plugins."
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/nicmell/scsynth-synthdef"
 readme = "README.md"

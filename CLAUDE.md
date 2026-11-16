@@ -2,11 +2,12 @@
 
 A Rust crate for SuperCollider synth definitions. It compiles them into
 the SynthDef file format (`SCgf`) and reads them back. It also carries a
-catalogue of the core UGens. SuperCollider 3.14.1 is the reference. This
-file is the operating manual.
+catalogue of the core UGens, and one of sc3-plugins behind a feature.
+SuperCollider 3.14.1 and sc3-plugins 3.14.0 are the reference. This file
+is the operating manual.
 
 The README is the reference of the crate. [docs/plan.md](docs/plan.md) holds
-the plan of version 0.14. Read both before any work.
+what is still open after version 0.14. Read both before any work.
 
 ## Ground rules
 
@@ -15,6 +16,9 @@ the plan of version 0.14. Read both before any work.
   `sc-crates/crates/scsynthdef-compiler`.
 - The SuperCollider source is in `~/Projects/supercollider`, at the tag
   `Version-3.14.1`. `sclang` and `scsynth` 3.14.1 are on the PATH.
+- The sc3-plugins source is in `~/Projects/sc3-plugins`, at the tag
+  `Version-3.14.0`. Its plugins are in the folder `SC3plugins` of the
+  Extensions.
 - Never touch the scsynth on UDP 57110. A test runs its own scsynth in NRT
   mode, which opens no port.
 
