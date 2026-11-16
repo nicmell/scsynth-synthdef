@@ -999,7 +999,7 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-This is not in version 0.12, the next item of value for sc-app3:
+This is not in version 0.13, the next item of value for sc-app3:
 
 1. sc3-plugins
 

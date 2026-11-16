@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.13.0 (2026-11-16)
+
+The fixes of a review of version 0.12, simplifications that keep every
+byte, and a faster `finish`.
+
+### Fixed
+
+- A clone of `SynthDefBuilder` took the outputs that the original made
+  after the clone, and `finish` panicked. An output made in a `wrap`
+  closure that failed passed after the rollback, and `finish` gave a
+  definition with 0 UGens. Each UGen now has a serial that its outputs
+  carry, and `BuildError::ForeignOutput` refuses both.
+- `finish` aborted with a stack overflow on a long chain that nothing
+  reads, such as 5,000 `* 2` on a thread of 2 MiB. `optimizeGraph` now
+  keeps its visits on a stack of its own.
+- `Array:poll` and `Array:dpoll` with an array among their arguments made
+  a `Poll` or a `Dpoll` for each element and each value of the array.
+  They now lace the arrays with the elements, as sclang does:
+  `[a, b].poll([t1, t2])` makes 2 `Poll`, not 4.
+- `Poll.new` took the rate of each instance after the expansion. It now
+  takes the rate of each element of `in` first, as sclang does.
+- `SplayAz` took a text `levelComp` as 1. It now refuses it with
+  `BuildError::WrongKind`, as `Splay` does, where sclang throws.
+
+### Changed
+
+- `finish` runs faster. Measured in user CPU time, building and finishing
+  every golden graph takes 12% less. A chain of 1,000 `+`, or a PV chain
+  before 1,000 sines, takes half the time.
+- The message of `BuildError::ForeignOutput` also names a call that
+  failed.
+- The code of the crate shrinks by 496 lines, and its tests by 315, with
+  the same bytes for every golden graph.
+- `generator/fixtures.scd` writes two more golden files, `pollarrays` and
+  `audioinput`, and checks that a text `levelComp` breaks `Splay` and
+  `SplayAz` in sclang.
+
 ## 0.12.0 (2026-11-16)
 
 The instance methods of `UGen` that build graphs, such as `range` and
