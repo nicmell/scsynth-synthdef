@@ -87,6 +87,22 @@ impl Fused {
     }
 }
 
+/// A step of `optimizeGraph` on its stack, in the order of the recursion of
+/// sclang.
+#[derive(Clone, Copy)]
+enum Step {
+    /// `optimizeGraph` of a UGen.
+    Visit(usize),
+    /// The rest of `performDeadCodeElimination` of a UGen, from an input on.
+    Inputs { node: usize, input: usize },
+}
+
+/// A rewrite of a `+` or a `-` with its two inputs.
+type Rewrite = fn(&mut Graph, usize, (Source, Source)) -> Fusion;
+
+/// The replacement of a rewrite, and the UGen that it fuses.
+type Fusion = Result<Option<(usize, usize)>, BuildError>;
+
 const BINARY_OP: &str = "BinaryOpUGen";
 const UNARY_OP: &str = "UnaryOpUGen";
 const SUM3: &str = "Sum3";
@@ -170,9 +186,15 @@ impl Graph {
     /// sclang 3.14.1 breaks or throws on refuses.
     pub(crate) fn optimize_graph(&mut self) -> Result<(), BuildError> {
         self.init_readers();
-        let visits: Vec<usize> = self.children.iter().flatten().copied().collect();
-        for node in visits {
-            self.optimize(node)?;
+        let mut steps: Vec<Step> = self
+            .children
+            .iter()
+            .flatten()
+            .rev()
+            .map(|&node| Step::Visit(node))
+            .collect();
+        while let Some(step) = steps.pop() {
+            self.step(step, &mut steps)?;
         }
         self.check_reads()
     }
@@ -212,90 +234,93 @@ impl Graph {
         }
     }
 
-    /// `optimizeGraph` of one UGen, by its class.
-    fn optimize(&mut self, node: usize) -> Result<(), BuildError> {
-        match optimize_of(&self.nodes[node].name) {
-            Optimize::Nothing => Ok(()),
-            Optimize::DeadCode => self.dead_code(node).map(drop),
-            Optimize::BinaryOp => {
-                if self.dead_code(node)? {
-                    Ok(())
-                } else if Fused::Plus.matches(&self.nodes[node]) {
-                    self.optimize_add(node)
-                } else if self.is_minus(node) {
-                    self.optimize_sub(node)
-                } else {
-                    Ok(())
+    /// `optimizeGraph` of one UGen, or the rest of its dead-code elimination.
+    /// A UGen that nothing reads goes, as `performDeadCodeElimination` does:
+    /// it leaves the readers of each direct input, in order, and the input
+    /// gets a visit. An output of a `MultiOutUGen` comes through an
+    /// `OutputProxy`, which has no readers, so the visit stops there (fact 7
+    /// of the plan of 0.7). A `+` or a `-` that a UGen reads gets its
+    /// rewrites, and the replacement gets a visit at once.
+    fn step(&mut self, step: Step, steps: &mut Vec<Step>) -> Result<(), BuildError> {
+        match step {
+            Step::Visit(node) => {
+                let optimize = optimize_of(&self.nodes[node].name);
+                if optimize == Optimize::Nothing {
+                    return Ok(());
                 }
-            }
-        }
-    }
-
-    /// `performDeadCodeElimination`: a UGen that nothing reads leaves the
-    /// readers of each direct input, in order, and the input gets another
-    /// visit. An output of a `MultiOutUGen` comes through an `OutputProxy`,
-    /// which has no readers, so the visit stops there (fact 7 of the plan of
-    /// 0.7).
-    fn dead_code(&mut self, node: usize) -> Result<bool, BuildError> {
-        if self.reader_count(node) > 0 {
-            return Ok(false);
-        }
-        let mut input = 0;
-        while let Some(&source) = self.nodes[node].inputs.get(input) {
-            input += 1;
-            if let Source::Output { ugen, .. } = source {
-                if !is_multi_out(&self.nodes[ugen].name) {
-                    if let Some(array) = self.readers[ugen] {
-                        self.arrays[array].remove(node);
+                if self.reader_count(node) == 0 {
+                    steps.push(Step::Inputs { node, input: 0 });
+                } else if optimize == Optimize::BinaryOp {
+                    if let Some(replacement) = self.rewrite(node)? {
+                        steps.push(Step::Visit(replacement));
                     }
-                    self.optimize(ugen)?;
                 }
             }
-        }
-        self.remove_ugen(node);
-        Ok(true)
-    }
-
-    /// `optimizeAdd`: a `+` becomes a `Sum3`, a `Sum4`, a `MulAdd` or a
-    /// `-`, the first that holds.
-    fn optimize_add(&mut self, this: usize) -> Result<(), BuildError> {
-        let mut replacement = self.fuse_sum3(this)?;
-        if replacement.is_none() {
-            replacement = self.fuse_sum4(this)?;
-        }
-        if replacement.is_none() {
-            replacement = self.fuse_mul_add(this)?;
-        }
-        if replacement.is_none() {
-            replacement = self.add_neg(this)?;
-        }
-        if let Some(replacement) = replacement {
-            self.replace_ugen(this, replacement);
-            self.optimize(replacement)?;
+            Step::Inputs { node, input } => {
+                let Some(&source) = self.nodes[node].inputs.get(input) else {
+                    self.remove_ugen(node);
+                    return Ok(());
+                };
+                steps.push(Step::Inputs {
+                    node,
+                    input: input + 1,
+                });
+                if let Source::Output { ugen, .. } = source {
+                    if !is_multi_out(&self.nodes[ugen].name) {
+                        if let Some(array) = self.readers[ugen] {
+                            self.arrays[array].remove(node);
+                        }
+                        steps.push(Step::Visit(ugen));
+                    }
+                }
+            }
         }
         Ok(())
     }
 
-    /// `optimizeToSum3`: a `+` that only this `+` reads becomes a `Sum3`
-    /// with the other input, or a `Sum4` when it is both inputs.
-    fn fuse_sum3(&mut self, this: usize) -> Result<Option<usize>, BuildError> {
-        let Some((a, b)) = self.pair(this) else {
+    /// The first rewrite of a `+` or a `-` that holds, which takes its place:
+    /// `optimizeAdd` tries a `Sum3`, a `Sum4`, a `MulAdd` and a `-`, and
+    /// `optimizeSub` tries a `+`.
+    fn rewrite(&mut self, node: usize) -> Result<Option<usize>, BuildError> {
+        let Some(pair) = self.pair(node) else {
             return Ok(None);
         };
+        let rewrites: &[Rewrite] = match operator::binary_name(self.nodes[node].special_index) {
+            Some("+") => &[
+                Self::fuse_sum3,
+                Self::fuse_sum4,
+                Self::fuse_mul_add,
+                Self::add_neg,
+            ],
+            Some("-") => &[Self::sub_neg],
+            _ => &[],
+        };
+        for rewrite in rewrites {
+            if let Some((replacement, deleted)) = rewrite(self, node, pair)? {
+                self.remove_ugen(deleted);
+                self.adopt(node, replacement, deleted);
+                self.replace_ugen(node, replacement);
+                return Ok(Some(replacement));
+            }
+        }
+        Ok(None)
+    }
+
+    /// `optimizeToSum3`: a `+` that only this `+` reads becomes a `Sum3`
+    /// with the other input, or a `Sum4` when it is both inputs.
+    fn fuse_sum3(&mut self, this: usize, (a, b): (Source, Source)) -> Fusion {
         if self.rate(a) == Rate::Demand || self.rate(b) == Rate::Demand {
             return Ok(None);
         }
         for (sum, other) in [(a, b), (b, a)] {
             if let Some(plus) = self.fusable(sum, Fused::Plus) {
-                self.remove_ugen(plus);
                 let (x, y) = (self.nodes[plus].inputs[0], self.nodes[plus].inputs[1]);
                 let replacement = if a == b {
                     self.sum(this, SUM4, vec![x, x, y, y])?
                 } else {
                     self.sum(this, SUM3, vec![x, y, other])?
                 };
-                self.adopt(this, replacement, plus);
-                return Ok(Some(replacement));
+                return Ok(Some((replacement, plus)));
             }
         }
         Ok(None)
@@ -303,21 +328,15 @@ impl Graph {
 
     /// `optimizeToSum4`: a `Sum3` that only this `+` reads becomes a `Sum4`
     /// with the other input.
-    fn fuse_sum4(&mut self, this: usize) -> Result<Option<usize>, BuildError> {
-        let Some((a, b)) = self.pair(this) else {
-            return Ok(None);
-        };
+    fn fuse_sum4(&mut self, this: usize, (a, b): (Source, Source)) -> Fusion {
         if a == b || self.rate(a) == Rate::Demand || self.rate(b) == Rate::Demand {
             return Ok(None);
         }
         for (sum, other) in [(a, b), (b, a)] {
             if let Some(sum3) = self.fusable(sum, Fused::Sum3) {
-                self.remove_ugen(sum3);
                 let mut inputs = self.nodes[sum3].inputs.clone();
                 inputs.push(other);
-                let replacement = self.sum(this, SUM4, inputs)?;
-                self.adopt(this, replacement, sum3);
-                return Ok(Some(replacement));
+                return Ok(Some((self.sum(this, SUM4, inputs)?, sum3)));
             }
         }
         Ok(None)
@@ -325,10 +344,7 @@ impl Graph {
 
     /// `optimizeToMulAdd`: a `*` that only this `+` reads becomes a `MulAdd`
     /// with the other input, if `canBeMulAdd` takes its inputs in one order.
-    fn fuse_mul_add(&mut self, this: usize) -> Result<Option<usize>, BuildError> {
-        let Some((a, b)) = self.pair(this) else {
-            return Ok(None);
-        };
+    fn fuse_mul_add(&mut self, this: usize, (a, b): (Source, Source)) -> Fusion {
         if a == b {
             return Ok(None);
         }
@@ -339,10 +355,7 @@ impl Graph {
             let (x, y) = (self.nodes[times].inputs[0], self.nodes[times].inputs[1]);
             for (input, mul) in [(x, y), (y, x)] {
                 if can_be_mul_add(self.rate(input), self.rate(mul), self.rate(other)) {
-                    self.remove_ugen(times);
-                    let replacement = self.mul_add(this, input, mul, other)?;
-                    self.adopt(this, replacement, times);
-                    return Ok(Some(replacement));
+                    return Ok(Some((self.mul_add(this, input, mul, other)?, times)));
                 }
             }
         }
@@ -351,40 +364,27 @@ impl Graph {
 
     /// `optimizeAddNeg`: `a + b.neg` becomes `a - b`, and `a.neg + b`
     /// becomes `b - a`, for a `neg` that only this `+` reads.
-    fn add_neg(&mut self, this: usize) -> Result<Option<usize>, BuildError> {
-        let Some((a, b)) = self.pair(this) else {
-            return Ok(None);
-        };
+    fn add_neg(&mut self, this: usize, (a, b): (Source, Source)) -> Fusion {
         if a == b {
             return Ok(None);
         }
         for (other, negated) in [(a, b), (b, a)] {
             if let Some(neg) = self.fusable(negated, Fused::Neg) {
-                self.remove_ugen(neg);
                 let inner = self.nodes[neg].inputs[0];
-                let replacement = self.binary(this, "-", other, inner, true)?;
-                self.adopt(this, replacement, neg);
-                return Ok(Some(replacement));
+                return Ok(Some((self.binary(this, "-", other, inner, true)?, neg)));
             }
         }
         Ok(None)
     }
 
     /// `optimizeSub`: `a - b.neg` becomes `a + b`, for a `neg` that only
-    /// this `-` reads, and the `+` gets a visit at once.
-    fn optimize_sub(&mut self, this: usize) -> Result<(), BuildError> {
-        let Some((a, b)) = self.pair(this) else {
-            return Ok(());
+    /// this `-` reads.
+    fn sub_neg(&mut self, this: usize, (a, b): (Source, Source)) -> Fusion {
+        let Some(neg) = self.fusable(b, Fused::Neg) else {
+            return Ok(None);
         };
-        if let Some(neg) = self.fusable(b, Fused::Neg) {
-            self.remove_ugen(neg);
-            let inner = self.nodes[neg].inputs[0];
-            let replacement = self.binary(this, "+", a, inner, false)?;
-            self.adopt(this, replacement, neg);
-            self.replace_ugen(this, replacement);
-            self.optimize(replacement)?;
-        }
-        Ok(())
+        let inner = self.nodes[neg].inputs[0];
+        Ok(Some((self.binary(this, "+", a, inner, false)?, neg)))
     }
 
     /// `Sum3.new1` or `Sum4.new1` of a rewrite: a new node, outside the
@@ -454,12 +454,11 @@ impl Graph {
         Ok(self.push(node, Vec::new(), false))
     }
 
-    /// The replacement takes the readers of `this`. Then
-    /// `optimizeUpdateDescendants` updates the readers of each of its
-    /// inputs: the replacement in place of `this`, and without `deleted`. A
-    /// full array loses the replacement (fact 7 of the plan of 0.7).
+    /// `optimizeUpdateDescendants`: the readers of each input of the
+    /// replacement get the replacement in place of `this`, and lose
+    /// `deleted`. A full array loses the replacement (fact 7 of the plan of
+    /// 0.7).
     fn adopt(&mut self, this: usize, replacement: usize, deleted: usize) {
-        self.readers[replacement] = self.readers[this];
         for input in self.nodes[replacement].inputs.clone() {
             let Source::Output { ugen, .. } = input else {
                 continue;
@@ -532,10 +531,6 @@ impl Graph {
             return None;
         };
         (fused.matches(&self.nodes[ugen]) && self.reader_count(ugen) == 1).then_some(ugen)
-    }
-
-    fn is_minus(&self, node: usize) -> bool {
-        operator::binary_index("-") == Some(self.nodes[node].special_index)
     }
 
     fn pair(&self, node: usize) -> Option<(Source, Source)> {
@@ -774,6 +769,16 @@ mod tests {
             "ar",
             &[("bus", input(0.0)), ("channelsArray", input(sum))],
         );
+    }
+
+    #[test]
+    fn a_dead_chain_of_ten_thousand_ugens_goes_on_the_stack_of_a_test_thread() {
+        let mut builder = SynthDefBuilder::new("chain", vec![]).unwrap();
+        let mut sound = by_name(&mut builder, "SinOsc", "ar", &[]);
+        for _ in 0..10_000 {
+            sound = builder.binary_op("*", sound, 2.0).unwrap();
+        }
+        assert_eq!(builder.finish().unwrap().children.len(), 0);
     }
 
     #[test]
