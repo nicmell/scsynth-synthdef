@@ -1609,6 +1609,47 @@ try {
 		}.value;
 	}.value;
 
+	// The fixes of 0.13, in one more function for the same reason.
+	{
+		var sines = { [SinOsc.kr(1), SinOsc.kr(2)] };
+		var nested = { [[SinOsc.ar(1), SinOsc.kr(2)], SinOsc.kr(3)] };
+		var dpolled = { |sequences, func| Out.kr(0, Demand.kr(Impulse.kr(1), 0, func.(sequences))) };
+		writeCases.("pollarrays", [
+			// Array:poll calls Poll once, so an array among the arguments laces
+			// with the elements, and the shorter one wraps.
+			[\pollarrays_trig, { Out.kr(0, sines.().poll([Impulse.kr(1), Impulse.kr(2)])) }],
+			[\pollarrays_three, { Out.kr(0, sines.().poll([1, 2, 3])) }],
+			[\pollarrays_trigid, { Out.kr(0, sines.().poll(10, trigid: [1, 2])) }],
+			[\pollarrays_label, { Out.kr(0, sines.().poll(5, "x")) }],
+			// Poll.new takes the rate of each element of in before the expansion.
+			[\pollarrays_nested, { nested.().poll }],
+			[\pollarrays_new_nested, { Poll.new(10, nested.()) }],
+			[\pollarrays_new_trigs, { Poll.new([1, 2], nested.()) }],
+			[\pollarrays_dpoll_run, {
+				dpolled.([Dseq([1, 2], inf), Dseq([3], inf)], { |d| d.dpoll(run: [1, 0]) })
+			}],
+			[\pollarrays_dpoll_trigid, {
+				dpolled.([Dseq([1, 2], inf), Dseq([3], inf)], { |d| d.dpoll(trigid: [7, 8]) })
+			}],
+			[\pollarrays_dpoll_nested, {
+				dpolled.([[Dseq([1, 2], inf), Dseq([3], inf)], Dseq([4], inf)], { |d| d.dpoll })
+			}]
+		]);
+		writeCases.("audioinput", [
+			// The zero of asAudioRateInput is positive.
+			[\audioinput_negative_zero, { Out.ar(0, DelayN.ar(-0.0, 0.2, 0.2)) }]
+		]);
+		[
+			// LevelComp clips a symbol, which does not understand clip.
+			[\refused_splay_levelcomp_text, {
+				Out.ar(0, Splay.ar([SinOsc.ar(1), SinOsc.ar(2)], levelComp: \abc))
+			}],
+			[\refused_splayaz_levelcomp_text, {
+				Out.kr(0, SplayAz.kr(2, [SinOsc.kr(1), SinOsc.kr(2)], levelComp: \abc))
+			}]
+		].do { |case| refused.(case[0], case[1]) };
+	}.value;
+
 	writeArithmetic.();
 
 	"fixtures.scd: wrote % golden files to %".format(written, fixtures).postln;

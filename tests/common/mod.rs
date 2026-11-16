@@ -115,6 +115,7 @@ pub const NAMES: &[&str] = &[
     "ugenmisc",
     "ugenreceivers",
     "envranges",
+    "audioinput",
 ];
 
 /// The bytes of a golden file.

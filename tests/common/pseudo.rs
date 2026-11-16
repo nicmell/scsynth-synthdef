@@ -30,6 +30,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "dynklang" => dynklang(),
         "unpackfft" => unpackfft(),
         "delays" => delays(),
+        "audioinput" => audioinput(),
         "linxfade2" => linxfade2(),
         "companderd" => companderd(),
         "hilbertfir" => hilbertfir(),
@@ -1059,6 +1060,21 @@ fn delays() -> Vec<SynthDef> {
             out(b, "ar", read);
         }),
     ]
+}
+
+fn audioinput() -> Vec<SynthDef> {
+    vec![def("audioinput_negative_zero", vec![], |b| {
+        let delayed = delay(
+            b,
+            "DelayN",
+            &[
+                ("in", input(-0.0)),
+                ("maxdelaytime", input(0.2)),
+                ("delaytime", input(0.2)),
+            ],
+        );
+        out(b, "ar", delayed);
+    })]
 }
 
 /// `LinXFade2` of two `SinOsc`, at the rate of `selector`.
