@@ -352,6 +352,9 @@ what each one does in sclang.
   together. If one of them runs at audio rate, `K2A.ar` takes the other
   one. The rate of an array is the least of its rates by name, so
   `[Impulse.ar(1), 1]` is at audio rate.
+- `PackFFT.new` writes the size of `magsphases` before its values. A nil
+  `tobin` is `bufsize / 2`, so an output as `bufsize` adds the `/` before
+  the `PackFFT`.
 - The codes of a symbol and of a label are its bytes as `Char:ascii` gives
   them in sclang, from -128 to 127.
 
@@ -535,6 +538,52 @@ assert_eq!(builder.finish()?.children.len(), 5);
 - A shape that sclang does not know, also as the `warp` of `VarLag`.
 - Levels and times of `Env.step` that differ in size.
 
+### The `pvcalc` methods
+
+`pvcalc`, `pvcalc2` and `pvcollect` copy the methods of `PV_ChainUGen`
+that take a function. Each unpacks the bins of a chain from `frombin` to
+`tobin`, as `UnpackFFT` does, and calls a closure in place of `func`. Then
+it packs what the closure gives into the chain again, as `PackFFT` does.
+The arguments come by name, with the defaults of sclang 3.14.1.
+
+```rust
+use scsynth_synthdef::SynthDefBuilder;
+
+// SynthDef(\bins, { var chain = FFT(LocalBuf(8), SinOsc.ar);
+//     Out.ar(0, IFFT(chain.pvcollect(8, { |mag, phase, bin| mag * bin }))) })
+let mut builder = SynthDefBuilder::new("bins", vec![])?;
+let buffer = builder.ugen("LocalBuf", "new", &[("numFrames", 8.0.into())])?;
+let sine = builder.ugen("SinOsc", "ar", &[])?;
+let chain = builder.ugen("FFT", "new", &[("buffer", buffer.into()), ("in", sine.into())])?;
+let packed = builder.pvcollect(chain, &[("numframes", 8.0.into())], |b, magnitude, _, bin, _| {
+    b.binary_op("*", magnitude, bin)
+})?;
+let sound = builder.ugen("IFFT", "new", &[("buffer", packed.into())])?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", sound.into())])?;
+let def = builder.finish()?;
+assert!(def.children.iter().any(|ugen| ugen.name == "PackFFT"));
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+- `pvcalc` gives its closure the array of the magnitudes and the array of
+  the phases. The size of the result decides what `PackFFT` takes, as in
+  sclang. An array of one value gets the phases after it, and an array of
+  two is the magnitudes and the phases. Anything else, a UGen included, is
+  the magnitudes, with the phases of the chain.
+- So two bins with their magnitudes alone count as the magnitudes and the
+  phases. `UnpackFFT` keeps `tobin` at most at `numframes / 2`, but
+  `PackFFT` takes it as it is.
+- `pvcalc2` takes `chain2` by name. Its closure gets the magnitudes and the
+  phases of the chain, then those of `chain2`.
+- `pvcollect` calls its closure for each bin, with its magnitude, its phase,
+  its bin and its index, the last two as numbers. A result of one value
+  gets the phase of its bin, and an array of more values stays.
+
+A `BuildError::WrongKind` refuses a chain that is not one output of a
+`PV_ChainUGen`, because sclang understands the methods on no other value.
+It also refuses `numframes`, `frombin` and `tobin` as outputs, where sclang
+throws, and a value of `func` by name.
+
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
@@ -558,6 +607,9 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
 - `catalog::env_method` and `catalog::env_methods` give the class methods
   of `Env` that make an envelope, with their arguments.
   `UGenClass::convert_env` tells how a class takes an `Env`.
+- `catalog::pv_method` and `catalog::pv_methods` give the instance methods
+  of `PV_ChainUGen` that take a function, with their arguments.
+  `ArgKind::Function` marks `func`.
 - A `RateMethod` is `ar`, `kr`, `ir`, `tr` or `new`. It has its arguments,
   each with a kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
@@ -586,7 +638,7 @@ two instances, instance i with element i. An array inside an array must
 make three. Last, the array argument takes `[[e0, e1], e2]`, then
 `[e2, [e0, e1]]`. The instances that they make give its `ArrayExpansion`.
 If one instance keeps the array among its inputs, the method has none.
-581 of the 635 methods are addable with a wiring, and 66 have a body. Most
+581 of the 635 methods are addable with a wiring, and 67 have a body. Most
 of the others do more than `UGen:new1` does:
 
 - The pseudo-UGens without a body, such as `Dunique`, create
@@ -608,9 +660,11 @@ does not hold, the script fails. Two more tables map the class that owns
 `optimizeGraph` and `fftSize` to `optimize` and `fft_size`. One more maps
 the class that owns `convertEnv` to `convert_env`. If no table names the
 owner, the script fails. Last, the script writes the specs of
-`Spec.specs`, and the class methods of `Env` that make an envelope. It
-fails on a spec that is not a `ControlSpec`, and on a warp that is not a
-symbol. It also fails on a class method of `Env` that no table names.
+`Spec.specs` and the class methods of `Env` that make an envelope. It also
+writes the methods of `PV_ChainUGen` that take a function. It fails on a
+spec that is not a `ControlSpec`, and on a warp that is not a symbol. It
+also fails on a class method of `Env`, or an instance method of
+`PV_ChainUGen`, that no table names.
 
 The script also reads the plugins at the tag. Each unit inside one of the
 two macros that set `kUnitDef_CantAliasInputsToOutputs` gets `cant_alias`.
@@ -815,15 +869,13 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-These are not in version 0.10, in the order of their value for sc-app3:
+These are not in version 0.11, in the order of their value for sc-app3:
 
-1. `PackFFT.new`, whose inputs follow a count, and the `pvcalc` methods of
-   `PV_ChainUGen`, which take a function
-2. The methods of `UGen` that build graphs, such as `range`, `exprange` and
+1. The methods of `UGen` that build graphs, such as `range`, `exprange` and
    `linlin`, and with them `range`, `exprange` and `curverange` of `Env`.
    `range` needs the `signalRange` of each class, which the catalogue does
    not measure yet.
-3. sc3-plugins
+2. sc3-plugins
 
 Also left out: the view of `SynthDesc`, with its inputs, outputs and
 metadata, the specs included. So are the pseudo-UGens `AudioIn` and

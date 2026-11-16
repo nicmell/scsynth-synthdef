@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.11.0 (2026-11-16)
+
+`PackFFT.new` and the `pvcalc` methods of `PV_ChainUGen`, as sclang 3.14.1
+builds them.
+
+### Added
+
+- `ugen` adds `PackFFT.new`. It writes the size of `magsphases` before its
+  values, and takes `bufsize / 2` for a nil `tobin`, as sclang does.
+- `SynthDefBuilder::pvcalc`, `pvcalc2` and `pvcollect` take the chain, the
+  arguments by name and a closure in place of `func`. See
+  [The `pvcalc` methods](README.md#the-pvcalc-methods).
+- `catalog::pv_method`, `catalog::pv_methods` and `ArgKind::Function`.
+- `generator/fixtures.scd` writes the golden files of 0.11: `packfft` and
+  `pvcalc`. Four graphs that the crate refuses must break in sclang, or the
+  script fails.
+
+### Changed
+
+- `PackFFT.new` no longer gives `NotAddable`. `ugen` refuses 18 methods,
+  from 19.
+
 ## 0.10.0 (2026-11-16)
 
 The count of wire buffers, as scsynth 3.14.1 counts them, and a fix of
