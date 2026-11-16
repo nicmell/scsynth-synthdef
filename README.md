@@ -42,6 +42,8 @@ its `Version` and its definitions.
   does. `SynthDef::as_bytes` writes a file of one definition, as
   `SynthDef:asBytes` does.
 - `write_def_file_old` writes version 1, as `SynthDefOld` does.
+- `SynthDef::wire_buffers` counts the wire buffers that scsynth gives a
+  definition (see [Wire buffers](#wire-buffers)).
 
 The versions differ in two places:
 
@@ -346,6 +348,10 @@ what each one does in sclang.
 - `Poll` gives back its input, not itself. A number trigger becomes an
   `Impulse` at the rate of the `Poll`. Without a label, the label names the
   class of the input, as "UGen(SinOsc)".
+- `DemandEnvGen.ar` takes its `gate` and its `reset` to audio rate
+  together. If one of them runs at audio rate, `K2A.ar` takes the other
+  one. The rate of an array is the least of its rates by name, so
+  `[Impulse.ar(1), 1]` is at audio rate.
 - The codes of a symbol and of a label are its bytes as `Char:ascii` gives
   them in sclang, from -128 to 127.
 
@@ -539,10 +545,12 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
 
 - A `UGenClass` has its superclasses, whether it is pure or width-first,
   and its categories in the help. It also has the rule of its
-  `checkInputs`, its `optimize` and its `fft_size`, and its rate methods.
-  `optimize` is what `optimizeGraph` does with a UGen of the class, and
-  `fft_size` is how `fftSize` finds the FFT of a PV chain. `doc_url` gives
-  its page on doc.sccode.org.
+  `checkInputs`, its `optimize`, its `fft_size`, its `cant_alias` and its
+  rate methods. `optimize` is what `optimizeGraph` does with a UGen of the
+  class, and `fft_size` is how `fftSize` finds the FFT of a PV chain.
+  `cant_alias` is the flag of its plugin that the count of
+  [wire buffers](#wire-buffers) reads. `doc_url` gives its page on
+  doc.sccode.org.
 - A `PseudoClass` has its categories in the help and its rate methods.
 - `catalog::spec` and `catalog::specs` give the 23 `ControlSpec`s of
   `Spec.specs`: the range, the warp, the step, the default and the units
@@ -555,8 +563,9 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
   holds the rate, the slot of each input, the outputs, the special index,
   whether `mul` and `add` apply, and whether a nested array expands again.
-  It also holds the argument that goes through `asAudioRateInput`, and
-  whether `level` multiplies the result. It holds the `Passthrough` of the
+  It also holds the argument that goes through `asAudioRateInput`, the
+  arguments that go to audio rate together, and whether `level` multiplies
+  the result. It holds the `Passthrough` of the
   Lag family, the argument whose zeros become silence, and the
   `ArrayExpansion` of the array argument.
   `Addable::Pseudo` marks a method that a body of the crate builds (see
@@ -592,16 +601,21 @@ than `new1`. Three tables name each class outside `UGen` that answers `ar`
 or `kr`, and each method that creates no instance of its class. The first
 table names the classes with a body, and the second the classes left out,
 with a reason. The third names the classes that are not pseudo-UGens. If a
-class is in no table, the script fails. Two more tables name the methods
-of the Lag family and the arguments whose zeros become silence. Probes
-test each entry. If one does not hold, the script fails. Two more tables
-map the class that owns `optimizeGraph` and `fftSize` to `optimize` and
-`fft_size`. One more maps the class that owns `convertEnv` to
-`convert_env`. If no table names the owner, the script fails. Last, the
-script writes the specs of `Spec.specs`, and the class methods of `Env`
-that make an envelope. It fails on a spec that is not a `ControlSpec`, and
-on a warp that is not a symbol. It also fails on a class method of `Env`
-that no table names.
+class is in no table, the script fails. Three more tables name the methods
+of the Lag family, the arguments whose zeros become silence, and the
+arguments that go to audio rate together. Probes test each entry. If one
+does not hold, the script fails. Two more tables map the class that owns
+`optimizeGraph` and `fftSize` to `optimize` and `fft_size`. One more maps
+the class that owns `convertEnv` to `convert_env`. If no table names the
+owner, the script fails. Last, the script writes the specs of
+`Spec.specs`, and the class methods of `Env` that make an envelope. It
+fails on a spec that is not a `ControlSpec`, and on a warp that is not a
+symbol. It also fails on a class method of `Env` that no table names.
+
+The script also reads the plugins at the tag. Each unit inside one of the
+two macros that set `kUnitDef_CantAliasInputsToOutputs` gets `cant_alias`.
+If a plugin sets the flag in another way, or for a class outside the core,
+the script fails.
 
 The catalogue gives the page of each class in the help, and not its
 summary: the help of SuperCollider is GPL-3, and the crate copies none of
@@ -664,10 +678,49 @@ byte, and reading checks every definition after it reads it. A
   `i16::MAX` in version 1. Each count of definitions and of variants fits
   `i16::MAX`.
 
-One limit depends on the server, so the crate does not check it. While the
-server runs, scsynth refuses a definition that needs more interconnect
-buffers than `-w` gives, 64 by default: "exceeded number of interconnect
-buffers." (`SC_GraphDef.cpp:909`). The count also depends on each plugin.
+One limit depends on the server, so writing does not check it: the wire
+buffers of a definition, against the `-w` of scsynth.
+[Wire buffers](#wire-buffers) counts them.
+
+### Wire buffers
+
+`SynthDef::wire_buffers` gives the number of wire buffers that scsynth
+3.14.1 gives a definition, as `DoBufferColoring` counts them
+(`SC_GraphDef.cpp:873`). While the server runs, scsynth refuses a
+definition that needs more than its `-w`, 64 by default: "exceeded number
+of interconnect buffers." It then drops every definition of the file.
+`GraphDef_Recv` prints the exception and goes on, so `/d_recv` still
+answers `/done` (`SC_GraphDef.cpp:589`). scsynth does not report its `-w`,
+so the caller compares the count with the `-w` that it gave the server.
+
+```rust
+use scsynth_synthdef::SynthDefBuilder;
+
+// SynthDef(\chain, { Out.ar(0, LPF.ar(SinOsc.ar, 1000)) })
+let mut builder = SynthDefBuilder::new("chain", vec![])?;
+let sine = builder.ugen("SinOsc", "ar", &[])?;
+let low = builder.ugen("LPF", "ar", &[("in", sine.into()), ("freq", 1000.0.into())])?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", low.into())])?;
+assert_eq!(builder.finish()?.wire_buffers()?, 1);
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+scsynth walks the UGens in file order:
+
+- Each audio-rate output takes a buffer, with one reference for each input
+  that reads it. Control-rate and scalar outputs take none.
+- A UGen frees its references first, then takes buffers for its outputs.
+  So an output can take a buffer that an input just freed, as `LPF` does
+  above. The count is the most buffers in use at one time.
+- A unit whose plugin sets `kUnitDef_CantAliasInputsToOutputs` takes its
+  buffers first. 18 core units do, such as `PlayBuf`, `PanAz` and the
+  `Grain` UGens. `UGenClass::cant_alias` holds the flag.
+- A demand-rate UGen frees no buffer.
+- An output that nothing reads keeps its buffer to the end.
+
+A UGen whose class the catalogue does not hold gives
+`WireBufferError::UnknownUGen`, because the count needs the flag of its
+plugin. A definition that breaks a limit gives `WireBufferError::Limit`.
 
 ### Traps
 
@@ -762,25 +815,25 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-These are not in version 0.9, in the order of their value for sc-app3:
+These are not in version 0.10, in the order of their value for sc-app3:
 
-1. The `pvcalc` methods of `PV_ChainUGen`, which take a function and need
-   `PackFFT`
-2. sc3-plugins
+1. `PackFFT.new`, whose inputs follow a count, and the `pvcalc` methods of
+   `PV_ChainUGen`, which take a function
+2. The methods of `UGen` that build graphs, such as `range`, `exprange` and
+   `linlin`, and with them `range`, `exprange` and `curverange` of `Env`.
+   `range` needs the `signalRange` of each class, which the catalogue does
+   not measure yet.
+3. sc3-plugins
 
-Also left out: the view of `SynthDesc` (its inputs, outputs and metadata,
-the specs included), and the count of interconnect buffers. So are the
-pseudo-UGens `AudioIn` and `SplayZ`, deprecated since 3.10, and `InBus`,
-`XIn` and `XInFeedback` of `JITLib`. `Dunique` builds a reader at each use
-as an input, and the crate adds the UGens of a method at its call. The
-methods of `UGen` that build graphs, such as `range` and `linlin`, are not
-pseudo-UGens. `range` needs the `signalRange` of each class, which the
-catalogue does not measure yet.
+Also left out: the view of `SynthDesc`, with its inputs, outputs and
+metadata, the specs included. So are the pseudo-UGens `AudioIn` and
+`SplayZ`, deprecated since 3.10, and `InBus`, `XIn` and `XInFeedback` of
+`JITLib`. `Dunique` builds a reader at each use as an input, and the crate
+adds the UGens of a method at its call.
 
-Of `Env`, the crate leaves out `range`, `exprange` and `curverange`, which
-need `linlin` and its family. It also leaves out the setters, the instance
-`circle` and `blend`. The methods of the language, such as `at`, `plot`
-and `test`, are out too.
+Of `Env`, the crate also leaves out the setters, the instance `circle` and
+`blend`. The methods of the language, such as `at`, `plot` and `test`, are
+out too.
 
 ## Tests
 
@@ -840,8 +893,15 @@ cargo test --test scsynth -- --ignored
 - A parameter name and a variant name of 31 bytes load. A UGen name of 31
   bytes reaches the message `UGen '<name>' not installed.`. Each of the
   three at 32 bytes throws "name too long (> 31 chars)".
-- The test only loads definitions. In NRT mode, scsynth 3.14.1 crashes on
-  `/s_new` of a definition with an `AudioControl`.
+- Each golden definition loads at a `-w` equal to its count of wire
+  buffers, and scsynth refuses it at one less. With
+  `SCSYNTH_SYNTHDEF_BLESS=1` set, the test then writes
+  `tests/fixtures/wire_buffers.json`, and `tests/wire_buffers.rs` tests the
+  crate against it.
+- A file with one definition over `-w` loads none of its definitions. Only
+  this test starts synths, of definitions without an `AudioControl`. In NRT
+  mode, scsynth 3.14.1 crashes on `/s_new` of a definition with an
+  `AudioControl`.
 
 ## Features
 

@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.10.0 (2026-11-16)
+
+The count of wire buffers, as scsynth 3.14.1 counts them, and a fix of
+`DemandEnvGen.ar`.
+
+### Added
+
+- `SynthDef::wire_buffers` gives the number of wire buffers that scsynth
+  gives a definition, as `DoBufferColoring` counts them. While it runs,
+  scsynth refuses a definition that needs more than its `-w`. See
+  [Wire buffers](README.md#wire-buffers).
+- `WireBufferError`, for a definition that breaks a limit, and for a UGen
+  whose class the catalogue does not hold.
+- `UGenClass::cant_alias`, the flag that the plugins at the tag set for 18
+  units, and `Wiring::audio_together`.
+- `generator/fixtures.scd` writes the golden files of 0.10:
+  `demandenvgen` and `wirebufs`. `tests/fixtures/wire_buffers.json` holds
+  the count of each golden definition, which the acceptance test confirms
+  in scsynth.
+
+### Fixed
+
+- `DemandEnvGen.ar` takes its `gate` and its `reset` to audio rate
+  together, as sclang does. If one of them runs at audio rate, `K2A.ar`
+  takes the other one. Before, the crate wrote the other one as it was, and
+  with an audio-rate gate, scsynth read a constant reset past its end.
+
 ## 0.9.0 (2026-11-16)
 
 Envelopes, as sclang 3.14.1 builds them: `Env`, `VarLag` and `EnvGate`.
