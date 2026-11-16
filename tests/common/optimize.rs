@@ -3,8 +3,8 @@
 
 use scsynth_synthdef::{Arg, SynthDef, SynthDefBuilder, UGenInput};
 
-use super::pseudo::{def, input, out, sine};
-use super::{arg, array, by_name};
+use super::pseudo::{def, demand, dseq, fft, ifft, impulse, input, local_buf, out, sine};
+use super::{arg, by_name};
 
 /// The definitions of a golden file of 0.7.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
@@ -35,17 +35,12 @@ fn plus_all(b: &mut SynthDefBuilder, inputs: Vec<UGenInput>) -> UGenInput {
 /// `FFT(buffer, SinOsc.ar)`.
 fn chain_of(b: &mut SynthDefBuilder, buffer: UGenInput) -> UGenInput {
     let sound = sine(b, "ar", 440.0);
-    by_name(
-        b,
-        "FFT",
-        "new",
-        &[("buffer", input(buffer)), ("in", input(sound))],
-    )
+    fft(b, buffer, sound)
 }
 
 /// `FFT(LocalBuf(512), SinOsc.ar)`.
 fn local_chain(b: &mut SynthDefBuilder) -> UGenInput {
-    let buffer = by_name(b, "LocalBuf", "new", &[("numFrames", input(512.0))]);
+    let buffer = local_buf(b, 512.0, 1.0);
     chain_of(b, buffer)
 }
 
@@ -57,10 +52,6 @@ fn pv(b: &mut SynthDefBuilder, class: &str, chain: UGenInput) -> UGenInput {
         "new",
         &[("buffer", input(chain)), ("threshold", input(1.0))],
     )
-}
-
-fn ifft(b: &mut SynthDefBuilder, chain: UGenInput) -> UGenInput {
-    by_name(b, "IFFT", "ar", &[("buffer", input(chain))])
 }
 
 fn binary(b: &mut SynthDefBuilder, op: &str, a: UGenInput, c: UGenInput) -> UGenInput {
@@ -109,7 +100,7 @@ fn pvcopy() -> Vec<SynthDef> {
             out(b, "ar", product);
         }),
         def("pvcopy_buffer", vec![], |b| {
-            let buffer = by_name(b, "LocalBuf", "new", &[("numFrames", input(16.0))]);
+            let buffer = local_buf(b, 16.0, 1.0);
             let chain = chain_of(b, 0.0.into());
             let above = pv(b, "PV_MagAbove", chain.clone());
             let left = ifft(b, above);
@@ -232,17 +223,8 @@ fn sums() -> Vec<SynthDef> {
             let pair = binary(b, "+", first, second);
             let third = dseq(b, &[5.0]);
             let sum = binary(b, "+", pair, third);
-            let trigger = by_name(b, "Impulse", "kr", &[("freq", input(1.0))]);
-            let demand = by_name(
-                b,
-                "Demand",
-                "kr",
-                &[
-                    ("trig", input(trigger)),
-                    ("reset", input(0.0)),
-                    ("demandUGens", input(sum)),
-                ],
-            );
+            let trigger = impulse(b, "kr", 1.0);
+            let demand = demand(b, trigger, sum);
             out(b, "kr", demand);
         }),
     ]
@@ -255,18 +237,6 @@ fn sum_of_sines(b: &mut SynthDefBuilder, count: u32) -> UGenInput {
         let sound = sine(b, "ar", f64::from(freq));
         binary(b, "+", sum, sound)
     })
-}
-
-fn dseq(b: &mut SynthDefBuilder, list: &[f64]) -> UGenInput {
-    by_name(
-        b,
-        "Dseq",
-        "new",
-        &[
-            ("list", input(array(list))),
-            ("repeats", input(f64::INFINITY)),
-        ],
-    )
 }
 
 fn deadcode() -> Vec<SynthDef> {

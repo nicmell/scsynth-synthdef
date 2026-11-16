@@ -3,28 +3,8 @@
 
 mod common;
 
-use common::{PERC, arg, element, golden};
-use scsynth_synthdef::{Arg, ArgRate, ArgValue, SynthDef, SynthDefBuilder, UGenInput};
-
-fn ugen(
-    builder: &mut SynthDefBuilder,
-    class: &str,
-    selector: &str,
-    args: &[(&str, ArgValue)],
-) -> UGenInput {
-    builder
-        .ugen(class, selector, args)
-        .unwrap_or_else(|error| panic!("{class}.{selector}: {error}"))
-}
-
-fn numbers(numbers: &[f64]) -> ArgValue {
-    numbers
-        .iter()
-        .copied()
-        .map(UGenInput::from)
-        .collect::<Vec<_>>()
-        .into()
-}
+use common::{PERC, arg, array, by_name as ugen, element, golden};
+use scsynth_synthdef::{Arg, ArgRate, SynthDef, SynthDefBuilder};
 
 fn assert_golden(def: &SynthDef, name: &str) {
     assert_eq!(def.as_bytes().unwrap(), golden(name), "{name}");
@@ -203,7 +183,7 @@ fn demand() {
         "Dseq",
         "new",
         &[
-            ("list", numbers(&[60.0, 62.0, 64.0])),
+            ("list", array(&[60.0, 62.0, 64.0]).into()),
             ("repeats", f64::INFINITY.into()),
         ],
     );
@@ -236,7 +216,7 @@ fn envgen() {
         "EnvGen",
         "kr",
         &[
-            ("envelope", numbers(&PERC)),
+            ("envelope", array(&PERC).into()),
             ("gate", gate.into()),
             ("doneAction", 2.0.into()),
         ],
@@ -276,7 +256,7 @@ fn the_rules_of_their_own_refuse_what_sclang_refuses() {
     let mut b = SynthDefBuilder::new("rules", vec![Arg::new("x", 1.0)]).unwrap();
     let control = arg(&b, "x");
     let audio = ugen(&mut b, "SinOsc", "ar", &[]);
-    let demand = ugen(&mut b, "Dseq", "new", &[("list", numbers(&[1.0]))]);
+    let demand = ugen(&mut b, "Dseq", "new", &[("list", array(&[1.0]).into())]);
     let refused = [
         (
             "BufWr",

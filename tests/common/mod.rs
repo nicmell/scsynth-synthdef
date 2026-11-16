@@ -19,105 +19,20 @@ use scsynth_synthdef::{
     write_def_file, write_def_file_old,
 };
 
-/// The golden files that the builder reproduces.
-pub const NAMES: &[&str] = &[
-    "sine",
-    "rates",
-    "lags17",
-    "multi_out",
-    "sort",
-    "fft",
-    "demand",
-    "constants",
-    "operators",
-    "variant",
-    "two_defs",
-    "old",
-    "envgen",
-    "sendreply",
-    "pair",
-    "wrap",
-    "voices",
-    "nested",
-    "in_buses",
-    "mul",
-    "mul_add",
-    "mul_array",
-    "mul_expanded",
-    "mul_swap",
-    "mul_ops",
-    "madd_numbers",
-    "folds",
-    "pmosc",
-    "changed",
-    "silent",
-    "dstutter",
-    "tchoose",
-    "twchoose",
-    "tap",
-    "linlin",
-    "soundin",
-    "selectx",
-    "blowpass4",
-    "bhipass4",
-    "sum",
-    "mix",
-    "numchannels",
-    "selectxfocus",
-    "multitap",
-    "splay",
-    "dynklank",
-    "dynklang",
-    "unpackfft",
-    "delays",
-    "linxfade2",
-    "companderd",
-    "hilbertfir",
-    "linselectx",
-    "splayaz",
-    "lag",
-    "outzeros",
-    "localbuf",
-    "beattrack",
-    "localin",
-    "poll",
-    "symbols",
-    "bufwr",
-    "duty",
-    "peak",
-    "t2k",
-    "klank",
-    "klang",
-    "pingpong",
-    "nestedout",
-    "nestedwire",
-    "nestedreply",
-    "nestedenv",
-    "nestedpseudo",
-    "optimize",
-    "deadcode",
-    "pvcopy",
-    "controlugens",
-    "defwrap",
-    "specs",
-    "namedcontrol",
-    "env",
-    "ienv",
-    "varlag",
-    "envgate",
-    "demandenvgen",
-    "wirebufs",
-    "packfft",
-    "pvcalc",
-    "ugenranges",
-    "ugenmaps",
-    "ugenlags",
-    "ugenmisc",
-    "ugenreceivers",
-    "envranges",
-    "audioinput",
-    "pollarrays",
-];
+/// The golden files that the builder reproduces: all but `empty_array`,
+/// whose empty argument `BuildError::EmptyArray` refuses.
+pub fn names() -> Vec<String> {
+    golden_files()
+        .iter()
+        .map(|path| {
+            path.file_stem()
+                .expect("a file name")
+                .to_string_lossy()
+                .into_owned()
+        })
+        .filter(|name| name != "empty_array")
+        .collect()
+}
 
 /// The bytes of a golden file.
 pub fn golden(name: &str) -> Vec<u8> {
@@ -175,8 +90,8 @@ pub fn wire_buffers_fixture() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/wire_buffers.json")
 }
 
-/// The definitions of a golden file: those of 0.1 built with `add`, and
-/// those of 0.2 with `ugen` and the operators.
+/// The definitions of a golden file, built with the crate in the order in
+/// which sclang builds them.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
     match name {
         "sine" => vec![sine()],
@@ -301,7 +216,7 @@ fn numbers(numbers: &[f64]) -> Vec<UGenInput> {
 }
 
 /// An array of numbers, as one input.
-fn array(values: &[f64]) -> UGenInput {
+pub fn array(values: &[f64]) -> UGenInput {
     UGenInput::Array(numbers(values))
 }
 
@@ -314,7 +229,7 @@ fn flat(input: UGenInput) -> Vec<UGenInput> {
 }
 
 /// A UGen by its class name, with the arguments by name.
-fn by_name(
+pub fn by_name(
     builder: &mut SynthDefBuilder,
     class: &str,
     selector: &str,
@@ -323,16 +238,6 @@ fn by_name(
     builder
         .ugen(class, selector, args)
         .unwrap_or_else(|error| panic!("{class}.{selector}: {error}"))
-}
-
-/// `Out.ar(0, channels)`, by class name.
-fn out_by_name(builder: &mut SynthDefBuilder, channels: UGenInput) {
-    by_name(
-        builder,
-        "Out",
-        "ar",
-        &[("bus", 0.0.into()), ("channelsArray", channels.into())],
-    );
 }
 
 pub fn sine() -> SynthDef {
@@ -511,7 +416,15 @@ pub fn constants() -> SynthDef {
     b.finish().unwrap()
 }
 
-pub fn operators() -> SynthDef {
+/// An operator by name, and its special index.
+type Op = (&'static str, i16);
+
+/// The `operators` golden graph, with each operator made by `unary_op` and
+/// `binary_op`.
+fn operators_with(
+    unary_op: impl Fn(&mut SynthDefBuilder, Op, UGenInput) -> UGenInput,
+    binary_op: impl Fn(&mut SynthDefBuilder, Op, UGenInput, UGenInput) -> UGenInput,
+) -> SynthDef {
     let mut b = SynthDefBuilder::new(
         "operators",
         vec![Arg::new("freq", 440.0), Arg::new("i_n", 2.0)],
@@ -524,15 +437,15 @@ pub fn operators() -> SynthDef {
         Rate::Audio,
         vec![freq.clone(), 0.0.into()],
     );
-    let abs = unary(&mut b, 5, a.clone());
-    let neg = unary(&mut b, 0, a.clone());
-    let power = binary(&mut b, 25, neg, 2.0.into());
-    let difference = binary(&mut b, 1, a.clone(), freq.clone());
-    let max = binary(&mut b, 13, difference, 0.1.into());
-    let less = binary(&mut b, 8, a, 0.5.into());
+    let abs = unary_op(&mut b, ("abs", 5), a.clone());
+    let neg = unary_op(&mut b, ("neg", 0), a.clone());
+    let power = binary_op(&mut b, ("pow", 25), neg, 2.0.into());
+    let difference = binary_op(&mut b, ("-", 1), a.clone(), freq.clone());
+    let max = binary_op(&mut b, ("max", 13), difference, 0.1.into());
+    let less = binary_op(&mut b, ("<", 8), a, 0.5.into());
     out(&mut b, Rate::Audio, vec![0.0.into(), abs, power, max, less]);
-    let midicps = unary(&mut b, 17, freq);
-    let doubled = binary(&mut b, 2, i_n, 2.0.into());
+    let midicps = unary_op(&mut b, ("midicps", 17), freq);
+    let doubled = binary_op(&mut b, ("*", 2), i_n, 2.0.into());
     let trig = ugen(&mut b, "Impulse", Rate::Control, numbers(&[1.0, 0.0]));
     let white = ugen(
         &mut b,
@@ -540,7 +453,7 @@ pub fn operators() -> SynthDef {
         Rate::Demand,
         numbers(&[f64::INFINITY, 0.0, 1.0]),
     );
-    let tripled = binary(&mut b, 2, white, 3.0.into());
+    let tripled = binary_op(&mut b, ("*", 2), white, 3.0.into());
     let demand = ugen(
         &mut b,
         "Demand",
@@ -555,49 +468,19 @@ pub fn operators() -> SynthDef {
     b.finish().unwrap()
 }
 
+pub fn operators() -> SynthDef {
+    operators_with(
+        |b, (_, index), a| unary(b, index, a),
+        |b, (_, index), a, c| binary(b, index, a, c),
+    )
+}
+
 /// The `operators` golden graph, with `unary_op` and `binary_op`.
 pub fn operators_by_name() -> SynthDef {
-    let mut b = SynthDefBuilder::new(
-        "operators",
-        vec![Arg::new("freq", 440.0), Arg::new("i_n", 2.0)],
+    operators_with(
+        |b, (name, _), a| b.unary_op(name, a).unwrap(),
+        |b, (name, _), a, c| b.binary_op(name, a, c).unwrap(),
     )
-    .unwrap();
-    let (freq, i_n) = (arg(&b, "freq"), arg(&b, "i_n"));
-    let a = ugen(
-        &mut b,
-        "SinOsc",
-        Rate::Audio,
-        vec![freq.clone(), 0.0.into()],
-    );
-    let abs = b.unary_op("abs", a.clone()).unwrap();
-    let neg = b.unary_op("neg", a.clone()).unwrap();
-    let power = b.binary_op("pow", neg, 2.0).unwrap();
-    let difference = b.binary_op("-", a.clone(), freq.clone()).unwrap();
-    let max = b.binary_op("max", difference, 0.1).unwrap();
-    let less = b.binary_op("<", a, 0.5).unwrap();
-    out(&mut b, Rate::Audio, vec![0.0.into(), abs, power, max, less]);
-    let midicps = b.unary_op("midicps", freq).unwrap();
-    let doubled = b.binary_op("*", i_n, 2.0).unwrap();
-    let trig = ugen(&mut b, "Impulse", Rate::Control, numbers(&[1.0, 0.0]));
-    let white = ugen(
-        &mut b,
-        "Dwhite",
-        Rate::Demand,
-        numbers(&[f64::INFINITY, 0.0, 1.0]),
-    );
-    let tripled = b.binary_op("*", white, 3.0).unwrap();
-    let demand = ugen(
-        &mut b,
-        "Demand",
-        Rate::Control,
-        vec![trig, 0.0.into(), tripled],
-    );
-    out(
-        &mut b,
-        Rate::Control,
-        vec![0.0.into(), midicps, doubled, demand],
-    );
-    b.finish().unwrap()
 }
 
 pub fn variant() -> SynthDef {
@@ -681,7 +564,7 @@ pub fn pair() -> SynthDef {
     let (freqs, amp) = (arg(&b, "freqs"), arg(&b, "amp"));
     let sines = by_name(&mut b, "SinOsc", "ar", &[("freq", freqs.into())]);
     let sound = b.binary_op("*", sines, amp).unwrap();
-    out_by_name(&mut b, sound);
+    pseudo::out(&mut b, "ar", sound);
     b.finish().unwrap()
 }
 
@@ -690,7 +573,7 @@ pub fn wrap() -> SynthDef {
     let freqs = array(&[440.0, 442.0, 444.0]);
     let sines = by_name(&mut b, "SinOsc", "ar", &[("freq", freqs.into())]);
     let sound = b.binary_op("*", sines, array(&[0.1, 0.2])).unwrap();
-    out_by_name(&mut b, sound);
+    pseudo::out(&mut b, "ar", sound);
     b.finish().unwrap()
 }
 
@@ -716,7 +599,7 @@ pub fn voices() -> SynthDef {
     let sum = b
         .binary_op("+", element(&pans, 0), element(&pans, 1))
         .unwrap();
-    out_by_name(&mut b, sum);
+    pseudo::out(&mut b, "ar", sum);
     b.finish().unwrap()
 }
 
@@ -740,7 +623,7 @@ pub fn nested() -> SynthDef {
     let sum = b
         .binary_op("+", element(&low, 0), element(&low, 1))
         .unwrap();
-    out_by_name(&mut b, sum);
+    pseudo::out(&mut b, "ar", sum);
     b.finish().unwrap()
 }
 
@@ -755,7 +638,7 @@ pub fn in_buses() -> SynthDef {
             ("numChannels", array(&[1.0, 2.0]).into()),
         ],
     );
-    out_by_name(&mut b, UGenInput::Array(flat(inputs)));
+    pseudo::out(&mut b, "ar", UGenInput::Array(flat(inputs)));
     b.finish().unwrap()
 }
 
@@ -772,7 +655,7 @@ fn sine_madd(name: &str, freq: UGenInput, mul: UGenInput, add: UGenInput) -> Syn
             ("add", add.into()),
         ],
     );
-    out_by_name(&mut b, sound);
+    pseudo::out(&mut b, "ar", sound);
     b.finish().unwrap()
 }
 
@@ -794,7 +677,7 @@ pub fn mul_swap() -> SynthDef {
             ("add", 0.5.into()),
         ],
     );
-    out_by_name(&mut b, sound);
+    pseudo::out(&mut b, "ar", sound);
     b.finish().unwrap()
 }
 
@@ -811,7 +694,7 @@ pub fn mul_ops() -> SynthDef {
             ("add", fast.into()),
         ],
     );
-    out_by_name(&mut b, sound);
+    pseudo::out(&mut b, "ar", sound);
     b.finish().unwrap()
 }
 
@@ -819,7 +702,7 @@ pub fn madd_numbers() -> SynthDef {
     let mut b = SynthDefBuilder::new("madd_numbers", vec![]).unwrap();
     let fast = fast(&mut b);
     let sound = b.madd(2.0, 3.0, fast).unwrap();
-    out_by_name(&mut b, sound);
+    pseudo::out(&mut b, "ar", sound);
     b.finish().unwrap()
 }
 
@@ -851,6 +734,6 @@ pub fn folds() -> SynthDef {
         plus_zero,
         times_minus_one,
     ];
-    out_by_name(&mut b, channels.into());
+    pseudo::out(&mut b, "ar", channels.into());
     b.finish().unwrap()
 }

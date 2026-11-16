@@ -5,8 +5,8 @@
 use scsynth_synthdef::{ArgValue, Env, SynthDef, SynthDefBuilder, UGenInput};
 
 use super::controls::kr;
-use super::pseudo::{def, dseq, impulse, input, out, sine};
-use super::{array, by_name, element};
+use super::pseudo::{def, demand, dseq, impulse, input, out, sine, sines};
+use super::{array, by_name, element, flat};
 
 /// The definitions of a golden file of 0.12.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
@@ -56,12 +56,7 @@ fn demand_out(
     let trig = impulse(b, "kr", 1.0);
     let sequence = dseq(b, &[1.0, 2.0]);
     let value = body(b, sequence);
-    let args = [
-        ("trig", input(trig)),
-        ("reset", input(0.0)),
-        ("demandUGens", input(value)),
-    ];
-    let demand = by_name(b, "Demand", "kr", &args);
+    let demand = demand(b, trig, value);
     out(b, "kr", demand);
 }
 
@@ -404,12 +399,20 @@ fn bilins() -> Vec<SynthDef> {
     vec![
         def("ugenmaps_bilin", vec![], |b| {
             let s = sine(b, "kr", 1.0);
-            let r = send(b, s, "bilin", &bilin(&[]));
+            let r = send(b, s, "bilin", &bilin([0.0, -1.0, 1.0, 0.2, 0.0, 1.0], &[]));
             out(b, "kr", r);
         }),
         def("ugenmaps_bilin_audio", vec![], |b| {
             let s = sine(b, "ar", 440.0);
-            let r = send(b, s, "bilin", &bilin(&[("clip", ArgValue::from("max"))]));
+            let r = send(
+                b,
+                s,
+                "bilin",
+                &bilin(
+                    [0.0, -1.0, 1.0, 0.2, 0.0, 1.0],
+                    &[("clip", ArgValue::from("max"))],
+                ),
+            );
             out(b, "ar", r);
         }),
         def("ugenmaps_prune", vec![], |b| {
@@ -428,8 +431,8 @@ fn bilins() -> Vec<SynthDef> {
     ]
 }
 
-/// The arguments of `bilin(0, -1, 1, 0.2, 0, 1)`, with these others.
-fn bilin(others: &[(&'static str, ArgValue)]) -> Vec<(&'static str, ArgValue)> {
+/// The arguments of `bilin(values)`, with these others.
+fn bilin(values: [f64; 6], others: &[(&'static str, ArgValue)]) -> Vec<(&'static str, ArgValue)> {
     let names = [
         "inCenter",
         "inMin",
@@ -438,7 +441,6 @@ fn bilin(others: &[(&'static str, ArgValue)]) -> Vec<(&'static str, ArgValue)> {
         "outMin",
         "outMax",
     ];
-    let values = [0.0, -1.0, 1.0, 0.2, 0.0, 1.0];
     let mut args: Vec<(&'static str, ArgValue)> = names
         .into_iter()
         .zip(values)
@@ -850,22 +852,9 @@ fn more_misc() -> Vec<SynthDef> {
     ]
 }
 
-/// The elements of a nested array, in order, as `flat` gives them.
-fn flat(input: UGenInput) -> Vec<UGenInput> {
-    match input {
-        UGenInput::Array(items) => items.into_iter().flat_map(flat).collect(),
-        other => vec![other],
-    }
-}
-
 /// The cases of `ugenreceivers` with an array, from `ugenreceivers_range` to
 /// `ugenreceivers_sanitize`.
 fn arrays() -> Vec<SynthDef> {
-    let two_sines = |b: &mut SynthDefBuilder| {
-        let first = sine(b, "kr", 1.0);
-        let second = sine(b, "kr", 2.0);
-        UGenInput::Array(vec![first, second])
-    };
     vec![
         def("ugenreceivers_range", vec![], |b| {
             let s = sine(b, "kr", 1.0);
@@ -879,7 +868,7 @@ fn arrays() -> Vec<SynthDef> {
             out(b, "kr", r);
         }),
         def("ugenreceivers_nested", vec![], |b| {
-            let inner = two_sines(b);
+            let inner = sines(b, "kr", &[1.0, 2.0]);
             let third = sine(b, "kr", 3.0);
             let r = send(b, vec![inner, third], "range", &lo_hi(2.0, 4.0));
             out(b, "kr", UGenInput::Array(flat(r)));
@@ -912,7 +901,7 @@ fn arrays() -> Vec<SynthDef> {
             );
         }),
         def("ugenreceivers_lazy_equals", vec![], |b| {
-            let pair = two_sines(b);
+            let pair = sines(b, "kr", &[1.0, 2.0]);
             let third = sine(b, "kr", 3.0);
             let r = send(b, pair, "|==|", &[("that", input(third))]);
             out(b, "kr", r);
@@ -924,7 +913,7 @@ fn arrays() -> Vec<SynthDef> {
             out(b, "kr", r);
         }),
         def("ugenreceivers_poll", vec![], |b| {
-            let pair = two_sines(b);
+            let pair = sines(b, "kr", &[1.0, 2.0]);
             let r = send(b, pair, "poll", &[]);
             out(b, "kr", r);
         }),
@@ -933,36 +922,26 @@ fn arrays() -> Vec<SynthDef> {
             let first = dseq(b, &[1.0, 2.0]);
             let second = dseq(b, &[3.0, 4.0]);
             let polled = send(b, vec![first, second], "dpoll", &[]);
-            let args = [
-                ("trig", input(trig)),
-                ("reset", input(0.0)),
-                ("demandUGens", input(polled)),
-            ];
-            let demand = by_name(b, "Demand", "kr", &args);
+            let demand = demand(b, trig, polled);
             out(b, "kr", demand);
         }),
         def("ugenreceivers_degreetokey", vec![], |b| {
-            let pair = two_sines(b);
+            let pair = sines(b, "kr", &[1.0, 2.0]);
             let r = send(b, pair, "degreeToKey", &[("scale", input(0.0))]);
             out(b, "kr", r);
         }),
         def("ugenreceivers_checkbadvalues", vec![], |b| {
-            let pair = two_sines(b);
+            let pair = sines(b, "kr", &[1.0, 2.0]);
             let args = [("id", input(0.0)), ("post", input(array(&[1.0, 2.0])))];
             let r = send(b, pair, "checkBadValues", &args);
             out(b, "kr", r);
         }),
         def("ugenreceivers_sanitize", vec![], |b| {
-            let pair = two_sines(b);
+            let pair = sines(b, "kr", &[1.0, 2.0]);
             let r = send(b, pair, "sanitize", &[]);
             out(b, "kr", r);
         }),
     ]
-}
-
-/// `number.selector(args)`, which computes a number or adds UGens.
-fn number(b: &mut SynthDefBuilder, x: f64, selector: &str, args: &[(&str, ArgValue)]) -> UGenInput {
-    send(b, x, selector, args)
 }
 
 /// The arguments `inMin`, `inMax`, `outMin` and `outMax`, then `curve`.
@@ -976,30 +955,40 @@ fn numbers() -> Vec<SynthDef> {
     vec![
         def("ugenreceivers_numbers", vec![], |b| {
             let values = vec![
-                number(b, 0.25, "linlin", &map([0.0, 1.0, 200.0, 800.0])),
-                number(b, 0.5, "linexp", &map([0.0, 1.0, 20.0, 20000.0])),
-                number(b, 0.5, "explin", &map([0.01, 1.0, 0.0, 1.0])),
-                number(b, 0.5, "expexp", &map([0.01, 1.0, 20.0, 20000.0])),
-                number(b, 0.5, "lincurve", &curve_map([0.0, 1.0, 0.0, 1.0], -4.0)),
-                number(b, 0.5, "curvelin", &curve_map([0.0, 1.0, 0.0, 1.0], -4.0)),
-                number(b, 0.75, "bilin", &bilin_numbers()),
-                number(b, 0.25, "bilin", &bilin_numbers()),
+                send(b, 0.25, "linlin", &map([0.0, 1.0, 200.0, 800.0])),
+                send(b, 0.5, "linexp", &map([0.0, 1.0, 20.0, 20000.0])),
+                send(b, 0.5, "explin", &map([0.01, 1.0, 0.0, 1.0])),
+                send(b, 0.5, "expexp", &map([0.01, 1.0, 20.0, 20000.0])),
+                send(b, 0.5, "lincurve", &curve_map([0.0, 1.0, 0.0, 1.0], -4.0)),
+                send(b, 0.5, "curvelin", &curve_map([0.0, 1.0, 0.0, 1.0], -4.0)),
+                send(
+                    b,
+                    0.75,
+                    "bilin",
+                    &bilin([0.5, 0.0, 1.0, 0.2, 0.0, 1.0], &[]),
+                ),
+                send(
+                    b,
+                    0.25,
+                    "bilin",
+                    &bilin([0.5, 0.0, 1.0, 0.2, 0.0, 1.0], &[]),
+                ),
             ];
             out(b, "kr", UGenInput::Array(values));
         }),
         def("ugenreceivers_clips", vec![], |b| {
             let values = vec![
-                number(b, 1.5, "linlin", &map([0.0, 1.0, 200.0, 800.0])),
-                number(
+                send(b, 1.5, "linlin", &map([0.0, 1.0, 200.0, 800.0])),
+                send(
                     b,
                     -0.5,
                     "linlin",
                     &map_with([0.0, 1.0, 2.0, 4.0], &[("clip", ArgValue::from("max"))]),
                 ),
-                number(b, 1.5, "clip", &lo_hi(0.0, 1.0)),
-                number(b, 1.5, "fold", &lo_hi(0.0, 1.0)),
-                number(b, 1.5, "wrap", &lo_hi(0.0, 1.0)),
-                number(b, 0.5, "lincurve", &curve_map([0.0, 1.0, 0.0, 1.0], 0.0001)),
+                send(b, 1.5, "clip", &lo_hi(0.0, 1.0)),
+                send(b, 1.5, "fold", &lo_hi(0.0, 1.0)),
+                send(b, 1.5, "wrap", &lo_hi(0.0, 1.0)),
+                send(b, 0.5, "lincurve", &curve_map([0.0, 1.0, 0.0, 1.0], 0.0001)),
             ];
             out(b, "kr", UGenInput::Array(values));
         }),
@@ -1011,33 +1000,33 @@ fn numbers() -> Vec<SynthDef> {
                 ("outMin", input(low)),
                 ("outMax", input(800.0)),
             ];
-            let r = number(b, 0.5, "linlin", &args);
+            let r = send(b, 0.5, "linlin", &args);
             out(b, "kr", r);
         }),
         def("ugenreceivers_number_misc", vec![], |b| {
             let scale = array(&[0.0, 2.0, 4.0, 5.0, 7.0, 9.0, 11.0]);
             let values = vec![
-                number(b, 0.5, "lag", &times(0.1, None)),
-                number(b, 0.5, "varlag", &[("time", input(0.1))]),
-                number(
+                send(b, 0.5, "lag", &times(0.1, None)),
+                send(b, 0.5, "varlag", &[("time", input(0.1))]),
+                send(
                     b,
                     0.5,
                     "blend",
                     &[("that", input(1.0)), ("blendFrac", input(0.25))],
                 ),
-                number(b, 90.0, "degrad", &[]),
-                number(b, 1.0, "raddeg", &[]),
-                number(b, 0.5, "moddif", &[("that", input(0.9))]),
-                number(b, 0.97, "snap", &[]),
-                number(b, 0.97, "softRound", &[]),
-                number(b, -0.5, "binaryValue", &[]),
-                number(b, 2.5, "degreeToKey", &[("scale", input(scale))]),
+                send(b, 90.0, "degrad", &[]),
+                send(b, 1.0, "raddeg", &[]),
+                send(b, 0.5, "moddif", &[("that", input(0.9))]),
+                send(b, 0.97, "snap", &[]),
+                send(b, 0.97, "softRound", &[]),
+                send(b, -0.5, "binaryValue", &[]),
+                send(b, 2.5, "degreeToKey", &[("scale", input(scale))]),
             ];
             out(b, "kr", UGenInput::Array(values));
         }),
         def("ugenreceivers_number_blend", vec![], |b| {
             let s = sine(b, "kr", 1.0);
-            let r = number(
+            let r = send(
                 b,
                 0.5,
                 "blend",
@@ -1046,32 +1035,15 @@ fn numbers() -> Vec<SynthDef> {
             out(b, "kr", r);
         }),
         def("ugenreceivers_number_poll", vec![], |b| {
-            let r = number(b, 0.5, "poll", &[]);
+            let r = send(b, 0.5, "poll", &[]);
             out(b, "kr", r);
         }),
         def("ugenreceivers_number_lazy_equals", vec![], |b| {
             let s = sine(b, "kr", 1.0);
-            let r = number(b, 0.5, "|==|", &[("that", input(s))]);
+            let r = send(b, 0.5, "|==|", &[("that", input(s))]);
             out(b, "kr", r);
         }),
     ]
-}
-
-/// The arguments of `bilin(0.5, 0, 1, 0.2, 0, 1)`.
-fn bilin_numbers() -> Vec<(&'static str, ArgValue)> {
-    let names = [
-        "inCenter",
-        "inMin",
-        "inMax",
-        "outCenter",
-        "outMin",
-        "outMax",
-    ];
-    names
-        .into_iter()
-        .zip([0.5, 0.0, 1.0, 0.2, 0.0, 1.0])
-        .map(|(name, value)| (name, input(value)))
-        .collect()
 }
 
 /// `Env([0, 1, 0.5], [1, 1])`.
@@ -1083,31 +1055,18 @@ fn env(b: &mut SynthDefBuilder) -> Env {
     b.env("new", &args).unwrap()
 }
 
-/// `Out.kr(0, EnvGen.kr(env.selector(args), gate))`.
-fn ranged_out(
-    b: &mut SynthDefBuilder,
-    env: &Env,
-    selector: &str,
-    args: &[(&str, ArgValue)],
-    gate: Option<UGenInput>,
-) {
+/// `Out.kr(0, EnvGen.kr(env.selector(args)))`.
+fn ranged_out(b: &mut SynthDefBuilder, env: &Env, selector: &str, args: &[(&str, ArgValue)]) {
     let ranged = b
         .send_env(env, selector, args)
         .unwrap_or_else(|error| panic!("{selector}: {error}"));
-    let mut all = vec![("envelope", ArgValue::Env(ranged))];
-    all.extend(gate.map(|gate| ("gate", input(gate))));
-    let generated = by_name(b, "EnvGen", "kr", &all);
+    let generated = by_name(b, "EnvGen", "kr", &[("envelope", ArgValue::Env(ranged))]);
     out(b, "kr", generated);
 }
 
 /// The cases of `pollarrays`: `Array:poll` and `Array:dpoll` with arrays
 /// among their arguments, and `Poll.new` of nested arrays.
 fn poll_arrays() -> Vec<SynthDef> {
-    let two_sines = |b: &mut SynthDefBuilder| {
-        let first = sine(b, "kr", 1.0);
-        let second = sine(b, "kr", 2.0);
-        UGenInput::Array(vec![first, second])
-    };
     let nested = |b: &mut SynthDefBuilder| {
         let first = sine(b, "ar", 1.0);
         let second = sine(b, "kr", 2.0);
@@ -1115,13 +1074,13 @@ fn poll_arrays() -> Vec<SynthDef> {
         UGenInput::Array(vec![UGenInput::Array(vec![first, second]), third])
     };
     let polled_out = |b: &mut SynthDefBuilder, args: &[(&str, ArgValue)]| {
-        let pair = two_sines(b);
+        let pair = sines(b, "kr", &[1.0, 2.0]);
         let r = send(b, pair, "poll", args);
         out(b, "kr", r);
     };
     vec![
         def("pollarrays_trig", vec![], |b| {
-            let pair = two_sines(b);
+            let pair = sines(b, "kr", &[1.0, 2.0]);
             let trigs = vec![impulse(b, "kr", 1.0), impulse(b, "kr", 2.0)];
             let r = send(b, pair, "poll", &[("trig", input(trigs))]);
             out(b, "kr", r);
@@ -1184,11 +1143,11 @@ fn env_ranges() -> Vec<SynthDef> {
     vec![
         def("envranges_range", vec![], |b| {
             let e = env(b);
-            ranged_out(b, &e, "range", &lo_hi(2.0, 4.0), None);
+            ranged_out(b, &e, "range", &lo_hi(2.0, 4.0));
         }),
         def("envranges_exprange", vec![], |b| {
             let e = env(b);
-            ranged_out(b, &e, "exprange", &lo_hi(0.01, 1.0), None);
+            ranged_out(b, &e, "exprange", &lo_hi(0.01, 1.0));
         }),
         def("envranges_curverange", vec![], |b| {
             let e = env(b);
@@ -1197,16 +1156,16 @@ fn env_ranges() -> Vec<SynthDef> {
                 ("hi", input(1.0)),
                 ("curve", input(-4.0)),
             ];
-            ranged_out(b, &e, "curverange", &args, None);
+            ranged_out(b, &e, "curverange", &args);
         }),
         def("envranges_defaults", vec![], |b| {
             let e = b.env("perc", &[]).unwrap();
-            ranged_out(b, &e, "range", &[], None);
+            ranged_out(b, &e, "range", &[]);
         }),
         def("envranges_ugen", vec![], |b| {
             let e = env(b);
             let lo = kr(b, "lo", 2.0);
-            ranged_out(b, &e, "range", &lo_hi(lo, 4.0), None);
+            ranged_out(b, &e, "range", &lo_hi(lo, 4.0));
         }),
         def("envranges_adsr", vec![], |b| {
             let e = b.env("adsr", &[]).unwrap();
