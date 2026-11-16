@@ -30,10 +30,11 @@ pub(crate) use fft_unpacking::{pvcalc, pvcalc2, pvcollect};
 pub(crate) use graph_builder::NamedEntry;
 pub(crate) use ugen_methods::send;
 
-use crate::builder::{SynthDefBuilder, count_to_usize};
+use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize};
 use crate::catalog::{self, RateMethod};
 use crate::env::Curve;
 use crate::error::BuildError;
+use crate::rate::Rate;
 use crate::ugen_input::{ArgValue, UGenInput};
 
 /// The arguments of a call of a pseudo-UGen, bound by name, with their
@@ -293,6 +294,32 @@ pub(crate) fn elements(value: UGenInput) -> Vec<UGenInput> {
         UGenInput::Array(items) => items,
         other => vec![other],
     }
+}
+
+/// `new1` of `class` at `rate`: a UGen of one output, after the rule of its
+/// `checkInputs`.
+pub(crate) fn new1(
+    builder: &mut SynthDefBuilder,
+    class: &str,
+    rate: Rate,
+    inputs: Vec<UGenInput>,
+) -> Result<UGenInput, BuildError> {
+    let ugen = catalog::lookup(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
+    builder.add_checked(ugen, NewUGen::new(class, rate).inputs(inputs))
+}
+
+/// `multiNew` of `class` at `rate`: the expansion of `multiNewList`, then
+/// `new1` for each instance.
+pub(crate) fn multi_new(
+    builder: &mut SynthDefBuilder,
+    class: &str,
+    rate: Rate,
+    names: &[&str],
+    inputs: &[UGenInput],
+) -> Result<UGenInput, BuildError> {
+    builder.expand(class, names, inputs, true, &mut |builder, instance| {
+        new1(builder, class, rate, instance.to_vec())
+    })
 }
 
 /// A number of elements as a number of sclang.

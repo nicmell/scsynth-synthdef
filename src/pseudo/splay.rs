@@ -1,9 +1,11 @@
 //! The pseudo-UGens of `Splay.sc`.
 
 use super::mix::mix;
+use super::ugen_methods::send_message;
 use super::{Args, elements, lang, number};
 use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
+use crate::rate::Rate;
 use crate::ugen_input::{ArgValue, UGenInput};
 
 /// `Splay.ar` and `Splay.kr`: the expansion of `multiNewList` over `spread`,
@@ -124,10 +126,31 @@ fn resamp1(
             let index = float(i) * factor;
             let low = index.ceil() - 1.0;
             let (a, b) = (clip_at(values, low), clip_at(values, low + 1.0));
-            lang::blend(builder, a, b, (index - low).abs())
+            blend(builder, a, b, (index - low).abs())
         })
         .collect::<Result<_, _>>()
         .map(UGenInput::Array)
+}
+
+/// `a.blend(b, frac)`, which refuses `a` or `b` at scalar or demand rate
+/// with `UnsupportedRate`.
+fn blend(
+    builder: &mut SynthDefBuilder,
+    a: UGenInput,
+    b: UGenInput,
+    frac: f64,
+) -> Result<UGenInput, BuildError> {
+    let demand = [&a, &b]
+        .into_iter()
+        .any(|value| lang::rate(value) == Some(Rate::Demand));
+    let given = vec![Some(ArgValue::from(b)), Some(ArgValue::from(frac))];
+    send_message(builder, a, "blend", given).map_err(|error| match error {
+        BuildError::BadMethod { .. } => BuildError::UnsupportedRate {
+            ugen: "UGen:blend".to_owned(),
+            rate: if demand { Rate::Demand } else { Rate::Scalar },
+        },
+        other => other,
+    })
 }
 
 /// `clipAt`: the element at `position`, a whole number, within the bounds of
@@ -198,7 +221,8 @@ fn level_comp_new(
         }
         ArgValue::Input(exponent) => {
             let reciprocal = lang::unary(builder, "reciprocal", number(n))?;
-            let clipped = lang::clip(builder, exponent.clone(), 0.0.into(), 1.0.into())?;
+            let bounds = vec![Some(ArgValue::from(0.0)), Some(ArgValue::from(1.0))];
+            let clipped = send_message(builder, exponent.clone(), "clip", bounds)?;
             lang::binary(builder, "pow", reciprocal, clipped)
         }
         _ => Ok(UGenInput::Number(1.0)),

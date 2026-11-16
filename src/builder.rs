@@ -1269,19 +1269,29 @@ impl SynthDefBuilder {
     ) -> Result<UGenInput, BuildError> {
         let inputs = wire_inputs(class, method, wiring, values)?;
         let outputs = wire_outputs(class, method, wiring, values)?;
-        check_inputs::check(ugen_class.check_inputs, wiring.rate, &inputs).map_err(|message| {
-            BuildError::CheckInputs {
-                class: class.to_owned(),
-                message,
-            }
-        })?;
-        self.add(
+        self.add_checked(
+            ugen_class,
             NewUGen::new(class, wiring.rate)
                 .inputs(inputs)
                 .outputs(outputs)
-                .special_index(wiring.special_index)
-                .width_first(ugen_class.is_width_first),
+                .special_index(wiring.special_index),
         )
+    }
+
+    /// Adds `ugen` of `class` after the rule of its `checkInputs`, with the
+    /// width-first flag of the class.
+    pub(crate) fn add_checked(
+        &mut self,
+        class: &UGenClass,
+        ugen: NewUGen,
+    ) -> Result<UGenInput, BuildError> {
+        check_inputs::check(class.check_inputs, ugen.rate, &ugen.inputs).map_err(|message| {
+            BuildError::CheckInputs {
+                class: ugen.name.clone(),
+                message,
+            }
+        })?;
+        self.add(ugen.width_first(class.is_width_first))
     }
 
     fn unary_leaf(&mut self, special_index: i16, a: UGenInput) -> Result<UGenInput, BuildError> {

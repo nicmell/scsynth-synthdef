@@ -1,8 +1,7 @@
 //! The bodies of `BufIO.sc`.
 
-use super::{Args, lang};
-use crate::builder::{NewUGen, SynthDefBuilder};
-use crate::catalog;
+use super::{Args, lang, new1};
+use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
 use crate::rate::Rate;
 use crate::ugen_input::UGenInput;
@@ -31,11 +30,11 @@ pub(super) fn new_local_buf(
     frames: UGenInput,
 ) -> Result<UGenInput, BuildError> {
     let max = builder.max_local_bufs()?;
-    let width_first = catalog::lookup("LocalBuf").is_some_and(|class| class.is_width_first);
-    builder.add(
-        NewUGen::new("LocalBuf", Rate::Scalar)
-            .inputs([channels, frames, max])
-            .width_first(width_first),
+    new1(
+        builder,
+        "LocalBuf",
+        Rate::Scalar,
+        vec![channels, frames, max],
     )
 }
 

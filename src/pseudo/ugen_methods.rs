@@ -2,10 +2,9 @@
 //! methods that a number or an array answers in their place. A body sends the
 //! messages that its method sends in sclang, in the same order.
 
-use super::{Args, lang, sclang_class};
-use crate::builder::{NewUGen, SynthDefBuilder, bind_optional};
+use super::{Args, lang, multi_new, sclang_class};
+use crate::builder::{SynthDefBuilder, bind_optional};
 use crate::catalog::{self, SignalRange, UGenMethod};
-use crate::check_inputs;
 use crate::error::BuildError;
 use crate::rate::Rate;
 use crate::ugen_input::{ArgValue, UGenInput};
@@ -21,9 +20,9 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("DUGen", "explin", explin),
     ("DUGen", "linexp", demand_linexp),
     ("DUGen", "linlin", demand_linlin),
-    ("Float", "clip", number_clip),
+    ("Float", "clip", clip),
     ("Float", "fold", number_fold),
-    ("Float", "wrap", number_wrap),
+    ("Float", "wrap", number_fold),
     ("LFGauss", "range", lf_gauss_range),
     ("Object", "blend", number_blend),
     ("Object", "|==|", object_lazy_equals),
@@ -72,11 +71,11 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("SequenceableCollection", "wrap", multi_channel_perform),
     ("SimpleNumber", "bilin", number_bilin),
     ("SimpleNumber", "binaryValue", binary_value),
-    ("SimpleNumber", "curvelin", number_curvelin),
+    ("SimpleNumber", "curvelin", number_map),
     ("SimpleNumber", "degrad", degrad),
     ("SimpleNumber", "degreeToKey", number_degree_to_key),
-    ("SimpleNumber", "expexp", number_expexp),
-    ("SimpleNumber", "explin", number_explin),
+    ("SimpleNumber", "expexp", number_map),
+    ("SimpleNumber", "explin", number_map),
     ("SimpleNumber", "isNegative", number_boolean),
     ("SimpleNumber", "isPositive", number_boolean),
     ("SimpleNumber", "isStrictlyPositive", number_boolean),
@@ -86,9 +85,9 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("SimpleNumber", "lag3", number_itself),
     ("SimpleNumber", "lag3ud", number_itself),
     ("SimpleNumber", "lagud", number_itself),
-    ("SimpleNumber", "lincurve", number_lincurve),
-    ("SimpleNumber", "linexp", number_linexp),
-    ("SimpleNumber", "linlin", number_linlin),
+    ("SimpleNumber", "lincurve", number_map),
+    ("SimpleNumber", "linexp", number_map),
+    ("SimpleNumber", "linlin", number_map),
     ("SimpleNumber", "moddif", number_moddif),
     ("SimpleNumber", "poll", poll),
     ("SimpleNumber", "raddeg", raddeg),
@@ -102,15 +101,15 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("UGen", "blend", blend),
     ("UGen", "checkBadValues", check_bad_values),
     ("UGen", "clip", clip),
-    ("UGen", "curvelin", curvelin),
-    ("UGen", "curverange", curverange),
+    ("UGen", "curvelin", lincurve),
+    ("UGen", "curverange", exprange),
     ("UGen", "degrad", degrad),
     ("UGen", "degreeToKey", degree_to_key),
-    ("UGen", "dpoll", dpoll),
+    ("UGen", "dpoll", poll),
     ("UGen", "expexp", expexp),
     ("UGen", "explin", explin),
     ("UGen", "exprange", exprange),
-    ("UGen", "fold", fold),
+    ("UGen", "fold", fold_or_wrap),
     ("UGen", "if", ugen_if),
     ("UGen", "isNegative", signs),
     ("UGen", "isPositive", signs),
@@ -136,7 +135,7 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("UGen", "softRound", snap),
     ("UGen", "unipolar", unipolar),
     ("UGen", "varlag", varlag),
-    ("UGen", "wrap", wrap),
+    ("UGen", "wrap", fold_or_wrap),
     ("UGen", "|==|", lazy_equals),
 ];
 
@@ -205,13 +204,7 @@ fn owner_of(builder: &SynthDefBuilder, receiver: &UGenInput, method: &UGenMethod
         .and_then(|class| {
             std::iter::once(class.name)
                 .chain(class.superclasses.iter().copied())
-                .find_map(|name| {
-                    method
-                        .overrides
-                        .iter()
-                        .copied()
-                        .find(|&owner| owner == name)
-                })
+                .find(|name| method.overrides.contains(name))
         })
         .unwrap_or("UGen")
 }
@@ -269,31 +262,6 @@ fn prune_to(
     send_message(builder, this, "prune", given)
 }
 
-/// `multiNew` of `class` at `rate`: the expansion of `multiNewList`, then a
-/// UGen of one output for each instance, with the rule of its `checkInputs`.
-fn multi_new(
-    builder: &mut SynthDefBuilder,
-    class: &str,
-    rate: Rate,
-    names: &[&str],
-    inputs: &[UGenInput],
-) -> Result<UGenInput, BuildError> {
-    let ugen = catalog::lookup(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
-    builder.expand(class, names, inputs, true, &mut |builder, instance| {
-        check_inputs::check(ugen.check_inputs, rate, instance).map_err(|message| {
-            BuildError::CheckInputs {
-                class: class.to_owned(),
-                message,
-            }
-        })?;
-        builder.add(
-            NewUGen::new(class, rate)
-                .inputs(instance.to_vec())
-                .width_first(ugen.is_width_first),
-        )
-    })
-}
-
 /// The `methodSelectorForRate` of the receiver for a method of `class`, `ar`
 /// or `kr`. At scalar or demand rate it names a method that `class` does not
 /// have as a UGen, and sclang writes the definition without its `Out`.
@@ -309,15 +277,6 @@ fn rate_selector(
             selector,
             &format!("{class} has no method for the rate {rate:?}, so sclang loses the Out"),
         )),
-    }
-}
-
-/// -1 for a bipolar receiver and 0 for a unipolar one: the low end of its
-/// range for `exprange` and `curverange`.
-fn low_end(builder: &SynthDefBuilder, this: &UGenInput) -> UGenInput {
-    match signal_range(builder, this) {
-        SignalRange::Bipolar => (-1.0).into(),
-        SignalRange::Unipolar => 0.0.into(),
     }
 }
 
@@ -364,40 +323,31 @@ fn lf_gauss_range(
     send_message(builder, this, "linlin", given)
 }
 
-/// `UGen:exprange`: `linexp` from the range of the receiver, without a clip.
+/// `UGen:exprange` and `curverange`: `linexp` or `lincurve` from the range of
+/// the receiver, -1 or 0 to 1, without a clip.
 fn exprange(
     builder: &mut SynthDefBuilder,
     this: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    let low = low_end(builder, &this);
-    let given = vec![
+    let low = match signal_range(builder, &this) {
+        SignalRange::Bipolar => -1.0,
+        SignalRange::Unipolar => 0.0,
+    };
+    let mut given = vec![
         Some(ArgValue::from(low)),
         Some(ArgValue::from(1.0)),
         Some(args.value("lo")?),
         Some(args.value("hi")?),
-        None,
     ];
-    send_message(builder, this, "linexp", given)
-}
-
-/// `UGen:curverange`: `lincurve` from the range of the receiver, without a
-/// clip.
-fn curverange(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    let low = low_end(builder, &this);
-    let given = vec![
-        Some(ArgValue::from(low)),
-        Some(ArgValue::from(1.0)),
-        Some(args.value("lo")?),
-        Some(args.value("hi")?),
-        Some(args.value("curve")?),
-        None,
-    ];
-    send_message(builder, this, "lincurve", given)
+    let map = if args.selector() == "exprange" {
+        "linexp"
+    } else {
+        given.push(Some(args.value("curve")?));
+        "lincurve"
+    };
+    given.push(None);
+    send_message(builder, this, map, given)
 }
 
 /// `UGen:unipolar`: `range(0, mul)`.
@@ -520,9 +470,9 @@ fn expexp(
     )
 }
 
-/// `UGen:lincurve`: `linlin` for a number curve under 0.125, the arithmetic
-/// of [`curved`] for a curve at scalar rate, and else a `Select` of the two
-/// by `abs(curve) >= 0.125`.
+/// `UGen:lincurve` and `curvelin`: `linlin` for a number curve under 0.125,
+/// the arithmetic of [`curved`] or [`curved_back`] for a curve at scalar
+/// rate, and else a `Select` of the two by `abs(curve) >= 0.125`.
 fn lincurve(
     builder: &mut SynthDefBuilder,
     this: UGenInput,
@@ -534,29 +484,28 @@ fn lincurve(
         return send_linlin(builder, this, args);
     }
     let ranges = [in_min.clone(), in_max.clone(), out_min, out_max];
-    let result = curved(builder, curve.clone(), ranges, |builder| {
-        prune_to(builder, this.clone(), &in_min, &in_max, args)
-    })?;
-    curve_select(builder, this, curve, result, args)
-}
-
-/// `UGen:curvelin`: as [`lincurve`], with the arithmetic of
-/// [`curved_back`].
-fn curvelin(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    let [in_min, in_max, out_min, out_max] = map_args(args)?;
-    let curve = args.input("curve")?;
-    if matches!(curve, UGenInput::Number(number) if number.abs() < 0.125) {
-        return send_linlin(builder, this, args);
+    let pruned =
+        |builder: &mut SynthDefBuilder| prune_to(builder, this.clone(), &in_min, &in_max, args);
+    let result = if args.selector() == "lincurve" {
+        curved(builder, curve.clone(), ranges, pruned)?
+    } else {
+        curved_back(builder, curve.clone(), ranges, pruned)?
+    };
+    if rate_of(&curve) == Rate::Scalar {
+        return Ok(result);
     }
-    let ranges = [in_min.clone(), in_max.clone(), out_min, out_max];
-    let result = curved_back(builder, curve.clone(), ranges, |builder| {
-        prune_to(builder, this.clone(), &in_min, &in_max, args)
-    })?;
-    curve_select(builder, this, curve, result, args)
+    let selector = rate_selector(&this, args.selector(), "Select")?;
+    let magnitude = lang::unary(builder, "abs", curve)?;
+    let which = lang::binary(builder, ">=", magnitude, 0.125.into())?;
+    let linear = send_linlin(builder, this, args)?;
+    builder.ugen(
+        "Select",
+        selector,
+        &[
+            ("which", which.into()),
+            ("array", UGenInput::Array(vec![linear, result]).into()),
+        ],
+    )
 }
 
 /// `this.linlin(inMin, inMax, outMin, outMax, clip)`, with the arguments of
@@ -575,32 +524,6 @@ fn send_linlin(
         clip,
     ];
     send_message(builder, this, "linlin", given)
-}
-
-/// The end of `lincurve` and `curvelin`: `result` for a curve at scalar
-/// rate, else a `Select` of `linlin` and `result` by `abs(curve) >= 0.125`.
-fn curve_select(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    curve: UGenInput,
-    result: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    if rate_of(&curve) == Rate::Scalar {
-        return Ok(result);
-    }
-    let selector = rate_selector(&this, args.selector(), "Select")?;
-    let magnitude = lang::unary(builder, "abs", curve)?;
-    let which = lang::binary(builder, ">=", magnitude, 0.125.into())?;
-    let linear = send_linlin(builder, this, args)?;
-    builder.ugen(
-        "Select",
-        selector,
-        &[
-            ("which", which.into()),
-            ("array", UGenInput::Array(vec![linear, result]).into()),
-        ],
-    )
 }
 
 /// `UGen:bilin`: a `Select` by `this < inCenter` of the `linlin` above the
@@ -640,8 +563,7 @@ fn bilin(
     )
 }
 
-/// `UGen:clip`: a `Clip` by the `methodSelectorForRate` of `Clip`, and
-/// `max(lo, min(hi, this))` at demand rate.
+/// `UGen:clip` and `Float:clip`: [`lang::clip`].
 fn clip(
     builder: &mut SynthDefBuilder,
     this: UGenInput,
@@ -650,28 +572,10 @@ fn clip(
     lang::clip(builder, this, args.input("lo")?, args.input("hi")?)
 }
 
-/// `UGen:fold`: a `Fold` by the `methodSelectorForRate` of `Fold`.
-fn fold(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    fold_or_wrap(builder, "Fold", this, args)
-}
-
-/// `UGen:wrap`: a `Wrap` by the `methodSelectorForRate` of `Wrap`.
-fn wrap(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    fold_or_wrap(builder, "Wrap", this, args)
-}
-
-/// `fold` and `wrap`, which sclang does not implement at demand rate.
+/// `UGen:fold` and `wrap`: a `Fold` or a `Wrap` by its `methodSelectorForRate`.
+/// sclang does not implement them at demand rate.
 fn fold_or_wrap(
     builder: &mut SynthDefBuilder,
-    class: &str,
     this: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
@@ -682,6 +586,11 @@ fn fold_or_wrap(
             "NotYetImplementedError at demand rate",
         ));
     }
+    let class = if args.selector() == "fold" {
+        "Fold"
+    } else {
+        "Wrap"
+    };
     builder.ugen(
         class,
         lang::selector_for_rate(rate),
@@ -748,44 +657,22 @@ fn demand_expexp(
     lang::binary(builder, "pow", base, exponent)
 }
 
-/// `Float:clip`: `sc_clip`.
-fn number_clip(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    lang::clip(builder, this, args.input("lo")?, args.input("hi")?)
-}
-
-/// `Float:fold`: `sc_fold`.
+/// `Float:fold` and `wrap`: `sc_fold` and `sc_mod(x - lo, hi - lo) + lo`. The
+/// primitive fails on an argument that is not a number.
 fn number_fold(
     _builder: &mut SynthDefBuilder,
     this: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    let [x, lo, hi] = primitive_numbers(this, args, "_FoldFloat")?;
-    Ok(lang::fold(x, lo, hi).into())
-}
-
-/// `Float:wrap`.
-fn number_wrap(
-    _builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    let [x, lo, hi] = primitive_numbers(this, args, "_WrapFloat")?;
-    Ok(lang::wrap(x, lo, hi).into())
-}
-
-/// The receiver, `lo` and `hi` of a primitive of `Float`, which fails on an
-/// argument that is not a number.
-fn primitive_numbers(
-    this: UGenInput,
-    args: &Args,
-    primitive: &str,
-) -> Result<[f64; 3], BuildError> {
+    let (compute, primitive): (fn(f64, f64, f64) -> f64, _) = if args.selector() == "fold" {
+        (lang::fold, "_FoldFloat")
+    } else {
+        (lang::wrap, "_WrapFloat")
+    };
     match (this, args.input("lo")?, args.input("hi")?) {
-        (UGenInput::Number(x), UGenInput::Number(lo), UGenInput::Number(hi)) => Ok([x, lo, hi]),
+        (UGenInput::Number(x), UGenInput::Number(lo), UGenInput::Number(hi)) => {
+            Ok(compute(x, lo, hi).into())
+        }
         _ => Err(bad_method(
             args.selector(),
             &format!("Primitive '{primitive}' failed. Wrong type."),
@@ -827,86 +714,35 @@ fn compared(
     }
 }
 
-/// `SimpleNumber:linlin`: [`linear`], after the clip.
-fn number_linlin(
+/// `SimpleNumber:linlin`, `linexp`, `explin`, `expexp`, `lincurve` and
+/// `curvelin`: the clip, then [`linear`], [`exponential`], [`logarithmic`],
+/// [`exponential_of_log`], or for the curves [`linear`] under 0.001 and else
+/// [`curved`] or [`curved_back`].
+fn number_map(
     builder: &mut SynthDefBuilder,
     this: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    if let Some(bound) = clipped(number_of(&this, "linlin")?, args)? {
+    let selector = args.selector();
+    if let Some(bound) = clipped(number_of(&this, selector)?, args)? {
         return Ok(bound);
     }
-    linear(builder, this, map_args(args)?)
-}
-
-/// `SimpleNumber:linexp`: [`exponential`], after the clip.
-fn number_linexp(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    if let Some(bound) = clipped(number_of(&this, "linexp")?, args)? {
-        return Ok(bound);
+    let curve = match selector {
+        "lincurve" | "curvelin" => {
+            let curve = args.input("curve")?;
+            (!small_curve(&curve, selector)?).then_some(curve)
+        }
+        _ => None,
+    };
+    let ranges = map_args(args)?;
+    match (selector, curve) {
+        ("linexp", _) => exponential(builder, this, ranges),
+        ("explin", _) => logarithmic(builder, this, ranges),
+        ("expexp", _) => exponential_of_log(builder, ranges, |_| Ok(this)),
+        ("lincurve", Some(curve)) => curved(builder, curve, ranges, |_| Ok(this)),
+        (_, Some(curve)) => curved_back(builder, curve, ranges, |_| Ok(this)),
+        _ => linear(builder, this, ranges),
     }
-    exponential(builder, this, map_args(args)?)
-}
-
-/// `SimpleNumber:explin`: [`logarithmic`], after the clip.
-fn number_explin(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    if let Some(bound) = clipped(number_of(&this, "explin")?, args)? {
-        return Ok(bound);
-    }
-    logarithmic(builder, this, map_args(args)?)
-}
-
-/// `SimpleNumber:expexp`: [`exponential_of_log`], after the clip.
-fn number_expexp(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    if let Some(bound) = clipped(number_of(&this, "expexp")?, args)? {
-        return Ok(bound);
-    }
-    exponential_of_log(builder, map_args(args)?, |_| Ok(this))
-}
-
-/// `SimpleNumber:lincurve`: after the clip, [`linear`] for a curve under
-/// 0.001, else [`curved`].
-fn number_lincurve(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    if let Some(bound) = clipped(number_of(&this, "lincurve")?, args)? {
-        return Ok(bound);
-    }
-    let curve = args.input("curve")?;
-    if small_curve(&curve, "lincurve")? {
-        return linear(builder, this, map_args(args)?);
-    }
-    curved(builder, curve, map_args(args)?, |_| Ok(this))
-}
-
-/// `SimpleNumber:curvelin`: after the clip, [`linear`] for a curve under
-/// 0.001, else [`curved_back`].
-fn number_curvelin(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    if let Some(bound) = clipped(number_of(&this, "curvelin")?, args)? {
-        return Ok(bound);
-    }
-    let curve = args.input("curve")?;
-    if small_curve(&curve, "curvelin")? {
-        return linear(builder, this, map_args(args)?);
-    }
-    curved_back(builder, curve, map_args(args)?, |_| Ok(this))
 }
 
 /// `abs(curve) < 0.001`, the test of `SimpleNumber:lincurve` and
@@ -1060,36 +896,31 @@ fn multi_channel_perform(
     receiver: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    let mut columns = vec![Some(ArgValue::Input(receiver))];
-    columns.extend(args.values.iter().cloned());
-    let size = columns
+    let items = super::elements(receiver);
+    let size = args
+        .values
         .iter()
         .map(|value| match value {
             Some(ArgValue::Input(UGenInput::Array(items))) => items.len(),
             _ => 1,
         })
-        .max()
-        .unwrap_or(1);
-    let mut results = Vec::with_capacity(size);
-    for row in 0..size {
-        let mut values: Vec<Option<ArgValue>> = columns
-            .iter()
-            .map(|value| match value {
-                Some(ArgValue::Input(UGenInput::Array(items))) => {
-                    (!items.is_empty()).then(|| ArgValue::Input(items[row % items.len()].clone()))
-                }
-                other => other.clone(),
-            })
-            .collect();
-        let Some(ArgValue::Input(element)) = values.remove(0) else {
-            return Err(bad_method(
-                args.selector(),
-                "nil does not understand the message",
-            ));
-        };
-        results.push(send_message(builder, element, args.selector(), values)?);
-    }
-    Ok(UGenInput::Array(results))
+        .fold(items.len(), usize::max);
+    (0..size)
+        .map(|row| {
+            let values = args
+                .values
+                .iter()
+                .map(|value| match value {
+                    Some(ArgValue::Input(UGenInput::Array(items))) => (!items.is_empty())
+                        .then(|| ArgValue::Input(items[row % items.len()].clone())),
+                    other => other.clone(),
+                })
+                .collect();
+            let element = items[row % items.len()].clone();
+            send_message(builder, element, args.selector(), values)
+        })
+        .collect::<Result<_, _>>()
+        .map(UGenInput::Array)
 }
 
 /// `SequenceableCollection:performUnaryOp` and `degreeToKey`: the message to
@@ -1290,13 +1121,19 @@ fn moddif(
     )
 }
 
-/// `SimpleNumber:moddif`.
+/// `SimpleNumber:moddif`: `mod * 0.5 - absdif(absdif(x, that) % mod, mod *
+/// 0.5)`.
 fn number_moddif(
     builder: &mut SynthDefBuilder,
     this: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
-    lang::moddif(builder, this, args.input("that")?, args.input("mod")?)
+    let modulus = args.input("mod")?;
+    let distance = lang::binary(builder, "absdif", this, args.input("that")?)?;
+    let reduced = lang::binary(builder, "mod", distance, modulus.clone())?;
+    let half = lang::binary(builder, "*", modulus, 0.5.into())?;
+    let gap = lang::binary(builder, "absdif", reduced, half.clone())?;
+    lang::binary(builder, "-", half, gap)
 }
 
 /// `UGen:sanitize`: a `Sanitize` by the `methodSelectorForRate` of the
@@ -1310,23 +1147,18 @@ fn sanitize(
     builder.ugen("Sanitize", selector, &[("in", this.into())])
 }
 
-/// `poll`: `Poll(trig, this, label, trigid)`, for a UGen and for a number.
+/// `poll`, for a UGen and for a number, and `UGen:dpoll`:
+/// `Poll(trig, this, label, trigid)` and `Dpoll(this, label, run, trigid)`.
 fn poll(
     builder: &mut SynthDefBuilder,
     this: UGenInput,
     args: &Args,
 ) -> Result<UGenInput, BuildError> {
     let label = args.text("label")?;
-    poll_with(builder, this, args, label)
-}
-
-/// `Poll(trig, this, label, trigid)`.
-fn poll_with(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-    label: Option<String>,
-) -> Result<UGenInput, BuildError> {
+    if args.selector() == "dpoll" {
+        let (run, trigid) = (args.value("run")?, args.value("trigid")?);
+        return dpoll_with(builder, this, label, run, trigid);
+    }
     let mut given = vec![
         ("trig", args.value("trig")?),
         ("in", this.into()),
@@ -1334,17 +1166,6 @@ fn poll_with(
     ];
     given.extend(label.map(|label| ("label", ArgValue::Text(label))));
     builder.ugen("Poll", "new", &given)
-}
-
-/// `UGen:dpoll`: `Dpoll(this, label, run, trigid)`.
-fn dpoll(
-    builder: &mut SynthDefBuilder,
-    this: UGenInput,
-    args: &Args,
-) -> Result<UGenInput, BuildError> {
-    let label = args.text("label")?;
-    let (run, trigid) = (args.value("run")?, args.value("trigid")?);
-    dpoll_with(builder, this, label, run, trigid)
 }
 
 /// `Dpoll(this, label, run, trigid)`, with the label of `Dpoll:new1`,
@@ -1464,15 +1285,12 @@ fn number_snap(
     let UGenInput::Number(size) = lang::unary(builder, "abs", difference.clone())? else {
         return Err(bad_method(selector, "Non Boolean in test."));
     };
-    let close = if selector == "snap" {
-        compared(selector, size, &args.input("margin")?, |size, margin| {
-            size < margin
-        })?
+    let test: fn(f64, f64) -> bool = if selector == "snap" {
+        |size, margin| size < margin
     } else {
-        compared(selector, size, &args.input("margin")?, |size, margin| {
-            size > margin
-        })?
+        |size, margin| size > margin
     };
+    let close = compared(selector, size, &args.input("margin")?, test)?;
     if !close {
         return Ok(this);
     }

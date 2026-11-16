@@ -1,10 +1,9 @@
 //! The pseudo-UGens of `FFTUnpacking.sc`, and the methods of `PV_ChainUGen`
 //! that take a function.
 
-use super::{Args, elements, lang, number};
-use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize};
+use super::{Args, elements, lang, multi_new, number};
+use crate::builder::{SynthDefBuilder, count_to_usize};
 use crate::catalog::{self, RateMethod};
-use crate::check_inputs;
 use crate::env::flop;
 use crate::error::BuildError;
 use crate::rate::Rate;
@@ -97,30 +96,7 @@ fn pack(
     ];
     names.resize(values.len() + magsphases.len(), "magsphases");
     values.extend(magsphases);
-    builder.expand(
-        "PackFFT",
-        &names,
-        &values,
-        true,
-        &mut |builder, instance| {
-            let inputs = instance.to_vec();
-            let class = catalog::lookup("PackFFT");
-            if let Some(class) = class {
-                check_inputs::check(class.check_inputs, Rate::Control, &inputs).map_err(
-                    |message| BuildError::CheckInputs {
-                        class: "PackFFT".to_owned(),
-                        message,
-                    },
-                )?;
-            }
-            builder.add(
-                NewUGen::new("PackFFT", Rate::Control)
-                    .inputs(inputs)
-                    .outputs([Rate::Control])
-                    .width_first(class.is_some_and(|class| class.is_width_first)),
-            )
-        },
-    )
+    multi_new(builder, "PackFFT", Rate::Control, &names, &values)
 }
 
 /// `PV_ChainUGen:pvcalc`: `func` of the magnitudes and of the phases of the

@@ -1,10 +1,11 @@
 //! The pseudo-UGens of `Osc.sc`.
 
 use super::mix::mix;
+use super::ugen_methods::send_message;
 use super::{Args, lang, number};
 use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;
-use crate::ugen_input::UGenInput;
+use crate::ugen_input::{ArgValue, UGenInput};
 
 /// `SelectX.ar` and `SelectX.kr`: an `XFade2` of the two `Select`s around
 /// `which`. The method takes `wrap`, and `new1` ignores it.
@@ -74,7 +75,11 @@ pub(super) fn select_x_focus(
     let mut weighted = Vec::with_capacity(array.len());
     for (index, input) in array.into_iter().enumerate() {
         let distance = if wrap {
-            lang::moddif(builder, which.clone(), number(index), size.clone())?
+            let given = vec![
+                Some(ArgValue::from(number(index))),
+                Some(ArgValue::from(size.clone())),
+            ];
+            send_message(builder, which.clone(), "moddif", given)?
         } else {
             lang::binary(builder, "absdif", which.clone(), number(index))?
         };

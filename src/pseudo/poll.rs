@@ -1,9 +1,7 @@
 //! The bodies of `Poll.sc`.
 
-use super::{Args, elements, lang, sclang_class};
-use crate::builder::{NewUGen, SynthDefBuilder, symbol_codes};
-use crate::catalog;
-use crate::check_inputs;
+use super::{Args, elements, lang, new1, sclang_class};
+use crate::builder::{SynthDefBuilder, symbol_codes};
 use crate::env::flop;
 use crate::error::BuildError;
 use crate::rate::Rate;
@@ -79,12 +77,5 @@ fn new_poll(
     };
     let mut inputs = vec![trig, input.clone(), trigid.clone()];
     inputs.extend(symbol_codes(&label));
-    let rule = catalog::lookup("Poll").map(|class| class.check_inputs);
-    if let Some(rule) = rule {
-        check_inputs::check(rule, rate, &inputs).map_err(|message| BuildError::CheckInputs {
-            class: "Poll".to_owned(),
-            message,
-        })?;
-    }
-    builder.add(NewUGen::new("Poll", rate).inputs(inputs))
+    new1(builder, "Poll", rate, inputs)
 }

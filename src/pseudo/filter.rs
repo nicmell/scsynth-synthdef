@@ -1,9 +1,7 @@
 //! The pseudo-UGens of `Filter.sc`.
 
 use super::{Args, lang};
-use crate::builder::{NewUGen, SynthDefBuilder};
-use crate::catalog;
-use crate::check_inputs;
+use crate::builder::SynthDefBuilder;
 use crate::env::{Curve, Env, bad, shape_named};
 use crate::error::BuildError;
 use crate::rate::Rate;
@@ -108,16 +106,7 @@ fn new1(
         } else {
             Rate::Control
         };
-        let inputs = [input, time, start];
-        if let Some(class) = catalog::lookup("VarLag") {
-            check_inputs::check(class.check_inputs, rate, &inputs).map_err(|message| {
-                BuildError::CheckInputs {
-                    class: "VarLag".to_owned(),
-                    message,
-                }
-            })?;
-        }
-        return builder.add(NewUGen::new("VarLag", rate).inputs(inputs).outputs([rate]));
+        return super::new1(builder, "VarLag", rate, vec![input, time, start]);
     }
     let env = Env::from_parts(
         vec![start, input.clone()],

@@ -1,12 +1,11 @@
 //! The bodies of `InOut.sc`.
 
 use super::Args;
+use super::ugen_methods::send_message;
 use crate::builder::{NewUGen, SynthDefBuilder};
-use crate::catalog;
-use crate::check_inputs;
 use crate::error::BuildError;
 use crate::rate::Rate;
-use crate::ugen_input::UGenInput;
+use crate::ugen_input::{ArgValue, UGenInput};
 
 /// `Control.kr`.
 pub(super) fn control_kr(
@@ -136,36 +135,13 @@ pub(super) fn lag_controls(
     Ok(UGenInput::Array(outputs))
 }
 
-/// `UGen:lag` with one lag time: a `Lag` at the rate of each channel, as
-/// `Lag.multiNew` adds it, with no passthrough.
+/// `UGen:lag` with one lag time, as `send` sends it.
 pub(super) fn lag(
     builder: &mut SynthDefBuilder,
     input: UGenInput,
     lags: UGenInput,
 ) -> Result<UGenInput, BuildError> {
-    let rule = catalog::lookup("Lag").map(|class| class.check_inputs);
-    builder.expand(
-        "Lag",
-        &["in", "lagTime"],
-        &[input, lags],
-        true,
-        &mut |builder, instance| {
-            let rate = instance[0].rate().unwrap_or(Rate::Scalar);
-            if let Some(rule) = rule {
-                check_inputs::check(rule, rate, instance).map_err(|message| {
-                    BuildError::CheckInputs {
-                        class: "Lag".to_owned(),
-                        message,
-                    }
-                })?;
-            }
-            builder.add(
-                NewUGen::new("Lag", rate)
-                    .inputs(instance.to_vec())
-                    .outputs([rate]),
-            )
-        },
-    )
+    send_message(builder, input, "lag", vec![Some(ArgValue::from(lags))])
 }
 
 /// The numbers of an instance of control values: a control UGen takes no

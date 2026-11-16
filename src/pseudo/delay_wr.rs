@@ -1,10 +1,10 @@
 //! The bodies of `DelayWr.sc`.
 
+use super::ugen_methods::send_message;
 use super::{Args, elements, lang, number};
 use crate::builder::{SynthDefBuilder, count_to_usize};
 use crate::error::BuildError;
-use crate::rate::Rate;
-use crate::ugen_input::UGenInput;
+use crate::ugen_input::{ArgValue, UGenInput};
 
 /// `PingPong.ar`: a delay through a buffer, whose channels come back
 /// through `LocalIn` and `LocalOut`, rotated by `rotate`, as feedback. The
@@ -45,7 +45,8 @@ pub(super) fn ping_pong(
     let back = builder.ugen("LocalIn", "ar", &[("numChannels", channels.clone().into())])?;
     let feedback_channels = lang::binary(builder, "*", back, feedback)?;
     let behind = lang::binary(builder, "-", phase.clone(), delay_samps)?;
-    let read = wrap(builder, behind, 0.0.into(), frames)?;
+    let bounds = vec![Some(ArgValue::from(0.0)), Some(ArgValue::from(frames))];
+    let read = send_message(builder, behind, "wrap", bounds)?;
     let delayed = builder.ugen(
         "BufRd",
         "ar",
@@ -76,21 +77,6 @@ pub(super) fn ping_pong(
         ],
     )?;
     Ok(delayed)
-}
-
-/// `UGen:wrap(lo, hi)`: a `Wrap` at the rate of `input`.
-fn wrap(
-    builder: &mut SynthDefBuilder,
-    input: UGenInput,
-    lo: UGenInput,
-    hi: UGenInput,
-) -> Result<UGenInput, BuildError> {
-    let rate = lang::rate(&input).unwrap_or(Rate::Scalar);
-    builder.ugen(
-        "Wrap",
-        lang::selector_for_rate(rate),
-        &[("in", input.into()), ("lo", lo.into()), ("hi", hi.into())],
-    )
 }
 
 /// `Array:rotate(n)`: element i moves to `sc_mod(i + n, size)`.
