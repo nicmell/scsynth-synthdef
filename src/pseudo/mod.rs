@@ -228,6 +228,7 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("NumChannels", "ar", mix::num_channels),
     ("PMOsc", "ar", pm_osc::pm_osc),
     ("PMOsc", "kr", pm_osc::pm_osc),
+    ("PackFFT", "new", fft_unpacking::pack_fft),
     ("PingPong", "ar", delay_wr::ping_pong),
     ("Poll", "ar", poll::poll),
     ("Poll", "kr", poll::poll),

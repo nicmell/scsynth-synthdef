@@ -4,6 +4,7 @@
 
 mod controls;
 mod envelopes;
+mod fft;
 mod optimize;
 mod pseudo;
 mod wire_buffers;
@@ -105,6 +106,7 @@ pub const NAMES: &[&str] = &[
     "envgate",
     "demandenvgen",
     "wirebufs",
+    "packfft",
 ];
 
 /// The bytes of a golden file.
@@ -208,6 +210,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "controlugens" | "defwrap" | "specs" | "namedcontrol" => controls::definitions(name),
         "env" | "ienv" | "varlag" | "envgate" => envelopes::definitions(name),
         "wirebufs" => wire_buffers::definitions(),
+        "packfft" => fft::definitions(name),
         _ => pseudo::definitions(name),
     }
 }

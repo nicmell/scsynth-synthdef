@@ -209,7 +209,7 @@ var argumentKinds = [
 var bodies = [\AudioControl, \BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD,
 	\Control, \Dstutter, \DynKlang, \DynKlank, \EnvGate, \HilbertFIR, \Klang, \Klank, \LagControl,
 	\LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix, \MultiTap, \NamedControl,
-	\NumChannels, \PMOsc, \PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
+	\NumChannels, \PMOsc, \PackFFT, \PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
 	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT,
 	\VarLag];
 // The classes of the census that have no body, and why.

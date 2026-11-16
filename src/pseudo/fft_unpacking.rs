@@ -1,8 +1,11 @@
 //! The pseudo-UGens of `FFTUnpacking.sc`.
 
-use super::{Args, elements};
-use crate::builder::{SynthDefBuilder, count_to_usize};
+use super::{Args, elements, lang, number};
+use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize};
+use crate::catalog;
+use crate::check_inputs;
 use crate::error::BuildError;
+use crate::rate::Rate;
 use crate::ugen_input::UGenInput;
 
 /// `UnpackFFT.new`: an `Unpack1FFT` of the magnitude, then of the phase, of
@@ -42,6 +45,56 @@ pub(super) fn unpack_fft(
             .flat_map(|(magnitude, phase)| [magnitude, phase])
             .collect(),
     ))
+}
+
+/// `PackFFT.new`: the chain, `bufsize`, `frombin`, `tobin`, `zeroothers`,
+/// the size of `magsphases` and each of its values, as `multiNewList`
+/// expands them. A nil `tobin` is `bufsize / 2`.
+pub(super) fn pack_fft(
+    builder: &mut SynthDefBuilder,
+    args: &Args,
+) -> Result<UGenInput, BuildError> {
+    let bufsize = args.input("bufsize")?;
+    let magsphases = args.array("magsphases")?;
+    let tobin = match args.optional("tobin")? {
+        Some(tobin) => tobin,
+        None => lang::binary(builder, "/", bufsize.clone(), 2.0.into())?,
+    };
+    let mut names = vec!["chain", "bufsize", "frombin", "tobin", "zeroothers"];
+    let mut values = vec![
+        args.input("chain")?,
+        bufsize,
+        args.input("frombin")?,
+        tobin,
+        args.input("zeroothers")?,
+        number(magsphases.len()),
+    ];
+    names.resize(values.len() + magsphases.len(), "magsphases");
+    values.extend(magsphases);
+    builder.expand(
+        "PackFFT",
+        &names,
+        &values,
+        true,
+        &mut |builder, instance| {
+            let inputs = instance.to_vec();
+            let class = catalog::lookup("PackFFT");
+            if let Some(class) = class {
+                check_inputs::check(class.check_inputs, Rate::Control, &inputs).map_err(
+                    |message| BuildError::CheckInputs {
+                        class: "PackFFT".to_owned(),
+                        message,
+                    },
+                )?;
+            }
+            builder.add(
+                NewUGen::new("PackFFT", Rate::Control)
+                    .inputs(inputs)
+                    .outputs([Rate::Control])
+                    .width_first(class.is_some_and(|class| class.is_width_first)),
+            )
+        },
+    )
 }
 
 /// `(first..last)`, as `prSimpleNumberSeries` gives it for Floats: steps of

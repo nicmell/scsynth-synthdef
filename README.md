@@ -630,8 +630,8 @@ it.
 - `MulAdd.new` folds and orders its inputs. Use `madd` instead.
 - An input comes from no argument, or the inputs follow a count:
   `DecodeB2.ar`, `DecodeB2.kr` and `Dwrand.new`.
-- So do `MaxLocalBufs.new`, `PackFFT.new`, `SendPeakRMS.ar`,
-  `SendPeakRMS.kr` and `SetBuf.new`.
+- So do `MaxLocalBufs.new`, `SendPeakRMS.ar`, `SendPeakRMS.kr` and
+  `SetBuf.new`.
 - They need arguments that the probe does not make, such as a `Ref`, a
   `Rect` or an operator: `BinaryOpUGen.new`, `InRect.ar` and `InRect.kr`.
 - So do `LagControl.ir`, `OffsetOut.kr`, `OutputProxy.new` and

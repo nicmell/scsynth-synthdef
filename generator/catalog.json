@@ -28856,8 +28856,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "input 5 maps to no argument"
+          "addable": "pseudo"
         }
       ]
     },

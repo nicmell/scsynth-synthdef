@@ -14028,7 +14028,7 @@ pub(super) static CLASSES: [UGenClass; 419] = [
                     ArgSpec { name: "tobin", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "zeroothers", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("input 5 maps to no argument"),
+                addable: Addable::Pseudo,
             },
         ],
     },
