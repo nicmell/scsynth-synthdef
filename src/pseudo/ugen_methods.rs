@@ -1364,7 +1364,7 @@ fn dpoll_with(
     builder.ugen("Dpoll", "new", &given)
 }
 
-/// `Array:poll` and `dpoll`: the label "UGen Array [i]" for each element
+/// `Array:poll` and `dpoll`: the label `UGen Array [i]` for each element
 /// when `label` is nil, as `Poll` and `Dpoll` expand an array of labels.
 fn array_poll(
     builder: &mut SynthDefBuilder,

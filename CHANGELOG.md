@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.12.0 (2026-11-16)
+
+The instance methods of `UGen` that build graphs, such as `range` and
+`lag`, as sclang 3.14.1 builds them. With them come the ranges of `Env`.
+
+### Added
+
+- `SynthDefBuilder::send` sends one of 42 methods to an output, an array
+  or a number, with the arguments by name and the defaults of `UGen`. An
+  output gets the method of the class of its UGen, as `DUGen` and
+  `LFGauss` have some of their own. An array gets the method of `Array`,
+  and a number the method of `Float`. See
+  [The methods of `UGen`](README.md#the-methods-of-ugen).
+- `SynthDefBuilder::send_env` gives `range`, `exprange` and `curverange`
+  of an `Env`.
+- `BuildError::BadMethod` refuses a message that sclang throws on, or
+  writes without its `Out`.
+- `catalog::ugen_method`, `catalog::ugen_methods`, `UGenMethod`,
+  `catalog::env_range` and `catalog::env_ranges`.
+- `UGenClass::signal_range` and `SignalRange`: 16 classes are unipolar.
+- `generator/catalog.scd` takes a census of the instance methods of
+  `UGen`. It fails on one that no table names.
+- `generator/fixtures.scd` writes the golden files of 0.12:
+  `ugenranges`, `ugenmaps`, `ugenlags`, `ugenmisc`, `ugenreceivers` and
+  `envranges`. Twenty graphs that the crate refuses must break in sclang,
+  or the script fails.
+- `tests/fixtures/arithmetic.json` gains `exp`, `log`, `squared`, `sign`,
+  `fold` and `wrap` of Floats.
+
+### Changed
+
+- `UGenClass` has the field `signal_range`.
+
 ## 0.11.0 (2026-11-16)
 
 `PackFFT.new` and the `pvcalc` methods of `PV_ChainUGen`, as sclang 3.14.1

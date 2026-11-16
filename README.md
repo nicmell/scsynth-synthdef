@@ -584,6 +584,104 @@ A `BuildError::WrongKind` refuses a chain that is not one output of a
 It also refuses `numframes`, `frombin` and `tobin` as outputs, where sclang
 throws, and a value of `func` by name.
 
+### The methods of `UGen`
+
+`send` sends an instance method of `UGen` that builds a graph, such as
+`range` or `lag`, to a receiver: an output, an array or a number. The
+arguments come by name, with the defaults of the method of `UGen` in
+sclang 3.14.1. `send_env` maps the levels of an `Env` in the same way.
+
+```rust
+use scsynth_synthdef::SynthDefBuilder;
+
+// SynthDef(\sweep, { Out.ar(0, SinOsc.ar(LFPulse.kr(2).range(200, 800).lag(0.05)) * 0.1) })
+let mut builder = SynthDefBuilder::new("sweep", vec![])?;
+let pulse = builder.ugen("LFPulse", "kr", &[("freq", 2.0.into())])?;
+let freq = builder.send(pulse, "range", &[("lo", 200.0.into()), ("hi", 800.0.into())])?;
+let freq = builder.send(freq, "lag", &[("t1", 0.05.into())])?;
+let sine = builder.ugen("SinOsc", "ar", &[("freq", freq.into())])?;
+let sound = builder.binary_op("*", sine, 0.1)?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", sound.into())])?;
+let def = builder.finish()?;
+let names: Vec<&str> = def.children.iter().map(|ugen| ugen.name.as_str()).collect();
+assert_eq!(names, ["LFPulse", "MulAdd", "Lag", "SinOsc", "BinaryOpUGen", "Out"]);
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+`LFPulse` is unipolar, so `range` maps 0 to 200 and 1 to 800: a `MulAdd`
+of 600 and 200.
+
+- The 42 methods are `range`, `exprange`, `curverange`, `unipolar` and
+  `bipolar`. Then come the maps `linlin`, `linexp`, `explin`, `expexp`,
+  `lincurve`, `curvelin`, `bilin` and `prune`. Then come `clip`, `fold` and
+  `wrap`, and the lag family: `lag`, `lag2`, `lag3`, `lagud`, `lag2ud`,
+  `lag3ud`, `varlag` and `slew`. Then `blend`, `minNyquist`, `degrad`,
+  `raddeg`, `moddif`, `sanitize`, `poll`, `dpoll` and `checkBadValues`.
+  Last come `snap`, `softRound`, `binaryValue`, `isPositive`,
+  `isNegative`, `isStrictlyPositive`, `|==|`, `degreeToKey` and `if`.
+- The call passes every argument, in its order, to the method that the
+  receiver answers. So it is the call of sclang with every argument by
+  position.
+- An output gets the method of the class of its UGen. `DUGen`, the
+  superclass of `Dseq` and the other demand UGens, has its own `linlin`,
+  `linexp`, `explin` and `expexp`, which compute with operators. `LFGauss`
+  has its own `range`, from the least value of its width. A message that
+  a method sends, as `exprange` sends `linexp`, goes to the class of the
+  receiver too.
+- `range`, `exprange` and `curverange` read the `signalRange` of the
+  class. 16 classes are unipolar, such as `LFPulse`, `Impulse` and
+  `Dust`. An output of a UGen with several outputs is an `OutputProxy`,
+  which is bipolar.
+- The lag family calls `multiNew` at the rate of the receiver, so it skips
+  the passthrough of the rate methods. `lag(0)` adds its `Lag`, and a
+  receiver at scalar or demand rate gives a `Lag` at that rate. `varlag`
+  builds the `VarLag` of `VarLag.kr` in the same way.
+- `clip`, `fold` and `wrap` take `ir` at scalar rate. At demand rate,
+  `clip` is `max(lo, min(hi, x))`. `checkBadValues` gives back the
+  receiver, and adds nothing at scalar or demand rate, as in sclang.
+- An array gets the method of `Array`. Most methods hand the message to
+  each element, as `multiChannelPerform` does. An array among the
+  arguments spreads over the elements, and the shorter array wraps.
+  `degrad`, `raddeg`, the signs and `degreeToKey` send the same arguments
+  to each element. `minNyquist` adds one `SampleRate`. If `label` is nil,
+  `poll` and `dpoll` label each element `UGen Array [i]`.
+- A number gets the method of `Float`. It computes a number where it can,
+  as `0.25.linlin(0, 1, 200, 800)` gives 350. The lag family gives the
+  number itself. An output among the arguments adds UGens, as in sclang.
+
+`BuildError::BadMethod` refuses a message that sclang throws on:
+
+- A receiver that does not understand the message. A number does not
+  understand `range`, `exprange`, `curverange`, `unipolar`, `bipolar`,
+  `prune`, `minNyquist`, `sanitize`, `dpoll`, `checkBadValues` or `if`. An
+  array does not understand `snap`, `softRound`, `binaryValue` or `if`.
+  An empty array is refused too.
+- `fold`, `wrap` and `blend` at demand rate: sclang does not implement
+  them.
+- The test of an `if` on an output, as in `linlin` of a number with an
+  output as `inMin`: "Non Boolean in test."
+- A Boolean: the signs of a number, and `|==|` of two numbers.
+- An output as a bound of `clip`, `fold` or `wrap` of a number, whose
+  primitives take numbers.
+- A nil `clip` of `expexp` on a `DUGen`, which divides it by `inMin`.
+
+It also refuses the definitions that sclang writes without their `Out`.
+At scalar or demand rate, `methodSelectorForRate` names a method that the
+class does not have as a UGen. So `sanitize`, `bilin`, `lincurve` and
+`curvelin` with a curve that is an output, and `blend` at scalar rate,
+build no UGen in sclang.
+
+`XFade2` takes two inputs at audio rate. So `blend` of an input at audio
+rate and one at another rate gives `BuildError::CheckInputs`, as sclang
+throws. `varlag` of a receiver at scalar rate gives it too, from the
+`HPZ1` of its `Changed.kr`.
+
+`send_env` gives `range`, `exprange` and `curverange` of an `Env`: a copy
+of the envelope, with its levels mapped by `linlin`, `linexp` or
+`lincurve` from the least level to the greatest. `BuildError::BadEnv`
+refuses an output among the levels, which `minItem` and `maxItem` cannot
+compare.
+
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
@@ -610,6 +708,14 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
 - `catalog::pv_method` and `catalog::pv_methods` give the instance methods
   of `PV_ChainUGen` that take a function, with their arguments.
   `ArgKind::Function` marks `func`.
+- `catalog::ugen_method` and `catalog::ugen_methods` give the instance
+  methods of `UGen` that build graphs, with their arguments and the
+  defaults of `UGen`. A `UGenMethod` also names the classes whose methods
+  a Float and an `Array` answer, and the subclasses of `UGen` with a
+  method of their own. `UGenClass::signal_range` is the `signalRange` of
+  the class.
+- `catalog::env_range` and `catalog::env_ranges` give `range`, `exprange`
+  and `curverange` of `Env`, with their arguments.
 - A `RateMethod` is `ar`, `kr`, `ir`, `tr` or `new`. It has its arguments,
   each with a kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
@@ -664,7 +770,11 @@ owner, the script fails. Last, the script writes the specs of
 writes the methods of `PV_ChainUGen` that take a function. It fails on a
 spec that is not a `ControlSpec`, and on a warp that is not a symbol. It
 also fails on a class method of `Env`, or an instance method of
-`PV_ChainUGen`, that no table names.
+`PV_ChainUGen`, that no table names. So it does on an instance method of
+`UGen`, and on a `signalRange` that is neither `\bipolar` nor
+`\unipolar`. For each method of `UGen` that builds a graph, it writes the
+classes whose methods a Float and an `Array` answer. It also writes the
+subclasses that have a method of their own.
 
 The script also reads the plugins at the tag. Each unit inside one of the
 two macros that set `kUnitDef_CantAliasInputsToOutputs` gets `cant_alias`.
@@ -851,7 +961,21 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - The `fill` methods of `Mix`, `Splay` and `SplayAz`, which take a
   function: build the array, then call `new`, `ar` or `kr`.
 - Numbers are the Floats of sclang. sclang keeps its Integers apart, but
-  gives the same values for the operators of the pseudo-UGens.
+  gives the same values for the operators of the pseudo-UGens. `send`
+  takes the methods of `Float` for every number. An Integer of sclang
+  wraps with `hi` included: `3.wrap(0, 2)` gives 0, and `3.0.wrap(0, 2)`
+  gives 1.0.
+- The arguments of `send`: they come by name, and go to the method by
+  position, with the defaults of the method of `UGen`. In sclang the
+  method of a number or an array has defaults of its own, as `Float:clip`
+  has none. An `Array` also drops the keywords of its methods.
+- A nil argument with a default: `send` cannot pass it. Give `none` as the
+  `clip` of the maps, which sclang takes as no clip too. Only `expexp` of a
+  `DUGen` throws on a nil `clip`.
+- An empty array as the receiver of `send`: sclang throws for most
+  methods, and gives an empty array for some. `send` refuses it.
+- A `Scale` as the `scale` of `degreeToKey` of a number: the crate takes
+  an array.
 - A spec as an array or a `ControlSpec`, such as `[0, 1, \lin, 0, 0.5]`:
   the `spec` of `NamedControl` takes a name of `catalog::specs`. Give the
   default of such a spec as the values. sclang keeps the spec only in the
@@ -869,13 +993,9 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-These are not in version 0.11, in the order of their value for sc-app3:
+This is not in version 0.12, the next item of value for sc-app3:
 
-1. The methods of `UGen` that build graphs, such as `range`, `exprange` and
-   `linlin`, and with them `range`, `exprange` and `curverange` of `Env`.
-   `range` needs the `signalRange` of each class, which the catalogue does
-   not measure yet.
-2. sc3-plugins
+1. sc3-plugins
 
 Also left out: the view of `SynthDesc`, with its inputs, outputs and
 metadata, the specs included. So are the pseudo-UGens `AudioIn` and
@@ -885,7 +1005,9 @@ adds the UGens of a method at its call.
 
 Of `Env`, the crate also leaves out the setters, the instance `circle` and
 `blend`. The methods of the language, such as `at`, `plot` and `test`, are
-out too.
+out too. Of the instance methods of `UGen`, it leaves out those that give
+objects of the language, such as `@` and `asComplex`. It also leaves out
+`scope` and `belaScope`, which play.
 
 ## Tests
 
