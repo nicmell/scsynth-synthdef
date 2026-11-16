@@ -5,6 +5,7 @@
 mod controls;
 mod envelopes;
 mod fft;
+pub mod nrt;
 mod optimize;
 mod pseudo;
 mod ugen_methods;
@@ -44,7 +45,13 @@ pub fn golden(name: &str) -> Vec<u8> {
 
 /// The paths of all the golden files, sorted.
 pub fn golden_files() -> Vec<PathBuf> {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
+    golden_files_in("tests/fixtures")
+}
+
+/// The paths of the golden files of the folder `folder` of the crate,
+/// sorted.
+pub fn golden_files_in(folder: &str) -> Vec<PathBuf> {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join(folder);
     let mut files: Vec<PathBuf> = fs::read_dir(root)
         .expect("the folder of golden files")
         .map(|entry| {
@@ -61,7 +68,13 @@ pub fn golden_files() -> Vec<PathBuf> {
 /// The count of wire buffers of each definition of each golden file, by the
 /// name of the file and the name of the definition.
 pub fn golden_wire_buffers() -> BTreeMap<String, BTreeMap<String, usize>> {
-    golden_files()
+    wire_buffers_of(&golden_files())
+}
+
+/// The count of wire buffers of each definition of each file of `files`, by
+/// the name of the file and the name of the definition.
+pub fn wire_buffers_of(files: &[PathBuf]) -> BTreeMap<String, BTreeMap<String, usize>> {
+    files
         .iter()
         .map(|path| {
             let bytes = fs::read(path).expect("a golden file reads");

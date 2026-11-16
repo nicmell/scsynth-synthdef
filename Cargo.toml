@@ -22,6 +22,11 @@ serde_json = "1.0.60"
 serde = ["dep:serde"]
 sc3-plugins = []
 
+[[test]]
+name = "sc3_plugins"
+path = "tests/sc3_plugins/main.rs"
+required-features = ["sc3-plugins"]
+
 [package.metadata.docs.rs]
 all-features = true
 
