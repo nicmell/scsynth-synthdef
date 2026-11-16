@@ -42634,6 +42634,75 @@
       "addable": "pseudo"
     }
   ],
+  "env_ranges": [
+    {
+      "selector": "range",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo"
+    },
+    {
+      "selector": "exprange",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0.01
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        }
+      ],
+      "addable": "pseudo"
+    },
+    {
+      "selector": "curverange",
+      "args": [
+        {
+          "name": "lo",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "hi",
+          "kind": "signal",
+          "default": {
+            "float": 1
+          }
+        },
+        {
+          "name": "curve",
+          "kind": "signal",
+          "default": {
+            "float": -4
+          }
+        }
+      ],
+      "addable": "pseudo"
+    }
+  ],
   "pv_methods": [
     {
       "selector": "pvcalc",

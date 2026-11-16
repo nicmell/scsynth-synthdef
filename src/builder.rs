@@ -400,6 +400,34 @@ impl SynthDefBuilder {
         self.transaction(|builder| pseudo::env::build(builder, method, values))
     }
 
+    /// `env.range(lo, hi)`, `env.exprange(lo, hi)` and
+    /// `env.curverange(lo, hi, curve)` of sclang: a copy of the envelope,
+    /// with its levels mapped by `linlin`, `linexp` or `lincurve` from the
+    /// least of them to the greatest, as [`send`](Self::send) maps an array.
+    /// The catalogue gives the arguments and their defaults (see
+    /// [`catalog::env_ranges`]).
+    ///
+    /// # Errors
+    ///
+    /// [`BuildError::BadMethod`] for a selector that the catalogue does not
+    /// have, and [`BuildError::BadEnv`] for levels that `minItem` and
+    /// `maxItem` cannot compare, such as an output among numbers, where
+    /// sclang throws. Also the errors of the arguments, and of the UGens that
+    /// the map adds. A call that fails leaves the build as it was.
+    pub fn send_env(
+        &mut self,
+        env: &Env,
+        selector: &str,
+        args: &[(&str, ArgValue)],
+    ) -> Result<Env, BuildError> {
+        let method = catalog::env_range(selector).ok_or_else(|| BuildError::BadMethod {
+            selector: selector.to_owned(),
+            message: "it is no range of Env".to_owned(),
+        })?;
+        let values = bind_optional("Env", method, args)?;
+        self.transaction(|builder| pseudo::env::range(builder, env, method, values))
+    }
+
     /// `chain.pvcalc(numframes, func, frombin, tobin, zeroothers)` of
     /// sclang. It unpacks the bins of `chain` from `frombin` to `tobin`, as
     /// `UnpackFFT` does, and calls `func` with the array of their magnitudes

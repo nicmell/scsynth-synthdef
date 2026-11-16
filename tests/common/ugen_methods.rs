@@ -2,7 +2,7 @@
 //! built with `SynthDefBuilder::send`. `generator/fixtures.scd` holds the
 //! sclang code of each.
 
-use scsynth_synthdef::{ArgValue, SynthDef, SynthDefBuilder, UGenInput};
+use scsynth_synthdef::{ArgValue, Env, SynthDef, SynthDefBuilder, UGenInput};
 
 use super::controls::kr;
 use super::pseudo::{def, dseq, impulse, input, out, sine};
@@ -16,6 +16,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "ugenlags" => [lags(), varlags()].concat(),
         "ugenmisc" => [misc(), checks(), more_misc()].concat(),
         "ugenreceivers" => [arrays(), numbers()].concat(),
+        "envranges" => env_ranges(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -1070,4 +1071,70 @@ fn bilin_numbers() -> Vec<(&'static str, ArgValue)> {
         .zip([0.5, 0.0, 1.0, 0.2, 0.0, 1.0])
         .map(|(name, value)| (name, input(value)))
         .collect()
+}
+
+/// `Env([0, 1, 0.5], [1, 1])`.
+fn env(b: &mut SynthDefBuilder) -> Env {
+    let args = [
+        ("levels", input(array(&[0.0, 1.0, 0.5]))),
+        ("times", input(array(&[1.0, 1.0]))),
+    ];
+    b.env("new", &args).unwrap()
+}
+
+/// `Out.kr(0, EnvGen.kr(env.selector(args), gate))`.
+fn ranged_out(
+    b: &mut SynthDefBuilder,
+    env: &Env,
+    selector: &str,
+    args: &[(&str, ArgValue)],
+    gate: Option<UGenInput>,
+) {
+    let ranged = b
+        .send_env(env, selector, args)
+        .unwrap_or_else(|error| panic!("{selector}: {error}"));
+    let mut all = vec![("envelope", ArgValue::Env(ranged))];
+    all.extend(gate.map(|gate| ("gate", input(gate))));
+    let generated = by_name(b, "EnvGen", "kr", &all);
+    out(b, "kr", generated);
+}
+
+/// The cases of `envranges`.
+fn env_ranges() -> Vec<SynthDef> {
+    vec![
+        def("envranges_range", vec![], |b| {
+            let e = env(b);
+            ranged_out(b, &e, "range", &lo_hi(2.0, 4.0), None);
+        }),
+        def("envranges_exprange", vec![], |b| {
+            let e = env(b);
+            ranged_out(b, &e, "exprange", &lo_hi(0.01, 1.0), None);
+        }),
+        def("envranges_curverange", vec![], |b| {
+            let e = env(b);
+            let args = [
+                ("lo", input(0.0)),
+                ("hi", input(1.0)),
+                ("curve", input(-4.0)),
+            ];
+            ranged_out(b, &e, "curverange", &args, None);
+        }),
+        def("envranges_defaults", vec![], |b| {
+            let e = b.env("perc", &[]).unwrap();
+            ranged_out(b, &e, "range", &[], None);
+        }),
+        def("envranges_ugen", vec![], |b| {
+            let e = env(b);
+            let lo = kr(b, "lo", 2.0);
+            ranged_out(b, &e, "range", &lo_hi(lo, 4.0), None);
+        }),
+        def("envranges_adsr", vec![], |b| {
+            let e = b.env("adsr", &[]).unwrap();
+            let ranged = b.send_env(&e, "range", &lo_hi(2.0, 4.0)).unwrap();
+            let gate = kr(b, "gate", 1.0);
+            let all = [("envelope", ArgValue::Env(ranged)), ("gate", input(gate))];
+            let generated = by_name(b, "EnvGen", "kr", &all);
+            out(b, "kr", generated);
+        }),
+    ]
 }

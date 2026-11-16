@@ -183,7 +183,7 @@ pub(crate) fn send(
 /// Sends `selector` to `receiver` as a method of sclang sends it: `given`
 /// holds the values of the first arguments, and the others take the
 /// defaults of `UGen`.
-fn send_message(
+pub(super) fn send_message(
     builder: &mut SynthDefBuilder,
     receiver: UGenInput,
     selector: &str,

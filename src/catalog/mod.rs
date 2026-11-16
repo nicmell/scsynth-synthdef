@@ -465,6 +465,22 @@ pub fn env_methods() -> &'static [RateMethod] {
     &generated::ENV_METHODS
 }
 
+/// The instance method of `Env` with this selector that maps its levels to
+/// a range, such as `exprange`.
+#[must_use]
+pub fn env_range(selector: &str) -> Option<&'static RateMethod> {
+    env_ranges()
+        .iter()
+        .find(|method| method.selector == selector)
+}
+
+/// The instance methods of `Env` that map its levels to a range, with their
+/// arguments.
+#[must_use]
+pub fn env_ranges() -> &'static [RateMethod] {
+    &generated::ENV_RANGES
+}
+
 /// The instance method of `PV_ChainUGen` with this selector that takes a
 /// function, such as `pvcalc`.
 #[must_use]
@@ -500,8 +516,9 @@ pub fn ugen_methods() -> &'static [UGenMethod] {
 mod tests {
     use super::{
         Addable, ArgDefault, ArgKind, ArrayExpansion, CheckInputs, ConvertEnv, FftSize, InputSlot,
-        Optimize, Outputs, SignalRange, UGenMethod, Wiring, all, env_method, env_methods, lookup,
-        pseudo_all, pseudo_lookup, pv_method, pv_methods, spec, specs, ugen_method, ugen_methods,
+        Optimize, Outputs, SignalRange, UGenMethod, Wiring, all, env_method, env_methods,
+        env_range, env_ranges, lookup, pseudo_all, pseudo_lookup, pv_method, pv_methods, spec,
+        specs, ugen_method, ugen_methods,
     };
     use crate::rate::Rate;
 
@@ -657,6 +674,28 @@ mod tests {
         );
         assert_eq!(pv_method("pvcalc2").unwrap().args[0].name, "chain2");
         assert!(pv_method("fftSize").is_none());
+    }
+
+    #[test]
+    fn the_ranges_of_env_are_range_exprange_and_curverange() {
+        // Fact 12 of the plan of 0.12.
+        let ranges: Vec<(&str, Vec<Option<ArgDefault>>)> = env_ranges()
+            .iter()
+            .map(|method| {
+                let defaults = method.args.iter().map(|arg| arg.default).collect();
+                (method.selector, defaults)
+            })
+            .collect();
+        let float = |value| Some(ArgDefault::Float(value));
+        assert_eq!(
+            ranges,
+            [
+                ("range", vec![float(0.0), float(1.0)]),
+                ("exprange", vec![float(0.01), float(1.0)]),
+                ("curverange", vec![float(0.0), float(1.0), float(-4.0)]),
+            ]
+        );
+        assert!(env_range("delay").is_none());
     }
 
     #[test]

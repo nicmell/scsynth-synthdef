@@ -114,6 +114,7 @@ pub const NAMES: &[&str] = &[
     "ugenlags",
     "ugenmisc",
     "ugenreceivers",
+    "envranges",
 ];
 
 /// The bytes of a golden file.
@@ -218,7 +219,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "env" | "ienv" | "varlag" | "envgate" => envelopes::definitions(name),
         "wirebufs" => wire_buffers::definitions(),
         "packfft" | "pvcalc" => fft::definitions(name),
-        "ugenranges" | "ugenmaps" | "ugenlags" | "ugenmisc" | "ugenreceivers" => {
+        "ugenranges" | "ugenmaps" | "ugenlags" | "ugenmisc" | "ugenreceivers" | "envranges" => {
             ugen_methods::definitions(name)
         }
         _ => pseudo::definitions(name),

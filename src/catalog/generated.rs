@@ -20847,6 +20847,34 @@ pub(super) static ENV_METHODS: [RateMethod; 14] = [
             },
 ];
 
+pub(super) static ENV_RANGES: [RateMethod; 3] = [
+            RateMethod {
+                selector: "range",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "exprange",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.01)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "curverange",
+                args: &[
+                    ArgSpec { name: "lo", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "hi", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "curve", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-4.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+];
+
 pub(super) static PV_METHODS: [RateMethod; 3] = [
             RateMethod {
                 selector: "pvcalc",

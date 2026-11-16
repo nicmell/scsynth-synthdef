@@ -481,6 +481,7 @@ fn render_catalog(catalog: &Value) -> String {
     render_pseudo_classes(&mut rendered, catalog);
     render_specs(&mut rendered, catalog);
     render_methods(&mut rendered, catalog, "env_methods", "ENV_METHODS");
+    render_methods(&mut rendered, catalog, "env_ranges", "ENV_RANGES");
     render_methods(&mut rendered, catalog, "pv_methods", "PV_METHODS");
     render_ugen_methods(&mut rendered, catalog);
     rendered

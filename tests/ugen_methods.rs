@@ -238,3 +238,21 @@ fn an_array_does_not_understand_snap() {
         .unwrap_err();
     assert_eq!(bad(&error), Some("snap"), "{error}");
 }
+
+#[test]
+fn the_ranges_of_env_refuse_an_output_among_the_levels() {
+    // refused_env_range_ugen.
+    let mut builder = builder();
+    let level = control(&mut builder, "l", 1.0);
+    let levels = UGenInput::Array(vec![0.0.into(), level, 0.0.into()]);
+    let times = UGenInput::Array(vec![1.0.into(), 1.0.into()]);
+    let env = builder
+        .env("new", &[("levels", levels.into()), ("times", times.into())])
+        .unwrap();
+    let args = [("lo", ArgValue::from(2.0)), ("hi", 4.0.into())];
+    let error = builder.send_env(&env, "range", &args).unwrap_err();
+    assert!(
+        matches!(error, BuildError::BadEnv { ref method, .. } if method == "Env:range"),
+        "{error}"
+    );
+}

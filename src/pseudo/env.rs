@@ -1,5 +1,6 @@
 //! The constructors of `Env.sc`: a body for each class method of `Env` that
-//! makes an envelope, and the array of `asArrayForInterpolation`.
+//! makes an envelope, the ranges of an envelope, and the array of
+//! `asArrayForInterpolation`.
 
 use super::{Args, elements, lang, number};
 use crate::builder::SynthDefBuilder;
@@ -32,6 +33,59 @@ static BODIES: &[(&str, Body)] = &[
     ("triangle", triangle),
     ("xyc", xyc),
 ];
+
+/// `Env:range`, `exprange` and `curverange`: a copy of the envelope, with its
+/// levels mapped by `linlin`, `linexp` or `lincurve` from `levels.minItem`
+/// to `levels.maxItem`.
+pub(crate) fn range(
+    builder: &mut SynthDefBuilder,
+    env: &Env,
+    method: &'static RateMethod,
+    values: Vec<Option<ArgValue>>,
+) -> Result<Env, BuildError> {
+    let name = format!("Env:{}", method.selector);
+    let low = extreme(&env.levels, &name, |level, least| level < least)?;
+    let high = extreme(&env.levels, &name, |level, greatest| level > greatest)?;
+    let map = match method.selector {
+        "range" => "linlin",
+        "exprange" => "linexp",
+        _ => "lincurve",
+    };
+    let mut given = vec![Some(ArgValue::from(low)), Some(ArgValue::from(high))];
+    given.extend(values);
+    let levels = UGenInput::Array(env.levels.clone());
+    let mapped = super::ugen_methods::send_message(builder, levels, map, given)?;
+    Ok(Env {
+        levels: elements(mapped),
+        ..env.clone()
+    })
+}
+
+/// `minItem` or `maxItem` of the levels: the first level that no later one
+/// beats. sclang throws "Non Boolean in test." on a comparison that is not of
+/// two numbers.
+fn extreme(
+    levels: &[UGenInput],
+    name: &str,
+    beats: fn(f64, f64) -> bool,
+) -> Result<UGenInput, BuildError> {
+    let mut levels = levels.iter();
+    let mut best = levels
+        .next()
+        .cloned()
+        .ok_or_else(|| bad(name, "the envelope has no levels"))?;
+    for level in levels {
+        match (level, &best) {
+            (&UGenInput::Number(level), &UGenInput::Number(current)) => {
+                if beats(level, current) {
+                    best = UGenInput::Number(level);
+                }
+            }
+            _ => return Err(bad(name, "Non Boolean in test.")),
+        }
+    }
+    Ok(best)
+}
 
 /// Runs the body of the class method `method` of `Env` on its bound
 /// arguments.

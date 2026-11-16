@@ -372,6 +372,9 @@ var notEnvMethods = [
 	[\shapeNumber, "gives the number of a shape"]
 ];
 
+// The instance methods of Env that map its levels to a range.
+var envRanges = [\range, \exprange, \curverange];
+
 // The instance methods of PV_ChainUGen that take a function, and why the
 // others do not count.
 var pvMethods = [\pvcalc, \pvcalc2, \pvcollect];
@@ -460,7 +463,7 @@ var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansio
 var testPassthrough, testSilence, testAudioTogether;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
-var classes, pseudoClasses, specs, envs, pvs, ugens, addable = 0, methods = 0, pseudo = 0;
+var classes, pseudoClasses, specs, envs, ranges, pvs, ugens, addable = 0, methods = 0, pseudo = 0;
 var helpDir, json;
 var cantAlias = List.new;
 
@@ -1357,6 +1360,11 @@ try {
 		if (method.isNil) { fail.("Env has no class method %".format(selector)) };
 		describeArgs.(Env, selector, method, Env)[1] ++ [\addable -> "pseudo"]
 	};
+	ranges = envRanges.collect { |selector|
+		var method = Env.findMethod(selector);
+		if (method.isNil) { fail.("Env has no method %".format(selector)) };
+		describeArgs.(Env, selector, method, Env)[1] ++ [\addable -> "pseudo"]
+	};
 
 	json = toJSON.([
 		\sclang -> Main.version,
@@ -1365,15 +1373,18 @@ try {
 		\pseudo_classes -> pseudoClasses,
 		\specs -> specs,
 		\env_methods -> envs,
+		\env_ranges -> ranges,
 		\pv_methods -> pvs,
 		\ugen_methods -> ugens
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
 		++ "% pseudo-UGen methods, % classes outside UGen, % specs, % methods of Env, "
-		++ "% methods of PV_ChainUGen, % units that cannot alias, % methods of UGen")
+		++ "% ranges of Env, % methods of PV_ChainUGen, % units that cannot alias, "
+		++ "% methods of UGen")
 		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
-			pseudoClasses.size, specs.size, envs.size, pvs.size, cantAlias.size, ugens.size).postln;
+			pseudoClasses.size, specs.size, envs.size, ranges.size, pvs.size, cantAlias.size,
+			ugens.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;
