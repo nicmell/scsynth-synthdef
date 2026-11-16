@@ -1,5 +1,6 @@
 //! The values that a build passes from UGen to UGen.
 
+use crate::env::{Curve, Env};
 use crate::rate::Rate;
 
 /// An input of a UGen during a build: a number, an output of a UGen, or an
@@ -86,6 +87,10 @@ pub enum ArgValue {
     Text(String),
     /// A boolean, such as `levelComp` of `Splay`.
     Bool(bool),
+    /// An envelope, such as the `envelope` of `EnvGen`.
+    Env(Env),
+    /// A curve of an envelope, such as the `curve` of `Env.perc`.
+    Curve(Curve),
 }
 
 impl From<UGenInput> for ArgValue {
@@ -133,5 +138,17 @@ impl From<String> for ArgValue {
 impl From<bool> for ArgValue {
     fn from(value: bool) -> Self {
         Self::Bool(value)
+    }
+}
+
+impl From<Env> for ArgValue {
+    fn from(env: Env) -> Self {
+        Self::Env(env)
+    }
+}
+
+impl From<Curve> for ArgValue {
+    fn from(curve: Curve) -> Self {
+        Self::Curve(curve)
     }
 }

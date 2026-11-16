@@ -3,6 +3,7 @@
 mod builder;
 pub mod catalog;
 mod check_inputs;
+mod env;
 mod error;
 mod file;
 mod limits;
@@ -15,6 +16,7 @@ mod topo;
 mod ugen_input;
 
 pub use builder::{Arg, ArgRate, NewUGen, SynthDefBuilder};
+pub use env::{Curve, Env};
 pub use error::{
     BuildError, CountKind, LimitError, LimitErrorKind, NameKind, ReadError, ReadErrorKind,
 };

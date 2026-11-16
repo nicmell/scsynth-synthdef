@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.9.0 (2026-11-16)
+
+Envelopes, as sclang 3.14.1 builds them: `Env`, `VarLag` and `EnvGate`.
+
+### Added
+
+- `SynthDefBuilder::env` makes an `Env` by a class method of `Env`, with
+  the arguments by name and the defaults of sclang. It takes `new`,
+  `newClear`, `triangle`, `sine`, `perc`, `linen` and `xyc`. It also takes
+  `pairs`, `step`, `cutoff`, `dadsr`, `adsr`, `asr` and `circle`. See
+  [Envelopes](README.md#envelopes).
+- `Env` and `Curve`, with `Env::as_array`, `Env::as_multichannel_array`
+  and `Env::delay`. `SynthDefBuilder::env_array_for_interpolation` gives the
+  form of `IEnvGen`.
+- `EnvGen` and `IEnvGen` take an `Env` as their `envelope`, as
+  `convertEnv` does. Several channels of `IEnvGen` expand with the index.
+- `ugen` adds `VarLag.ar`, `VarLag.kr` and `EnvGate.new`.
+- `ArgValue::Env` and `ArgValue::Curve`, `ArgKind::Curve` and
+  `ArgDefault::Floats`. `UGenClass::convert_env`, `ConvertEnv`,
+  `catalog::env_method` and `catalog::env_methods`.
+- `BuildError::BadEnv`, for an envelope that sclang throws on.
+- `generator/fixtures.scd` writes the golden files of 0.9: `env`, `ienv`,
+  `varlag` and `envgate`. Six graphs that the crate refuses must break in
+  sclang, or the script fails.
+
+### Changed
+
+- `VarLag.ar` and `VarLag.kr` no longer give `NotAddable`. `ugen` refuses
+  19 methods, from 21.
+
 ## 0.8.0 (2026-11-15)
 
 The controls that a graph function makes after its arguments, as sclang

@@ -87,6 +87,9 @@ assert_eq!(def.children.len(), 3);
 - `wrap`, `control_names`, and `ugen` with `NamedControl` and the classes
   of controls add controls after the arguments (see
   [Controls inside the graph](#controls-inside-the-graph)).
+- `env` makes an envelope by a class method of `Env`, such as `perc`.
+  `EnvGen` and `IEnvGen` take it as their `envelope` (see
+  [Envelopes](#envelopes)).
 - `ugen` adds a UGen by its class name and the selector of a rate method,
   `ar`, `kr`, `ir`, `tr` or `new`, with the arguments by name. The catalogue
   gives the order of the arguments, their defaults, the wiring and the
@@ -464,6 +467,68 @@ assert_eq!(def.controls, [0.1, 440.0, 0.0]);
 - Values and lags of `LagControl.kr` that differ in size: sclang gives nil,
   and its reader throws.
 
+### Envelopes
+
+`env` makes an envelope by a class method of `Env`, with the arguments by
+name and the defaults of sclang 3.14.1. `EnvGen` and `IEnvGen` take the
+`Env` as their `envelope`.
+
+```rust
+use scsynth_synthdef::{Arg, SynthDefBuilder};
+
+// SynthDef(\adsr, { |gate = 1|
+//     Out.ar(0, SinOsc.ar * EnvGen.kr(Env.adsr(sustainLevel: 0.7), gate, doneAction: 2))
+// })
+let mut builder = SynthDefBuilder::new("adsr", vec![Arg::new("gate", 1.0)])?;
+let gate = builder.arguments()[0].clone();
+let sine = builder.ugen("SinOsc", "ar", &[])?;
+let env = builder.env("adsr", &[("sustainLevel", 0.7.into())])?;
+assert_eq!(env.release_node, Some(2.0));
+let level = builder.ugen(
+    "EnvGen",
+    "kr",
+    &[("envelope", env.into()), ("gate", gate.into()), ("doneAction", 2.0.into())],
+)?;
+let sound = builder.binary_op("*", sine, level)?;
+builder.ugen("Out", "ar", &[("bus", 0.0.into()), ("channelsArray", sound.into())])?;
+assert_eq!(builder.finish()?.children.len(), 5);
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
+- The constructors are `new`, `newClear`, `triangle`, `sine`, `perc`,
+  `linen`, `xyc`, `pairs`, `step`, `cutoff`, `dadsr`, `adsr`, `asr` and
+  `circle`. Each does its math at the time of the `Env`. So `adsr` with
+  outputs as `peakLevel` and `sustainLevel` adds their `*` before the UGens
+  that follow. `circle` adds `Impulse`, `Delay1` and `Latch`.
+- A `Curve` is a shape by name, a value or an array. The shapes are `step`,
+  `lin`, `exp`, `sin`, `wel`, `sqr`, `cub` and `hold`, and long names such
+  as `linear`. A value is the shape 5, with this curvature. An array gives
+  one curve per segment, in turn, or one per channel. A `curve` argument
+  also takes a text as a shape, and an input as values.
+- `Env::as_array` gives the array that `EnvGen` reads, and
+  `Env::as_multichannel_array` keeps the outer array of one channel.
+  `env_array_for_interpolation` gives the form of `IEnvGen`. When a time is
+  an output, its sum of the times adds UGens, as `times.sum` does.
+  `Env::delay` puts a delay before the envelope. An array among the levels
+  or the curves makes channels.
+- `EnvGen` takes an `Env` through `as_array`. `IEnvGen` takes its channels,
+  and several channels expand with the index, as `IEnvGen.convertEnv`
+  does. For `Env.kr` and `Env.ar` of sclang, add `EnvGen.kr` and
+  `EnvGen.ar` of the `Env` with `ugen`.
+- `VarLag.ar` and `VarLag.kr` give back the input and its `madd` for an
+  input at scalar rate, or a `time` of 0. A curve of 1 makes a real
+  `VarLag`. Any other curve makes the `EnvGen` of an envelope of two
+  levels, which `Changed` and `Impulse` trigger.
+- `EnvGate.new` makes `\gate.kr(1)` and `\fadeTime.kr(0.02)` for the
+  arguments that are nil, as `NamedControl` makes them. Then it makes the
+  `EnvGen` of its envelope.
+
+`BuildError::BadEnv` refuses an envelope that sclang throws on:
+
+- An envelope with no levels.
+- A shape that sclang does not know, also as the `warp` of `VarLag`.
+- Levels and times of `Env.step` that differ in size.
+
 ## The catalogue
 
 The module `catalog` holds the 419 UGen classes of the core class library
@@ -482,6 +547,9 @@ classes outside `UGen` that the crate builds, such as `LinLin`.
 - `catalog::spec` and `catalog::specs` give the 23 `ControlSpec`s of
   `Spec.specs`: the range, the warp, the step, the default and the units
   of each name, such as `freq`.
+- `catalog::env_method` and `catalog::env_methods` give the class methods
+  of `Env` that make an envelope, with their arguments.
+  `UGenClass::convert_env` tells how a class takes an `Env`.
 - A `RateMethod` is `ar`, `kr`, `ir`, `tr` or `new`. It has its arguments,
   each with a kind and a default, and an `Addable`.
 - `Addable::Yes` holds the `Wiring`: what the method gives `UGen:new1`. It
@@ -509,7 +577,7 @@ two instances, instance i with element i. An array inside an array must
 make three. Last, the array argument takes `[[e0, e1], e2]`, then
 `[e2, [e0, e1]]`. The instances that they make give its `ArrayExpansion`.
 If one instance keeps the array among its inputs, the method has none.
-581 of the 635 methods are addable with a wiring, and 63 have a body. Most
+581 of the 635 methods are addable with a wiring, and 66 have a body. Most
 of the others do more than `UGen:new1` does:
 
 - The pseudo-UGens without a body, such as `Dunique`, create
@@ -528,9 +596,12 @@ class is in no table, the script fails. Two more tables name the methods
 of the Lag family and the arguments whose zeros become silence. Probes
 test each entry. If one does not hold, the script fails. Two more tables
 map the class that owns `optimizeGraph` and `fftSize` to `optimize` and
-`fft_size`. If no table names the owner, the script fails. Last, the
-script writes the specs of `Spec.specs`. It fails on a spec that is not a
-`ControlSpec`, and on a warp that is not a symbol.
+`fft_size`. One more maps the class that owns `convertEnv` to
+`convert_env`. If no table names the owner, the script fails. Last, the
+script writes the specs of `Spec.specs`, and the class methods of `Env`
+that make an envelope. It fails on a spec that is not a `ControlSpec`, and
+on a warp that is not a symbol. It also fails on a class method of `Env`
+that no table names.
 
 The catalogue gives the page of each class in the help, and not its
 summary: the help of SuperCollider is GPL-3, and the crate copies none of
@@ -542,7 +613,6 @@ it.
 
 - These pseudo-UGens have no body. `Dunique.new` builds its reader at each
   use as an input, and `InBus.ar` and `InBus.kr` read a `Bus` of sclang.
-- `VarLag.ar` and `VarLag.kr` build an `Env` with their default warp.
 - `MulAdd.new` folds and orders its inputs. Use `madd` instead.
 - An input comes from no argument, or the inputs follow a count:
   `DecodeB2.ar`, `DecodeB2.kr` and `Dwrand.new`.
@@ -685,24 +755,32 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   the result, sclang skips the call. `ugen` refuses it.
 - `LagControl.kr` with no values: sclang adds nothing, and `ugen` refuses
   it.
+- A release or loop node of an `Env` that is an output: the crate takes
+  numbers, so `delay` needs no math.
+- A name as the curve of a triplet of `Env.xyc`: use `Env.pairs` with a
+  curve per segment.
 
 ## Left out
 
-These are not in version 0.8, in the order of their value for sc-app3:
+These are not in version 0.9, in the order of their value for sc-app3:
 
-1. `Env`, `VarLag`, and `EnvGate`, which waits for `Env`
-2. The `pvcalc` methods of `PV_ChainUGen`, which take a function and need
+1. The `pvcalc` methods of `PV_ChainUGen`, which take a function and need
    `PackFFT`
-3. sc3-plugins
+2. sc3-plugins
 
 Also left out: the view of `SynthDesc` (its inputs, outputs and metadata,
 the specs included), and the count of interconnect buffers. So are the
 pseudo-UGens `AudioIn` and `SplayZ`, deprecated since 3.10, and `InBus`,
-`XIn` and `XInFeedback` of `JITLib`. `Dunique` builds a reader at each use as an input, and the
-crate adds the UGens of a method at its call. The methods of `UGen` that
-build graphs, such as `range` and `linlin`, are not pseudo-UGens. `range`
-needs the `signalRange` of each class, which the catalogue does not measure
-yet.
+`XIn` and `XInFeedback` of `JITLib`. `Dunique` builds a reader at each use
+as an input, and the crate adds the UGens of a method at its call. The
+methods of `UGen` that build graphs, such as `range` and `linlin`, are not
+pseudo-UGens. `range` needs the `signalRange` of each class, which the
+catalogue does not measure yet.
+
+Of `Env`, the crate leaves out `range`, `exprange` and `curverange`, which
+need `linlin` and its family. It also leaves out the setters, the instance
+`circle` and `blend`. The methods of the language, such as `at`, `plot`
+and `test`, are out too.
 
 ## Tests
 

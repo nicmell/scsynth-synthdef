@@ -478,6 +478,16 @@ pub enum BuildError {
         /// What fails in sclang.
         message: String,
     },
+    /// An envelope that sclang 3.14.1 throws on: no levels, a shape that it
+    /// does not know, levels and times of `Env.step` that differ in size,
+    /// or a `warp` of `VarLag` that it does not know.
+    #[non_exhaustive]
+    BadEnv {
+        /// The method, such as `Env.step`.
+        method: String,
+        /// What fails in sclang.
+        message: String,
+    },
     /// A control that sclang 3.14.1 throws on, or writes a broken
     /// definition for. A `NamedControl` takes other values, another rate or
     /// other fixed lags than the first use of its name, names an unknown
@@ -568,6 +578,7 @@ impl fmt::Display for BuildError {
             Self::CheckInputs { class, message } | Self::BadControl { class, message } => {
                 write!(f, "{class}: {message}")
             }
+            Self::BadEnv { method, message } => write!(f, "{method}: {message}"),
             Self::Limit(error) => write!(f, "{error}"),
             Self::UnsupportedRate { ugen, rate } => {
                 write!(f, "{ugen} takes no input at the rate {rate:?}")

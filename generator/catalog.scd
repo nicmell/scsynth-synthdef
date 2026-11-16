@@ -31,8 +31,8 @@ var show = { |path|
 // The kind of each argument that is not a signal, by the class that owns
 // the method, the selector and the argument. A count is an integer number
 // of channels. An array is flattened into the inputs. A symbol is written as
-// its size and its ASCII codes. A signal entry marks a name that only looks
-// like an array.
+// its size and its ASCII codes. A curve is a shape by name, a value, or an
+// array of them. A signal entry marks a name that only looks like an array.
 var argumentKinds = [
 	[\AudioControl, \ar, \values, \array],
 	[\BelaScopeOut, \ar, \channelsArray, \array],
@@ -60,6 +60,26 @@ var argumentKinds = [
 	[\DynKlang, \kr, \specificationsArrayRef, \array],
 	[\DynKlank, \ar, \specificationsArrayRef, \array],
 	[\DynKlank, \kr, \specificationsArrayRef, \array],
+	[\Env, \adsr, \curve, \curve],
+	[\Env, \asr, \curve, \curve],
+	[\Env, \circle, \curve, \curve],
+	[\Env, \circle, \levels, \array],
+	[\Env, \circle, \times, \array],
+	[\Env, \cutoff, \curve, \curve],
+	[\Env, \dadsr, \curve, \curve],
+	[\Env, \linen, \curve, \curve],
+	[\Env, \new, \curve, \curve],
+	[\Env, \new, \levels, \array],
+	[\Env, \new, \times, \array],
+	[\Env, \newClear, \numChannels, \count],
+	[\Env, \newClear, \numSegments, \count],
+	[\Env, \pairs, \curve, \curve],
+	[\Env, \pairs, \pairs, \array],
+	[\Env, \perc, \curve, \curve],
+	[\Env, \step, \levels, \array],
+	[\Env, \step, \times, \array],
+	[\Env, \xyc, \xyc, \array],
+	[\EnvGate, \new, \curve, \curve],
 	[\EnvGen, \ar, \envelope, \array],
 	[\EnvGen, \ar, \levelScale, \signal],
 	[\EnvGen, \ar, \timeScale, \signal],
@@ -173,6 +193,8 @@ var argumentKinds = [
 	[\TWindex, \kr, \array, \array],
 	[\Tap, \ar, \numChannels, \count],
 	[\VDiskIn, \ar, \numChannels, \count],
+	[\VarLag, \ar, \warp, \curve],
+	[\VarLag, \kr, \warp, \curve],
 	[\Warp1, \ar, \numChannels, \count],
 	[\XOut, \ar, \channelsArray, \array],
 	[\XOut, \kr, \channelsArray, \array]
@@ -183,15 +205,15 @@ var argumentKinds = [
 // a body for each rate method of a class of bodies, but a method that sclang
 // refuses as not valid for its subclass.
 var bodies = [\AudioControl, \BeatTrack, \BHiPass4, \BLowPass4, \Changed, \CompanderD,
-	\Control, \Dstutter, \DynKlang, \DynKlank, \HilbertFIR, \Klang, \Klank, \LagControl,
+	\Control, \Dstutter, \DynKlang, \DynKlank, \EnvGate, \HilbertFIR, \Klang, \Klank, \LagControl,
 	\LinLin, \LinSelectX, \LocalBuf, \LocalIn, \Mix, \MultiTap, \NamedControl,
 	\NumChannels, \PMOsc, \PingPong, \Poll, \SelectX, \SelectXFocus, \Silent, \SoundIn,
-	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT];
+	\Splay, \SplayAz, \Sum3, \Sum4, \TChoose, \TWChoose, \Tap, \TrigControl, \UnpackFFT,
+	\VarLag];
 // The classes of the census that have no body, and why.
 var leftOut = [
 	[\AudioIn, "deprecated since 3.10"],
 	[\Dunique, "builds its reader in asUGenInput, at each use as an input"],
-	[\EnvGate, "needs Env: item 1 of Left out"],
 	[\InBus, "reads a Bus of sclang, for NodeProxy"],
 	[\SplayZ, "deprecated since 3.10"],
 	[\XIn, "a helper of InBus"],
@@ -201,8 +223,7 @@ var leftOut = [
 var notPseudo = [
 	[\LevelComp, "a helper of Splay and SplayAz"],
 	[\MulAdd, "folds: madd of the builder"],
-	[\Ndef, "a proxy of JITLib"],
-	[\VarLag, "builds an Env with its default warp, which waits for Env"]
+	[\Ndef, "a proxy of JITLib"]
 ];
 var census = bodies ++ leftOut.collect(_.first) ++ notPseudo.collect(_.first);
 
@@ -310,13 +331,29 @@ var fftRules = (
 	PV_ChainUGen: \chain
 );
 
+// How convertEnv takes an Env as the envelope of a UGen, by the class that
+// owns the class method: through asArray, or asArrayForInterpolation.
+var convertEnvRules = (
+	EnvGen: \array,
+	IEnvGen: \interpolation
+);
+
+// The class methods of Env that make an envelope, and why the others do not.
+var envMethods = [\new, \newClear, \triangle, \sine, \perc, \linen, \xyc, \pairs, \step,
+	\cutoff, \dadsr, \adsr, \asr, \circle];
+var notEnvMethods = [
+	[\initClass, "sets up the class"],
+	[\shapeNames, "gives the table of the shapes"],
+	[\shapeNumber, "gives the number of a shape"]
+];
+
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansionOf, wiring;
 var testPassthrough, testSilence;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
-var classes, pseudoClasses, specs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
+var classes, pseudoClasses, specs, envs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -886,6 +923,9 @@ try {
 						{ value === true or: { value === false } } { [\bool -> value] }
 						{ value.isKindOf(Symbol) } { [\symbol -> value] }
 						{ value.isString } { [\string -> value] }
+						{ value.isKindOf(ArrayedCollection) and: { value.every(_.isNumber) } } {
+							[\floats -> value]
+						}
 						{ value.isNumber } {
 							[\float -> case
 								{ value.isNaN } { "nan" }
@@ -972,6 +1012,8 @@ try {
 		var rule = checkRules[check.name];
 		var optimize = optimizeRules[class.findRespondingMethodFor(\optimizeGraph).ownerClass.name];
 		var fftSize = class.findRespondingMethodFor(\fftSize);
+		var convertEnv = class.class.findRespondingMethodFor(\convertEnv);
+		var convertEnvOwner = convertEnv !? { methodOwner.(convertEnv).name };
 		var doc = SCDoc.documents["Classes/" ++ class.name];
 		var kindOf = { |base| class == base or: { supers.includes(base) } };
 		if (rule.isNil) {
@@ -986,6 +1028,10 @@ try {
 			fail.("fftSize of % belongs to %, which fftRules does not know"
 				.format(class, fftSize.ownerClass.name));
 		};
+		if (convertEnvOwner.notNil and: { convertEnvRules[convertEnvOwner].isNil }) {
+			fail.("convertEnv of % belongs to %, which convertEnvRules does not know"
+				.format(class, convertEnvOwner));
+		};
 		[
 			\name -> class.name,
 			\superclasses -> supers.copyRange(0, supers.indexOf(UGen) ? -1).collect(_.name),
@@ -993,6 +1039,7 @@ try {
 			\optimize -> optimize,
 			\width_first -> kindOf.(WidthFirstUGen),
 			\fft_size -> (fftSize !? { fftRules[fftSize.ownerClass.name] }),
+			\convert_env -> (convertEnvOwner !? { convertEnvRules[convertEnvOwner] }),
 			\categories -> (doc !? { doc.categories } ? []),
 			\check_inputs -> ([\rule -> rule[0]] ++ switch (rule[0])
 				{ \n_inputs } { [\count -> rule[1]] }
@@ -1079,19 +1126,32 @@ try {
 			\units -> spec.units
 		]
 	};
+	// The class methods of Env that make an envelope, with their arguments.
+	Env.class.methods.do { |method|
+		if (envMethods.includes(method.name).not
+			and: { notEnvMethods.any { |entry| entry[0] == method.name }.not }) {
+			fail.("Env.% needs an entry in envMethods or notEnvMethods".format(method.name));
+		};
+	};
+	envs = envMethods.collect { |selector|
+		var method = Env.class.findMethod(selector);
+		if (method.isNil) { fail.("Env has no class method %".format(selector)) };
+		describeArgs.(Env, selector, method, Env)[1] ++ [\addable -> "pseudo"]
+	};
 
 	json = toJSON.([
 		\sclang -> Main.version,
 		\operators -> [\unary -> unary, \binary -> binary],
 		\classes -> classes,
 		\pseudo_classes -> pseudoClasses,
-		\specs -> specs
+		\specs -> specs,
+		\env_methods -> envs
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
-		++ "% pseudo-UGen methods, % classes outside UGen, % specs")
+		++ "% pseudo-UGen methods, % classes outside UGen, % specs, % methods of Env")
 		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
-			pseudoClasses.size, specs.size).postln;
+			pseudoClasses.size, specs.size, envs.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;

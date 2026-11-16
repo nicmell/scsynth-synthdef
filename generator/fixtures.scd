@@ -1086,6 +1086,127 @@ try {
 		].do { |case| refused.(case[0], case[1]) };
 	}.value;
 
+	// The envelopes, of 0.9, in functions of their own for the same reason.
+	{
+		var cases = List.new;
+		{
+			cases.addAll([
+				[\env_new, { Out.kr(0, EnvGen.kr(Env([0, 1, 0], [1, 1]))) }],
+				[\env_wrap_times, { Out.kr(0, EnvGen.kr(Env([0, 1, 0.5, 0], [1]))) }],
+				[\env_default, { Out.kr(0, EnvGen.kr(Env.new)) }],
+				[\env_perc, { Out.kr(0, EnvGen.kr(Env.perc)) }],
+				[\env_perc_args, { Out.kr(0, EnvGen.kr(Env.perc(0.1, 2, 0.5, \exp))) }],
+				[\env_adsr, { Out.kr(0, EnvGen.kr(Env.adsr)) }],
+				[\env_asr, { Out.kr(0, EnvGen.kr(Env.asr)) }],
+				[\env_linen, { Out.kr(0, EnvGen.kr(Env.linen)) }],
+				[\env_triangle, { Out.kr(0, EnvGen.kr(Env.triangle(2))) }],
+				[\env_sine, { Out.kr(0, EnvGen.kr(Env.sine)) }],
+				[\env_cutoff, { Out.kr(0, EnvGen.kr(Env.cutoff)) }],
+				// -100.dbamp ends the envelope.
+				[\env_cutoff_exp, { Out.kr(0, EnvGen.kr(Env.cutoff(0.1, 1, \exp))) }],
+				[\env_dadsr, { Out.kr(0, EnvGen.kr(Env.dadsr)) }],
+				[\env_step, { Out.kr(0, EnvGen.kr(Env.step([1, 2, 3], [1, 1, 1]))) }],
+				[\env_new_clear, { Out.kr(0, EnvGen.kr(Env.newClear(3))) }],
+				[\env_new_clear_two, { Out.kr(0, EnvGen.kr(Env.newClear(2, 2))) }],
+				// No segments make an envelope of one level.
+				[\env_new_clear_none, { Out.kr(0, EnvGen.kr(Env.newClear(0))) }],
+				[\env_new_clear_none_two, { Out.kr(0, EnvGen.kr(Env.newClear(0, 2))) }],
+				// The triplets sort by time, and the curve 2 goes to the first
+				// segment.
+				[\env_xyc, { Out.kr(0, EnvGen.kr(Env.xyc([[2, 0.5], [0, 1, 2], [3, 0]]))) }],
+				[\env_pairs, { Out.kr(0, EnvGen.kr(Env.pairs([[0, 1], [2, 0.5], [3, 0]], \exp))) }]
+			]);
+		}.value;
+		{
+			cases.addAll([
+				[\env_shapes, {
+					Out.kr(0, EnvGen.kr(Env([0, 1, 0, 1, 0, 1, 0, 1, 0], 1 ! 8,
+						[\step, \hold, \lin, \exp, \sin, \wel, \sqr, \cub])))
+				}],
+				[\env_shape_names, {
+					Out.kr(0, EnvGen.kr(Env([0, 1, 0, 1, 0, 1, 0], 1 ! 6,
+						[\linear, \exponential, \sine, \welch, \squared, \cubed])))
+				}],
+				[\env_curves, { Out.kr(0, EnvGen.kr(Env([0, 1, 0], [1, 1], [\exp, 3]))) }],
+				[\env_curve_ugen, { Out.kr(0, EnvGen.kr(Env([0, 1], [1], \c.kr(-4)))) }],
+				[\env_multi, { Out.kr(0, EnvGen.kr(Env([0, [1, 2], 0], [1, 1]))) }],
+				[\env_multi_curve, {
+					Out.kr(0, EnvGen.kr(Env([0, 1, 0], [1, 1], [[\lin, \exp], \sin])))
+				}],
+				[\env_nodes, { Out.kr(0, EnvGen.kr(Env([0, 1, 0.5, 0], [1, 1, 1], \lin, 2, 1))) }],
+				[\env_ugen_level, { Out.kr(0, EnvGen.kr(Env([0, \l.kr(1), 0], [1, 1]))) }],
+				// p * s comes before the gate.
+				[\env_adsr_ugens, {
+					Out.kr(0, EnvGen.kr(Env.adsr(peakLevel: \p.kr(2), sustainLevel: \s.kr(0.5)),
+						\gate.kr(1)))
+				}],
+				[\env_adsr_bias, { Out.kr(0, EnvGen.kr(Env.adsr(bias: \b.kr(0.1)))) }],
+				[\env_circle, { Out.kr(0, EnvGen.kr(Env.circle([0, 1, 0], [1, 1, 2], \exp))) }],
+				[\env_delay, { Out.kr(0, EnvGen.kr(Env.adsr.delay(0.5))) }],
+				[\env_one_level, { Out.kr(0, EnvGen.kr(Env([1], []))) }],
+				[\env_kr, { Out.kr(0, Env.perc.kr(2, \gate.kr(1))) }],
+				[\env_ar, { Out.ar(0, Env.sine.ar) }]
+			]);
+		}.value;
+		writeCases.("env", cases.asArray);
+	}.value;
+	{
+		writeCases.("ienv", [
+			[\ienv_new, { Out.kr(0, IEnvGen.kr(Env([0, 1, 0], [1, 2]), \i.kr(0))) }],
+			[\ienv_offset, { Out.kr(0, IEnvGen.kr(Env([0, 1, 0], [1, 2], \exp, offset: 0.5), 0.5)) }],
+			[\ienv_ugen_times, {
+				Out.kr(0, IEnvGen.kr(Env([0, 1, 0], [\t1.kr(1), \t2.kr(2)]), 0.5))
+			}],
+			// t + 1 + 1 of the sum of the times becomes a Sum3.
+			[\ienv_ugen_time_numbers, {
+				Out.kr(0, IEnvGen.kr(Env([0, 1, 0, 1], [\t.kr(1), 1, 1]), 0.5))
+			}],
+			[\ienv_multi, { Out.kr(0, IEnvGen.kr(Env([0, [1, 2], 0], [1, 2]), 0.5)) }],
+			// Three instances, with the channels 0, 1 and 0.
+			[\ienv_multi_index, {
+				Out.kr(0, IEnvGen.kr(Env([0, [1, 2], 0], [1, 2]), [0.25, 0.5, 0.75]))
+			}],
+			[\ienv_madd, { Out.ar(0, IEnvGen.ar(Env.perc, \i.ar(0), 0.5, 0.1)) }],
+			[\ienv_xyc, { Out.kr(0, IEnvGen.kr(Env.xyc([[1, 1], [2, 0.5], [4, 0]]), 1.5)) }]
+		]);
+		writeCases.("varlag", [
+			[\varlag_kr, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2)) }],
+			[\varlag_ar, { Out.ar(0, VarLag.ar(\x.ar(1), 0.2)) }],
+			[\varlag_lin, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2, warp: \lin)) }],
+			[\varlag_one, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2, warp: 1)) }],
+			[\varlag_exp, { Out.ar(0, VarLag.ar(\x.ar(1), \t.kr(0.2), 2, \exp)) }],
+			[\varlag_three, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2, -2, 3)) }],
+			[\varlag_start, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2, start: 0.5)) }],
+			[\varlag_ugen_warp, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2, warp: \w.kr(5))) }],
+			[\varlag_array, { Out.kr(0, VarLag.kr([\x.kr(1), \y.kr(2)], 0.2)) }],
+			[\varlag_array_warp, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2, warp: [5, 1])) }],
+			[\varlag_madd, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2, mul: 2, add: 1)) }],
+			[\varlag_scalar, { Out.kr(0, VarLag.kr(3, 0.2, mul: 2, add: 1)) }],
+			[\varlag_time_zero, { Out.kr(0, VarLag.kr(\x.kr(1), 0)) }]
+		]);
+		writeCases.("envgate", [
+			[\envgate_new, { Out.ar(0, SinOsc.ar * EnvGate.new) }],
+			[\envgate_args, { Out.ar(0, SinOsc.ar * EnvGate(0, \g.kr(1), 0.5, 0, \lin)) }],
+			[\envgate_twice, { Out.ar(0, SinOsc.ar * EnvGate.new + (SinOsc.ar(2) * EnvGate.new)) }],
+			[\envgate_level, { Out.ar(0, SinOsc.ar * EnvGate(\l.kr(0.5))) }],
+			// The graph of the test of sc-app3.
+			[\envgate_markup, { |freq = 440|
+				var lag = VarLag.kr(freq, 0.2);
+				var osc = SinOsc.ar(lag);
+				var env = EnvGate.new;
+				Out.ar(0, osc * env)
+			}]
+		]);
+		[
+			[\refused_env_no_levels, { Out.kr(0, EnvGen.kr(Env([], []))) }],
+			[\refused_env_shape, { Out.kr(0, EnvGen.kr(Env([0, 1], [1], \foo))) }],
+			[\refused_env_cutoff_shape, { Out.kr(0, EnvGen.kr(Env.cutoff(0.1, 1, \foo))) }],
+			[\refused_env_step, { Out.kr(0, EnvGen.kr(Env.step([1, 2], [1]))) }],
+			[\refused_varlag_warp, { Out.kr(0, VarLag.kr(\x.kr(1), 0.2, warp: \foo)) }],
+			[\refused_varlag_rate, { Out.ar(0, VarLag.ar(\x.kr(1), 0.2, warp: \lin)) }]
+		].do { |case| refused.(case[0], case[1]) };
+	}.value;
+
 	writeArithmetic.();
 
 	"fixtures.scd: wrote % golden files to %".format(written, fixtures).postln;

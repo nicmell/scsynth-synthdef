@@ -3,6 +3,7 @@
 #![allow(dead_code)]
 
 mod controls;
+mod envelopes;
 mod optimize;
 mod pseudo;
 
@@ -96,6 +97,10 @@ pub const NAMES: &[&str] = &[
     "defwrap",
     "specs",
     "namedcontrol",
+    "env",
+    "ienv",
+    "varlag",
+    "envgate",
 ];
 
 /// The bytes of a golden file.
@@ -149,6 +154,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "folds" => vec![folds()],
         "optimize" | "deadcode" | "pvcopy" => optimize::definitions(name),
         "controlugens" | "defwrap" | "specs" | "namedcontrol" => controls::definitions(name),
+        "env" | "ienv" | "varlag" | "envgate" => envelopes::definitions(name),
         _ => pseudo::definitions(name),
     }
 }
