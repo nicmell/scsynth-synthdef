@@ -1,10 +1,11 @@
 //! The case files of sc3-plugins, built by hand: the expansion over counts,
-//! arrays and a variable list of arguments, PV chains, and the reverbs.
-//! `generator/sc3_plugins/fixtures.scd` holds the sclang code of each.
+//! arrays and a variable list of arguments, and PV chains, which share one
+//! chain between two readers. `generator/sc3_plugins/fixtures.scd` holds the
+//! sclang code of each.
 
-use scsynth_synthdef::{Arg, ArgValue, SynthDef, SynthDefBuilder, UGenInput, write_def_file};
+use scsynth_synthdef::{ArgValue, SynthDef, SynthDefBuilder, UGenInput, write_def_file};
 
-use super::common::{arg, array, by_name};
+use super::common::{array, by_name};
 use super::golden;
 
 /// A builder without arguments.
@@ -178,58 +179,9 @@ fn pv() -> Vec<SynthDef> {
     vec![copies, out(b, "ar", sound)]
 }
 
-fn reverbs() -> Vec<SynthDef> {
-    let mut defs = Vec::new();
-    let mut b = builder("reverbs_greyhole_mono");
-    let input = sine(&mut b, "ar", 440.0);
-    let wet = by_name(&mut b, "Greyhole", "ar", &[("in", input.into())]);
-    defs.push(out(b, "ar", wet));
-    let mut b = builder("reverbs_greyhole_three");
-    let inputs = sines(&mut b, "ar", &[1.0, 2.0, 3.0]);
-    let args = [
-        ("in", inputs.into()),
-        ("delayTime", 1.5.into()),
-        ("feedback", 0.5.into()),
-    ];
-    let wet = by_name(&mut b, "Greyhole", "ar", &args);
-    defs.push(out(b, "ar", wet));
-    let mut b = SynthDefBuilder::new("reverbs_jpverb", vec![Arg::new("t60", 2.0)]).unwrap();
-    let t60 = arg(&b, "t60");
-    let inputs = sines(&mut b, "ar", &[1.0, 2.0]);
-    let wet = by_name(
-        &mut b,
-        "JPverb",
-        "ar",
-        &[("in", inputs.into()), ("t60", t60.into())],
-    );
-    defs.push(out(b, "ar", wet));
-    let mut b = builder("reverbs_jpverb_nested");
-    let pair = sines(&mut b, "ar", &[1.0, 2.0]);
-    let inputs = UGenInput::Array(vec![pair, sine(&mut b, "ar", 3.0)]);
-    let args = [("in", inputs.into()), ("highcut", 4000.0.into())];
-    let wet = by_name(&mut b, "JPverb", "ar", &args);
-    defs.push(out(b, "ar", wet));
-    let mut b = builder("reverbs_nhhall");
-    let inputs = sines(&mut b, "ar", &[1.0, 2.0]);
-    let args = [("in", inputs.into()), ("rt60", 2.0.into())];
-    let wet = by_name(&mut b, "NHHall", "ar", &args);
-    defs.push(out(b, "ar", wet));
-    let mut b = builder("reverbs_nhhall_nested");
-    let pair = sines(&mut b, "ar", &[1.0, 2.0]);
-    let inputs = UGenInput::Array(vec![pair, sine(&mut b, "ar", 3.0)]);
-    let args = [("in", inputs.into()), ("rt60", array(&[1.0, 2.0]).into())];
-    let wet = by_name(&mut b, "NHHall", "ar", &args);
-    defs.push(out(b, "ar", wet));
-    defs
-}
-
 #[test]
 fn the_case_files_write_the_bytes_of_sclang() {
-    for (name, defs) in [
-        ("expansion", expansion()),
-        ("pv", pv()),
-        ("reverbs", reverbs()),
-    ] {
+    for (name, defs) in [("expansion", expansion()), ("pv", pv())] {
         assert_eq!(write_def_file(&defs).unwrap(), golden(name), "{name}");
     }
 }

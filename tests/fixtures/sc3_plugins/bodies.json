@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {"name": "reverbs_greyhole_mono", "out": "ar", "call": ["Greyhole", "ar", [["in", {"ugen": ["SinOsc", "ar", []]}]]]},
+    {"name": "reverbs_greyhole_three", "out": "ar", "call": ["Greyhole", "ar", [["in", [{"ugen": ["SinOsc", "ar", [["freq", 1]]]}, {"ugen": ["SinOsc", "ar", [["freq", 2]]]}, {"ugen": ["SinOsc", "ar", [["freq", 3]]]}]], ["delayTime", 1.5], ["feedback", 0.5]]]},
+    {"name": "reverbs_jpverb", "out": "ar", "call": ["JPverb", "ar", [["in", [{"ugen": ["SinOsc", "ar", [["freq", 1]]]}, {"ugen": ["SinOsc", "ar", [["freq", 2]]]}]], ["t60", {"control": ["t60", 2]}]]]},
+    {"name": "reverbs_jpverb_nested", "out": "ar", "call": ["JPverb", "ar", [["in", [[{"ugen": ["SinOsc", "ar", [["freq", 1]]]}, {"ugen": ["SinOsc", "ar", [["freq", 2]]]}], {"ugen": ["SinOsc", "ar", [["freq", 3]]]}]], ["highcut", 4000]]]},
+    {"name": "reverbs_nhhall", "out": "ar", "call": ["NHHall", "ar", [["in", [{"ugen": ["SinOsc", "ar", [["freq", 1]]]}, {"ugen": ["SinOsc", "ar", [["freq", 2]]]}]], ["rt60", 2]]]},
+    {"name": "reverbs_nhhall_nested", "out": "ar", "call": ["NHHall", "ar", [["in", [[{"ugen": ["SinOsc", "ar", [["freq", 1]]]}, {"ugen": ["SinOsc", "ar", [["freq", 2]]]}], {"ugen": ["SinOsc", "ar", [["freq", 3]]]}]], ["rt60", [1, 2]]]]},
+    {"name": "refused_nhhall_mono", "out": "ar", "refused": true, "call": ["NHHall", "ar", [["in", {"ugen": ["SinOsc", "ar", []]}]]]},
+    {"name": "refused_nhhall_three", "out": "ar", "refused": true, "call": ["NHHall", "ar", [["in", [{"ugen": ["SinOsc", "ar", [["freq", 1]]]}, {"ugen": ["SinOsc", "ar", [["freq", 2]]]}, {"ugen": ["SinOsc", "ar", [["freq", 3]]]}]]]]},
+    {"name": "refused_greyhole_empty", "out": "ar", "refused": true, "call": ["Greyhole", "ar", [["in", []]]]},
+    {"name": "refused_jpverb_empty", "out": "ar", "refused": true, "call": ["JPverb", "ar", [["in", []]]]}
+  ]
+}

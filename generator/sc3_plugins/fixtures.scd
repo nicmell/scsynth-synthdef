@@ -6,8 +6,9 @@
 //   sclang -l "$PWD/generator/sc3_plugins/sclang_conf.yaml" \
 //     "$PWD/generator/sc3_plugins/fixtures.scd"
 //
-// It reads the addable methods from generator/sc3_plugins/catalog.json, and
-// the writers from generator/goldens.scd. It exits with 1 if sclang is not
+// It reads the addable methods from generator/sc3_plugins/catalog.json, the
+// cases of the bodies from tests/fixtures/sc3_plugins/bodies.json, and the
+// writers from generator/goldens.scd. It exits with 1 if sclang is not
 // 3.14.1, if a class or a method comes from outside the core library and the
 // folder SC3plugins, or if a graph that the crate refuses does not break in
 // sclang.
@@ -27,6 +28,7 @@ var known = { |item|
 	path.beginsWith(library) or: { folder.notNil and: { path.beginsWith(folder) } }
 };
 var goldens, build, write, writeCases, refused, catalog, definition, methods = List.new;
+var valueCode, callCode, bodies = List.new;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -131,33 +133,45 @@ try {
 		}],
 		[\pv_magmuladd, { Out.ar(0, IFFT(PV_MagMulAdd(FFT(LocalBuf(512), SinOsc.ar), 2, 0.5))) }]
 	]);
-	writeCases.("reverbs", [
-		// The first and the last channel of in.
-		[\reverbs_greyhole_mono, { Out.ar(0, Greyhole.ar(SinOsc.ar)) }],
-		[\reverbs_greyhole_three, {
-			Out.ar(0, Greyhole.ar([SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)], 1.5, feedback: 0.5))
-		}],
-		[\reverbs_jpverb, { |t60 = 2| Out.ar(0, JPverb.ar([SinOsc.ar(1), SinOsc.ar(2)], t60)) }],
-		// A first channel that is an array expands the raw class.
-		[\reverbs_jpverb_nested, {
-			Out.ar(0, JPverb.ar([[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)], highcut: 4000))
-		}],
-		[\reverbs_nhhall, { Out.ar(0, NHHall.ar([SinOsc.ar(1), SinOsc.ar(2)], 2)) }],
-		[\reverbs_nhhall_nested, {
-			Out.ar(0, NHHall.ar([[SinOsc.ar(1), SinOsc.ar(2)], SinOsc.ar(3)], [1, 2]))
-		}]
-	]);
-	[
-		// NHHall throws on an in that is not an array of two.
-		[\refused_nhhall_mono, { Out.ar(0, NHHall.ar(SinOsc.ar)) }],
-		[\refused_nhhall_three, { Out.ar(0, NHHall.ar([SinOsc.ar(1), SinOsc.ar(2), SinOsc.ar(3)])) }],
-		// An empty in gives nil to the raw class.
-		[\refused_greyhole_empty, { Out.ar(0, Greyhole.ar([])) }],
-		[\refused_jpverb_empty, { Out.ar(0, JPverb.ar([])) }]
-	].do { |case| refused.(case[0], case[1]) };
+	// The cases of the bodies. The sclang code of a value of a case, and the
+	// controls that it reads, in order: a number, as parseJSON gives it, an
+	// array, a control, a UGen, a symbol or a boolean.
+	valueCode = { |value, controls|
+		case
+		{ value.isString } { value }
+		{ value.isArray } { "[" ++ value.collect { |item| valueCode.(item, controls) }.join(", ") ++ "]" }
+		{ value["control"].notNil } {
+			controls.add(value["control"]);
+			value["control"][0]
+		}
+		{ value["ugen"].notNil } { callCode.(value["ugen"], controls) }
+		{ value["symbol"].notNil } { value["symbol"].asSymbol.asCompileString }
+		{ value["bool"].notNil } { value["bool"] }
+		{ fail.("bodies.json has the value %".format(value)) }
+	};
+	callCode = { |call, controls|
+		"%.%(%)".format(call[0], call[1], call[2].collect { |pair|
+			pair[0] ++ ": " ++ valueCode.(pair[1], controls)
+		}.join(", "))
+	};
+	(fixtures +/+ "bodies.json").parseJSONFile["cases"].do { |case|
+		var controls = List.new, call = callCode.(case["call"], controls), func;
+		var body = case["out"] !? { |rate| "Out.%(0, %)".format(rate, call) } ? call;
+		var code = "{ " ++ if (controls.isEmpty) { "" } {
+			"|" ++ controls.collect { |control| control[0] ++ " = " ++ control[1] }.join(", ") ++ "| "
+		} ++ body ++ " }";
+		func = code.interpret;
+		if (func.isNil) { fail.("the case % does not compile: %".format(case["name"], code)) };
+		if (case["refused"] == "true") {
+			refused.(case["name"], func);
+		} {
+			bodies.add(build.(case["name"], func));
+		};
+	};
+	write.("bodies", bodies);
 
-	"sc3_plugins/fixtures.scd: wrote % golden files, % definitions of methods, to %"
-		.format(goldens[\written].value, methods.size, fixtures).postln;
+	"sc3_plugins/fixtures.scd: wrote % golden files, % definitions of methods, % cases of bodies, to %"
+		.format(goldens[\written].value, methods.size, bodies.size, fixtures).postln;
 	0.exit;
 } { |error|
 	error.reportError;

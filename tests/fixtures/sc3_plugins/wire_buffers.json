@@ -1,4 +1,12 @@
 {
+  "bodies": {
+    "reverbs_greyhole_mono": 3,
+    "reverbs_greyhole_three": 4,
+    "reverbs_jpverb": 4,
+    "reverbs_jpverb_nested": 6,
+    "reverbs_nhhall": 2,
+    "reverbs_nhhall_nested": 4
+  },
   "expansion": {
     "expansion_arraymax": 0,
     "expansion_chromagram": 1,
@@ -651,13 +659,5 @@
   "pv": {
     "pv_copies": 2,
     "pv_magmuladd": 1
-  },
-  "reverbs": {
-    "reverbs_greyhole_mono": 3,
-    "reverbs_greyhole_three": 4,
-    "reverbs_jpverb": 4,
-    "reverbs_jpverb_nested": 6,
-    "reverbs_nhhall": 2,
-    "reverbs_nhhall_nested": 4
   }
 }
