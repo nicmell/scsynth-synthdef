@@ -9661,7 +9661,11 @@
           },
           "special_index": 0,
           "madd": false,
-          "nested_expansion": true
+          "nested_expansion": true,
+          "audio_together": [
+            4,
+            5
+          ]
         },
         {
           "selector": "kr",

@@ -101,6 +101,7 @@ pub const NAMES: &[&str] = &[
     "ienv",
     "varlag",
     "envgate",
+    "demandenvgen",
 ];
 
 /// The bytes of a golden file.

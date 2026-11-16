@@ -262,6 +262,12 @@ var silentZeros = [
 	[\LocalOut, \ar, \channelsArray],
 	[\XOut, \ar, \channelsArray]
 ];
+// The arguments that go to audio rate together before multiNew: when one of
+// them is at audio rate, K2A.ar takes each other one, in order. By the class
+// that owns the method. testAudioTogether tests each entry.
+var audioTogether = [
+	[\DemandEnvGen, \ar, [\gate, \reset]]
+];
 
 // An argument whose name holds one of these words needs an entry above.
 var arrayWords = ["array", "list", "values", "ugens", "envelope", "weights",
@@ -350,7 +356,7 @@ var notEnvMethods = [
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansionOf, wiring;
-var testPassthrough, testSilence;
+var testPassthrough, testSilence, testAudioTogether;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
 var classes, pseudoClasses, specs, envs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
@@ -901,6 +907,38 @@ try {
 		};
 	};
 
+	// Fails unless the entry of audioTogether holds: with one of its arguments
+	// at audio rate, a K2A at audio rate takes each other number, in order,
+	// and the instance takes the K2A. With all of them at audio rate, the
+	// method makes the instance alone.
+	testAudioTogether = { |class, selector, kinds, positions|
+		var holds = positions.every { |position|
+			var created = probe.(class, selector,
+				valuesAt.(kinds, position, { audio.(position) }))[1];
+			var others = positions.reject { |other| other == position };
+			created.size == (others.size + 1)
+				and: { created.last.class === class }
+				and: {
+					others.every { |other, index|
+						var converted = created[index];
+						converted.class === K2A and: { converted.rate == \audio }
+							and: { converted.inputs[0] == signal.(other) }
+							and: { created.last.inputs.includes(converted) }
+					}
+				}
+		} and: {
+			var created = probe.(class, selector, {
+				var arguments = numberValues.(kinds, [], []).value;
+				positions.do { |position| arguments.put(position, audio.(position)) };
+				arguments
+			})[1];
+			created.size == 1 and: { created[0].class === class }
+		};
+		if (holds.not) {
+			fail.("the audio rate of %.% does not go together".format(class.name, selector));
+		};
+	};
+
 	// The kinds of the arguments of a method, with the kinds of `owner`, and
 	// the method as associations: its selector and its arguments.
 	describeArgs = { |class, selector, method, owner|
@@ -947,7 +985,10 @@ try {
 		var names = (method.argNames ? []).drop(1).asArray;
 		var through = passthroughs.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
 		var silent = silentZeros.detect { |entry| entry[0] == owner.name and: { entry[1] == selector } };
-		var wired, input, zero, position, refusal;
+		var together = audioTogether.detect { |entry|
+			entry[0] == owner.name and: { entry[1] == selector }
+		};
+		var wired, input, zero, position, positions, refusal;
 		methods = methods + 1;
 		if (bodies.includes(class.name)) {
 			refusal = probe.(class, selector, numberValues.(described[0], [], []))[0];
@@ -972,6 +1013,11 @@ try {
 				position = names.indexOf(silent[2]);
 				testSilence.(class, selector, described[0], position);
 				wired = wired ++ [\silence -> position];
+			};
+			if (together.notNil and: { wired.isString.not }) {
+				positions = together[2].collect { |name| names.indexOf(name) };
+				testAudioTogether.(class, selector, described[0], positions);
+				wired = wired ++ [\audio_together -> positions];
 			};
 			if (wired.isString and: { wired.contains("creates no instance") }
 				and: { census.includes(class.name).not }) {

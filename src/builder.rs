@@ -576,12 +576,7 @@ impl SynthDefBuilder {
                     values[position] = ArgValue::Input(UGenInput::Array(channels));
                 }
             }
-            let audio_slot = wiring
-                .audio_input
-                .and_then(|audio| positions.iter().position(|&position| position == audio));
-            if let Some(slot) = audio_slot {
-                expanded[slot] = lang::as_audio_rate_input(builder, expanded[slot].clone())?;
-            }
+            builder.audio_rate_inputs(wiring, &positions, &mut expanded)?;
             let channels = match ugen_class.convert_env {
                 Some(form) => builder.convert_env(form, method, &mut values)?,
                 None => None,
@@ -792,6 +787,38 @@ impl SynthDefBuilder {
         };
         limits::check(&def, Version::V2).map_err(BuildError::Limit)?;
         Ok(def)
+    }
+
+    /// The inputs that go to audio rate before the expansion. The input of a
+    /// delay goes through `asAudioRateInput`. When one argument of
+    /// `audio_together` is at audio rate, `K2A.ar` takes each other one, in
+    /// order, as `DemandEnvGen.ar` does.
+    fn audio_rate_inputs(
+        &mut self,
+        wiring: Wiring,
+        positions: &[usize],
+        expanded: &mut [UGenInput],
+    ) -> Result<(), BuildError> {
+        let slot_of = |argument: usize| positions.iter().position(|&position| position == argument);
+        if let Some(slot) = wiring.audio_input.and_then(slot_of) {
+            expanded[slot] = lang::as_audio_rate_input(self, expanded[slot].clone())?;
+        }
+        let together: Vec<usize> = wiring
+            .audio_together
+            .unwrap_or_default()
+            .iter()
+            .filter_map(|&argument| slot_of(argument))
+            .collect();
+        let audio = |input: &UGenInput| lang::rate(input) == Some(Rate::Audio);
+        if together.iter().any(|&slot| audio(&expanded[slot])) {
+            for slot in together {
+                if !audio(&expanded[slot]) {
+                    let input = ArgValue::Input(expanded[slot].clone());
+                    expanded[slot] = self.ugen("K2A", "ar", &[("in", input)])?;
+                }
+            }
+        }
+        Ok(())
     }
 
     /// The `envelope` of `values` as `convertEnv` takes an `Env`: the array

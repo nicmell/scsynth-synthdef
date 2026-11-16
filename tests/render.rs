@@ -192,6 +192,20 @@ fn convert_env(value: &Value) -> &'static str {
     }
 }
 
+fn audio_together(method: &Value) -> String {
+    method
+        .get("audio_together")
+        .map_or("None".to_owned(), |positions| {
+            let positions: Vec<String> = positions
+                .as_array()
+                .expect("audio_together is an array")
+                .iter()
+                .map(|position| number(position).to_string())
+                .collect();
+            format!("Some(&[{}])", positions.join(", "))
+        })
+}
+
 fn slot(value: &Value) -> String {
     let (tag, position) = value
         .as_object()
@@ -324,6 +338,12 @@ fn render_wiring(rendered: &mut String, method: &Value) {
             format!("Some({})", number(position))
         });
     writeln!(rendered, "                    audio_input: {audio_input},").unwrap();
+    writeln!(
+        rendered,
+        "                    audio_together: {},",
+        audio_together(method)
+    )
+    .unwrap();
     writeln!(
         rendered,
         "                    level: {},",
