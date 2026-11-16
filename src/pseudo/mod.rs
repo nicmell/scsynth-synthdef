@@ -35,6 +35,8 @@ use crate::catalog::{self, RateMethod};
 use crate::env::Curve;
 use crate::error::BuildError;
 use crate::rate::Rate;
+#[cfg(feature = "sc3-plugins")]
+use crate::sc3_plugins::BODIES as PLUGIN_BODIES;
 use crate::ugen_input::{ArgValue, UGenInput};
 
 /// The arguments of a call of a pseudo-UGen, bound by name, with their
@@ -182,7 +184,7 @@ impl Args {
 }
 
 /// What one rate method adds.
-type Body = fn(&mut SynthDefBuilder, &Args) -> Result<UGenInput, BuildError>;
+pub(crate) type Body = fn(&mut SynthDefBuilder, &Args) -> Result<UGenInput, BuildError>;
 
 /// The body of each method that the catalogue marks `Addable::Pseudo`, by
 /// class and selector.
@@ -256,6 +258,10 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("VarLag", "kr", filter::var_lag),
 ];
 
+/// The bodies of sc3-plugins, without the feature `sc3-plugins`.
+#[cfg(not(feature = "sc3-plugins"))]
+static PLUGIN_BODIES: &[(&str, &str, Body)] = &[];
+
 /// Runs the body of the method `method` of `class` on its bound arguments.
 pub(crate) fn build(
     builder: &mut SynthDefBuilder,
@@ -263,7 +269,12 @@ pub(crate) fn build(
     method: &'static RateMethod,
     values: Vec<Option<ArgValue>>,
 ) -> Result<UGenInput, BuildError> {
-    let body = body_of(BODIES, class, method.selector)?;
+    let table = if BODIES.iter().any(|&(name, _, _)| name == class) {
+        BODIES
+    } else {
+        PLUGIN_BODIES
+    };
+    let body = body_of(table, class, method.selector)?;
     body(
         builder,
         &Args {
@@ -307,7 +318,7 @@ pub(crate) fn new1(
     rate: Rate,
     inputs: Vec<UGenInput>,
 ) -> Result<UGenInput, BuildError> {
-    let ugen = catalog::lookup(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
+    let ugen = catalog::find(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
     builder.add_checked(ugen, NewUGen::new(class, rate).inputs(inputs))
 }
 
@@ -348,7 +359,7 @@ pub(crate) fn sclang_class(builder: &SynthDefBuilder, input: &UGenInput) -> Stri
         UGenInput::Number(_) => "Float".to_owned(),
         ref output => {
             let class = builder.class_of(output).unwrap_or("UGen");
-            let multi = catalog::lookup(class)
+            let multi = catalog::find(class)
                 .is_some_and(|ugen| ugen.superclasses.contains(&"MultiOutUGen"));
             if multi {
                 "OutputProxy".to_owned()

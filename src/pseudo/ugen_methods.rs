@@ -192,7 +192,7 @@ pub(super) fn send_message(
 /// The class whose method an output answers: the first of the class of its
 /// UGen and its superclasses that has a method of its own, else `UGen`.
 fn owner_of(builder: &SynthDefBuilder, receiver: &UGenInput, method: &UGenMethod) -> &'static str {
-    catalog::lookup(&sclang_class(builder, receiver))
+    catalog::find(&sclang_class(builder, receiver))
         .and_then(|class| {
             std::iter::once(class.name)
                 .chain(class.superclasses.iter().copied())
@@ -204,7 +204,7 @@ fn owner_of(builder: &SynthDefBuilder, receiver: &UGenInput, method: &UGenMethod
 /// `signalRange` of an output: that of the class of its UGen. An output of a
 /// `MultiOutUGen` is an `OutputProxy`, which is bipolar.
 fn signal_range(builder: &SynthDefBuilder, receiver: &UGenInput) -> SignalRange {
-    catalog::lookup(&sclang_class(builder, receiver))
+    catalog::find(&sclang_class(builder, receiver))
         .map_or(SignalRange::Bipolar, |class| class.signal_range)
 }
 

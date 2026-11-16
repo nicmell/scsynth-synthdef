@@ -215,7 +215,7 @@ fn pv_args(
     };
     let is_chain = builder
         .class_of(chain)
-        .and_then(catalog::lookup)
+        .and_then(catalog::find)
         .is_some_and(|class| class.superclasses.contains(&"PV_ChainUGen"));
     if is_chain {
         Ok(args)

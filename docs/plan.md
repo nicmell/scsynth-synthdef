@@ -148,7 +148,9 @@ tags.
     numbers and outputs.
 11. The core catalogue takes 102 KB of a release wasm32 build, and 17 KB
     after gzip -9: a cdylib that reads `catalog::all()`, against one that
-    does not. The catalogue of sc3-plugins has about the same size.
+    does not. The catalogue of sc3-plugins takes 258 KB, and 28.5 KB after
+    gzip. Its 96 HOA classes hold 6,142 of its 9,181 arguments, against
+    2,429 arguments in the core.
 12. sc-expression of sc-app3 finds a class with `catalog::lookup` and
     `catalog::pseudo_lookup`. It lists `catalog::all` in an error.
 

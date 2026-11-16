@@ -1575,12 +1575,12 @@ fn find_method(class: &str, selector: &str) -> Result<Found, BuildError> {
         class: class.to_owned(),
         selector: selector.to_owned(),
     };
-    if let Some(ugen_class) = catalog::lookup(class) {
+    if let Some(ugen_class) = catalog::find(class) {
         let method = ugen_class.method(selector).ok_or_else(unknown_method)?;
         return Ok(Found::UGen(ugen_class, method));
     }
     let pseudo_class =
-        catalog::pseudo_lookup(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
+        catalog::find_pseudo(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
     let method = pseudo_class.method(selector).ok_or_else(unknown_method)?;
     Ok(Found::Pseudo(pseudo_class.name, method))
 }
