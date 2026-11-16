@@ -400,6 +400,34 @@ impl SynthDefBuilder {
         self.transaction(|builder| pseudo::env::build(builder, method, values))
     }
 
+    /// `env.range(lo, hi)`, `env.exprange(lo, hi)` and
+    /// `env.curverange(lo, hi, curve)` of sclang: a copy of the envelope,
+    /// with its levels mapped by `linlin`, `linexp` or `lincurve` from the
+    /// least of them to the greatest, as [`send`](Self::send) maps an array.
+    /// The catalogue gives the arguments and their defaults (see
+    /// [`catalog::env_ranges`]).
+    ///
+    /// # Errors
+    ///
+    /// [`BuildError::BadMethod`] for a selector that the catalogue does not
+    /// have, and [`BuildError::BadEnv`] for levels that `minItem` and
+    /// `maxItem` cannot compare, such as an output among numbers, where
+    /// sclang throws. Also the errors of the arguments, and of the UGens that
+    /// the map adds. A call that fails leaves the build as it was.
+    pub fn send_env(
+        &mut self,
+        env: &Env,
+        selector: &str,
+        args: &[(&str, ArgValue)],
+    ) -> Result<Env, BuildError> {
+        let method = catalog::env_range(selector).ok_or_else(|| BuildError::BadMethod {
+            selector: selector.to_owned(),
+            message: "it is no range of Env".to_owned(),
+        })?;
+        let values = bind_optional("Env", method, args)?;
+        self.transaction(|builder| pseudo::env::range(builder, env, method, values))
+    }
+
     /// `chain.pvcalc(numframes, func, frombin, tobin, zeroothers)` of
     /// sclang. It unpacks the bins of `chain` from `frombin` to `tobin`, as
     /// `UnpackFFT` does, and calls `func` with the array of their magnitudes
@@ -473,6 +501,44 @@ impl SynthDefBuilder {
         let (method, values) = pv_values("pvcollect", args)?;
         let chain = chain.into();
         self.transaction(|builder| pseudo::pvcollect(builder, chain, method, values, func))
+    }
+
+    /// Sends the message `selector` to `receiver` with the arguments by name,
+    /// as `receiver.range(200, 800)` sends `range` in sclang. The messages are
+    /// the instance methods of `UGen` that build graphs (see
+    /// [`catalog::ugen_methods`]), with the arguments and the defaults of
+    /// `UGen`. The call passes all of them, in their order, to the method
+    /// that the receiver answers, as sclang does when every argument comes by
+    /// position.
+    ///
+    /// An output gets the method of the class of its UGen: that of `UGen`,
+    /// or one of its own, as `DUGen` has for `linlin`. An output of a UGen
+    /// with several outputs is an `OutputProxy`. An array gets the method of
+    /// `Array`, which mostly hands the message to each element, with the
+    /// arrays among the arguments spread over the elements. A number gets the
+    /// method of `Float`, which computes a number where it can.
+    ///
+    /// # Errors
+    ///
+    /// [`BuildError::BadMethod`] for a selector that the catalogue does not
+    /// have, and where sclang throws or writes a broken definition: a
+    /// receiver that does not understand the message, a test of `if` on an
+    /// output, or a rate that the method does not take. Also the errors of
+    /// the arguments, and of the UGens that the method adds. A call that
+    /// fails leaves the build as it was.
+    pub fn send(
+        &mut self,
+        receiver: impl Into<UGenInput>,
+        selector: &str,
+        args: &[(&str, ArgValue)],
+    ) -> Result<UGenInput, BuildError> {
+        let method = catalog::ugen_method(selector).ok_or_else(|| BuildError::BadMethod {
+            selector: selector.to_owned(),
+            message: "it is no method of UGen that builds a graph".to_owned(),
+        })?;
+        let values = bind_optional("UGen", &method.method, args)?;
+        let receiver = receiver.into();
+        self.transaction(|builder| pseudo::send(builder, receiver, method, values))
     }
 
     /// `asArrayForInterpolation`: the envelope as `IEnvGen` reads it, an
@@ -1084,6 +1150,26 @@ impl SynthDefBuilder {
         Ok(self.outputs_of(node))
     }
 
+    /// The input `index` of the UGen of `input`, for an output of this
+    /// build, as `inputs[index]` gives it in sclang.
+    pub(crate) fn input_of(&self, input: &UGenInput, index: usize) -> Option<UGenInput> {
+        let UGenInput::Output(proxy) = input else {
+            return None;
+        };
+        if proxy.build != self.build {
+            return None;
+        }
+        Some(match *self.children.get(proxy.ugen)?.inputs.get(index)? {
+            Source::Number(number) => UGenInput::Number(number),
+            Source::Output { ugen, output } => UGenInput::Output(OutputProxy {
+                build: self.build,
+                ugen,
+                output,
+                rate: self.children[ugen].outputs[to_usize(output)],
+            }),
+        })
+    }
+
     /// The class of the UGen of `input`, for an output of this build.
     pub(crate) fn class_of(&self, input: &UGenInput) -> Option<&str> {
         match input {
@@ -1549,7 +1635,7 @@ fn pv_values(
     Ok((method, bind_optional("PV_ChainUGen", method, args)?))
 }
 
-fn bind_optional(
+pub(crate) fn bind_optional(
     class: &str,
     method: &RateMethod,
     args: &[(&str, ArgValue)],
@@ -2566,6 +2652,19 @@ mod tests {
         let def = builder.finish().unwrap();
         assert_eq!(def.children.len(), 1);
         assert_eq!(def.constants, [0.0, 1.0]);
+    }
+
+    #[test]
+    fn a_message_that_fails_adds_no_ugen() {
+        // lincurve adds the UGens of its arithmetic before it finds that
+        // Select has no method at scalar rate.
+        let mut builder = SynthDefBuilder::new("atomic", vec![]).unwrap();
+        let value = builder.ugen("Rand", "new", &[]).unwrap();
+        let curve = builder.ugen("DC", "kr", &[]).unwrap();
+        let children = builder.children.len();
+        let args = [("curve", ArgValue::from(curve))];
+        assert!(builder.send(value, "lincurve", &args).is_err());
+        assert_eq!(builder.children.len(), children);
     }
 
     #[test]

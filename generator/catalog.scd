@@ -201,6 +201,17 @@ var argumentKinds = [
 	[\TWindex, \kr, \array, \array],
 	[\Tap, \ar, \numChannels, \count],
 	[\VDiskIn, \ar, \numChannels, \count],
+	[\UGen, \bilin, \clip, \symbol],
+	[\UGen, \curvelin, \clip, \symbol],
+	[\UGen, \explin, \clip, \symbol],
+	[\UGen, \expexp, \clip, \symbol],
+	[\UGen, \lincurve, \clip, \symbol],
+	[\UGen, \linexp, \clip, \symbol],
+	[\UGen, \linlin, \clip, \symbol],
+	[\UGen, \dpoll, \label, \symbol],
+	[\UGen, \poll, \label, \symbol],
+	[\UGen, \prune, \type, \symbol],
+	[\UGen, \varlag, \warp, \curve],
 	[\VarLag, \ar, \warp, \curve],
 	[\VarLag, \kr, \warp, \curve],
 	[\Warp1, \ar, \numChannels, \count],
@@ -361,6 +372,9 @@ var notEnvMethods = [
 	[\shapeNumber, "gives the number of a shape"]
 ];
 
+// The instance methods of Env that map its levels to a range.
+var envRanges = [\range, \exprange, \curverange];
+
 // The instance methods of PV_ChainUGen that take a function, and why the
 // others do not count.
 var pvMethods = [\pvcalc, \pvcalc2, \pvcollect];
@@ -369,13 +383,88 @@ var notPvMethods = [
 	[\fftSize, "the size of the FFT, which fft_size holds"]
 ];
 
+// The instance methods of UGen that build graphs, and why the others do
+// not count.
+var ugenMethods = [\range, \exprange, \curverange, \unipolar, \bipolar, \linlin, \linexp,
+	\explin, \expexp, \lincurve, \curvelin, \bilin, \prune, \clip, \fold, \wrap, \lag, \lag2,
+	\lag3, \lagud, \lag2ud, \lag3ud, \varlag, \slew, \blend, \minNyquist, \degrad, \raddeg,
+	\moddif, \sanitize, \poll, \dpoll, \checkBadValues, \snap, \softRound, \binaryValue,
+	\isPositive, \isNegative, \isStrictlyPositive, '|==|', \degreeToKey, \if];
+var notUgenMethods = [
+	['@', "gives a Point"],
+	[\addToSynth, "a step of the build"],
+	[\antecedents, "a step of the build"],
+	[\antecedents_, "a step of the build"],
+	[\argNameForInputAt, "names an input for a message"],
+	[\argNamesInputsOffset, "names an input for a message"],
+	[\asComplex, "gives a Complex"],
+	[\asControlInput, "a step of the build"],
+	[\asUGenInput, "a step of the build"],
+	[\belaScope, "plays on a Bela board"],
+	[\checkInputs, "a step of the build"],
+	[\checkNInputs, "a step of the build"],
+	[\checkSameRateAsFirstInput, "a step of the build"],
+	[\checkValidInputs, "a step of the build"],
+	[\collectConstants, "a step of the build"],
+	[\composeBinaryOp, "binary_op"],
+	[\composeNAryOp, "is not implemented"],
+	[\composeUnaryOp, "unary_op"],
+	[\copy, "gives the UGen itself"],
+	[\descendants, "a step of the build"],
+	[\descendants_, "a step of the build"],
+	[\dumpArgs, "prints"],
+	[\dumpName, "prints"],
+	[\init, "a step of the build"],
+	[\initTopoSort, "a step of the build"],
+	[\inputs, "a step of the build"],
+	[\inputs_, "a step of the build"],
+	[\isUGen, "a test of the language"],
+	[\isValidUGenInput, "a test of the language"],
+	[\madd, "madd"],
+	[\makeAvailable, "a step of the build"],
+	[\methodSelectorForRate, "a step of the build"],
+	[\name, "a step of the build"],
+	[\numChannels, "a step of the build"],
+	[\numInputs, "a step of the build"],
+	[\numOutputs, "a step of the build"],
+	[\optimizeGraph, "a step of the build"],
+	[\outputIndex, "a step of the build"],
+	[\performBinaryOpOnComplex, "gives a Complex"],
+	[\performDeadCodeElimination, "a step of the build"],
+	[\prReverseLazyEquals, "the reverse of |==|"],
+	[\rate, "a step of the build"],
+	[\rate_, "a step of the build"],
+	[\rateNumber, "a step of the build"],
+	[\removeAntecedent, "a step of the build"],
+	[\reverseComposeBinaryOp, "binary_op"],
+	[\schedule, "a step of the build"],
+	[\scope, "plays on the server"],
+	[\signalRange, "the signal_range of the class"],
+	[\specialIndex, "a step of the build"],
+	[\specialIndex_, "a step of the build"],
+	[\synthDef, "a step of the build"],
+	[\synthDef_, "a step of the build"],
+	[\synthIndex, "a step of the build"],
+	[\synthIndex_, "a step of the build"],
+	[\widthFirstAntecedents, "a step of the build"],
+	[\widthFirstAntecedents_, "a step of the build"],
+	[\writeDef, "a step of the build"],
+	[\writeDefOld, "a step of the build"],
+	[\writeInputSpec, "a step of the build"],
+	[\writeInputSpecOld, "a step of the build"],
+	[\writeOutputSpec, "a step of the build"],
+	[\writeOutputSpecs, "a step of the build"],
+	[\writesToBus, "a step of the build"]
+];
+
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansionOf, wiring;
 var testPassthrough, testSilence, testAudioTogether;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
-var classes, pseudoClasses, specs, envs, pvs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
+var classes, pseudoClasses, specs, envs, ranges, pvs, ugens, addable = 0, methods = 0, pseudo = 0;
+var helpDir, json;
 var cantAlias = List.new;
 
 try {
@@ -1079,6 +1168,10 @@ try {
 		var convertEnvOwner = convertEnv !? { methodOwner.(convertEnv).name };
 		var doc = SCDoc.documents["Classes/" ++ class.name];
 		var kindOf = { |base| class == base or: { supers.includes(base) } };
+		var signalRange = class.newCopyArgs.signalRange;
+		if ([\bipolar, \unipolar].includes(signalRange).not) {
+			fail.("the signalRange of % is %".format(class, signalRange));
+		};
 		if (rule.isNil) {
 			fail.("checkInputs of % belongs to %, which checkRules does not know"
 				.format(class, check.name));
@@ -1104,6 +1197,7 @@ try {
 			\fft_size -> (fftSize !? { fftRules[fftSize.ownerClass.name] }),
 			\convert_env -> (convertEnvOwner !? { convertEnvRules[convertEnvOwner] }),
 			\cant_alias -> cantAlias.includes(class.name),
+			\signal_range -> signalRange,
 			\categories -> (doc !? { doc.categories } ? []),
 			\check_inputs -> ([\rule -> rule[0]] ++ switch (rule[0])
 				{ \n_inputs } { [\count -> rule[1]] }
@@ -1240,9 +1334,35 @@ try {
 		if (method.isNil) { fail.("PV_ChainUGen has no method %".format(selector)) };
 		describeArgs.(PV_ChainUGen, selector, method, PV_ChainUGen)[1] ++ [\addable -> "pseudo"]
 	};
+	// The instance methods of UGen that build graphs, with their arguments,
+	// the classes whose methods a Float and an Array answer, and the
+	// subclasses of UGen with a method of their own.
+	UGen.methods.do { |method|
+		if (ugenMethods.includes(method.name).not
+			and: { notUgenMethods.any { |entry| entry[0] == method.name }.not }) {
+			fail.("UGen:% needs an entry in ugenMethods or notUgenMethods".format(method.name));
+		};
+	};
+	ugens = ugenMethods.collect { |selector|
+		var method = UGen.findMethod(selector);
+		var owner = { |class| class.findRespondingMethodFor(selector) !? { |found| found.ownerClass.name } };
+		var overrides = UGen.allSubclasses.collect(owner).reject { |name| name == \UGen };
+		if (method.isNil) { fail.("UGen has no method %".format(selector)) };
+		describeArgs.(UGen, selector, method, UGen)[1] ++ [
+			\addable -> "pseudo",
+			\number -> owner.(Float),
+			\array -> owner.(Array),
+			\overrides -> overrides.asSet.asArray.sort
+		]
+	};
 	envs = envMethods.collect { |selector|
 		var method = Env.class.findMethod(selector);
 		if (method.isNil) { fail.("Env has no class method %".format(selector)) };
+		describeArgs.(Env, selector, method, Env)[1] ++ [\addable -> "pseudo"]
+	};
+	ranges = envRanges.collect { |selector|
+		var method = Env.findMethod(selector);
+		if (method.isNil) { fail.("Env has no method %".format(selector)) };
 		describeArgs.(Env, selector, method, Env)[1] ++ [\addable -> "pseudo"]
 	};
 
@@ -1253,14 +1373,18 @@ try {
 		\pseudo_classes -> pseudoClasses,
 		\specs -> specs,
 		\env_methods -> envs,
-		\pv_methods -> pvs
+		\env_ranges -> ranges,
+		\pv_methods -> pvs,
+		\ugen_methods -> ugens
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
 		++ "% pseudo-UGen methods, % classes outside UGen, % specs, % methods of Env, "
-		++ "% methods of PV_ChainUGen, % units that cannot alias")
+		++ "% ranges of Env, % methods of PV_ChainUGen, % units that cannot alias, "
+		++ "% methods of UGen")
 		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
-			pseudoClasses.size, specs.size, envs.size, pvs.size, cantAlias.size).postln;
+			pseudoClasses.size, specs.size, envs.size, ranges.size, pvs.size, cantAlias.size,
+			ugens.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;

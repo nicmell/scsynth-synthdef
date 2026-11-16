@@ -532,6 +532,17 @@ pub enum BuildError {
         /// What fails in sclang.
         message: String,
     },
+    /// A message of `SynthDefBuilder::send` that sclang 3.14.1 throws on, or
+    /// writes a broken definition for: a selector that it does not know, a
+    /// receiver that does not understand the message, a test of `if` on an
+    /// output, or a rate that the method does not take.
+    #[non_exhaustive]
+    BadMethod {
+        /// The selector, such as `range`.
+        selector: String,
+        /// What fails in sclang.
+        message: String,
+    },
 }
 
 impl fmt::Display for BuildError {
@@ -610,7 +621,11 @@ impl fmt::Display for BuildError {
             Self::CheckInputs { class, message } | Self::BadControl { class, message } => {
                 write!(f, "{class}: {message}")
             }
-            Self::BadEnv { method, message } => write!(f, "{method}: {message}"),
+            Self::BadEnv { method, message }
+            | Self::BadMethod {
+                selector: method,
+                message,
+            } => write!(f, "{method}: {message}"),
             Self::Limit(error) => write!(f, "{error}"),
             Self::UnsupportedRate { ugen, rate } => {
                 write!(f, "{ugen} takes no input at the rate {rate:?}")

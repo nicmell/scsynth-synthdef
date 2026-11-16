@@ -191,7 +191,7 @@ fn level_comp_new(
         }
         ArgValue::Input(exponent) => {
             let reciprocal = lang::unary(builder, "reciprocal", number(n))?;
-            let clipped = lang::clip(builder, exponent.clone(), 0.0, 1.0)?;
+            let clipped = lang::clip(builder, exponent.clone(), 0.0.into(), 1.0.into())?;
             lang::binary(builder, "pow", reciprocal, clipped)
         }
         _ => Ok(UGenInput::Number(1.0)),

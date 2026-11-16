@@ -7,6 +7,7 @@ mod envelopes;
 mod fft;
 mod optimize;
 mod pseudo;
+mod ugen_methods;
 mod wire_buffers;
 
 use std::collections::BTreeMap;
@@ -108,6 +109,12 @@ pub const NAMES: &[&str] = &[
     "wirebufs",
     "packfft",
     "pvcalc",
+    "ugenranges",
+    "ugenmaps",
+    "ugenlags",
+    "ugenmisc",
+    "ugenreceivers",
+    "envranges",
 ];
 
 /// The bytes of a golden file.
@@ -212,6 +219,9 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "env" | "ienv" | "varlag" | "envgate" => envelopes::definitions(name),
         "wirebufs" => wire_buffers::definitions(),
         "packfft" | "pvcalc" => fft::definitions(name),
+        "ugenranges" | "ugenmaps" | "ugenlags" | "ugenmisc" | "ugenreceivers" | "envranges" => {
+            ugen_methods::definitions(name)
+        }
         _ => pseudo::definitions(name),
     }
 }

@@ -37,6 +37,9 @@ pub struct UGenClass {
     pub categories: &'static [&'static str],
     /// The rule of its `checkInputs`.
     pub check_inputs: CheckInputs,
+    /// What `signalRange` gives for a UGen of the class, which `range` and
+    /// `exprange` read.
+    pub signal_range: SignalRange,
     /// The methods `ar`, `kr`, `ir` and `new` that the class responds to and
     /// that a UGen class defines.
     pub methods: &'static [RateMethod],
@@ -56,6 +59,36 @@ impl UGenClass {
     pub fn doc_url(&self) -> String {
         format!("https://doc.sccode.org/Classes/{}.html", self.name)
     }
+}
+
+/// The range of the values of a UGen, as `signalRange` gives it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum SignalRange {
+    /// From -1 to 1, as `SinOsc` gives them.
+    Bipolar,
+    /// From 0 to 1, as `LFPulse` gives them.
+    Unipolar,
+}
+
+/// An instance method of `UGen` that builds a graph, such as `range`, with
+/// the classes whose methods a number and an array answer in its place.
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[non_exhaustive]
+pub struct UGenMethod {
+    /// The selector, and the arguments with the defaults of the method of
+    /// `UGen`.
+    pub method: RateMethod,
+    /// The class whose method a Float answers, such as `SimpleNumber`.
+    /// `None` where a Float does not understand the message.
+    pub number: Option<&'static str>,
+    /// The class whose method an `Array` answers, such as
+    /// `SequenceableCollection`. `None` where an `Array` does not understand
+    /// the message.
+    pub array: Option<&'static str>,
+    /// The subclasses of `UGen` with a method of their own, such as `DUGen`
+    /// for `linlin`.
+    pub overrides: &'static [&'static str],
 }
 
 /// A pseudo-UGen class outside `UGen`, such as `LinLin`: its rate methods
@@ -432,6 +465,22 @@ pub fn env_methods() -> &'static [RateMethod] {
     &generated::ENV_METHODS
 }
 
+/// The instance method of `Env` with this selector that maps its levels to
+/// a range, such as `exprange`.
+#[must_use]
+pub fn env_range(selector: &str) -> Option<&'static RateMethod> {
+    env_ranges()
+        .iter()
+        .find(|method| method.selector == selector)
+}
+
+/// The instance methods of `Env` that map its levels to a range, with their
+/// arguments.
+#[must_use]
+pub fn env_ranges() -> &'static [RateMethod] {
+    &generated::ENV_RANGES
+}
+
 /// The instance method of `PV_ChainUGen` with this selector that takes a
 /// function, such as `pvcalc`.
 #[must_use]
@@ -448,12 +497,28 @@ pub fn pv_methods() -> &'static [RateMethod] {
     &generated::PV_METHODS
 }
 
+/// The instance method of `UGen` with this selector that builds a graph,
+/// such as `range`.
+#[must_use]
+pub fn ugen_method(selector: &str) -> Option<&'static UGenMethod> {
+    ugen_methods()
+        .iter()
+        .find(|method| method.method.selector == selector)
+}
+
+/// The instance methods of `UGen` that build graphs, with their arguments.
+#[must_use]
+pub fn ugen_methods() -> &'static [UGenMethod] {
+    &generated::UGEN_METHODS
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         Addable, ArgDefault, ArgKind, ArrayExpansion, CheckInputs, ConvertEnv, FftSize, InputSlot,
-        Optimize, Outputs, Wiring, all, env_method, env_methods, lookup, pseudo_all, pseudo_lookup,
-        pv_method, pv_methods, spec, specs,
+        Optimize, Outputs, SignalRange, UGenMethod, Wiring, all, env_method, env_methods,
+        env_range, env_ranges, lookup, pseudo_all, pseudo_lookup, pv_method, pv_methods, spec,
+        specs, ugen_method, ugen_methods,
     };
     use crate::rate::Rate;
 
@@ -609,6 +674,202 @@ mod tests {
         );
         assert_eq!(pv_method("pvcalc2").unwrap().args[0].name, "chain2");
         assert!(pv_method("fftSize").is_none());
+    }
+
+    #[test]
+    fn the_ranges_of_env_are_range_exprange_and_curverange() {
+        // Fact 12 of the plan of 0.12.
+        let ranges: Vec<(&str, Vec<Option<ArgDefault>>)> = env_ranges()
+            .iter()
+            .map(|method| {
+                let defaults = method.args.iter().map(|arg| arg.default).collect();
+                (method.selector, defaults)
+            })
+            .collect();
+        let float = |value| Some(ArgDefault::Float(value));
+        assert_eq!(
+            ranges,
+            [
+                ("range", vec![float(0.0), float(1.0)]),
+                ("exprange", vec![float(0.01), float(1.0)]),
+                ("curverange", vec![float(0.0), float(1.0), float(-4.0)]),
+            ]
+        );
+        assert!(env_range("delay").is_none());
+    }
+
+    #[test]
+    fn the_methods_of_ugen_that_build_graphs_are_these_42() {
+        // Fact 1 of the plan of 0.12.
+        let selectors: Vec<&str> = ugen_methods()
+            .iter()
+            .map(|method| method.method.selector)
+            .collect();
+        assert_eq!(
+            selectors,
+            [
+                "range",
+                "exprange",
+                "curverange",
+                "unipolar",
+                "bipolar",
+                "linlin",
+                "linexp",
+                "explin",
+                "expexp",
+                "lincurve",
+                "curvelin",
+                "bilin",
+                "prune",
+                "clip",
+                "fold",
+                "wrap",
+                "lag",
+                "lag2",
+                "lag3",
+                "lagud",
+                "lag2ud",
+                "lag3ud",
+                "varlag",
+                "slew",
+                "blend",
+                "minNyquist",
+                "degrad",
+                "raddeg",
+                "moddif",
+                "sanitize",
+                "poll",
+                "dpoll",
+                "checkBadValues",
+                "snap",
+                "softRound",
+                "binaryValue",
+                "isPositive",
+                "isNegative",
+                "isStrictlyPositive",
+                "|==|",
+                "degreeToKey",
+                "if",
+            ]
+        );
+        let linlin = ugen_method("linlin").unwrap();
+        let args: Vec<(&str, ArgKind, Option<ArgDefault>)> = linlin
+            .method
+            .args
+            .iter()
+            .map(|arg| (arg.name, arg.kind, arg.default))
+            .collect();
+        assert_eq!(
+            args,
+            [
+                ("inMin", ArgKind::Signal, None),
+                ("inMax", ArgKind::Signal, None),
+                ("outMin", ArgKind::Signal, None),
+                ("outMax", ArgKind::Signal, None),
+                ("clip", ArgKind::Symbol, Some(ArgDefault::Symbol("minmax"))),
+            ]
+        );
+        assert!(ugen_method("madd").is_none());
+    }
+
+    /// The selectors of the methods whose receiver of one kind answers the
+    /// method of `owner`.
+    fn answered(kind: fn(&UGenMethod) -> Option<&str>, owner: Option<&str>) -> Vec<&'static str> {
+        ugen_methods()
+            .iter()
+            .filter(|method| kind(method) == owner)
+            .map(|method| method.method.selector)
+            .collect()
+    }
+
+    #[test]
+    fn a_number_answers_31_of_the_methods() {
+        // Fact 10 of the plan of 0.12.
+        let number = |method: &UGenMethod| method.number;
+        assert_eq!(
+            answered(number, None),
+            [
+                "range",
+                "exprange",
+                "curverange",
+                "unipolar",
+                "bipolar",
+                "prune",
+                "minNyquist",
+                "sanitize",
+                "dpoll",
+                "checkBadValues",
+                "if",
+            ]
+        );
+        assert_eq!(answered(number, Some("Float")), ["clip", "fold", "wrap"]);
+        assert_eq!(answered(number, Some("Object")), ["blend", "|==|"]);
+        assert_eq!(answered(number, Some("SimpleNumber")).len(), 26);
+    }
+
+    #[test]
+    fn an_array_answers_38_of_the_methods() {
+        // Fact 11 of the plan of 0.12.
+        let array = |method: &UGenMethod| method.array;
+        assert_eq!(
+            answered(array, None),
+            ["snap", "softRound", "binaryValue", "if"]
+        );
+        assert_eq!(answered(array, Some("Array")), ["poll", "dpoll"]);
+        assert_eq!(answered(array, Some("Object")), ["|==|"]);
+        assert_eq!(answered(array, Some("SequenceableCollection")).len(), 35);
+    }
+
+    #[test]
+    fn dugen_and_lfgauss_have_methods_of_their_own() {
+        // Fact 2 of the plan of 0.12.
+        let overridden: Vec<(&str, &[&str])> = ugen_methods()
+            .iter()
+            .filter(|method| !method.overrides.is_empty())
+            .map(|method| (method.method.selector, method.overrides))
+            .collect();
+        let dugen: &[&str] = &["DUGen"];
+        assert_eq!(
+            overridden,
+            [
+                ("range", &["LFGauss"][..]),
+                ("linlin", dugen),
+                ("linexp", dugen),
+                ("explin", dugen),
+                ("expexp", dugen),
+            ]
+        );
+    }
+
+    #[test]
+    fn sixteen_classes_are_unipolar() {
+        // Fact 4 of the plan of 0.12: 13 classes, and 3 that inherit.
+        let unipolar: Vec<&str> = all()
+            .iter()
+            .filter(|class| class.signal_range == SignalRange::Unipolar)
+            .map(|class| class.name)
+            .collect();
+        assert_eq!(
+            unipolar,
+            [
+                "AnalogIn",
+                "DigitalIO",
+                "DigitalIn",
+                "Dust",
+                "Impulse",
+                "KeyState",
+                "LFPulse",
+                "MouseButton",
+                "MouseX",
+                "MouseY",
+                "MultiplexAnalogIn",
+                "SetResetFF",
+                "TDelay",
+                "ToggleFF",
+                "Trig",
+                "Trig1",
+            ]
+        );
     }
 
     #[test]

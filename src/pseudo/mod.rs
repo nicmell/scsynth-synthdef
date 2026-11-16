@@ -24,12 +24,14 @@ mod pm_osc;
 mod poll;
 mod sound_in;
 mod splay;
+mod ugen_methods;
 
 pub(crate) use fft_unpacking::{pvcalc, pvcalc2, pvcollect};
 pub(crate) use graph_builder::NamedEntry;
+pub(crate) use ugen_methods::send;
 
 use crate::builder::{SynthDefBuilder, count_to_usize};
-use crate::catalog::RateMethod;
+use crate::catalog::{self, RateMethod};
 use crate::env::Curve;
 use crate::error::BuildError;
 use crate::ugen_input::{ArgValue, UGenInput};
@@ -296,6 +298,30 @@ pub(crate) fn elements(value: UGenInput) -> Vec<UGenInput> {
 /// A number of elements as a number of sclang.
 pub(crate) fn number(count: usize) -> UGenInput {
     UGenInput::Number(f64::from(u32::try_from(count).unwrap_or(u32::MAX)))
+}
+
+/// The class of `input` in sclang: `Integer` for a whole number in the
+/// range of an Integer, `Float` for another number, `OutputProxy` for an
+/// output of a `MultiOutUGen`, and else the class of the UGen of the output.
+pub(crate) fn sclang_class(builder: &SynthDefBuilder, input: &UGenInput) -> String {
+    match *input {
+        UGenInput::Number(number)
+            if number.fract() == 0.0 && number.abs() <= f64::from(i32::MAX) =>
+        {
+            "Integer".to_owned()
+        }
+        UGenInput::Number(_) => "Float".to_owned(),
+        ref output => {
+            let class = builder.class_of(output).unwrap_or("UGen");
+            let multi = catalog::lookup(class)
+                .is_some_and(|ugen| ugen.superclasses.contains(&"MultiOutUGen"));
+            if multi {
+                "OutputProxy".to_owned()
+            } else {
+                class.to_owned()
+            }
+        }
+    }
 }
 
 #[cfg(test)]
