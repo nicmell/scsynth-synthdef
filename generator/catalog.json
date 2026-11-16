@@ -42214,5 +42214,117 @@
       ],
       "addable": "pseudo"
     }
+  ],
+  "pv_methods": [
+    {
+      "selector": "pvcalc",
+      "args": [
+        {
+          "name": "numframes",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "func",
+          "kind": "function",
+          "default": null
+        },
+        {
+          "name": "frombin",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "tobin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "zeroothers",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        }
+      ],
+      "addable": "pseudo"
+    },
+    {
+      "selector": "pvcalc2",
+      "args": [
+        {
+          "name": "chain2",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "numframes",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "func",
+          "kind": "function",
+          "default": null
+        },
+        {
+          "name": "frombin",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "tobin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "zeroothers",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        }
+      ],
+      "addable": "pseudo"
+    },
+    {
+      "selector": "pvcollect",
+      "args": [
+        {
+          "name": "numframes",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "func",
+          "kind": "function",
+          "default": null
+        },
+        {
+          "name": "frombin",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        },
+        {
+          "name": "tobin",
+          "kind": "signal",
+          "default": null
+        },
+        {
+          "name": "zeroothers",
+          "kind": "signal",
+          "default": {
+            "float": 0
+          }
+        }
+      ],
+      "addable": "pseudo"
+    }
   ]
 }

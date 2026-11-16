@@ -107,6 +107,7 @@ pub const NAMES: &[&str] = &[
     "demandenvgen",
     "wirebufs",
     "packfft",
+    "pvcalc",
 ];
 
 /// The bytes of a golden file.
@@ -210,7 +211,7 @@ pub fn definitions(name: &str) -> Vec<SynthDef> {
         "controlugens" | "defwrap" | "specs" | "namedcontrol" => controls::definitions(name),
         "env" | "ienv" | "varlag" | "envgate" => envelopes::definitions(name),
         "wirebufs" => wire_buffers::definitions(),
-        "packfft" => fft::definitions(name),
+        "packfft" | "pvcalc" => fft::definitions(name),
         _ => pseudo::definitions(name),
     }
 }

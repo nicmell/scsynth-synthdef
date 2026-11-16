@@ -137,6 +137,7 @@ fn kind(value: &Value) -> &'static str {
         "symbol" => "ArgKind::Symbol",
         "bool" => "ArgKind::Bool",
         "curve" => "ArgKind::Curve",
+        "function" => "ArgKind::Function",
         other => panic!("{other} is no kind of argument"),
     }
 }
@@ -473,17 +474,18 @@ fn render_catalog(catalog: &Value) -> String {
     rendered.push_str("];\n");
     render_pseudo_classes(&mut rendered, catalog);
     render_specs(&mut rendered, catalog);
-    render_env_methods(&mut rendered, catalog);
+    render_methods(&mut rendered, catalog, "env_methods", "ENV_METHODS");
+    render_methods(&mut rendered, catalog, "pv_methods", "PV_METHODS");
     rendered
 }
 
-fn render_env_methods(rendered: &mut String, catalog: &Value) {
-    let methods = catalog["env_methods"]
+fn render_methods(rendered: &mut String, catalog: &Value, key: &str, name: &str) {
+    let methods = catalog[key]
         .as_array()
-        .expect("a list of methods of Env");
+        .unwrap_or_else(|| panic!("{key} is a list of methods"));
     writeln!(
         rendered,
-        "\npub(super) static ENV_METHODS: [RateMethod; {}] = [",
+        "\npub(super) static {name}: [RateMethod; {}] = [",
         methods.len()
     )
     .unwrap();

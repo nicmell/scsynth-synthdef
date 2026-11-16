@@ -25,6 +25,7 @@ mod poll;
 mod sound_in;
 mod splay;
 
+pub(crate) use fft_unpacking::{pvcalc, pvcalc2, pvcollect};
 pub(crate) use graph_builder::NamedEntry;
 
 use crate::builder::{SynthDefBuilder, count_to_usize};

@@ -143,6 +143,12 @@ var argumentKinds = [
 	[\NumChannels, \ar, \numChannels, \count],
 	[\Out, \ar, \channelsArray, \array],
 	[\Out, \kr, \channelsArray, \array],
+	[\PV_ChainUGen, \pvcalc, \func, \function],
+	[\PV_ChainUGen, \pvcalc, \numframes, \signal],
+	[\PV_ChainUGen, \pvcalc2, \func, \function],
+	[\PV_ChainUGen, \pvcalc2, \numframes, \signal],
+	[\PV_ChainUGen, \pvcollect, \func, \function],
+	[\PV_ChainUGen, \pvcollect, \numframes, \signal],
 	[\PackFFT, \new, \magsphases, \array],
 	[\PanAz, \ar, \numChans, \count],
 	[\PanAz, \kr, \numChans, \count],
@@ -355,13 +361,21 @@ var notEnvMethods = [
 	[\shapeNumber, "gives the number of a shape"]
 ];
 
+// The instance methods of PV_ChainUGen that take a function, and why the
+// others do not count.
+var pvMethods = [\pvcalc, \pvcalc2, \pvcollect];
+var notPvMethods = [
+	[\addCopiesIfNeeded, "a step of the build"],
+	[\fftSize, "the size of the FFT, which fft_size holds"]
+];
+
 var stripComments, enumFrom, selectorsOf, operatorTable, quote, toJSON;
 var ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues, controlValues;
 var same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf, arrayExpansionOf, wiring;
 var testPassthrough, testSilence, testAudioTogether;
 var describeArgs, describeMethod, describeClass, methodOwner, describePseudoClass;
 var opcodes, parseNode, unaryEnum, binaryEnum, unaryNames, binaryNames, unary, binary;
-var classes, pseudoClasses, specs, envs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
+var classes, pseudoClasses, specs, envs, pvs, addable = 0, methods = 0, pseudo = 0, helpDir, json;
 var cantAlias = List.new;
 
 try {
@@ -1213,6 +1227,19 @@ try {
 			fail.("Env.% needs an entry in envMethods or notEnvMethods".format(method.name));
 		};
 	};
+	// The instance methods of PV_ChainUGen that take a function, with their
+	// arguments.
+	PV_ChainUGen.methods.do { |method|
+		if (pvMethods.includes(method.name).not
+			and: { notPvMethods.any { |entry| entry[0] == method.name }.not }) {
+			fail.("PV_ChainUGen:% needs an entry in pvMethods or notPvMethods".format(method.name));
+		};
+	};
+	pvs = pvMethods.collect { |selector|
+		var method = PV_ChainUGen.findMethod(selector);
+		if (method.isNil) { fail.("PV_ChainUGen has no method %".format(selector)) };
+		describeArgs.(PV_ChainUGen, selector, method, PV_ChainUGen)[1] ++ [\addable -> "pseudo"]
+	};
 	envs = envMethods.collect { |selector|
 		var method = Env.class.findMethod(selector);
 		if (method.isNil) { fail.("Env has no class method %".format(selector)) };
@@ -1225,14 +1252,15 @@ try {
 		\classes -> classes,
 		\pseudo_classes -> pseudoClasses,
 		\specs -> specs,
-		\env_methods -> envs
+		\env_methods -> envs,
+		\pv_methods -> pvs
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("catalog.scd: % unary and % binary operators, % classes, % of % methods addable, "
 		++ "% pseudo-UGen methods, % classes outside UGen, % specs, % methods of Env, "
-		++ "% units that cannot alias")
+		++ "% methods of PV_ChainUGen, % units that cannot alias")
 		.format(unary.size, binary.size, classes.size, addable, methods, pseudo,
-			pseudoClasses.size, specs.size, envs.size, cantAlias.size).postln;
+			pseudoClasses.size, specs.size, envs.size, pvs.size, cantAlias.size).postln;
 	0.exit;
 } { |error|
 	error.reportError;

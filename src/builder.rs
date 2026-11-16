@@ -400,6 +400,81 @@ impl SynthDefBuilder {
         self.transaction(|builder| pseudo::env::build(builder, method, values))
     }
 
+    /// `chain.pvcalc(numframes, func, frombin, tobin, zeroothers)` of
+    /// sclang. It unpacks the bins of `chain` from `frombin` to `tobin`, as
+    /// `UnpackFFT` does, and calls `func` with the array of their magnitudes
+    /// and the array of their phases. Then it packs into `chain` what `func`
+    /// gives, as `PackFFT` does. The catalogue gives the arguments and their
+    /// defaults (see [`catalog::pv_method`]).
+    ///
+    /// As in sclang, the size of the result decides what `PackFFT` takes. An
+    /// array of one value gets the phases after it, and an array of two is
+    /// the magnitudes and the phases. Anything else, a UGen included, is the
+    /// magnitudes, with the phases of `chain`.
+    ///
+    /// # Errors
+    ///
+    /// [`BuildError::WrongKind`] for a `chain` that is not one output of a
+    /// `PV_ChainUGen`, as sclang understands the method on no other value,
+    /// and for a value of `func` by name. Also the errors of the arguments,
+    /// of `func`, and of the UGens that the method adds. A call that fails
+    /// leaves the build as it was.
+    pub fn pvcalc(
+        &mut self,
+        chain: impl Into<UGenInput>,
+        args: &[(&str, ArgValue)],
+        func: impl FnOnce(&mut Self, UGenInput, UGenInput) -> Result<UGenInput, BuildError>,
+    ) -> Result<UGenInput, BuildError> {
+        let (method, values) = pv_values("pvcalc", args)?;
+        let chain = chain.into();
+        self.transaction(|builder| pseudo::pvcalc(builder, chain, method, values, func))
+    }
+
+    /// `chain.pvcalc2(chain2, numframes, func, frombin, tobin, zeroothers)` of
+    /// sclang: [`pvcalc`](Self::pvcalc) over the bins of `chain` and of
+    /// `chain2`. `func` takes the magnitudes and the phases of `chain`, then
+    /// those of `chain2`, and what it gives goes into `chain`.
+    ///
+    /// # Errors
+    ///
+    /// The errors of [`pvcalc`](Self::pvcalc).
+    pub fn pvcalc2(
+        &mut self,
+        chain: impl Into<UGenInput>,
+        args: &[(&str, ArgValue)],
+        func: impl FnOnce(
+            &mut Self,
+            UGenInput,
+            UGenInput,
+            UGenInput,
+            UGenInput,
+        ) -> Result<UGenInput, BuildError>,
+    ) -> Result<UGenInput, BuildError> {
+        let (method, values) = pv_values("pvcalc2", args)?;
+        let chain = chain.into();
+        self.transaction(|builder| pseudo::pvcalc2(builder, chain, method, values, func))
+    }
+
+    /// `chain.pvcollect(numframes, func, frombin, tobin, zeroothers)` of
+    /// sclang. It calls `func` for each bin of `chain` from `frombin` to
+    /// `tobin`, with its magnitude, its phase, its bin and its index from 0,
+    /// and packs what each call gives into `chain`. A result of one value
+    /// gets the phase of its bin, and an array of more values stays as it is.
+    ///
+    /// # Errors
+    ///
+    /// The errors of [`pvcalc`](Self::pvcalc).
+    pub fn pvcollect(
+        &mut self,
+        chain: impl Into<UGenInput>,
+        args: &[(&str, ArgValue)],
+        func: impl FnMut(&mut Self, UGenInput, UGenInput, f64, f64) -> Result<UGenInput, BuildError>,
+    ) -> Result<UGenInput, BuildError> {
+        let (method, values) = pv_values("pvcollect", args)?;
+        let chain = chain.into();
+        self.transaction(|builder| pseudo::pvcollect(builder, chain, method, values, func))
+    }
+
     /// `asArrayForInterpolation`: the envelope as `IEnvGen` reads it, an
     /// array per channel, one channel included. Its fourth value is
     /// `times.sum`, which adds UGens when a time is an output.
@@ -1453,6 +1528,27 @@ fn bind_arguments(
 
 /// The value of each argument of `method`: the one that `args` gives by
 /// name, or the default, or none for a nil default.
+/// The instance method of `PV_ChainUGen` with this selector, and its
+/// arguments bound by name. `func` takes no value by name: the closure of
+/// the call takes its place.
+fn pv_values(
+    selector: &str,
+    args: &[(&str, ArgValue)],
+) -> Result<(&'static RateMethod, Vec<Option<ArgValue>>), BuildError> {
+    let method = catalog::pv_method(selector).ok_or_else(|| BuildError::UnknownMethod {
+        class: "PV_ChainUGen".to_owned(),
+        selector: selector.to_owned(),
+    })?;
+    if args.iter().any(|(name, _)| *name == "func") {
+        return Err(BuildError::WrongKind {
+            class: "PV_ChainUGen".to_owned(),
+            argument: "func".to_owned(),
+            expected: "the closure of the call",
+        });
+    }
+    Ok((method, bind_optional("PV_ChainUGen", method, args)?))
+}
+
 fn bind_optional(
     class: &str,
     method: &RateMethod,

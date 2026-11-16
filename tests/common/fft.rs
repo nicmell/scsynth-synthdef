@@ -2,16 +2,17 @@
 //! methods, built with the crate. `generator/fixtures.scd` holds the sclang
 //! code of each.
 
-use scsynth_synthdef::{ArgValue, SynthDef, SynthDefBuilder, UGenInput};
+use scsynth_synthdef::{ArgValue, BuildError, SynthDef, SynthDefBuilder, UGenInput};
 
 use super::controls::kr;
 use super::pseudo::{def, input, out, sine};
-use super::{array, by_name};
+use super::{array, by_name, element};
 
 /// The definitions of a golden file of 0.11.
 pub fn definitions(name: &str) -> Vec<SynthDef> {
     match name {
         "packfft" => [packfft_inputs(), packfft_arrays()].concat(),
+        "pvcalc" => [pvcalc(), pvcollect()].concat(),
         _ => panic!("no golden graph is named {name}"),
     }
 }
@@ -32,7 +33,12 @@ fn chain(b: &mut SynthDefBuilder) -> UGenInput {
 /// `Out.ar(0, IFFT(...))`.
 fn pack_out(b: &mut SynthDefBuilder, args: &[(&str, ArgValue)]) {
     let packed = by_name(b, "PackFFT", "new", args);
-    let sound = by_name(b, "IFFT", "new", &[("buffer", input(packed))]);
+    ifft_out(b, packed);
+}
+
+/// `Out.ar(0, IFFT(chain))`.
+fn ifft_out(b: &mut SynthDefBuilder, chain: UGenInput) {
+    let sound = by_name(b, "IFFT", "new", &[("buffer", input(chain))]);
     out(b, "ar", sound);
 }
 
@@ -146,5 +152,97 @@ fn packfft_arrays() -> Vec<SynthDef> {
             ];
             pack_out(b, &args);
         }),
+    ]
+}
+
+/// `chain.pvcalc(8, func, ...)` of the chain, into `Out.ar(0, IFFT(...))`,
+/// with these other arguments.
+fn calc(
+    name: &str,
+    args: &[(&str, ArgValue)],
+    func: impl FnOnce(&mut SynthDefBuilder, UGenInput, UGenInput) -> Result<UGenInput, BuildError>,
+) -> SynthDef {
+    def(name, vec![], |b| {
+        let c = chain(b);
+        let mut all = vec![("numframes", input(8.0))];
+        all.extend(args.iter().cloned());
+        let packed = b.pvcalc(c, &all, func).unwrap();
+        ifft_out(b, packed);
+    })
+}
+
+/// `{ |m, p| [m, p] }`: the magnitudes and the phases as they come.
+fn identity()
+-> impl FnOnce(&mut SynthDefBuilder, UGenInput, UGenInput) -> Result<UGenInput, BuildError> {
+    |_, magnitudes, phases| Ok(UGenInput::Array(vec![magnitudes, phases]))
+}
+
+fn pvcalc() -> Vec<SynthDef> {
+    let bins = |frombin: f64, tobin: f64| [("frombin", input(frombin)), ("tobin", input(tobin))];
+    vec![
+        calc("pvcalc_identity", &[], identity()),
+        calc("pvcalc_mags", &[], |b, m, _| b.binary_op("*", m, 2.0)),
+        calc("pvcalc_one_bin", &bins(2.0, 2.0), |_, m, _| Ok(m)),
+        calc("pvcalc_one_value", &[], |_, m, _| {
+            Ok(UGenInput::Array(vec![element(&m, 0)]))
+        }),
+        calc("pvcalc_ugen", &[], |_, m, _| Ok(element(&m, 0))),
+        calc("pvcalc_two_bins", &bins(0.0, 1.0), |_, m, _| Ok(m)),
+        calc("pvcalc_past", &bins(0.0, 10.0), identity()),
+        def("pvcalc2", vec![], |b| {
+            let c = chain(b);
+            let buffer = by_name(b, "LocalBuf", "new", &[("numFrames", input(8.0))]);
+            let sound = sine(b, "ar", 2.0);
+            let d = by_name(
+                b,
+                "FFT",
+                "new",
+                &[("buffer", input(buffer)), ("in", input(sound))],
+            );
+            let args = [("chain2", input(d)), ("numframes", input(8.0))];
+            let packed = b
+                .pvcalc2(c, &args, |b, m, p, m2, _| {
+                    let sum = b.binary_op("+", m, m2)?;
+                    Ok(UGenInput::Array(vec![sum, p]))
+                })
+                .unwrap();
+            ifft_out(b, packed);
+        }),
+    ]
+}
+
+/// `chain.pvcollect(8, func, ...)` of the chain, into `Out.ar(0, IFFT(...))`,
+/// with these other arguments.
+fn collect(
+    name: &str,
+    args: &[(&str, ArgValue)],
+    func: impl FnMut(
+        &mut SynthDefBuilder,
+        UGenInput,
+        UGenInput,
+        f64,
+        f64,
+    ) -> Result<UGenInput, BuildError>,
+) -> SynthDef {
+    def(name, vec![], |b| {
+        let c = chain(b);
+        let mut all = vec![("numframes", input(8.0))];
+        all.extend(args.iter().cloned());
+        let packed = b.pvcollect(c, &all, func).unwrap();
+        ifft_out(b, packed);
+    })
+}
+
+fn pvcollect() -> Vec<SynthDef> {
+    vec![
+        collect("pvcollect_mag", &[], |_, m, _, _, _| Ok(m)),
+        collect("pvcollect_three", &[], |_, m, p, _, _| {
+            Ok(UGenInput::Array(vec![m, p, 0.0.into()]))
+        }),
+        collect(
+            "pvcollect_bin",
+            &[("frombin", input(1.0)), ("tobin", input(3.0))],
+            |b, m, _, bin, _| b.binary_op("*", m, bin),
+        ),
     ]
 }

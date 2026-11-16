@@ -20427,3 +20427,40 @@ pub(super) static ENV_METHODS: [RateMethod; 14] = [
                 addable: Addable::Pseudo,
             },
 ];
+
+pub(super) static PV_METHODS: [RateMethod; 3] = [
+            RateMethod {
+                selector: "pvcalc",
+                args: &[
+                    ArgSpec { name: "numframes", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "func", kind: ArgKind::Function, default: None },
+                    ArgSpec { name: "frombin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "tobin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "zeroothers", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "pvcalc2",
+                args: &[
+                    ArgSpec { name: "chain2", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "numframes", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "func", kind: ArgKind::Function, default: None },
+                    ArgSpec { name: "frombin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "tobin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "zeroothers", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "pvcollect",
+                args: &[
+                    ArgSpec { name: "numframes", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "func", kind: ArgKind::Function, default: None },
+                    ArgSpec { name: "frombin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "tobin", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "zeroothers", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+];
