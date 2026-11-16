@@ -1282,6 +1282,71 @@ try {
 		]);
 	}.value;
 
+	// PackFFT.new and the pvcalc methods, of 0.11, in functions of their own
+	// for the same reason. Each chain is an FFT of 8 frames.
+	{
+		var chain = { FFT(LocalBuf(8), SinOsc.ar) };
+		writeCases.("packfft", [
+			[\packfft_unpack, { var c = chain.value; Out.ar(0, IFFT(PackFFT(c, 8, UnpackFFT(c, 8)))) }],
+			[\packfft_numbers, { Out.ar(0, IFFT(PackFFT(chain.value, 8, [1, 0, 1, 0], 1, 2, 1))) }],
+			// The default tobin, bufsize / 2, adds a BinaryOpUGen.
+			[\packfft_ugen_size, { Out.ar(0, IFFT(PackFFT(chain.value, \b.kr(8), [1, 0]))) }],
+			[\packfft_ugen_frombin, { Out.ar(0, IFFT(PackFFT(chain.value, 8, [1, 0], \f.kr(0)))) }],
+			// Two PackFFT, and a PV_Copy before the first.
+			[\packfft_nested, { Out.ar(0, IFFT(PackFFT(chain.value, 8, [[1, 2], 0]))) }],
+			[\packfft_empty, { Out.ar(0, IFFT(PackFFT(chain.value, 8, []))) }],
+			[\packfft_chains, {
+				Out.ar(0, IFFT(PackFFT(FFT(LocalBuf(8, [1, 1]), SinOsc.ar([1, 2])), 8, [1, 0])))
+			}],
+			// The graph of the test of sc-app3.
+			[\packfft_markup, {
+				var chain = FFT(LocalBuf(8), SinOsc.ar);
+				var bins = UnpackFFT(chain, 8);
+				Out.ar(0, IFFT(PackFFT(chain, 8, bins * 2)))
+			}]
+		]);
+	}.value;
+	{
+		var chain = { FFT(LocalBuf(8), SinOsc.ar) };
+		writeCases.("pvcalc", [
+			[\pvcalc_identity, { Out.ar(0, IFFT(chain.value.pvcalc(8, { |m, p| [m, p] }))) }],
+			[\pvcalc_mags, { Out.ar(0, IFFT(chain.value.pvcalc(8, { |m, p| m * 2 }))) }],
+			[\pvcalc_one_bin, { Out.ar(0, IFFT(chain.value.pvcalc(8, { |m, p| m }, 2, 2))) }],
+			// One value over five bins gets every phase after it.
+			[\pvcalc_one_value, { Out.ar(0, IFFT(chain.value.pvcalc(8, { |m, p| [m[0]] }))) }],
+			// A UGen takes the place of every magnitude.
+			[\pvcalc_ugen, { Out.ar(0, IFFT(chain.value.pvcalc(8, { |m, p| m[0] }))) }],
+			// Two magnitudes alone count as [mags, phases].
+			[\pvcalc_two_bins, { Out.ar(0, IFFT(chain.value.pvcalc(8, { |m, p| m }, 0, 1))) }],
+			// UnpackFFT clamps tobin, and PackFFT takes it as it is.
+			[\pvcalc_past, { Out.ar(0, IFFT(chain.value.pvcalc(8, { |m, p| [m, p] }, 0, 10))) }],
+			[\pvcalc2, {
+				var c = chain.value;
+				var d = FFT(LocalBuf(8), SinOsc.ar(2));
+				Out.ar(0, IFFT(c.pvcalc2(d, 8, { |m, p, m2, p2| [m + m2, p] })))
+			}],
+			[\pvcollect_mag, { Out.ar(0, IFFT(chain.value.pvcollect(8, { |m, p, bin, i| m }))) }],
+			[\pvcollect_three, {
+				Out.ar(0, IFFT(chain.value.pvcollect(8, { |m, p, bin, i| [m, p, 0] })))
+			}],
+			[\pvcollect_bin, {
+				Out.ar(0, IFFT(chain.value.pvcollect(8, { |m, p, bin, i| m * bin }, 1, 3)))
+			}]
+		]);
+		[
+			[\refused_pvcalc_numframes, {
+				Out.ar(0, IFFT(chain.value.pvcalc(\n.kr(8), { |m, p| [m, p] })))
+			}],
+			[\refused_pvcollect_frombin, {
+				Out.ar(0, IFFT(chain.value.pvcollect(8, { |m, p| m }, \f.kr(0))))
+			}],
+			[\refused_pvcalc_not_chain, { Out.ar(0, IFFT(SinOsc.ar.pvcalc(8, { |m, p| [m, p] }))) }],
+			[\refused_pvcalc_chains, {
+				Out.ar(0, IFFT(FFT(LocalBuf([8, 8]), SinOsc.ar).pvcalc(8, { |m, p| [m, p] })))
+			}]
+		].do { |case| refused.(case[0], case[1]) };
+	}.value;
+
 	writeArithmetic.();
 
 	"fixtures.scd: wrote % golden files to %".format(written, fixtures).postln;

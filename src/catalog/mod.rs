@@ -131,6 +131,9 @@ pub enum ArgKind {
     /// A curve of an envelope, such as the `curve` of `Env.perc`: a shape
     /// by name, a value, or an array of them.
     Curve,
+    /// A function, such as the `func` of `pvcalc`. The methods of the
+    /// builder take a closure in its place.
+    Function,
 }
 
 /// The default value of an argument.
@@ -429,12 +432,28 @@ pub fn env_methods() -> &'static [RateMethod] {
     &generated::ENV_METHODS
 }
 
+/// The instance method of `PV_ChainUGen` with this selector that takes a
+/// function, such as `pvcalc`.
+#[must_use]
+pub fn pv_method(selector: &str) -> Option<&'static RateMethod> {
+    pv_methods()
+        .iter()
+        .find(|method| method.selector == selector)
+}
+
+/// The instance methods of `PV_ChainUGen` that take a function, with their
+/// arguments.
+#[must_use]
+pub fn pv_methods() -> &'static [RateMethod] {
+    &generated::PV_METHODS
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         Addable, ArgDefault, ArgKind, ArrayExpansion, CheckInputs, ConvertEnv, FftSize, InputSlot,
         Optimize, Outputs, Wiring, all, env_method, env_methods, lookup, pseudo_all, pseudo_lookup,
-        spec, specs,
+        pv_method, pv_methods, spec, specs,
     };
     use crate::rate::Rate;
 
@@ -565,6 +584,31 @@ mod tests {
             .filter(|method| matches!(method.addable, Addable::Yes(wiring) if wiring.audio_input.is_some()))
             .count();
         assert_eq!(converted, 19);
+    }
+
+    #[test]
+    fn the_methods_that_take_a_function_are_those_of_pv_chain_ugen() {
+        // Fact 7 of the plan of 0.11.
+        let selectors: Vec<&str> = pv_methods().iter().map(|method| method.selector).collect();
+        assert_eq!(selectors, ["pvcalc", "pvcalc2", "pvcollect"]);
+        let pvcalc = pv_method("pvcalc").unwrap();
+        let args: Vec<(&str, ArgKind, Option<ArgDefault>)> = pvcalc
+            .args
+            .iter()
+            .map(|arg| (arg.name, arg.kind, arg.default))
+            .collect();
+        assert_eq!(
+            args,
+            [
+                ("numframes", ArgKind::Signal, None),
+                ("func", ArgKind::Function, None),
+                ("frombin", ArgKind::Signal, Some(ArgDefault::Float(0.0))),
+                ("tobin", ArgKind::Signal, None),
+                ("zeroothers", ArgKind::Signal, Some(ArgDefault::Float(0.0))),
+            ]
+        );
+        assert_eq!(pv_method("pvcalc2").unwrap().args[0].name, "chain2");
+        assert!(pv_method("fftSize").is_none());
     }
 
     #[test]

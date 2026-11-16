@@ -417,6 +417,16 @@
     "outzeros_two": 2,
     "outzeros_x": 2
   },
+  "packfft": {
+    "packfft_chains": 2,
+    "packfft_empty": 1,
+    "packfft_markup": 1,
+    "packfft_nested": 2,
+    "packfft_numbers": 1,
+    "packfft_ugen_frombin": 1,
+    "packfft_ugen_size": 1,
+    "packfft_unpack": 1
+  },
   "pair": {
     "pair": 2
   },
@@ -448,6 +458,19 @@
     "poll_out": 2,
     "poll_proxy": 0,
     "poll_symbol": 0
+  },
+  "pvcalc": {
+    "pvcalc2": 1,
+    "pvcalc_identity": 1,
+    "pvcalc_mags": 1,
+    "pvcalc_one_bin": 1,
+    "pvcalc_one_value": 1,
+    "pvcalc_past": 1,
+    "pvcalc_two_bins": 1,
+    "pvcalc_ugen": 1,
+    "pvcollect_bin": 1,
+    "pvcollect_mag": 1,
+    "pvcollect_three": 1
   },
   "pvcopy": {
     "pvcopy_analysis": 1,
