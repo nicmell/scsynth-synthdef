@@ -51,7 +51,8 @@ try {
 		var binary = [['+', "+"], ['-', "-"], ['*', "*"], ['/', "/"], ['pow', "pow"],
 			['%', "mod"], ['round', "round"], ['trunc', "trunc"], ['roundUp', "roundUp"],
 			['fold2', "fold2"], ['max', "max"], ['min', "min"], ['absdif', "absdif"]];
-		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin, \exp, \log, \squared, \sign];
+		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin, \exp, \log, \squared, \sign, \dbamp,
+			\softclip];
 		var ranges = [[0.0, 1.0], [-1.0, 1.0], [0.5, 2.0]];
 		var sections = List.new;
 		sections.add("  \"binary\": [\n" ++ binary.collect { |op|

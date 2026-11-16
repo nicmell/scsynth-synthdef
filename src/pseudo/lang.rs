@@ -256,6 +256,14 @@ fn number_unary(op: &str, x: f64) -> Option<f64> {
                 -1.0
             }
         }
+        "dbamp" => 10f64.powf(x * 0.05),
+        "softclip" => {
+            if x.abs() <= 0.5 {
+                x
+            } else {
+                (x.abs() - 0.25) / x
+            }
+        }
         _ => return None,
     })
 }
@@ -346,7 +354,10 @@ mod tests {
     /// libm of another platform can round `pow`, `cos` and `sin` one unit in
     /// the last place away from the libm of the macOS that wrote the table.
     fn same(op: &str, computed: f64, expected: f64) -> bool {
-        let ulps = u64::from(matches!(op, "pow" | "cos" | "sin" | "exp" | "log"));
+        let ulps = u64::from(matches!(
+            op,
+            "pow" | "cos" | "sin" | "exp" | "log" | "dbamp"
+        ));
         (computed.is_nan() && expected.is_nan())
             || computed.to_bits().abs_diff(expected.to_bits()) <= ulps
     }
@@ -382,7 +393,7 @@ mod tests {
                 "{x}.{op}: {computed}, not {expected}"
             );
         }
-        assert_eq!(rows(&table, "unary").len(), 90);
+        assert_eq!(rows(&table, "unary").len(), 108);
     }
 
     #[test]

@@ -28885,7 +28885,71 @@ pub(super) static CLASSES: [UGenClass; 491] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 2] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 16] = [
+    PseudoClass {
+        name: "BHPF",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "order", kind: ArgKind::Signal, default: Some(ArgDefault::Float(4.0)) },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "BLPF",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "order", kind: ArgKind::Signal, default: Some(ArgDefault::Float(4.0)) },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "BhobHiShelf",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "amp", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "BhobLoShelf",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "amp", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
     PseudoClass {
         name: "Greyhole",
         categories: &["UGens>Delays"],
@@ -28901,6 +28965,24 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 2] = [
                     ArgSpec { name: "feedback", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.9)) },
                     ArgSpec { name: "modDepth", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
                     ArgSpec { name: "modFreq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(2.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "HighShelf",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "shelfslope", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "dbgain", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
                 addable: Addable::Pseudo,
             },
@@ -28925,6 +29007,162 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 2] = [
                     ArgSpec { name: "high", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "lowcut", kind: ArgKind::Signal, default: Some(ArgDefault::Float(500.0)) },
                     ArgSpec { name: "highcut", kind: ArgKind::Signal, default: Some(ArgDefault::Float(2000.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "LRHPF",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "order", kind: ArgKind::Signal, default: Some(ArgDefault::Float(4.0)) },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "LRLPF",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "order", kind: ArgKind::Signal, default: Some(ArgDefault::Float(4.0)) },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "LowShelf",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "shelfslope", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "dbgain", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "Notch",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "rq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "RBJHighShelf",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "shelfslope", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "dbgain", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "RBJLowShelf",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "shelfslope", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "dbgain", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "RBJNotch",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "rq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "ZHPF",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "fc", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "damping", kind: ArgKind::Array, default: Some(ArgDefault::Float(0.707)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "ZLPF",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "fc", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "damping", kind: ArgKind::Array, default: Some(ArgDefault::Float(0.707)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
                 addable: Addable::Pseudo,
             },

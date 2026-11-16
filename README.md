@@ -815,13 +815,14 @@ it.
 ## sc3-plugins
 
 With the feature `sc3-plugins`, the module `sc3_plugins` holds the 491
-UGen classes of sc3-plugins 3.14.0, the plugins that many installations of
-SuperCollider add to the core. `ugen` adds them as it adds the classes of
+UGen classes of sc3-plugins 3.14.0. Many installations of SuperCollider
+add these plugins to the core. `ugen` adds them as it adds the classes of
 `catalog`. `sc3_plugins::lookup` gives a class by name, and
 `sc3_plugins::all` gives all of them, sorted by name.
-`sc3_plugins::pseudo_lookup` and `sc3_plugins::pseudo_all` give `Greyhole`
-and `JPverb`. The classes have the types of `catalog`, and no name is in
-both catalogues.
+`sc3_plugins::pseudo_lookup` and `sc3_plugins::pseudo_all` give the
+classes outside `UGen` that the crate builds, such as `JPverb` and `BLPF`.
+The classes have the types of `catalog`, and no name is in both
+catalogues.
 
 ```rust
 # #[cfg(feature = "sc3-plugins")]
@@ -850,13 +851,13 @@ inputs: the definition needs four wire buffers.
   folder `SC3plugins` of the Extensions holds its class files.
   `Version-3.14.1` changes `VBAPSpeakerArray` alone, which builds no UGen,
   so the catalogue serves both.
-- 635 of the 679 rate methods are addable with a wiring. `Greyhole.ar`,
-  `JPverb.ar` and `NHHall.ar` have a body. `Greyhole` and `JPverb` call
-  their raw class on the first and the last channel of `in`. `NHHall`
-  takes an array of two channels.
+- 635 of the 679 rate methods are addable with a wiring, and one has a
+  body. [Pseudo-UGens of sc3-plugins](#pseudo-ugens-of-sc3-plugins) lists
+  the bodies.
 - Most rules of `checkInputs` are those of the core. The 96 HOA classes
-  ask for audio rate on their first n inputs at audio rate, n from 1 to
-  121. `BFGrainPanner` and its subclasses ask for it on input 2.
+  ask for audio rate on their first n inputs at audio rate, for an n of 1
+  to 121 by class. `BFGrainPanner` and its subclasses ask for it on input
+  2.
 - 176 units of sc3-plugins with a class set
   `kUnitDef_CantAliasInputsToOutputs`, such as `GreyholeRaw`, `JPverbRaw`
   and the HOA classes. `SynthDef::wire_buffers` counts them.
@@ -872,10 +873,36 @@ outside HOA, and the script measures the n of each HOA class. Then it
 gives the instances of every class inputs at audio and at control rate,
 and their `checkInputs` must give the verdict of the crate. The script
 also reads the C++ files of the plugins at the tag. A unit can set the
-flag through the two macros of the core, through a macro of its own file,
-or, in a FAUST plugin, in its call of `fDefineUnit`. If a unit sets the
+flag through the two macros of the core, or through a macro of its own
+file. A FAUST plugin sets it in its call of `fDefineUnit`. If a unit sets the
 flag in another way, or has no class outside ATK and three names of a
 table, the script fails.
+
+### Pseudo-UGens of sc3-plugins
+
+`tests/readme.rs` keeps this list equal to the catalogue of sc3-plugins.
+Each body follows the sclang code of its method, as the bodies of the core
+do.
+
+- `DEINDUGens`: `Greyhole.ar` and `JPverb.ar` call their raw class on the
+  first and the last channel of `in`.
+- `NHUGens`: `NHHall.ar` takes an array of two channels.
+- `JoshUGens`: `HighShelf.ar`, `LowShelf.ar` and `Notch.ar` compute the
+  coefficients of one `SOS`. `RBJHighShelf.ar`, `RBJLowShelf.ar` and
+  `RBJNotch.ar` inherit these methods.
+- `JoshUGens`: `ZLPF.ar` and `ZHPF.ar` add one `SOS` for each element of
+  `damping`, and each `SOS` applies `mul` and `add`.
+- `JoshUGens`: `BLPF.ar` and `BHPF.ar` call `ZLPF` or `ZHPF` with the
+  dampings of their order. `LRLPF.ar` and `LRHPF.ar` call them twice, with
+  half their order.
+- `BhobUGens`: `BhobLoShelf.ar` and `BhobHiShelf.ar` mix `in` with an
+  allpass `FOS`. Their arguments have no defaults.
+
+The order of `BLPF` and `BHPF` is 2, 4, 6, 8 or 10, after `asInteger`
+truncates it. The order of `LRLPF` and `LRHPF` is twice that. For another
+order, sclang posts an error and gives a String, and a use of the result
+throws. `ugen` refuses such an order with `BuildError::WrongKind`. It
+refuses an output as an order too.
 
 ### Methods of sc3-plugins that `ugen` refuses
 
@@ -1099,8 +1126,8 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 This is not in version 0.14, the next item of value for sc-app3:
 
-1. The bodies of the other pseudo-UGens of sc3-plugins, such as `Notch`,
-   `BLPF` and `FreeVerb1`, and of the methods above that do more than
+1. The bodies of the other pseudo-UGens of sc3-plugins, such as
+   `FreeVerb1` and `Vocoder`, and of the methods above that do more than
    `new1`.
 
 Of sc3-plugins, the crate also leaves out ATK, whose classes come with the
@@ -1126,7 +1153,7 @@ objects of the language, such as `@` and `asComplex`. It also leaves out
 
 `cargo test --all-features` runs every test but the acceptance tests. It
 needs no SuperCollider. `tests/readme.rs` checks the lists of methods that
-`ugen` refuses.
+`ugen` refuses, and the list of the pseudo-UGens of sc3-plugins.
 
 The golden files in `tests/fixtures` are definitions that sclang 3.14.1
 built and wrote. Each one reads, and writes back to its own bytes.
@@ -1151,8 +1178,10 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 The golden files of sc3-plugins are in `tests/fixtures/sc3_plugins`, and
 `tests/sc3_plugins` tests them with the feature. `methods.scsyndef` holds
 one definition for each addable method, which the crate builds from the
-catalogue alone. `generator/sc3_plugins/fixtures.scd` writes the files
-again:
+catalogue alone. `bodies.json` holds the cases of the bodies, and each
+case builds in sclang and in the crate from that file. Each pseudo method
+needs a case that builds. `generator/sc3_plugins/fixtures.scd` writes the
+files again:
 
 ```sh
 sclang -l "$PWD/generator/sc3_plugins/sclang_conf.yaml" \

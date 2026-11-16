@@ -105963,6 +105963,162 @@
   ],
   "pseudo_classes": [
     {
+      "name": "BHPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "order",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BLPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "order",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BhobHiShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "amp",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BhobLoShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "amp",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "Greyhole",
       "categories": [
         "UGens>Delays"
@@ -106023,6 +106179,61 @@
               "kind": "signal",
               "default": {
                 "float": 2
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "HighShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "shelfslope",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dbgain",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
               }
             }
           ],
@@ -106119,6 +106330,459 @@
               "kind": "signal",
               "default": {
                 "float": 2000
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "LRHPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "order",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "LRLPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "order",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "LowShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "shelfslope",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dbgain",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Notch",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "rq",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "RBJHighShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "shelfslope",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dbgain",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "RBJLowShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "shelfslope",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dbgain",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "RBJNotch",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "rq",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "ZHPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fc",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "damping",
+              "kind": "array",
+              "default": {
+                "float": 0.70699999999999996
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "ZLPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fc",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "damping",
+              "kind": "array",
+              "default": {
+                "float": 0.70699999999999996
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
               }
             }
           ],

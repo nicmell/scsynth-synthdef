@@ -2,17 +2,35 @@
 //! catalogue of sc3-plugins marks `Addable::Pseudo`, with the `Args` of the
 //! bodies of the core.
 
+mod bhob_ugens;
 mod deind_ugens;
+mod josh_ugens;
 mod nh_ugens;
+
+use josh_ugens::{biquad_eq, joshfilts};
 
 use crate::pseudo::Body;
 
 /// The body of each method that the catalogue of sc3-plugins marks
 /// `Addable::Pseudo`, by class and selector.
 pub(crate) static BODIES: &[(&str, &str, Body)] = &[
+    ("BHPF", "ar", joshfilts::bhpf),
+    ("BLPF", "ar", joshfilts::blpf),
+    ("BhobHiShelf", "ar", bhob_ugens::hi_shelf),
+    ("BhobLoShelf", "ar", bhob_ugens::lo_shelf),
     ("Greyhole", "ar", deind_ugens::greyhole),
+    ("HighShelf", "ar", biquad_eq::high_shelf),
     ("JPverb", "ar", deind_ugens::jp_verb),
+    ("LRHPF", "ar", joshfilts::lrhpf),
+    ("LRLPF", "ar", joshfilts::lrlpf),
+    ("LowShelf", "ar", biquad_eq::low_shelf),
     ("NHHall", "ar", nh_ugens::nh_hall),
+    ("Notch", "ar", biquad_eq::notch),
+    ("RBJHighShelf", "ar", biquad_eq::high_shelf),
+    ("RBJLowShelf", "ar", biquad_eq::low_shelf),
+    ("RBJNotch", "ar", biquad_eq::notch),
+    ("ZHPF", "ar", joshfilts::zhpf),
+    ("ZLPF", "ar", joshfilts::zlpf),
 ];
 
 #[cfg(test)]

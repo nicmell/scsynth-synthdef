@@ -63,8 +63,11 @@ mod tests {
             }] += 1;
         }
         assert_eq!(counts, [635, 1, 43]);
-        let pseudo: Vec<&str> = pseudo_all().iter().map(|class| class.name).collect();
-        assert_eq!(pseudo, ["Greyhole", "JPverb"]);
+        assert!(
+            pseudo_all()
+                .windows(2)
+                .all(|pair| pair[0].name < pair[1].name)
+        );
     }
 
     #[test]

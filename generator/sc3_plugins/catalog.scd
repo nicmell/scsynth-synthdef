@@ -103,7 +103,9 @@ var argumentKinds = [
 	[\TextVU, \new, \label, \symbol],
 	[\VBAP, \ar, \numChans, \count],
 	[\VBAP, \kr, \numChans, \count],
-	[\WarpZ, \ar, \numChannels, \count]
+	[\WarpZ, \ar, \numChannels, \count],
+	[\ZHPF, \ar, \damping, \array],
+	[\ZLPF, \ar, \damping, \array]
 ];
 
 // The rules of checkInputs of the owners of the folder outside HOA. The rule
@@ -143,7 +145,8 @@ var checkRules = (
 // outside UGen that answers ar or kr, and each UGen class whose methods
 // create no instance of the class. The crate has a body for each method of a
 // class of bodies.
-var bodies = [\Greyhole, \JPverb, \NHHall];
+var bodies = [\BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \Greyhole, \HighShelf, \JPverb, \LRHPF,
+	\LRLPF, \LowShelf, \NHHall, \Notch, \RBJHighShelf, \RBJLowShelf, \RBJNotch, \ZHPF, \ZLPF];
 // The classes of the census without a body, and why.
 var leftOut = [
 	[\AutoTrack, "no body yet"],
@@ -152,10 +155,6 @@ var leftOut = [
 	[\BFEncode, "computes with objects of the language, such as ZPoint"],
 	[\BFFreeVerb, "no body yet"],
 	[\BFGVerb, "no body yet"],
-	[\BHPF, "no body yet"],
-	[\BLPF, "no body yet"],
-	[\BhobHiShelf, "no body yet"],
-	[\BhobLoShelf, "no body yet"],
 	[\BhobTone, "calls HiShelf, which no class defines"],
 	[\BtoUHJ, "no body yet"],
 	[\CheapVerb, "draws rand of the language at each build"],
@@ -163,19 +162,11 @@ var leftOut = [
 	[\FFTCentroid, "no body yet"],
 	[\Feedback, "no body yet"],
 	[\FreeVerb1, "no body yet"],
-	[\HighShelf, "no body yet"],
-	[\LRHPF, "no body yet"],
-	[\LRLPF, "no body yet"],
-	[\LowShelf, "no body yet"],
-	[\Notch, "no body yet"],
 	[\OnsetsDS, "deprecated, and gives a Function"],
 	[\PV_DiffMags, "no body yet"],
 	[\PanX2D, "no body yet"],
 	[\Phaser, "no body yet"],
 	[\PulseDPW, "no body yet"],
-	[\RBJHighShelf, "no body yet"],
-	[\RBJLowShelf, "no body yet"],
-	[\RBJNotch, "no body yet"],
 	[\Reflections, "computes with objects of the language, such as ZPoint"],
 	[\Rotate, "no body yet"],
 	[\SoftClipAmp, "no body yet"],
@@ -187,9 +178,7 @@ var leftOut = [
 	[\Vocode, "no body yet"],
 	[\VocodeBand, "no body yet"],
 	[\Vocoder, "no body yet"],
-	[\WarpOverlap, "no body yet"],
-	[\ZHPF, "no body yet"],
-	[\ZLPF, "no body yet"]
+	[\WarpOverlap, "no body yet"]
 ];
 var census = bodies ++ leftOut.collect(_.first);
 

@@ -8,6 +8,8 @@
 //! arguments]}`, `{"symbol": text}` or `{"bool": value}`. A refused case
 //! breaks in sclang, and the crate must refuse it.
 
+use scsynth_synthdef::catalog::{Addable, RateMethod};
+use scsynth_synthdef::sc3_plugins;
 use scsynth_synthdef::{
     Arg, ArgValue, BuildError, SynthDef, SynthDefBuilder, UGenInput, read_def_file,
 };
@@ -137,5 +139,36 @@ fn every_refused_case_of_the_bodies_fails_in_the_crate() {
     for case in refusals {
         let name = text(&case["name"]);
         assert!(definition(&case).is_err(), "{name} builds");
+    }
+}
+
+#[test]
+fn every_pseudo_method_of_sc3_plugins_has_a_case_that_builds() {
+    let built: Vec<(String, String)> = cases()
+        .iter()
+        .filter(|case| !refused(case))
+        .map(|case| {
+            let call = &case["call"];
+            (text(&call[0]).to_owned(), text(&call[1]).to_owned())
+        })
+        .collect();
+    let classes = sc3_plugins::all()
+        .iter()
+        .map(|class| (class.name, class.methods))
+        .chain(
+            sc3_plugins::pseudo_all()
+                .iter()
+                .map(|class| (class.name, class.methods)),
+        );
+    for (class, methods) in classes {
+        let pseudo = methods
+            .iter()
+            .filter(|method| method.addable == Addable::Pseudo);
+        for RateMethod { selector, .. } in pseudo {
+            let has_case = built
+                .iter()
+                .any(|(name, method)| name == class && method == selector);
+            assert!(has_case, "{class}.{selector} has no case");
+        }
     }
 }
