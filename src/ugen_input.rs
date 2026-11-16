@@ -55,7 +55,8 @@ impl From<Vec<UGenInput>> for UGenInput {
 /// An output of a UGen of a build: the `OutputProxy` of sclang.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct OutputProxy {
-    pub(crate) build: u64,
+    /// The serial of its UGen, which no other UGen of any build has.
+    pub(crate) serial: u64,
     pub(crate) ugen: usize,
     pub(crate) output: u32,
     pub(crate) rate: Rate,

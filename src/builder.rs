@@ -20,7 +20,8 @@ use crate::synth_def::{ControlName, InputSpec, SynthDef, UGen, Variant};
 use crate::topo;
 use crate::ugen_input::{ArgValue, OutputProxy, UGenInput};
 
-static NEXT_BUILD: AtomicU64 = AtomicU64::new(0);
+/// The serial of the next UGen of any build. A rollback takes none back.
+static NEXT_SERIAL: AtomicU64 = AtomicU64::new(0);
 
 /// The rate entry of an argument, as in the `rates` of `SynthDef.new`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -180,10 +181,11 @@ impl NewUGen {
 
 /// A synth definition during its build: the `SynthDef` of sclang between
 /// `initBuild` and `finishBuild`. A call that fails leaves the build as it
-/// was.
+/// was, and an output that the call made belongs to no build. A clone takes
+/// the outputs from before it, and no output that the other build makes
+/// after it.
 #[derive(Clone, Debug)]
 pub struct SynthDefBuilder {
-    build: u64,
     name: String,
     controls: Vec<f64>,
     control_names: Vec<ControlName>,
@@ -197,6 +199,8 @@ pub struct SynthDefBuilder {
     named: Vec<NamedEntry>,
     arguments: Vec<UGenInput>,
     children: Vec<Node>,
+    /// The serial of each child, which its outputs carry.
+    serials: Vec<u64>,
     width_first: Vec<usize>,
     variants: Vec<Variant>,
     max_local_bufs: Option<MaxLocalBufs>,
@@ -237,7 +241,6 @@ impl SynthDefBuilder {
     /// for a lag on a scalar, trigger or audio argument, and for a NaN lag.
     pub fn new(name: impl Into<String>, args: Vec<Arg>) -> Result<Self, BuildError> {
         let mut builder = Self {
-            build: NEXT_BUILD.fetch_add(1, Ordering::Relaxed),
             name: name.into(),
             controls: Vec::new(),
             control_names: Vec::new(),
@@ -246,6 +249,7 @@ impl SynthDefBuilder {
             named: Vec::new(),
             arguments: Vec::new(),
             children: Vec::new(),
+            serials: Vec::new(),
             width_first: Vec::new(),
             variants: Vec::new(),
             max_local_bufs: None,
@@ -559,14 +563,13 @@ impl SynthDefBuilder {
     /// # Errors
     ///
     /// A [`BuildError`] for an input that is NaN, an array, or an output of
-    /// another build.
+    /// another build or of a failed call.
     pub fn add(&mut self, ugen: NewUGen) -> Result<UGenInput, BuildError> {
         let mut inputs = Vec::with_capacity(ugen.inputs.len());
         for (input, value) in ugen.inputs.iter().enumerate() {
             inputs.push(self.source(&ugen.name, input, value)?);
         }
-        let index = self.children.len();
-        self.children.push(Node {
+        let index = self.push(Node {
             name: ugen.name,
             rate: ugen.rate,
             inputs,
@@ -1039,8 +1042,7 @@ impl SynthDefBuilder {
             inputs.push(self.source(name, input, lag)?);
         }
         self.controls.extend_from_slice(values);
-        let index = self.children.len();
-        self.children.push(Node {
+        let index = self.push(Node {
             name: name.to_owned(),
             rate,
             inputs,
@@ -1050,7 +1052,7 @@ impl SynthDefBuilder {
         });
         Ok((0..values.len())
             .map(|output| OutputProxy {
-                build: self.build,
+                serial: self.serials[index],
                 ugen: index,
                 output: to_u32(output),
                 rate,
@@ -1116,6 +1118,7 @@ impl SynthDefBuilder {
         let result = build(self);
         if result.is_err() {
             self.children.truncate(children);
+            self.serials.truncate(children);
             self.width_first.truncate(width_first);
             self.controls.truncate(controls);
             self.control_names.truncate(names);
@@ -1156,13 +1159,13 @@ impl SynthDefBuilder {
         let UGenInput::Output(proxy) = input else {
             return None;
         };
-        if proxy.build != self.build {
+        if !self.owns(proxy) {
             return None;
         }
         Some(match *self.children.get(proxy.ugen)?.inputs.get(index)? {
             Source::Number(number) => UGenInput::Number(number),
             Source::Output { ugen, output } => UGenInput::Output(OutputProxy {
-                build: self.build,
+                serial: self.serials[ugen],
                 ugen,
                 output,
                 rate: self.children[ugen].outputs[to_usize(output)],
@@ -1173,12 +1176,25 @@ impl SynthDefBuilder {
     /// The class of the UGen of `input`, for an output of this build.
     pub(crate) fn class_of(&self, input: &UGenInput) -> Option<&str> {
         match input {
-            UGenInput::Output(output) if output.build == self.build => self
+            UGenInput::Output(output) if self.owns(output) => self
                 .children
                 .get(output.ugen)
                 .map(|node| node.name.as_str()),
             _ => None,
         }
+    }
+
+    /// Whether `proxy` is an output of a UGen of this build.
+    fn owns(&self, proxy: &OutputProxy) -> bool {
+        self.serials.get(proxy.ugen) == Some(&proxy.serial)
+    }
+
+    /// Adds `node` as the next child, with a new serial, and gives its index.
+    fn push(&mut self, node: Node) -> usize {
+        self.children.push(node);
+        self.serials
+            .push(NEXT_SERIAL.fetch_add(1, Ordering::Relaxed));
+        self.children.len() - 1
     }
 
     /// The expansion of `multiNewList` over `values`, the arguments that
@@ -1408,12 +1424,10 @@ impl SynthDefBuilder {
                 input,
             }),
             UGenInput::Number(number) => Ok(Source::Number(*number)),
-            UGenInput::Output(output) if output.build != self.build => {
-                Err(BuildError::ForeignOutput {
-                    ugen: ugen.to_owned(),
-                    input,
-                })
-            }
+            UGenInput::Output(output) if !self.owns(output) => Err(BuildError::ForeignOutput {
+                ugen: ugen.to_owned(),
+                input,
+            }),
             UGenInput::Output(output) => Ok(Source::Output {
                 ugen: output.ugen,
                 output: output.output,
@@ -1432,7 +1446,7 @@ impl SynthDefBuilder {
             .enumerate()
             .map(|(output, &rate)| {
                 UGenInput::Output(OutputProxy {
-                    build: self.build,
+                    serial: self.serials[index],
                     ugen: index,
                     output: to_u32(output),
                     rate,
@@ -2034,6 +2048,45 @@ mod tests {
                 input: 0
             }
         );
+    }
+
+    /// A `DC.kr` of `input`.
+    fn dc(input: UGenInput) -> NewUGen {
+        NewUGen::new("DC", Rate::Control).inputs([input])
+    }
+
+    fn foreign() -> BuildError {
+        BuildError::ForeignOutput {
+            ugen: "DC".to_owned(),
+            input: 0,
+        }
+    }
+
+    #[test]
+    fn a_clone_takes_the_outputs_from_before_it_and_none_from_after() {
+        let mut builder = SynthDefBuilder::new("fork", vec![]).unwrap();
+        let before = builder.add(dc(1.0.into())).unwrap();
+        let mut fork = builder.clone();
+        let after = fork.add(dc(2.0.into())).unwrap();
+        // The index of `after` holds a UGen of `builder` too.
+        builder.add(dc(3.0.into())).unwrap();
+        assert!(fork.add(dc(before.clone())).is_ok());
+        assert!(builder.add(dc(before)).is_ok());
+        assert_eq!(builder.add(dc(after)), Err(foreign()));
+    }
+
+    #[test]
+    fn an_output_of_a_call_that_failed_is_foreign() {
+        let mut builder = SynthDefBuilder::new("rollback", vec![]).unwrap();
+        let mut kept = None;
+        let failed: Result<(), BuildError> = builder.wrap(vec![], |builder, _| {
+            kept = Some(builder.add(dc(1.0.into()))?);
+            Err(BuildError::UnknownClass("Nothing".to_owned()))
+        });
+        assert!(failed.is_err());
+        // The index of `kept` holds a new UGen.
+        builder.add(dc(2.0.into())).unwrap();
+        assert_eq!(builder.add(dc(kept.unwrap())), Err(foreign()));
     }
 
     #[test]

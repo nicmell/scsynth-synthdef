@@ -386,7 +386,7 @@ pub enum BuildError {
         /// The name of the argument.
         argument: String,
     },
-    /// An input is an output of another build.
+    /// An input is an output of another build, or of a call that failed.
     #[non_exhaustive]
     ForeignOutput {
         /// The class of the UGen.
@@ -572,7 +572,10 @@ impl fmt::Display for BuildError {
                 "the argument {argument} of {ugen} holds an array inside an array, which does not expand there"
             ),
             Self::ForeignOutput { ugen, input } => {
-                write!(f, "input {input} of {ugen} is an output of another build")
+                write!(
+                    f,
+                    "input {input} of {ugen} is an output of another build, or of a call that failed"
+                )
             }
             Self::UnknownOperator(name) => write!(f, "'{name}' is no operator of scsynth"),
             Self::DuplicateVariant(name) => write!(f, "two variants are named '{name}'"),
