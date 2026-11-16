@@ -95646,8 +95646,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -104242,8 +104241,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -104359,8 +104357,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -105963,6 +105960,195 @@
   ],
   "pseudo_classes": [
     {
+      "name": "BFFreeVerb",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "w",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "x",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "y",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "z",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "mix",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "room",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "damp",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "diffuse",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BFGVerb",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "w",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "x",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "y",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "z",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "diffuse",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "roomsize",
+              "kind": "signal",
+              "default": {
+                "float": 10
+              }
+            },
+            {
+              "name": "revtime",
+              "kind": "signal",
+              "default": {
+                "float": 3
+              }
+            },
+            {
+              "name": "damping",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "inputbw",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "drylevel",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "earlyreflevel",
+              "kind": "signal",
+              "default": {
+                "float": 0.69999999999999996
+              }
+            },
+            {
+              "name": "taillevel",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "maxroomsize",
+              "kind": "signal",
+              "default": {
+                "float": 300
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "BHPF",
       "categories": [
         "Undocumented classes",
@@ -106110,6 +106296,36 @@
             },
             {
               "name": "amp",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BtoUHJ",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "wsig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "xsig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "ysig",
               "kind": "signal",
               "default": null
             }
@@ -106688,6 +106904,31 @@
               "default": {
                 "float": 0
               }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "UHJtoB",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "leftsig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "rightsig",
+              "kind": "signal",
+              "default": null
             }
           ],
           "addable": "pseudo"

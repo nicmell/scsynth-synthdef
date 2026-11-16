@@ -1,5 +1,15 @@
 {
   "bodies": {
+    "ambisonics_bf_free_verb": 5,
+    "ambisonics_bf_free_verb_control": 5,
+    "ambisonics_bf_free_verb_dry": 4,
+    "ambisonics_bf_g_verb": 5,
+    "ambisonics_bf_g_verb_diffuse": 9,
+    "ambisonics_rotate": 4,
+    "ambisonics_rotate_channels": 6,
+    "ambisonics_rotate_control": 4,
+    "ambisonics_tilt": 4,
+    "ambisonics_tumble": 4,
     "filters_bhob_hi_shelf": 3,
     "filters_bhob_lo_shelf": 3,
     "filters_bhob_lo_shelf_channels": 4,
@@ -32,7 +42,11 @@
     "reverbs_jpverb": 4,
     "reverbs_jpverb_nested": 6,
     "reverbs_nhhall": 2,
-    "reverbs_nhhall_nested": 4
+    "reverbs_nhhall_nested": 4,
+    "uhj_b_to_uhj": 5,
+    "uhj_b_to_uhj_channels": 8,
+    "uhj_uhj_to_b": 8,
+    "uhj_uhj_to_b_control": 8
   },
   "expansion": {
     "expansion_arraymax": 0,

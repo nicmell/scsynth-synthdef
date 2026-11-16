@@ -1,7 +1,9 @@
 //! The pseudo-UGens of the plugin `JoshUGens`, by class file.
 
+pub(super) mod ambisonics;
 pub(super) mod biquad_eq;
 pub(super) mod joshfilts;
+pub(super) mod uhj;
 
 use crate::builder::SynthDefBuilder;
 use crate::error::BuildError;

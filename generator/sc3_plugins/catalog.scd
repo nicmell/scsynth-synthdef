@@ -145,18 +145,16 @@ var checkRules = (
 // outside UGen that answers ar or kr, and each UGen class whose methods
 // create no instance of the class. The crate has a body for each method of a
 // class of bodies.
-var bodies = [\BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \Greyhole, \HighShelf, \JPverb, \LRHPF,
-	\LRLPF, \LowShelf, \NHHall, \Notch, \RBJHighShelf, \RBJLowShelf, \RBJNotch, \ZHPF, \ZLPF];
+var bodies = [\BFFreeVerb, \BFGVerb, \BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \BtoUHJ, \Greyhole,
+	\HighShelf, \JPverb, \LRHPF, \LRLPF, \LowShelf, \NHHall, \Notch, \RBJHighShelf, \RBJLowShelf,
+	\RBJNotch, \Rotate, \Tilt, \Tumble, \UHJtoB, \ZHPF, \ZLPF];
 // The classes of the census without a body, and why.
 var leftOut = [
 	[\AutoTrack, "no body yet"],
 	[\BF, "computes with objects of the language, such as ZPoint"],
 	[\BFDecode, "computes with objects of the language, such as ZPoint"],
 	[\BFEncode, "computes with objects of the language, such as ZPoint"],
-	[\BFFreeVerb, "no body yet"],
-	[\BFGVerb, "no body yet"],
 	[\BhobTone, "calls HiShelf, which no class defines"],
-	[\BtoUHJ, "no body yet"],
 	[\CheapVerb, "draws rand of the language at each build"],
 	[\DelayWr, "no body yet"],
 	[\FFTCentroid, "no body yet"],
@@ -168,13 +166,9 @@ var leftOut = [
 	[\Phaser, "no body yet"],
 	[\PulseDPW, "no body yet"],
 	[\Reflections, "computes with objects of the language, such as ZPoint"],
-	[\Rotate, "no body yet"],
 	[\SoftClipAmp, "no body yet"],
 	[\StkBowedI, "no body yet"],
 	[\TapN, "no body yet"],
-	[\Tilt, "no body yet"],
-	[\Tumble, "no body yet"],
-	[\UHJtoB, "no body yet"],
 	[\Vocode, "no body yet"],
 	[\VocodeBand, "no body yet"],
 	[\Vocoder, "no body yet"],

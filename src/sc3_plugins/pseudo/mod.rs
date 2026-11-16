@@ -7,17 +7,22 @@ mod deind_ugens;
 mod josh_ugens;
 mod nh_ugens;
 
-use josh_ugens::{biquad_eq, joshfilts};
+use josh_ugens::{ambisonics, biquad_eq, joshfilts, uhj};
 
-use crate::pseudo::Body;
+use crate::error::BuildError;
+use crate::pseudo::{Args, Body, elements};
+use crate::ugen_input::{ArgValue, UGenInput};
 
 /// The body of each method that the catalogue of sc3-plugins marks
 /// `Addable::Pseudo`, by class and selector.
 pub(crate) static BODIES: &[(&str, &str, Body)] = &[
+    ("BFFreeVerb", "ar", ambisonics::bf_free_verb),
+    ("BFGVerb", "ar", ambisonics::bf_g_verb),
     ("BHPF", "ar", joshfilts::bhpf),
     ("BLPF", "ar", joshfilts::blpf),
     ("BhobHiShelf", "ar", bhob_ugens::hi_shelf),
     ("BhobLoShelf", "ar", bhob_ugens::lo_shelf),
+    ("BtoUHJ", "ar", uhj::b_to_uhj),
     ("Greyhole", "ar", deind_ugens::greyhole),
     ("HighShelf", "ar", biquad_eq::high_shelf),
     ("JPverb", "ar", deind_ugens::jp_verb),
@@ -29,9 +34,35 @@ pub(crate) static BODIES: &[(&str, &str, Body)] = &[
     ("RBJHighShelf", "ar", biquad_eq::high_shelf),
     ("RBJLowShelf", "ar", biquad_eq::low_shelf),
     ("RBJNotch", "ar", biquad_eq::notch),
+    ("Rotate", "ar", ambisonics::rotate),
+    ("Tilt", "ar", ambisonics::tilt),
+    ("Tumble", "ar", ambisonics::tumble),
+    ("UHJtoB", "ar", uhj::uhj_to_b),
     ("ZHPF", "ar", joshfilts::zhpf),
     ("ZLPF", "ar", joshfilts::zlpf),
 ];
+
+/// `#a, b, ... = value` of sclang: the first `N` elements of `value`, the
+/// result of an expansion over the arguments `names`. Past the end of an
+/// array, sclang gives nil, which a later call throws on. The crate refuses
+/// the first of `names` that holds an array, with `expected`.
+fn first<const N: usize>(
+    args: &Args,
+    names: &[&str],
+    expected: &'static str,
+    value: UGenInput,
+) -> Result<[UGenInput; N], BuildError> {
+    let mut items = elements(value);
+    items.truncate(N);
+    <[UGenInput; N]>::try_from(items).map_err(|_| {
+        let array = names
+            .iter()
+            .copied()
+            .find(|name| matches!(args.value(name), Ok(ArgValue::Input(UGenInput::Array(_)))));
+        let name = array.or_else(|| names.first().copied());
+        args.wrong_kind(name.unwrap_or_default(), expected)
+    })
+}
 
 #[cfg(test)]
 mod tests {

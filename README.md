@@ -851,7 +851,7 @@ inputs: the definition needs four wire buffers.
   folder `SC3plugins` of the Extensions holds its class files.
   `Version-3.14.1` changes `VBAPSpeakerArray` alone, which builds no UGen,
   so the catalogue serves both.
-- 635 of the 679 rate methods are addable with a wiring, and one has a
+- 635 of the 679 rate methods are addable with a wiring, and four have a
   body. [Pseudo-UGens of sc3-plugins](#pseudo-ugens-of-sc3-plugins) lists
   the bodies.
 - Most rules of `checkInputs` are those of the core. The 96 HOA classes
@@ -895,8 +895,22 @@ do.
 - `JoshUGens`: `BLPF.ar` and `BHPF.ar` call `ZLPF` or `ZHPF` with the
   dampings of their order. `LRLPF.ar` and `LRHPF.ar` call them twice, with
   half their order.
+- `JoshUGens`: `Rotate.ar`, `Tilt.ar` and `Tumble.ar` turn two channels
+  of B-format with `Rotate2`, and give the other two back as they come.
+- `JoshUGens`: `BFFreeVerb.ar` and `BFGVerb.ar` put a reverb on each
+  channel of `B2A`, mix each channel with two others, and give `A2B` of
+  the mix. `BFGVerb` delays each channel by a `Rand` first.
+- `JoshUGens`: `BtoUHJ.ar` and `UHJtoB.ar` mix the channels with their
+  shifts by 90 degrees, as the two chains of six `FOS` of `Shift90.filt`
+  give them.
 - `BhobUGens`: `BhobLoShelf.ar` and `BhobHiShelf.ar` mix `in` with an
   allpass `FOS`. Their arguments have no defaults.
+
+These bodies take the elements of an array as sclang destructures it, as
+in `#a, b = Rotate2.ar(x, y, angle)`. When an argument is an array, the
+expansion can give fewer elements than the destructuring takes. Then
+sclang takes nil, and a later call throws. `ugen` refuses the argument
+with `BuildError::WrongKind`.
 
 The order of `BLPF` and `BHPF` is 2, 4, 6, 8 or 10, after `asInteger`
 truncates it. The order of `LRLPF` and `LRHPF` is twice that. For another
@@ -915,8 +929,8 @@ refuses an output as an order too.
   `UGen '<name>' not installed.`.
 - `StkFlute.kr` applies `madd` twice.
 - These methods create no instance of their class: `FFTCentroid.kr`,
-  `OnsetsDS.kr`, `PV_DiffMags.new`, `PanX2D.ar` and `PanX2D.kr`. So do
-  `Rotate.ar`, `SoftClipAmp.ar`, `Tilt.ar` and `Tumble.ar`.
+  `OnsetsDS.kr`, `PV_DiffMags.new`, `PanX2D.ar` and `PanX2D.kr`. So does
+  `SoftClipAmp.ar`.
 - They put the size of an array before it: `FeatureSave.kr`,
   `FFTSubbandFlatness.kr`, `FFTSubbandPower.kr`, `MatchingPResynth.ar`
   and `MatchingPResynth.kr`.

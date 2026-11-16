@@ -24981,7 +24981,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "z", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "rotate", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -28173,7 +28173,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "z", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "tilt", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -28235,7 +28235,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "z", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "tilt", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -28885,7 +28885,56 @@ pub(super) static CLASSES: [UGenClass; 491] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 16] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 20] = [
+    PseudoClass {
+        name: "BFFreeVerb",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "w", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "x", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "y", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "z", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "mix", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "room", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
+                    ArgSpec { name: "damp", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
+                    ArgSpec { name: "diffuse", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "BFGVerb",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "w", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "x", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "y", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "z", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "diffuse", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "roomsize", kind: ArgKind::Signal, default: Some(ArgDefault::Float(10.0)) },
+                    ArgSpec { name: "revtime", kind: ArgKind::Signal, default: Some(ArgDefault::Float(3.0)) },
+                    ArgSpec { name: "damping", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
+                    ArgSpec { name: "inputbw", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
+                    ArgSpec { name: "drylevel", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "earlyreflevel", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.7)) },
+                    ArgSpec { name: "taillevel", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
+                    ArgSpec { name: "maxroomsize", kind: ArgKind::Signal, default: Some(ArgDefault::Float(300.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
     PseudoClass {
         name: "BHPF",
         categories: &["Undocumented classes", "UGens>Undocumented"],
@@ -28945,6 +28994,21 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 16] = [
                     ArgSpec { name: "in", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "freq", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "amp", kind: ArgKind::Signal, default: None },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "BtoUHJ",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "wsig", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "xsig", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "ysig", kind: ArgKind::Signal, default: None },
                 ],
                 addable: Addable::Pseudo,
             },
@@ -29129,6 +29193,20 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 16] = [
                     ArgSpec { name: "rq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
                     ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "UHJtoB",
+        categories: &["Undocumented classes", "UGens>Undocumented"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "leftsig", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "rightsig", kind: ArgKind::Signal, default: None },
                 ],
                 addable: Addable::Pseudo,
             },
