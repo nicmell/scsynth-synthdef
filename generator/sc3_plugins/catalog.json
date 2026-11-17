@@ -8053,12 +8053,12 @@
             },
             {
               "name": "axiom",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "rules",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8076,8 +8076,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'collect' not understood."
+          "addable": "pseudo"
         }
       ]
     },
@@ -8245,7 +8244,7 @@
           "args": [
             {
               "name": "rules",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8261,8 +8260,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'rotate' not understood. Perhaps you misspelled 'rate', or meant to call 'rotate' on another receiver?"
+          "addable": "pseudo"
         }
       ]
     },
@@ -8506,12 +8504,12 @@
             },
             {
               "name": "theta",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "x",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8520,8 +8518,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Duty, Duty]"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -8538,12 +8535,12 @@
             },
             {
               "name": "theta",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "x",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8552,8 +8549,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Duty, Duty]"
+          "addable": "pseudo"
         },
         {
           "selector": "new",
@@ -8565,12 +8561,12 @@
             },
             {
               "name": "theta",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "x",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8579,8 +8575,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "an array on argument 0 does not make one instance per element"
+          "addable": "pseudo"
         }
       ]
     },
@@ -9663,12 +9658,12 @@
             },
             {
               "name": "axiom",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "rules",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -9686,8 +9681,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'collect' not understood."
+          "addable": "pseudo"
         }
       ]
     },
@@ -10734,8 +10728,8 @@
         "UGens>Generators>Deterministic"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "FM7"
+        "rule": "input_count",
+        "count": 54
       },
       "methods": [
         {
@@ -10743,17 +10737,16 @@
           "args": [
             {
               "name": "ctlMatrix",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "modMatrix",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'flatten' not understood."
+          "addable": "pseudo"
         }
       ]
     },
@@ -12066,8 +12059,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "input 0 maps to no argument"
+          "addable": "pseudo"
         }
       ]
     },
@@ -97854,8 +97846,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -98206,8 +98197,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, ERROR: Non Boolean in test."
+          "addable": "pseudo"
         }
       ]
     },
@@ -100568,30 +100558,7 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "audio",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            },
-            {
-              "arg": 2
-            },
-            {
-              "arg": 3
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "audio"
-            ]
-          },
-          "special_index": 0,
-          "madd": true,
-          "nested_expansion": true
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -100639,8 +100606,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method applies madd otherwise than once"
+          "addable": "pseudo"
         }
       ]
     },
@@ -100678,12 +100644,11 @@
             },
             {
               "name": "rawfilepath",
-              "kind": "signal",
+              "kind": "symbol",
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'ascii' not understood. Perhaps you misspelled 'asin', or meant to call 'ascii' on another receiver?"
+          "addable": "pseudo"
         }
       ]
     },
@@ -105940,6 +105905,32 @@
   ],
   "pseudo_classes": [
     {
+      "name": "AutoTrack",
+      "categories": [
+        "UGens>Analysis"
+      ],
+      "methods": [
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "lock",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "BFFreeVerb",
       "categories": [
         "Undocumented classes",
@@ -107228,6 +107219,84 @@
               "kind": "signal",
               "default": {
                 "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "StkBowedI",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 220
+              }
+            },
+            {
+              "name": "gate",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "onamp",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "offamp",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "bowpressure",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            },
+            {
+              "name": "bowposition",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            },
+            {
+              "name": "vibfreq",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            },
+            {
+              "name": "vibgain",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            },
+            {
+              "name": "loudness",
+              "kind": "signal",
+              "default": {
+                "float": 64
               }
             }
           ],

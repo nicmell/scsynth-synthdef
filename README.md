@@ -851,13 +851,14 @@ inputs: the definition needs four wire buffers.
   folder `SC3plugins` of the Extensions holds its class files.
   `Version-3.14.1` changes `VBAPSpeakerArray` alone, which builds no UGen,
   so the catalogue serves both.
-- 635 of the 679 rate methods are addable with a wiring, and 24 have a
+- 634 of the 679 rate methods are addable with a wiring, and 37 have a
   body. [Pseudo-UGens of sc3-plugins](#pseudo-ugens-of-sc3-plugins) lists
   the bodies.
 - Most rules of `checkInputs` are those of the core. The 96 HOA classes
   ask for audio rate on their first n inputs at audio rate, for an n of 1
   to 121 by class. `BFGrainPanner` and its subclasses ask for it on input
-  2.
+  2. `FM7` asks for exactly 54 inputs, which `CheckInputs::InputCount`
+  checks.
 - 176 units of sc3-plugins with a class set
   `kUnitDef_CantAliasInputsToOutputs`, such as `GreyholeRaw`, `JPverbRaw`
   and the HOA classes. `SynthDef::wire_buffers` counts them.
@@ -931,6 +932,24 @@ do.
 - `MCLDUGens`: `Getenv.new` and `TextVU.ar`, `TextVU.kr` and
   `TextVU.new` write the codes of a text. A `TextVU` runs at control rate,
   and the call gives back `in`.
+- `StkUGens` and `StkInst`: `StkFlute.ar` and `StkFlute.kr` apply `madd`,
+  and `kr` applies it twice, as sclang does. `StkBowedI.ar` adds a
+  `StkInst` of the instrument 6, `Stk.at("Bowed")`. `StkGlobals.ar`
+  writes the codes of `rawfilepath` without their count.
+- `SkUGens`: `FM7.ar` flattens its two matrices by one level. A nil matrix
+  holds zeros: 6 rows of 3 for `ctlMatrix`, and 6 rows of 6 for
+  `modMatrix`.
+- `TagSystemUGens`: `DbufTag.new` and `Dtag.new` put the sizes of `axiom`
+  and `rules` before them. They make one instance, as sclang throws for
+  more. `Dfsm.new` puts its states before its next states, and takes a
+  `Dwhite` for a nil `rgen`.
+- `Neuromodules`: `Dneuromodule.new` has `numChannels` outputs at demand
+  rate. `Dneuromodule.ar` and `Dneuromodule.kr` read it with a `Duty` at
+  audio rate, `kr` too, as sclang does.
+- `SCMIRUGens`: `FeatureSave.kr` puts the size of `features` first.
+  `SpectralEntropy.kr` has `numbands` outputs, at most `fftsize`.
+- `BerlachUGens`: `SoftClipAmp.ar` is the `softclip` of `in * pregain`.
+  `BBCut2UGens`: `AutoTrack.kr` calls `BeatTrack` of the core.
 
 `TextVU` copies two traits of sclang. `TextVU:new1` turns a number
 `trig` into an `Impulse` before the default `ana` reads `trig`. So the
@@ -967,15 +986,8 @@ refuses an output as an order too.
   define that of `RMAFoodChainL.ar`, `RegaliaMitraEQ.ar` or
   `RosslerResL.ar`. sclang writes them, and scsynth refuses them with
   `UGen '<name>' not installed.`.
-- `StkFlute.kr` applies `madd` twice.
-- `OnsetsDS.kr` and `SoftClipAmp.ar` create no instance of their class.
-- `FeatureSave.kr` puts the size of an array before it.
-- `SpectralEntropy.kr` tests numbers.
-- They compute their inputs: `DbufTag.new`, `Dtag.new` and `Dfsm.new`
-  from rules, and `FM7.ar` from two matrices.
-- `Dneuromodule.ar` and `Dneuromodule.kr` put a `Duty` around
-  `Dneuromodule.new`, which takes its arrays and its count in its own way.
-- `StkGlobals.ar` writes the codes of a text without its size first.
+- `OnsetsDS.kr` creates no instance of its class. The class is
+  deprecated, and the method gives a Function.
 
 ## Strictness
 
@@ -1115,9 +1127,10 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - A whole Float as `rotate` of `PingPong`, such as 2.0: `Array:rotate` of
   sclang takes only an Integer, and the crate takes it. The same goes for
   `numTaps` and `numAllpasses` of `FreeVerb1`, for which `copyRange`
-  takes only an Integer. It goes too for `ntofind` of `MatchingP`, `num`
-  of `NearestN` and `numdims` of `SOMRd`, which give a count of outputs:
-  `initOutputs` takes only an Integer.
+  takes only an Integer. It goes too for these counts of outputs, for
+  which `initOutputs` or `collect` take only an Integer: `ntofind` of
+  `MatchingP`, `num` of `NearestN`, `numdims` of `SOMRd`, `numbands` of
+  `SpectralEntropy` and `numChannels` of `Dneuromodule`.
 - A count of `do` or `Array.fill` above 65535, as the `num` of `Vocoder`
   or the `overlaps` of `WarpOverlap`: sclang builds that many bands or
   grains, and the crate refuses the count.
@@ -1180,9 +1193,7 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 This is not in version 0.14, the next item of value for sc-app3:
 
-1. The bodies of the other pseudo-UGens of sc3-plugins, such as
-   `FM7` and `StkBowedI`, and of the methods above that do more than
-   `new1`.
+1. `UGen:circleRamp` of sc3-plugins, for `send`.
 
 Of sc3-plugins, the crate also leaves out ATK, whose classes come with the
 quark `atk-sc3`. `CheapVerb` draws `rand` of the language at each build.

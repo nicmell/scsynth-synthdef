@@ -341,6 +341,8 @@ pub enum CheckInputs {
     Peak,
     /// The rule of `T2K`: the first input is at audio rate.
     T2K,
+    /// Exactly this many inputs, at any rate, as `FM7` of sc3-plugins asks.
+    InputCount(usize),
     /// A rule of its own, defined in the class with this name, which the
     /// crate does not have.
     Custom(&'static str),

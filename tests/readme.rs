@@ -61,11 +61,7 @@ fn the_readme_lists_every_method_that_ugen_refuses() {
 #[test]
 fn the_readme_lists_every_method_of_sc3_plugins_that_ugen_refuses() {
     let classes = scsynth_synthdef::sc3_plugins::all();
-    assert_listed(
-        "### Methods of sc3-plugins that `ugen` refuses",
-        classes,
-        20,
-    );
+    assert_listed("### Methods of sc3-plugins that `ugen` refuses", classes, 8);
 }
 
 #[cfg(feature = "sc3-plugins")]
@@ -90,5 +86,5 @@ fn the_readme_lists_every_pseudo_ugen_of_sc3_plugins() {
         .chain(classes)
         .collect();
     assert_eq!(listed("### Pseudo-UGens of sc3-plugins"), bodies);
-    assert_eq!(bodies.len(), 57);
+    assert_eq!(bodies.len(), 72);
 }

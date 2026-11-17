@@ -44,12 +44,25 @@ var argumentKinds = [
 	[\ArrayMax, \ar, \array, \array],
 	[\ArrayMax, \kr, \array, \array],
 	[\Chromagram, \kr, \n, \count],
+	[\DbufTag, \new, \axiom, \array],
+	[\DbufTag, \new, \rules, \array],
+	[\Dfsm, \new, \rules, \array],
 	[\Dneuromodule, \ar, \numChannels, \count],
+	[\Dneuromodule, \ar, \theta, \array],
 	[\Dneuromodule, \ar, \weights, \array],
+	[\Dneuromodule, \ar, \x, \array],
 	[\Dneuromodule, \kr, \numChannels, \count],
+	[\Dneuromodule, \kr, \theta, \array],
 	[\Dneuromodule, \kr, \weights, \array],
+	[\Dneuromodule, \kr, \x, \array],
 	[\Dneuromodule, \new, \numChannels, \count],
+	[\Dneuromodule, \new, \theta, \array],
 	[\Dneuromodule, \new, \weights, \array],
+	[\Dneuromodule, \new, \x, \array],
+	[\Dtag, \new, \axiom, \array],
+	[\Dtag, \new, \rules, \array],
+	[\FM7, \ar, \ctlMatrix, \array],
+	[\FM7, \ar, \modMatrix, \array],
 	[\FFTSubbandFlatness, \kr, \cutfreqs, \array],
 	[\FFTSubbandFlux, \kr, \cutfreqs, \array],
 	[\FFTSubbandPower, \kr, \cutfreqs, \array],
@@ -97,6 +110,7 @@ var argumentKinds = [
 	[\SOMRd, \kr, \numdims, \count],
 	[\SOMTrain, \kr, \inputdata, \array],
 	[\SpectralEntropy, \kr, \numbands, \count],
+	[\StkGlobals, \ar, \rawfilepath, \symbol],
 	[\StkInst, \ar, \args, \array],
 	[\TGrains2, \ar, \numChannels, \count],
 	[\TGrains3, \ar, \numChannels, \count],
@@ -128,7 +142,7 @@ var checkRules = (
 	BFManipulate: [\n_inputs, 4],
 	Dneuromodule: [\n_inputs, 1],
 	EnvDetect: [\same_rate_as_first_input_if_audio],
-	FM7: [\custom],
+	FM7: [\input_count, FM7.numRequiredInputs],
 	FMHDecode1: [\n_inputs, 9],
 	GreyholeRaw: [\n_inputs, 2],
 	JPverbRaw: [\n_inputs, 2],
@@ -149,24 +163,23 @@ var checkRules = (
 // outside UGen that answers ar or kr, and each UGen class whose methods
 // create no instance of the class. The crate has a body for each method of a
 // class of bodies.
-var bodies = [\BFFreeVerb, \BFGVerb, \BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \BtoUHJ, \DelayWr,
-	\FFTCentroid, \FFTSubbandFlatness, \FFTSubbandPower, \Feedback, \FreeVerb1, \Getenv, \Greyhole,
-	\HighShelf, \JPverb, \LPCSynth, \LPCVals, \LRHPF, \LRLPF, \LowShelf, \MatchingP,
-	\MatchingPResynth, \NHHall, \NearestN, \Notch, \PV_DiffMags, \PanX2D, \Phaser, \PulseDPW,
-	\RBJHighShelf, \RBJLowShelf, \RBJNotch, \Rotate, \SOMRd, \TapN, \TextVU, \Tilt, \Tumble,
-	\UHJtoB, \Vocode, \VocodeBand, \Vocoder, \WarpOverlap, \ZHPF, \ZLPF];
+var bodies = [\AutoTrack, \BFFreeVerb, \BFGVerb, \BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \BtoUHJ,
+	\DbufTag, \DelayWr, \Dfsm, \Dneuromodule, \Dtag, \FFTCentroid, \FFTSubbandFlatness,
+	\FFTSubbandPower, \FM7, \FeatureSave, \Feedback, \FreeVerb1, \Getenv, \Greyhole, \HighShelf,
+	\JPverb, \LPCSynth, \LPCVals, \LRHPF, \LRLPF, \LowShelf, \MatchingP, \MatchingPResynth,
+	\NHHall, \NearestN, \Notch, \PV_DiffMags, \PanX2D, \Phaser, \PulseDPW, \RBJHighShelf,
+	\RBJLowShelf, \RBJNotch, \Rotate, \SOMRd, \SoftClipAmp, \SpectralEntropy, \StkBowedI, \StkFlute,
+	\StkGlobals, \TapN, \TextVU, \Tilt, \Tumble, \UHJtoB, \Vocode, \VocodeBand, \Vocoder,
+	\WarpOverlap, \ZHPF, \ZLPF];
 // The classes of the census without a body, and why.
 var leftOut = [
-	[\AutoTrack, "no body yet"],
 	[\BF, "computes with objects of the language, such as ZPoint"],
 	[\BFDecode, "computes with objects of the language, such as ZPoint"],
 	[\BFEncode, "computes with objects of the language, such as ZPoint"],
 	[\BhobTone, "calls HiShelf, which no class defines"],
 	[\CheapVerb, "draws rand of the language at each build"],
 	[\OnsetsDS, "deprecated, and gives a Function"],
-	[\Reflections, "computes with objects of the language, such as ZPoint"],
-	[\SoftClipAmp, "no body yet"],
-	[\StkBowedI, "no body yet"]
+	[\Reflections, "computes with objects of the language, such as ZPoint"]
 ];
 var census = bodies ++ leftOut.collect(_.first);
 
@@ -315,6 +328,7 @@ try {
 		{ \same_rate_as_first_input_if_audio } { rate != \audio or: { rates[0] == \audio } }
 		{ \n_inputs } { rate != \audio or: { rates.keep(rule[1]).every { |input| input == \audio } } }
 		{ \audio_at } { rate != \audio or: { rates[rule[1]] == \audio } }
+		{ \input_count } { rates.size == rule[1] }
 	};
 	// A bare instance of `class` at `rate`, with inputs at the rates `rates`.
 	inputs = (audio: SinOsc.newCopyArgs.rate_(\audio), control: SinOsc.newCopyArgs.rate_(\control));
@@ -328,6 +342,9 @@ try {
 		if (rule[0] == \n_inputs) { patterns = patterns ++ [first.(rule[1] - 1), first.(rule[1])] };
 		if (rule[0] == \audio_at) {
 			patterns = patterns ++ [first.(0).put(rule[1], \audio), first.(128).put(rule[1], \control)];
+		};
+		if (rule[0] == \input_count) {
+			patterns = patterns ++ [first.(rule[1]).keep(rule[1]), first.(0).keep(rule[1] - 1)];
 		};
 		[\audio, \control].every { |rate|
 			patterns.every { |rates|

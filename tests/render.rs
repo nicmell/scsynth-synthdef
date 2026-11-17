@@ -206,6 +206,7 @@ fn default(value: &Value) -> String {
 fn check_inputs(value: &Value) -> String {
     match text(&value["rule"]) {
         "n_inputs" => format!("CheckInputs::NInputs({})", number(&value["count"])),
+        "input_count" => format!("CheckInputs::InputCount({})", number(&value["count"])),
         "audio_at" => format!("CheckInputs::AudioAt({})", number(&value["index"])),
         "audio_from" => format!("CheckInputs::AudioFrom({})", number(&value["index"])),
         "abstract_out" => format!(

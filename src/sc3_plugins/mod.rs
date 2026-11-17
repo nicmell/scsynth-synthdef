@@ -62,7 +62,7 @@ mod tests {
                 Addable::No(_) => 2,
             }] += 1;
         }
-        assert_eq!(counts, [635, 24, 20]);
+        assert_eq!(counts, [634, 37, 8]);
         assert!(
             pseudo_all()
                 .windows(2)
@@ -140,7 +140,7 @@ mod tests {
         assert_eq!(rule("JPverbRaw"), CheckInputs::NInputs(2));
         assert_eq!(rule("EnvDetect"), CheckInputs::SameRateAsFirstInputIfAudio);
         assert_eq!(rule("Summer"), CheckInputs::SameRateAsFirstInput);
-        assert_eq!(rule("FM7"), CheckInputs::Custom("FM7"));
+        assert_eq!(rule("FM7"), CheckInputs::InputCount(54));
         // BFGrainPanner checks input 2 in a checkNInputs of its own.
         assert_eq!(rule("InGrainIBF"), CheckInputs::AudioAt(2));
         let count = |wanted: fn(CheckInputs) -> bool| {

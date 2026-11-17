@@ -842,6 +842,7 @@
 			\categories -> (doc !? { doc.categories } ? []),
 			\check_inputs -> ([\rule -> rule[0]] ++ switch (rule[0])
 				{ \n_inputs } { [\count -> rule[1]] }
+				{ \input_count } { [\count -> rule[1]] }
 				{ \audio_at } { [\index -> rule[1]] }
 				{ \audio_from } { [\index -> rule[1]] }
 				{ \abstract_out } { [\fixed -> (try { class.numFixedArgs } ? 0)] }

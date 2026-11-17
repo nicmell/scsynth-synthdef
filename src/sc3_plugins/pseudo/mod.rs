@@ -2,11 +2,19 @@
 //! catalogue of sc3-plugins marks `Addable::Pseudo`, with the `Args` of the
 //! bodies of the core.
 
+mod bbcut2_ugens;
+mod berlach_ugens;
 mod bhob_ugens;
 mod deind_ugens;
 mod josh_ugens;
 mod mcld_ugens;
+mod neuromodules;
 mod nh_ugens;
+mod scmir_ugens;
+mod sk_ugens;
+mod stk_inst;
+mod stk_ugens;
+mod tag_system_ugens;
 
 use josh_ugens::{
     ambisonics, biquad_eq, feedback, free_verb1, joshfilts, lpc_synth, pan_x, phaser, sc2_compat,
@@ -23,6 +31,7 @@ use crate::ugen_input::{ArgValue, UGenInput};
 /// The body of each method that the catalogue of sc3-plugins marks
 /// `Addable::Pseudo`, by class and selector.
 pub(crate) static BODIES: &[(&str, &str, Body)] = &[
+    ("AutoTrack", "kr", bbcut2_ugens::auto_track),
     ("BFFreeVerb", "ar", ambisonics::bf_free_verb),
     ("BFGVerb", "ar", ambisonics::bf_g_verb),
     ("BHPF", "ar", joshfilts::bhpf),
@@ -30,10 +39,18 @@ pub(crate) static BODIES: &[(&str, &str, Body)] = &[
     ("BhobHiShelf", "ar", bhob_ugens::hi_shelf),
     ("BhobLoShelf", "ar", bhob_ugens::lo_shelf),
     ("BtoUHJ", "ar", uhj::b_to_uhj),
+    ("DbufTag", "new", tag_system_ugens::dbuf_tag),
     ("DelayWr", "ar", sc2_compat::delay_wr),
+    ("Dfsm", "new", tag_system_ugens::dfsm),
+    ("Dneuromodule", "ar", neuromodules::dneuromodule_duty),
+    ("Dneuromodule", "kr", neuromodules::dneuromodule_duty),
+    ("Dneuromodule", "new", neuromodules::dneuromodule),
+    ("Dtag", "new", tag_system_ugens::dtag),
     ("FFTCentroid", "kr", mcld_ugens::fft_centroid),
     ("FFTSubbandFlatness", "kr", mcld_ugens::fft_subband_flatness),
     ("FFTSubbandPower", "kr", mcld_ugens::fft_subband_power),
+    ("FM7", "ar", sk_ugens::fm7),
+    ("FeatureSave", "kr", scmir_ugens::feature_save),
     ("Feedback", "ar", feedback::feedback),
     ("FreeVerb1", "ar", free_verb1::free_verb1),
     ("Getenv", "new", mcld_ugens::getenv),
@@ -67,6 +84,12 @@ pub(crate) static BODIES: &[(&str, &str, Body)] = &[
     ("Rotate", "ar", ambisonics::rotate),
     ("SOMRd", "ar", mcld_ugens::som_rd),
     ("SOMRd", "kr", mcld_ugens::som_rd),
+    ("SoftClipAmp", "ar", berlach_ugens::soft_clip_amp),
+    ("SpectralEntropy", "kr", scmir_ugens::spectral_entropy),
+    ("StkBowedI", "ar", stk_inst::stk_bowed_i),
+    ("StkFlute", "ar", stk_ugens::stk_flute),
+    ("StkFlute", "kr", stk_ugens::stk_flute),
+    ("StkGlobals", "ar", stk_inst::stk_globals),
     ("TapN", "ar", sc2_compat::tap_n),
     ("TextVU", "ar", mcld_ugens::text_vu),
     ("TextVU", "kr", mcld_ugens::text_vu),
