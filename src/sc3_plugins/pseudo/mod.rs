@@ -15,6 +15,7 @@ mod sk_ugens;
 mod stk_inst;
 mod stk_ugens;
 mod tag_system_ugens;
+mod vbap_ugens;
 
 use josh_ugens::{
     ambisonics, biquad_eq, feedback, free_verb1, joshfilts, lpc_synth, pan_x, phaser, sc2_compat,
@@ -24,7 +25,7 @@ use josh_ugens::{
 use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize, whole_count};
 use crate::catalog;
 use crate::error::BuildError;
-use crate::pseudo::{Args, Body, elements};
+use crate::pseudo::{Args, Body, MethodBody, elements};
 use crate::rate::Rate;
 use crate::ugen_input::{ArgValue, UGenInput};
 
@@ -105,6 +106,11 @@ pub(crate) static BODIES: &[(&str, &str, Body)] = &[
     ("ZLPF", "ar", joshfilts::zlpf),
 ];
 
+/// The body of each instance method of `UGen` that sc3-plugins adds, by the
+/// class that owns it and its selector.
+pub(crate) static UGEN_BODIES: &[(&str, &str, MethodBody)] =
+    &[("UGen", "circleRamp", vbap_ugens::circle_ramp)];
+
 /// `#a, b, ... = value` of sclang: the first `N` elements of `value`, the
 /// result of an expansion over the arguments `names`. Past the end of an
 /// array, sclang gives nil, which a later call throws on. The crate refuses
@@ -179,11 +185,11 @@ fn do_count(args: &Args, name: &str, count: f64) -> Result<usize, BuildError> {
 
 #[cfg(test)]
 mod tests {
-    use super::BODIES;
+    use super::{BODIES, UGEN_BODIES};
     use crate::builder::SynthDefBuilder;
     use crate::catalog::{Addable, RateMethod};
     use crate::error::BuildError;
-    use crate::sc3_plugins::{all, pseudo_all};
+    use crate::sc3_plugins::{all, pseudo_all, ugen_methods};
     use crate::ugen_input::UGenInput;
 
     /// A builder with a sine at audio rate.
@@ -239,6 +245,28 @@ mod tests {
         let mut bodies: Vec<(&str, &str)> = BODIES
             .iter()
             .map(|&(class, selector, _)| (class, selector))
+            .collect();
+        bodies.sort_unstable();
+        assert_eq!(methods, bodies);
+    }
+
+    #[test]
+    fn each_method_of_ugen_has_a_body_and_each_body_its_method() {
+        let mut methods: Vec<(&str, &str)> = ugen_methods()
+            .iter()
+            .flat_map(|method| {
+                let selector = method.method.selector;
+                std::iter::once("UGen")
+                    .chain(method.number)
+                    .chain(method.array)
+                    .chain(method.overrides.iter().copied())
+                    .map(move |owner| (owner, selector))
+            })
+            .collect();
+        methods.sort_unstable();
+        let mut bodies: Vec<(&str, &str)> = UGEN_BODIES
+            .iter()
+            .map(|&(owner, selector, _)| (owner, selector))
             .collect();
         bodies.sort_unstable();
         assert_eq!(methods, bodies);

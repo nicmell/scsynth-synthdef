@@ -3,7 +3,7 @@
 
 use crate::catalog::{
     Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,
-    Optimize, Outputs, PseudoClass, RateMethod, SignalRange, UGenClass, Wiring,
+    Optimize, Outputs, PseudoClass, RateMethod, SignalRange, UGenClass, UGenMethod, Wiring,
 };
 use crate::rate::Rate;
 
@@ -29486,5 +29486,23 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 32] = [
                 addable: Addable::Pseudo,
             },
         ],
+    },
+];
+
+pub(super) static UGEN_METHODS: [UGenMethod; 1] = [
+    UGenMethod {
+        method:
+            RateMethod {
+                selector: "circleRamp",
+                args: &[
+                    ArgSpec { name: "lagTime", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.1)) },
+                    ArgSpec { name: "circmin", kind: ArgKind::Signal, default: Some(ArgDefault::Float(-180.0)) },
+                    ArgSpec { name: "circmax", kind: ArgKind::Signal, default: Some(ArgDefault::Float(180.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        number: None,
+        array: None,
+        overrides: &[],
     },
 ];

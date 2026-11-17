@@ -28,6 +28,8 @@ mod ugen_methods;
 
 pub(crate) use fft_unpacking::{pvcalc, pvcalc2, pvcollect};
 pub(crate) use graph_builder::NamedEntry;
+#[cfg(feature = "sc3-plugins")]
+pub(crate) use ugen_methods::MethodBody;
 pub(crate) use ugen_methods::send;
 
 use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize, whole_count};

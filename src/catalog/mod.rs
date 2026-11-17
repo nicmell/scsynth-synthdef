@@ -8,7 +8,10 @@ mod generated;
 
 use crate::rate::Rate;
 #[cfg(feature = "sc3-plugins")]
-use crate::sc3_plugins::{lookup as plugin_lookup, pseudo_lookup as plugin_pseudo_lookup};
+use crate::sc3_plugins::{
+    lookup as plugin_lookup, pseudo_lookup as plugin_pseudo_lookup,
+    ugen_method as plugin_ugen_method,
+};
 
 /// A UGen class of the core class library, or of sc3-plugins.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -445,8 +448,19 @@ pub(crate) fn find_pseudo(name: &str) -> Option<&'static PseudoClass> {
     pseudo_lookup(name).or_else(|| plugin_pseudo_lookup(name))
 }
 
+/// The instance method of `UGen` with this selector that builds a graph, of
+/// the core or, with the feature `sc3-plugins`, of sc3-plugins.
+pub(crate) fn find_ugen_method(selector: &str) -> Option<&'static UGenMethod> {
+    ugen_method(selector).or_else(|| plugin_ugen_method(selector))
+}
+
 #[cfg(not(feature = "sc3-plugins"))]
 fn plugin_lookup(_: &str) -> Option<&'static UGenClass> {
+    None
+}
+
+#[cfg(not(feature = "sc3-plugins"))]
+fn plugin_ugen_method(_: &str) -> Option<&'static UGenMethod> {
     None
 }
 

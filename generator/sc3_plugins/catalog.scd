@@ -193,8 +193,8 @@ var noUnit = [\BlitB3D, \CQ_Diff, \Clipper32, \FFTSubbandFlux, \RMAFoodChainL, \
 // folder ATK, whose classes come with the quark atk-sc3.
 var classless = [\CubicDelay, \TALReverb, \Xover2];
 
-// The methods that the folder adds to classes of the core. Only
-// UGen:circleRamp builds a graph, and it has no body yet.
+// The methods that the folder adds to classes of the core. Those of UGen
+// build graphs, and the catalogue describes them: UGen:circleRamp alone.
 var extensions = [
 	[\EnvelopeView, \asEnv],
 	[\Function, \benchmark],
@@ -230,7 +230,7 @@ var extensions = [
 ];
 
 var probes, toJSON, describeClass, describePseudoClass, scanCantAlias, stats, cantAlias;
-var inputs, verdict, bare, first, ruleHolds, blobs, classes, pseudoClasses, helpDir, json;
+var inputs, verdict, bare, first, ruleHolds, blobs, classes, pseudoClasses, ugenMethods, helpDir, json;
 var measured = 0;
 
 try {
@@ -397,12 +397,15 @@ try {
 		.reject { |class| (class.superclasses ? []).includes(UGen) }
 		.sort { |a, b| a.name.asString < b.name.asString }
 		.collect(describePseudoClass);
+	ugenMethods = probes[\describeUGenMethods]
+		.(extensions.select { |entry| entry[0] == \UGen }.collect(_.last));
 
 	json = toJSON.([
 		\sclang -> Main.version,
 		\sc3_plugins -> tag.drop(8),
 		\classes -> classes,
-		\pseudo_classes -> pseudoClasses
+		\pseudo_classes -> pseudoClasses,
+		\ugen_methods -> ugenMethods
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "sc3_plugins" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("sc3_plugins/catalog.scd: % classes, % of % methods addable, % pseudo-UGen methods, "

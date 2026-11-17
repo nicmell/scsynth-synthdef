@@ -623,6 +623,10 @@ of 600 and 200.
   `raddeg`, `moddif`, `sanitize`, `poll`, `dpoll` and `checkBadValues`.
   Last come `snap`, `softRound`, `binaryValue`, `isPositive`,
   `isNegative`, `isStrictlyPositive`, `|==|`, `degreeToKey` and `if`.
+- With the feature `sc3-plugins`, `send` also sends `circleRamp`, which
+  sc3-plugins adds to `UGen`: a `CircleRamp` at the rate of the receiver.
+  `sc3_plugins::ugen_method` and `sc3_plugins::ugen_methods` give it. A
+  number or an array does not understand it.
 - The call passes every argument, in its order, to the method that the
   receiver answers. So it is the call of sclang with every argument by
   position.
@@ -821,8 +825,9 @@ add these plugins to the core. `ugen` adds them as it adds the classes of
 `sc3_plugins::all` gives all of them, sorted by name.
 `sc3_plugins::pseudo_lookup` and `sc3_plugins::pseudo_all` give the
 classes outside `UGen` that the crate builds, such as `JPverb` and `BLPF`.
-The classes have the types of `catalog`, and no name is in both
-catalogues.
+`sc3_plugins::ugen_method` and `sc3_plugins::ugen_methods` give
+`circleRamp`, which sc3-plugins adds to `UGen`. The classes have the types
+of `catalog`, and no name is in both catalogues.
 
 ```rust
 # #[cfg(feature = "sc3-plugins")]
@@ -1191,16 +1196,11 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-This is not in version 0.14, the next item of value for sc-app3:
-
-1. `UGen:circleRamp` of sc3-plugins, for `send`.
-
-Of sc3-plugins, the crate also leaves out ATK, whose classes come with the
+Of sc3-plugins, the crate leaves out ATK, whose classes come with the
 quark `atk-sc3`. `CheapVerb` draws `rand` of the language at each build.
 `BF`, `BFDecode`, `BFEncode` and `Reflections` compute with objects of the
 language, such as `ZPoint`. `BhobTone` calls `HiShelf`, which no class
-defines. `OnsetsDS` is deprecated, and gives a Function. `UGen:circleRamp`
-has no body yet.
+defines. `OnsetsDS` is deprecated, and gives a Function.
 
 Also left out: the view of `SynthDesc`, with its inputs, outputs and
 metadata, the specs included. So are the pseudo-UGens `AudioIn` and
@@ -1244,8 +1244,10 @@ The golden files of sc3-plugins are in `tests/fixtures/sc3_plugins`, and
 `tests/sc3_plugins` tests them with the feature. `methods.scsyndef` holds
 one definition for each addable method, which the crate builds from the
 catalogue alone. `bodies.json` holds the cases of the bodies, and each
-case builds in sclang and in the crate from that file. Each pseudo method
-needs a case that builds. `generator/sc3_plugins/fixtures.scd` writes the
+case builds in sclang and in the crate from that file. A case calls a
+method of a class, or sends a method of `UGen` to a receiver. Each pseudo
+method and each method of `UGen` of sc3-plugins needs a case that
+builds. `generator/sc3_plugins/fixtures.scd` writes the
 files again:
 
 ```sh

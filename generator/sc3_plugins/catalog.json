@@ -107785,5 +107785,37 @@
         }
       ]
     }
+  ],
+  "ugen_methods": [
+    {
+      "selector": "circleRamp",
+      "args": [
+        {
+          "name": "lagTime",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "circmin",
+          "kind": "signal",
+          "default": {
+            "float": -180
+          }
+        },
+        {
+          "name": "circmax",
+          "kind": "signal",
+          "default": {
+            "float": 180
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": null,
+      "overrides": []
+    }
   ]
 }

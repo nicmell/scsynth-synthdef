@@ -129,7 +129,10 @@
     "uhj_b_to_uhj": 5,
     "uhj_b_to_uhj_channels": 8,
     "uhj_uhj_to_b": 8,
-    "uhj_uhj_to_b_control": 8
+    "uhj_uhj_to_b_control": 8,
+    "vbap_circle_ramp": 0,
+    "vbap_circle_ramp_ar": 1,
+    "vbap_circle_ramp_controls": 0
   },
   "expansion": {
     "expansion_arraymax": 0,

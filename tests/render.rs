@@ -358,10 +358,11 @@ fn render_sc3_plugins(catalog: &Value) -> String {
     let mut rendered = header(SC3_PLUGINS);
     rendered.push_str(ALLOW);
     rendered.push_str(
-        "use crate::catalog::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,\n    Optimize, Outputs, PseudoClass, RateMethod, SignalRange, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use crate::catalog::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,\n    Optimize, Outputs, PseudoClass, RateMethod, SignalRange, UGenClass, UGenMethod, Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     render_classes(&mut rendered, catalog);
     render_pseudo_classes(&mut rendered, catalog);
+    render_ugen_methods(&mut rendered, catalog);
     rendered
 }
 

@@ -488,7 +488,8 @@ impl SynthDefBuilder {
     /// Sends the message `selector` to `receiver` with the arguments by name,
     /// as `receiver.range(200, 800)` sends `range` in sclang. The messages are
     /// the instance methods of `UGen` that build graphs (see
-    /// [`catalog::ugen_methods`]), with the arguments and the defaults of
+    /// [`catalog::ugen_methods`], and with the feature `sc3-plugins`,
+    /// `sc3_plugins::ugen_methods`), with the arguments and the defaults of
     /// `UGen`. The call passes all of them, in their order, to the method
     /// that the receiver answers, as sclang does when every argument comes by
     /// position.
@@ -514,7 +515,7 @@ impl SynthDefBuilder {
         selector: &str,
         args: &[(&str, ArgValue)],
     ) -> Result<UGenInput, BuildError> {
-        let method = catalog::ugen_method(selector).ok_or_else(|| BuildError::BadMethod {
+        let method = catalog::find_ugen_method(selector).ok_or_else(|| BuildError::BadMethod {
             selector: selector.to_owned(),
             message: "it is no method of UGen that builds a graph".to_owned(),
         })?;

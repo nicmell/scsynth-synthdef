@@ -167,6 +167,11 @@
     {"name": "neuro_dneuromodule_ar", "out": "ar", "call": ["Dneuromodule", "ar", [["dt", 0.01], ["numChannels", 2], ["theta", [0, 1]], ["x", [0.5, 0.5]], ["weights", [1, 2, 3, 4]]]]},
     {"name": "neuro_dneuromodule_kr", "out": "ar", "call": ["Dneuromodule", "kr", [["dt", {"control": ["dt", 0.1]}], ["numChannels", 1], ["theta", [0]], ["x", [0]], ["weights", [1]]]]},
     {"name": "refused_dneuromodule_count", "out": "kr", "refused": true, "call": ["Dneuromodule", "new", [["numChannels", {"control": ["n", 2]}], ["theta", [0, 1]], ["x", [0, 0]], ["weights", [1, 2, 3, 4]]]]},
-    {"name": "bbcut_auto_track", "out": "kr", "call": ["AutoTrack", "kr", [["in", {"ugen": ["FFT", "new", [["buffer", {"ugen": ["LocalBuf", "new", [["numFrames", 1024]]]}], ["in", {"ugen": ["SinOsc", "ar", []]}]]]}], ["lock", 0]]]}
+    {"name": "bbcut_auto_track", "out": "kr", "call": ["AutoTrack", "kr", [["in", {"ugen": ["FFT", "new", [["buffer", {"ugen": ["LocalBuf", "new", [["numFrames", 1024]]]}], ["in", {"ugen": ["SinOsc", "ar", []]}]]]}], ["lock", 0]]]},
+    {"name": "vbap_circle_ramp", "out": "kr", "send": [{"ugen": ["SinOsc", "kr", [["freq", 0.1]]]}, "circleRamp", [["lagTime", 0.2]]]},
+    {"name": "vbap_circle_ramp_ar", "out": "ar", "send": [{"ugen": ["SinOsc", "ar", []]}, "circleRamp", []]},
+    {"name": "vbap_circle_ramp_controls", "out": "kr", "send": [{"ugen": ["LFSaw", "kr", []]}, "circleRamp", [["lagTime", {"control": ["lag", 0.1]}], ["circmin", -90], ["circmax", 90]]]},
+    {"name": "refused_circle_ramp_number", "out": "kr", "refused": true, "send": [5, "circleRamp", []]},
+    {"name": "refused_circle_ramp_array", "out": "kr", "refused": true, "send": [[{"ugen": ["SinOsc", "kr", []]}, {"ugen": ["SinOsc", "kr", [["freq", 2]]]}], "circleRamp", []]}
   ]
 }

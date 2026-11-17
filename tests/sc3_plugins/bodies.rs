@@ -2,8 +2,9 @@
 //! each one into `bodies.scsyndef` through `generator/sc3_plugins/fixtures.scd`,
 //! and the crate builds it from the same case.
 //!
-//! A case has a name, a call (a class, a selector and the arguments by name),
-//! and the rate of an `Out` of the result, or none. A value is a number, an
+//! A case has a name, a call (a class, a selector and the arguments by name)
+//! or a send (a receiver, a selector of a method of `UGen` and the
+//! arguments by name), and the rate of an `Out` of the result, or none. A value is a number, an
 //! array, `{"control": [name, default]}`, `{"ugen": [class, selector,
 //! arguments]}`, `{"symbol": text}` or `{"bool": value}`. A refused case
 //! breaks in sclang, and the crate must refuse it.
@@ -103,12 +104,31 @@ fn call(builder: &mut SynthDefBuilder, call: &Value) -> Result<UGenInput, BuildE
     builder.ugen(text(&call[0]), text(&call[1]), &values)
 }
 
+/// The send of a case: the receiver, then the arguments by name in their
+/// order, to the method of `UGen`.
+fn send(builder: &mut SynthDefBuilder, send: &Value) -> Result<UGenInput, BuildError> {
+    let receiver = input(builder, &send[0]);
+    let values: Vec<(&str, ArgValue)> = list(&send[2])
+        .iter()
+        .map(|pair| (text(&pair[0]), value(builder, &pair[1])))
+        .collect();
+    builder.send(receiver, text(&send[1]), &values)
+}
+
 /// The definition of a case, or the error of the crate.
 fn definition(case: &Value) -> Result<SynthDef, BuildError> {
     let mut found = Vec::new();
-    arguments(&case["call"], &mut found);
+    if let Some(sent) = case.get("send") {
+        controls(&sent[0], &mut found);
+        arguments(sent, &mut found);
+    } else {
+        arguments(&case["call"], &mut found);
+    }
     let mut builder = SynthDefBuilder::new(text(&case["name"]), found)?;
-    let result = call(&mut builder, &case["call"])?;
+    let result = match case.get("send") {
+        Some(sent) => send(&mut builder, sent)?,
+        None => call(&mut builder, &case["call"])?,
+    };
     if let Some(rate) = case["out"].as_str() {
         let channels = [("bus", 0.0.into()), ("channelsArray", result.into())];
         builder.ugen("Out", rate, &channels)?;
@@ -143,10 +163,24 @@ fn every_refused_case_of_the_bodies_fails_in_the_crate() {
 }
 
 #[test]
+fn every_method_of_ugen_of_sc3_plugins_has_a_case_that_builds() {
+    for method in sc3_plugins::ugen_methods() {
+        let selector = method.method.selector;
+        let has_case = cases().iter().any(|case| {
+            !refused(case)
+                && case
+                    .get("send")
+                    .is_some_and(|sent| text(&sent[1]) == selector)
+        });
+        assert!(has_case, "UGen:{selector} has no case");
+    }
+}
+
+#[test]
 fn every_pseudo_method_of_sc3_plugins_has_a_case_that_builds() {
     let built: Vec<(String, String)> = cases()
         .iter()
-        .filter(|case| !refused(case))
+        .filter(|case| !refused(case) && case.get("call").is_some())
         .map(|case| {
             let call = &case["call"];
             (text(&call[0]).to_owned(), text(&call[1]).to_owned())

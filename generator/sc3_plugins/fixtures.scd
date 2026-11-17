@@ -28,7 +28,7 @@ var known = { |item|
 	path.beginsWith(library) or: { folder.notNil and: { path.beginsWith(folder) } }
 };
 var goldens, build, write, writeCases, refused, catalog, definition, methods = List.new;
-var valueCode, callCode, bodies = List.new;
+var valueCode, callCode, sendCode, bodies = List.new;
 
 try {
 	if (Main.version != "3.14.1") {
@@ -163,8 +163,17 @@ try {
 			{ valueCode.(pair[1], controls) }
 		}.join(", "))
 	};
+	// A case that sends a method of UGen to a receiver.
+	sendCode = { |send, controls|
+		"(%).%(%)".format(valueCode.(send[0], controls), send[1], send[2].collect { |pair|
+			pair[0] ++ ": " ++ valueCode.(pair[1], controls)
+		}.join(", "))
+	};
 	(fixtures +/+ "bodies.json").parseJSONFile["cases"].do { |case|
-		var controls = List.new, call = callCode.(case["call"], controls), func;
+		var controls = List.new, func;
+		var call = case["send"] !? { |send| sendCode.(send, controls) } ?? {
+			callCode.(case["call"], controls)
+		};
 		var body = case["out"] !? { |rate| "Out.%(0, %)".format(rate, call) } ? call;
 		var code = "{ " ++ if (controls.isEmpty) { "" } {
 			"|" ++ controls.collect { |control| control[0] ++ " = " ++ control[1] }.join(", ") ++ "| "

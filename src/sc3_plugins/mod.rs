@@ -8,9 +8,9 @@
 mod generated;
 mod pseudo;
 
-pub(crate) use pseudo::BODIES;
+pub(crate) use pseudo::{BODIES, UGEN_BODIES};
 
-use crate::catalog::{PseudoClass, UGenClass, by_name};
+use crate::catalog::{PseudoClass, UGenClass, UGenMethod, by_name};
 
 /// The class with this name.
 #[must_use]
@@ -35,6 +35,22 @@ pub fn pseudo_lookup(name: &str) -> Option<&'static PseudoClass> {
 #[must_use]
 pub fn pseudo_all() -> &'static [PseudoClass] {
     &generated::PSEUDO_CLASSES
+}
+
+/// The instance method of `UGen` with this selector that sc3-plugins adds
+/// and that builds a graph, such as `circleRamp`.
+#[must_use]
+pub fn ugen_method(selector: &str) -> Option<&'static UGenMethod> {
+    ugen_methods()
+        .iter()
+        .find(|method| method.method.selector == selector)
+}
+
+/// The instance methods of `UGen` that sc3-plugins adds and that build
+/// graphs, with their arguments.
+#[must_use]
+pub fn ugen_methods() -> &'static [UGenMethod] {
+    &generated::UGEN_METHODS
 }
 
 #[cfg(test)]
