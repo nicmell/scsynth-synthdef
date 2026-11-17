@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.15.0 (2026-11-17)
+
+The bodies of the other pseudo-UGens of sc3-plugins, and
+`UGen:circleRamp`.
+
+### Added
+
+- With the feature `sc3-plugins`, `SynthDefBuilder::ugen` builds 69 more
+  methods of sc3-plugins that do more than `new1`, 72 in all. They are
+  the filters, the reverbs and the other pseudo-UGens of JoshUGens, the
+  classes of MCLDUGens, and the pseudo-UGens of eight other plugins. See
+  [Pseudo-UGens of sc3-plugins](README.md#pseudo-ugens-of-sc3-plugins).
+  Of the 679 rate methods of sc3-plugins, `ugen` refuses 8, against 43.
+- `SynthDefBuilder::send` sends `circleRamp`, which sc3-plugins adds to
+  `UGen`. `sc3_plugins::ugen_method` and `sc3_plugins::ugen_methods` give
+  it.
+- `CheckInputs::InputCount`, the rule of `FM7`: exactly 54 inputs.
+- The arithmetic of numbers computes `dbamp`, `softclip` and `wrap2` as
+  sclang 3.14.1 does. `tests/fixtures/arithmetic.json` measures them.
+- `tests/fixtures/sc3_plugins/bodies.json` holds 133 cases of the bodies
+  and 40 refused cases. sclang builds each case into `bodies.scsyndef`,
+  and the crate writes the same bytes. Each refused case breaks in sclang
+  and fails in the crate, and scsynth loads each definition.
+
+### Changed
+
+- `StkFlute.ar` is no longer addable by its wiring. Its class has a body
+  now, which `StkFlute.kr` needs, since it applies `madd` twice. `ugen`
+  builds both methods, as sclang does.
+- `generator/probes.scd` describes the methods of `UGen` for both
+  generators.
+- The README lists more differences from sclang: a whole Float where
+  sclang needs an Integer, a count of `do` above 65535, and a `Ref` as an
+  argument of `WarpOverlap`.
+
 ## 0.14.0 (2026-11-16)
 
 The UGens of sc3-plugins 3.14.0, in a catalogue of their own behind the

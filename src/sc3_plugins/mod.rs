@@ -66,7 +66,8 @@ mod tests {
 
     #[test]
     fn the_catalogue_holds_the_classes_of_sc3_plugins_sorted_by_name() {
-        // Facts 3, 4 and 7 of the plan of 0.14.
+        // Facts 3 and 4 of the plan of 0.14, and the counts of the plan of
+        // 0.15.
         assert_eq!(all().len(), 491);
         assert!(all().windows(2).all(|pair| pair[0].name < pair[1].name));
         assert!(lookup("DFM1").is_some());

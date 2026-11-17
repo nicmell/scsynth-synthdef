@@ -867,9 +867,11 @@ inputs: the definition needs four wire buffers.
 - 176 units of sc3-plugins with a class set
   `kUnitDef_CantAliasInputsToOutputs`, such as `GreyholeRaw`, `JPverbRaw`
   and the HOA classes. `SynthDef::wire_buffers` counts them.
-- The feature adds 258 KB to a release wasm32 build, and 28.5 KB after
-  gzip. The core catalogue takes 102 KB, and 17 KB after gzip. The 96
-  HOA classes hold two thirds of the arguments.
+- A release wasm32 build that reads `sc3_plugins::all()` takes 257 KB,
+  and 28 KB after gzip. The core catalogue takes 102 KB, and 17 KB after
+  gzip. The 96 HOA classes hold two thirds of the arguments. In a build
+  that calls `ugen`, the feature adds 433 KB, and 82 KB after gzip, with
+  the bodies.
 
 `generator/sc3_plugins/catalog.scd` measured each method with the probes of
 `generator/catalog.scd`, in sclang 3.14.1 with the core class library and

@@ -7,7 +7,7 @@ SuperCollider 3.14.1 and sc3-plugins 3.14.0 are the reference. This file
 is the operating manual.
 
 The README is the reference of the crate. [docs/plan.md](docs/plan.md) holds
-the plan of version 0.15. Read both before any work.
+what is still open after version 0.15. Read both before any work.
 
 ## Ground rules
 
