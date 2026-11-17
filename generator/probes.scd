@@ -96,6 +96,7 @@
 	// The units that cannot alias, which scanCantAlias finds.
 	var cantAlias = List.new;
 	var stripComments, quote, toJSON, entryFor, number, requireEntries, describeMethods;
+	var describeUGenMethods;
 	var methodOwner, ugenOwner, kindsOf, probe, signal, element, audio, control, numberValues;
 	var controlValues, same, mapInputs, outputsOf, instanceOf, valuesAt, expansionOf;
 	var arrayExpansionOf, wiring, testPassthrough, testSilence, testAudioTogether;
@@ -204,6 +205,23 @@
 			var method = find.(selector);
 			if (method.isNil) { fail.("% has no % %".format(owner.name, noun, selector)) };
 			describeArgs.(owner, selector, method, owner)[1] ++ [\addable -> "pseudo"]
+		}
+	};
+	// The instance methods `selectors` of UGen, with the classes whose methods
+	// a Float and an Array answer, and the subclasses of UGen with a method of
+	// their own.
+	describeUGenMethods = { |selectors|
+		describeMethods.(UGen, selectors, UGen.findMethod(_), "method").collect { |entry, index|
+			var selector = selectors[index];
+			var owner = { |class|
+				class.findRespondingMethodFor(selector) !? { |found| found.ownerClass.name }
+			};
+			var overrides = UGen.allSubclasses.collect(owner).reject { |name| name == \UGen };
+			entry ++ [
+				\number -> owner.(Float),
+				\array -> owner.(Array),
+				\overrides -> overrides.asSet.asArray.sort
+			]
 		}
 	};
 	// The class that owns a class method.
@@ -842,6 +860,7 @@
 			\categories -> (doc !? { doc.categories } ? []),
 			\check_inputs -> ([\rule -> rule[0]] ++ switch (rule[0])
 				{ \n_inputs } { [\count -> rule[1]] }
+				{ \input_count } { [\count -> rule[1]] }
 				{ \audio_at } { [\index -> rule[1]] }
 				{ \audio_from } { [\index -> rule[1]] }
 				{ \abstract_out } { [\fixed -> (try { class.numFixedArgs } ? 0)] }
@@ -921,7 +940,8 @@
 	(
 		stats: stats, cantAlias: cantAlias, checkRules: checkRules, stripComments: stripComments,
 		toJSON: toJSON, number: number, requireEntries: requireEntries,
-		describeMethods: describeMethods, describeClass: describeClass,
+		describeMethods: describeMethods, describeUGenMethods: describeUGenMethods,
+		describeClass: describeClass,
 		describePseudoClass: describePseudoClass, scanCantAlias: scanCantAlias
 	)
 }

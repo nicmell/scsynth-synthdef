@@ -292,8 +292,8 @@ that `levelComp` gives two inputs at audio rate: the square root of 1/2.
   give a number, in f64, as sclang computes its Floats. An array goes
   element by element. Anything else goes to `binary_op` and `unary_op`.
 - `tests/fixtures/arithmetic.json` tests each operator against sclang
-  3.14.1 for macOS on arm64. That sclang computes `%` and `fold2` of Floats
-  with one fused multiply-add, and so does the crate.
+  3.14.1 for macOS on arm64. That sclang computes `%`, `fold2` and `wrap2`
+  of Floats with one fused multiply-add, and so does the crate.
 - The crate builds `BHiPass4`, `BLowPass4`, `Changed`, `CompanderD`,
   `Dstutter`, `DynKlang`, `DynKlank`, `HilbertFIR`, `LinLin`, `LinSelectX`,
   `Mix`, `MultiTap` and `NumChannels`.
@@ -623,6 +623,10 @@ of 600 and 200.
   `raddeg`, `moddif`, `sanitize`, `poll`, `dpoll` and `checkBadValues`.
   Last come `snap`, `softRound`, `binaryValue`, `isPositive`,
   `isNegative`, `isStrictlyPositive`, `|==|`, `degreeToKey` and `if`.
+- With the feature `sc3-plugins`, `send` also sends `circleRamp`, which
+  sc3-plugins adds to `UGen`: a `CircleRamp` at the rate of the receiver.
+  `sc3_plugins::ugen_method` and `sc3_plugins::ugen_methods` give it. A
+  number or an array does not understand it.
 - The call passes every argument, in its order, to the method that the
   receiver answers. So it is the call of sclang with every argument by
   position.
@@ -815,13 +819,15 @@ it.
 ## sc3-plugins
 
 With the feature `sc3-plugins`, the module `sc3_plugins` holds the 491
-UGen classes of sc3-plugins 3.14.0, the plugins that many installations of
-SuperCollider add to the core. `ugen` adds them as it adds the classes of
+UGen classes of sc3-plugins 3.14.0. Many installations of SuperCollider
+add these plugins to the core. `ugen` adds them as it adds the classes of
 `catalog`. `sc3_plugins::lookup` gives a class by name, and
 `sc3_plugins::all` gives all of them, sorted by name.
-`sc3_plugins::pseudo_lookup` and `sc3_plugins::pseudo_all` give `Greyhole`
-and `JPverb`. The classes have the types of `catalog`, and no name is in
-both catalogues.
+`sc3_plugins::pseudo_lookup` and `sc3_plugins::pseudo_all` give the
+classes outside `UGen` that the crate builds, such as `JPverb` and `BLPF`.
+`sc3_plugins::ugen_method` and `sc3_plugins::ugen_methods` give
+`circleRamp`, which sc3-plugins adds to `UGen`. The classes have the types
+of `catalog`, and no name is in both catalogues.
 
 ```rust
 # #[cfg(feature = "sc3-plugins")]
@@ -850,19 +856,22 @@ inputs: the definition needs four wire buffers.
   folder `SC3plugins` of the Extensions holds its class files.
   `Version-3.14.1` changes `VBAPSpeakerArray` alone, which builds no UGen,
   so the catalogue serves both.
-- 635 of the 679 rate methods are addable with a wiring. `Greyhole.ar`,
-  `JPverb.ar` and `NHHall.ar` have a body. `Greyhole` and `JPverb` call
-  their raw class on the first and the last channel of `in`. `NHHall`
-  takes an array of two channels.
+- 634 of the 679 rate methods are addable with a wiring, and 37 have a
+  body. [Pseudo-UGens of sc3-plugins](#pseudo-ugens-of-sc3-plugins) lists
+  the bodies.
 - Most rules of `checkInputs` are those of the core. The 96 HOA classes
-  ask for audio rate on their first n inputs at audio rate, n from 1 to
-  121. `BFGrainPanner` and its subclasses ask for it on input 2.
+  ask for audio rate on their first n inputs at audio rate, for an n of 1
+  to 121 by class. `BFGrainPanner` and its subclasses ask for it on input
+  2. `FM7` asks for exactly 54 inputs, which `CheckInputs::InputCount`
+  checks.
 - 176 units of sc3-plugins with a class set
   `kUnitDef_CantAliasInputsToOutputs`, such as `GreyholeRaw`, `JPverbRaw`
   and the HOA classes. `SynthDef::wire_buffers` counts them.
-- The feature adds 258 KB to a release wasm32 build, and 28.5 KB after
-  gzip. The core catalogue takes 102 KB, and 17 KB after gzip. The 96
-  HOA classes hold two thirds of the arguments.
+- A release wasm32 build that reads `sc3_plugins::all()` takes 257 KB,
+  and 28 KB after gzip. The core catalogue takes 102 KB, and 17 KB after
+  gzip. The 96 HOA classes hold two thirds of the arguments. In a build
+  that calls `ugen`, the feature adds 433 KB, and 82 KB after gzip, with
+  the bodies.
 
 `generator/sc3_plugins/catalog.scd` measured each method with the probes of
 `generator/catalog.scd`, in sclang 3.14.1 with the core class library and
@@ -872,10 +881,108 @@ outside HOA, and the script measures the n of each HOA class. Then it
 gives the instances of every class inputs at audio and at control rate,
 and their `checkInputs` must give the verdict of the crate. The script
 also reads the C++ files of the plugins at the tag. A unit can set the
-flag through the two macros of the core, through a macro of its own file,
-or, in a FAUST plugin, in its call of `fDefineUnit`. If a unit sets the
+flag through the two macros of the core, or through a macro of its own
+file. A FAUST plugin sets it in its call of `fDefineUnit`. If a unit sets the
 flag in another way, or has no class outside ATK and three names of a
 table, the script fails.
+
+### Pseudo-UGens of sc3-plugins
+
+`tests/readme.rs` keeps this list equal to the catalogue of sc3-plugins.
+Each body follows the sclang code of its method, as the bodies of the core
+do.
+
+- `DEINDUGens`: `Greyhole.ar` and `JPverb.ar` call their raw class on the
+  first and the last channel of `in`.
+- `NHUGens`: `NHHall.ar` takes an array of two channels.
+- `JoshUGens`: `HighShelf.ar`, `LowShelf.ar` and `Notch.ar` compute the
+  coefficients of one `SOS`. `RBJHighShelf.ar`, `RBJLowShelf.ar` and
+  `RBJNotch.ar` inherit these methods.
+- `JoshUGens`: `ZLPF.ar` and `ZHPF.ar` add one `SOS` for each element of
+  `damping`, and each `SOS` applies `mul` and `add`.
+- `JoshUGens`: `BLPF.ar` and `BHPF.ar` call `ZLPF` or `ZHPF` with the
+  dampings of their order. `LRLPF.ar` and `LRHPF.ar` call them twice, with
+  half their order.
+- `JoshUGens`: `Rotate.ar`, `Tilt.ar` and `Tumble.ar` turn two channels
+  of B-format with `Rotate2`, and give the other two back as they come.
+- `JoshUGens`: `BFFreeVerb.ar` and `BFGVerb.ar` put a reverb on each
+  channel of `B2A`, mix each channel with two others, and give `A2B` of
+  the mix. `BFGVerb` delays each channel by a `Rand` first.
+- `JoshUGens`: `BtoUHJ.ar` and `UHJtoB.ar` mix the channels with their
+  shifts by 90 degrees, as the two chains of six `FOS` of `Shift90.filt`
+  give them.
+- `JoshUGens`: `Phaser.ar` and `Phaser.kr` wrap an `LFSaw` with `wrap2`.
+  `PanX2D.ar` and `PanX2D.kr` put a `PanX` on each channel of a `PanX`.
+- `JoshUGens`: `LPCSynth.ar`, `LPCVals.ar` and `LPCVals.kr` clip
+  `pointer` between 0 and 1. An `LPCVals` has three outputs.
+- `JoshUGens`: `Feedback.ar`, `TapN.ar` and `DelayWr.ar` read and write a
+  buffer with `PlayBuf` and `RecordBuf`. Nothing reads the `Impulse` that
+  `Feedback` builds.
+- `JoshUGens`: `FreeVerb1.ar` builds the taps of a `DelayL`, then a chain
+  of `CombL` and a chain of `AllpassN`. Each comb sums the taps again, and
+  nothing reads its `OnePole`.
+- `JoshUGens`: `Vocode.ar` and `VocodeBand.ar` filter `src` in 19 bands,
+  and `Vocoder.ar` in `num + 1` bands. `WarpOverlap.ar` sums `overlaps`
+  grains of `Warp1`.
+- `BhobUGens`: `BhobLoShelf.ar` and `BhobHiShelf.ar` mix `in` with an
+  allpass `FOS`. Their arguments have no defaults.
+- `MCLDUGens`: `PulseDPW.ar`, `PulseDPW.kr` and `PulseDPW.new` subtract
+  two `SawDPW`. `FFTCentroid.kr` calls `SpecCentroid`, and
+  `PV_DiffMags.new` calls `PV_MagSubtract`.
+- `MCLDUGens`: `FFTSubbandPower.kr` and `FFTSubbandFlatness.kr` sort
+  `cutfreqs`, and put its size first. Their outputs are one more than
+  `cutfreqs` holds.
+- `MCLDUGens`: the outputs of `MatchingP.ar` and `MatchingP.kr` follow
+  `ntofind`, those of `NearestN.kr` follow `num`, and those of `SOMRd.ar`
+  and `SOMRd.kr` follow `numdims`. `MatchingPResynth.ar` and
+  `MatchingPResynth.kr` put half the size of `activs` before it.
+- `MCLDUGens`: `Getenv.new` and `TextVU.ar`, `TextVU.kr` and
+  `TextVU.new` write the codes of a text. A `TextVU` runs at control rate,
+  and the call gives back `in`.
+- `StkUGens` and `StkInst`: `StkFlute.ar` and `StkFlute.kr` apply `madd`,
+  and `kr` applies it twice, as sclang does. `StkBowedI.ar` adds a
+  `StkInst` of the instrument 6, `Stk.at("Bowed")`. `StkGlobals.ar`
+  writes the codes of `rawfilepath` without their count.
+- `SkUGens`: `FM7.ar` flattens its two matrices by one level. A nil matrix
+  holds zeros: 6 rows of 3 for `ctlMatrix`, and 6 rows of 6 for
+  `modMatrix`.
+- `TagSystemUGens`: `DbufTag.new` and `Dtag.new` put the sizes of `axiom`
+  and `rules` before them. They make one instance, as sclang throws for
+  more. `Dfsm.new` puts its states before its next states, and takes a
+  `Dwhite` for a nil `rgen`.
+- `Neuromodules`: `Dneuromodule.new` has `numChannels` outputs at demand
+  rate. `Dneuromodule.ar` and `Dneuromodule.kr` read it with a `Duty` at
+  audio rate, `kr` too, as sclang does.
+- `SCMIRUGens`: `FeatureSave.kr` puts the size of `features` first.
+  `SpectralEntropy.kr` has `numbands` outputs, at most `fftsize`.
+- `BerlachUGens`: `SoftClipAmp.ar` is the `softclip` of `in * pregain`.
+  `BBCut2UGens`: `AutoTrack.kr` calls `BeatTrack` of the core.
+
+`TextVU` copies two traits of sclang. `TextVU:new1` turns a number
+`trig` into an `Impulse` before the default `ana` reads `trig`. So the
+`Amplitude` of `in` always gets 5 as its release time. Also, the
+`TextVU` enters the graph before that `Amplitude`, and the constants of a
+definition come in the order in which the UGens enter. A given `ana`
+is a signal, which takes the place of the `Amplitude`.
+
+These arguments set counts of the language, and must be numbers:
+`numTaps`, `numCombs` and `numAllpasses` of `FreeVerb1`, `num` of
+`Vocoder`, `band` of `VocodeBand` and `overlaps` of `WarpOverlap`.
+`numTaps` and `numAllpasses` above 0 must be whole. `band` can also be an
+array of numbers. A count of `do` or `Array.fill` runs the floor of a
+Float, and the crate refuses a count above 65535.
+
+These bodies take the elements of an array as sclang destructures it, as
+in `#a, b = Rotate2.ar(x, y, angle)`. When an argument is an array, the
+expansion can give fewer elements than the destructuring takes. Then
+sclang takes nil, and a later call throws. `ugen` refuses the argument
+with `BuildError::WrongKind`.
+
+The order of `BLPF` and `BHPF` is 2, 4, 6, 8 or 10, after `asInteger`
+truncates it. The order of `LRLPF` and `LRHPF` is twice that. For another
+order, sclang posts an error and gives a String, and a use of the result
+throws. `ugen` refuses such an order with `BuildError::WrongKind`. It
+refuses an output as an order too.
 
 ### Methods of sc3-plugins that `ugen` refuses
 
@@ -886,24 +993,8 @@ table, the script fails.
   define that of `RMAFoodChainL.ar`, `RegaliaMitraEQ.ar` or
   `RosslerResL.ar`. sclang writes them, and scsynth refuses them with
   `UGen '<name>' not installed.`.
-- `StkFlute.kr` applies `madd` twice.
-- These methods create no instance of their class: `FFTCentroid.kr`,
-  `OnsetsDS.kr`, `PV_DiffMags.new`, `PanX2D.ar` and `PanX2D.kr`. So do
-  `Rotate.ar`, `SoftClipAmp.ar`, `Tilt.ar` and `Tumble.ar`.
-- They put the size of an array before it: `FeatureSave.kr`,
-  `FFTSubbandFlatness.kr`, `FFTSubbandPower.kr`, `MatchingPResynth.ar`
-  and `MatchingPResynth.kr`.
-- Their outputs come from a count in another way: `MatchingP.ar`,
-  `MatchingP.kr` and `NearestN.kr`. `SOMRd.ar`, `SOMRd.kr` and
-  `SpectralEntropy.kr` test numbers.
-- They compute their inputs: `DbufTag.new`, `Dtag.new` and `Dfsm.new`
-  from rules, `FM7.ar` from two matrices, and `LPCSynth.ar`, `LPCVals.ar`
-  and `LPCVals.kr` from a clip of `pointer`.
-- `Dneuromodule.ar` and `Dneuromodule.kr` put a `Duty` around
-  `Dneuromodule.new`, which takes its arrays and its count in its own way.
-- `TextVU.ar`, `TextVU.kr` and `TextVU.new` work as `Poll` does.
-  `StkGlobals.ar` and `Getenv.new` write the codes of a text without its
-  size first.
+- `OnsetsDS.kr` creates no instance of its class. The class is
+  deprecated, and the method gives a Function.
 
 ## Strictness
 
@@ -1038,10 +1129,19 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   expansion).
 - An array of symbols: sclang expands a symbol argument too, as the command
   names of `SendReply` or the labels of `Poll`. `ArgValue` holds one text.
-- The default label of `Poll` for a whole number names `Integer`. sclang
-  names `Float` for a Float such as 440.0.
+- The default label of `Poll` and `TextVU` for a whole number names
+  `Integer`. sclang names `Float` for a Float such as 440.0.
 - A whole Float as `rotate` of `PingPong`, such as 2.0: `Array:rotate` of
-  sclang takes only an Integer, and the crate takes it.
+  sclang takes only an Integer, and the crate takes it. The same goes for
+  `numTaps` and `numAllpasses` of `FreeVerb1`, for which `copyRange`
+  takes only an Integer. It goes too for these counts of outputs, for
+  which `initOutputs` or `collect` take only an Integer: `ntofind` of
+  `MatchingP`, `num` of `NearestN`, `numdims` of `SOMRd`, `numbands` of
+  `SpectralEntropy` and `numChannels` of `Dneuromodule`.
+- A count of `do` or `Array.fill` above 65535, as the `num` of `Vocoder`
+  or the `overlaps` of `WarpOverlap`: sclang builds that many bands or
+  grains, and the crate refuses the count.
+- A `Ref` as an argument of `WarpOverlap`: the crate has no `Ref`.
 - Two numbers: `unary_op` and `binary_op` make a UGen of them, as
   `UnaryOpUGen.new` and `BinaryOpUGen.new` do. The operators of sclang
   compute them instead, as `2 * 3` gives 6. The crate cannot copy that.
@@ -1054,8 +1154,9 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - An output in an array of buses of `SoundIn`: sclang builds a `+ 1` for
   its test of consecutive buses, and `optimizeGraph` removes it. `ugen`
   refuses the output.
-- The warnings of `Dstutter` and `Mix.kr`: the crate does no I/O, and
-  builds the same graph.
+- The warnings of `Dstutter` and `Mix.kr`, and those of `FFTCentroid` and
+  `PV_DiffMags` of sc3-plugins: the crate does no I/O, and builds the
+  same graph.
 - An array of specs for `DynKlank`, `DynKlang`, `Klank` and `Klang`: sclang
   expands it, as an array of `Ref`s. `ugen` takes one spec.
 - A `spread` or a `center` of `SplayAz` at scalar rate: the `blend` of its
@@ -1097,18 +1198,11 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 
 ## Left out
 
-This is not in version 0.14, the next item of value for sc-app3:
-
-1. The bodies of the other pseudo-UGens of sc3-plugins, such as `Notch`,
-   `BLPF` and `FreeVerb1`, and of the methods above that do more than
-   `new1`.
-
-Of sc3-plugins, the crate also leaves out ATK, whose classes come with the
+Of sc3-plugins, the crate leaves out ATK, whose classes come with the
 quark `atk-sc3`. `CheapVerb` draws `rand` of the language at each build.
 `BF`, `BFDecode`, `BFEncode` and `Reflections` compute with objects of the
 language, such as `ZPoint`. `BhobTone` calls `HiShelf`, which no class
-defines. `OnsetsDS` is deprecated, and gives a Function. `UGen:circleRamp`
-has no body yet.
+defines. `OnsetsDS` is deprecated, and gives a Function.
 
 Also left out: the view of `SynthDesc`, with its inputs, outputs and
 metadata, the specs included. So are the pseudo-UGens `AudioIn` and
@@ -1126,7 +1220,7 @@ objects of the language, such as `@` and `asComplex`. It also leaves out
 
 `cargo test --all-features` runs every test but the acceptance tests. It
 needs no SuperCollider. `tests/readme.rs` checks the lists of methods that
-`ugen` refuses.
+`ugen` refuses, and the list of the pseudo-UGens of sc3-plugins.
 
 The golden files in `tests/fixtures` are definitions that sclang 3.14.1
 built and wrote. Each one reads, and writes back to its own bytes.
@@ -1151,8 +1245,12 @@ sclang -l "$PWD/generator/sclang_conf.yaml" "$PWD/generator/fixtures.scd"
 The golden files of sc3-plugins are in `tests/fixtures/sc3_plugins`, and
 `tests/sc3_plugins` tests them with the feature. `methods.scsyndef` holds
 one definition for each addable method, which the crate builds from the
-catalogue alone. `generator/sc3_plugins/fixtures.scd` writes the files
-again:
+catalogue alone. `bodies.json` holds the cases of the bodies, and each
+case builds in sclang and in the crate from that file. A case calls a
+method of a class, or sends a method of `UGen` to a receiver. Each pseudo
+method and each method of `UGen` of sc3-plugins needs a case that
+builds. `generator/sc3_plugins/fixtures.scd` writes the
+files again:
 
 ```sh
 sclang -l "$PWD/generator/sc3_plugins/sclang_conf.yaml" \

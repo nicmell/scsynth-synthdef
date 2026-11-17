@@ -536,16 +536,7 @@ try {
 	requireEntries.(UGen.methods, "UGen:", ugenMethods, notUgenMethods,
 		"ugenMethods", "notUgenMethods");
 	pvs = describeMethods.(PV_ChainUGen, pvMethods, PV_ChainUGen.findMethod(_), "method");
-	ugens = describeMethods.(UGen, ugenMethods, UGen.findMethod(_), "method").collect { |entry, index|
-		var selector = ugenMethods[index];
-		var owner = { |class| class.findRespondingMethodFor(selector) !? { |found| found.ownerClass.name } };
-		var overrides = UGen.allSubclasses.collect(owner).reject { |name| name == \UGen };
-		entry ++ [
-			\number -> owner.(Float),
-			\array -> owner.(Array),
-			\overrides -> overrides.asSet.asArray.sort
-		]
-	};
+	ugens = probes[\describeUGenMethods].(ugenMethods);
 	envs = describeMethods.(Env, envMethods, Env.class.findMethod(_), "class method");
 	ranges = describeMethods.(Env, envRanges, Env.findMethod(_), "method");
 

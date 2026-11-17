@@ -50,8 +50,10 @@ try {
 		var values = [-2.5, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.7, 1000.0];
 		var binary = [['+', "+"], ['-', "-"], ['*', "*"], ['/', "/"], ['pow', "pow"],
 			['%', "mod"], ['round', "round"], ['trunc', "trunc"], ['roundUp', "roundUp"],
-			['fold2', "fold2"], ['max', "max"], ['min', "min"], ['absdif', "absdif"]];
-		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin, \exp, \log, \squared, \sign];
+			['fold2', "fold2"], ['wrap2', "wrap2"], ['max', "max"], ['min', "min"],
+			['absdif', "absdif"]];
+		var unary = [\neg, \abs, \reciprocal, \sqrt, \cos, \sin, \exp, \log, \squared, \sign, \dbamp,
+			\softclip];
 		var ranges = [[0.0, 1.0], [-1.0, 1.0], [0.5, 2.0]];
 		var sections = List.new;
 		sections.add("  \"binary\": [\n" ++ binary.collect { |op|

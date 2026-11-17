@@ -8,9 +8,9 @@
 mod generated;
 mod pseudo;
 
-pub(crate) use pseudo::BODIES;
+pub(crate) use pseudo::{BODIES, UGEN_BODIES};
 
-use crate::catalog::{PseudoClass, UGenClass, by_name};
+use crate::catalog::{PseudoClass, UGenClass, UGenMethod, by_name};
 
 /// The class with this name.
 #[must_use]
@@ -37,6 +37,22 @@ pub fn pseudo_all() -> &'static [PseudoClass] {
     &generated::PSEUDO_CLASSES
 }
 
+/// The instance method of `UGen` with this selector that sc3-plugins adds
+/// and that builds a graph, such as `circleRamp`.
+#[must_use]
+pub fn ugen_method(selector: &str) -> Option<&'static UGenMethod> {
+    ugen_methods()
+        .iter()
+        .find(|method| method.method.selector == selector)
+}
+
+/// The instance methods of `UGen` that sc3-plugins adds and that build
+/// graphs, with their arguments.
+#[must_use]
+pub fn ugen_methods() -> &'static [UGenMethod] {
+    &generated::UGEN_METHODS
+}
+
 #[cfg(test)]
 mod tests {
     use super::{all, lookup, pseudo_all};
@@ -50,7 +66,8 @@ mod tests {
 
     #[test]
     fn the_catalogue_holds_the_classes_of_sc3_plugins_sorted_by_name() {
-        // Facts 3, 4 and 7 of the plan of 0.14.
+        // Facts 3 and 4 of the plan of 0.14, and the counts of the plan of
+        // 0.15.
         assert_eq!(all().len(), 491);
         assert!(all().windows(2).all(|pair| pair[0].name < pair[1].name));
         assert!(lookup("DFM1").is_some());
@@ -62,9 +79,12 @@ mod tests {
                 Addable::No(_) => 2,
             }] += 1;
         }
-        assert_eq!(counts, [635, 1, 43]);
-        let pseudo: Vec<&str> = pseudo_all().iter().map(|class| class.name).collect();
-        assert_eq!(pseudo, ["Greyhole", "JPverb"]);
+        assert_eq!(counts, [634, 37, 8]);
+        assert!(
+            pseudo_all()
+                .windows(2)
+                .all(|pair| pair[0].name < pair[1].name)
+        );
     }
 
     #[test]
@@ -137,7 +157,7 @@ mod tests {
         assert_eq!(rule("JPverbRaw"), CheckInputs::NInputs(2));
         assert_eq!(rule("EnvDetect"), CheckInputs::SameRateAsFirstInputIfAudio);
         assert_eq!(rule("Summer"), CheckInputs::SameRateAsFirstInput);
-        assert_eq!(rule("FM7"), CheckInputs::Custom("FM7"));
+        assert_eq!(rule("FM7"), CheckInputs::InputCount(54));
         // BFGrainPanner checks input 2 in a checkNInputs of its own.
         assert_eq!(rule("InGrainIBF"), CheckInputs::AudioAt(2));
         let count = |wanted: fn(CheckInputs) -> bool| {

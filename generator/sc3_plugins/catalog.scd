@@ -44,17 +44,31 @@ var argumentKinds = [
 	[\ArrayMax, \ar, \array, \array],
 	[\ArrayMax, \kr, \array, \array],
 	[\Chromagram, \kr, \n, \count],
+	[\DbufTag, \new, \axiom, \array],
+	[\DbufTag, \new, \rules, \array],
+	[\Dfsm, \new, \rules, \array],
 	[\Dneuromodule, \ar, \numChannels, \count],
+	[\Dneuromodule, \ar, \theta, \array],
 	[\Dneuromodule, \ar, \weights, \array],
+	[\Dneuromodule, \ar, \x, \array],
 	[\Dneuromodule, \kr, \numChannels, \count],
+	[\Dneuromodule, \kr, \theta, \array],
 	[\Dneuromodule, \kr, \weights, \array],
+	[\Dneuromodule, \kr, \x, \array],
 	[\Dneuromodule, \new, \numChannels, \count],
+	[\Dneuromodule, \new, \theta, \array],
 	[\Dneuromodule, \new, \weights, \array],
+	[\Dneuromodule, \new, \x, \array],
+	[\Dtag, \new, \axiom, \array],
+	[\Dtag, \new, \rules, \array],
+	[\FM7, \ar, \ctlMatrix, \array],
+	[\FM7, \ar, \modMatrix, \array],
 	[\FFTSubbandFlatness, \kr, \cutfreqs, \array],
 	[\FFTSubbandFlux, \kr, \cutfreqs, \array],
 	[\FFTSubbandPower, \kr, \cutfreqs, \array],
 	[\FeatureSave, \kr, \features, \array],
 	[\GaussClass, \kr, \in, \array],
+	[\Getenv, \new, \key, \symbol],
 	[\GrainBufJ, \ar, \numChannels, \count],
 	[\GrainFMJ, \ar, \numChannels, \count],
 	[\GrainInJ, \ar, \numChannels, \count],
@@ -87,6 +101,7 @@ var argumentKinds = [
 	[\PanX2D, \kr, \numChansY, \count],
 	[\PermModArray, \ar, \pattern, \array],
 	[\PlaneTree, \kr, \in, \array],
+	[\PulseDPW, \new, \rate, \symbol],
 	[\SOMAreaWr, \kr, \coords, \array],
 	[\SOMAreaWr, \kr, \inputdata, \array],
 	[\SOMRd, \ar, \inputdata, \array],
@@ -95,15 +110,20 @@ var argumentKinds = [
 	[\SOMRd, \kr, \numdims, \count],
 	[\SOMTrain, \kr, \inputdata, \array],
 	[\SpectralEntropy, \kr, \numbands, \count],
+	[\StkGlobals, \ar, \rawfilepath, \symbol],
 	[\StkInst, \ar, \args, \array],
 	[\TGrains2, \ar, \numChannels, \count],
 	[\TGrains3, \ar, \numChannels, \count],
+	[\TapN, \ar, \numChannels, \count],
 	[\TextVU, \ar, \label, \symbol],
 	[\TextVU, \kr, \label, \symbol],
 	[\TextVU, \new, \label, \symbol],
 	[\VBAP, \ar, \numChans, \count],
 	[\VBAP, \kr, \numChans, \count],
-	[\WarpZ, \ar, \numChannels, \count]
+	[\WarpOverlap, \ar, \numChans, \count],
+	[\WarpZ, \ar, \numChannels, \count],
+	[\ZHPF, \ar, \damping, \array],
+	[\ZLPF, \ar, \damping, \array]
 ];
 
 // The rules of checkInputs of the owners of the folder outside HOA. The rule
@@ -122,7 +142,7 @@ var checkRules = (
 	BFManipulate: [\n_inputs, 4],
 	Dneuromodule: [\n_inputs, 1],
 	EnvDetect: [\same_rate_as_first_input_if_audio],
-	FM7: [\custom],
+	FM7: [\input_count, FM7.numRequiredInputs],
 	FMHDecode1: [\n_inputs, 9],
 	GreyholeRaw: [\n_inputs, 2],
 	JPverbRaw: [\n_inputs, 2],
@@ -143,53 +163,23 @@ var checkRules = (
 // outside UGen that answers ar or kr, and each UGen class whose methods
 // create no instance of the class. The crate has a body for each method of a
 // class of bodies.
-var bodies = [\Greyhole, \JPverb, \NHHall];
+var bodies = [\AutoTrack, \BFFreeVerb, \BFGVerb, \BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \BtoUHJ,
+	\DbufTag, \DelayWr, \Dfsm, \Dneuromodule, \Dtag, \FFTCentroid, \FFTSubbandFlatness,
+	\FFTSubbandPower, \FM7, \FeatureSave, \Feedback, \FreeVerb1, \Getenv, \Greyhole, \HighShelf,
+	\JPverb, \LPCSynth, \LPCVals, \LRHPF, \LRLPF, \LowShelf, \MatchingP, \MatchingPResynth,
+	\NHHall, \NearestN, \Notch, \PV_DiffMags, \PanX2D, \Phaser, \PulseDPW, \RBJHighShelf,
+	\RBJLowShelf, \RBJNotch, \Rotate, \SOMRd, \SoftClipAmp, \SpectralEntropy, \StkBowedI, \StkFlute,
+	\StkGlobals, \TapN, \TextVU, \Tilt, \Tumble, \UHJtoB, \Vocode, \VocodeBand, \Vocoder,
+	\WarpOverlap, \ZHPF, \ZLPF];
 // The classes of the census without a body, and why.
 var leftOut = [
-	[\AutoTrack, "no body yet"],
 	[\BF, "computes with objects of the language, such as ZPoint"],
 	[\BFDecode, "computes with objects of the language, such as ZPoint"],
 	[\BFEncode, "computes with objects of the language, such as ZPoint"],
-	[\BFFreeVerb, "no body yet"],
-	[\BFGVerb, "no body yet"],
-	[\BHPF, "no body yet"],
-	[\BLPF, "no body yet"],
-	[\BhobHiShelf, "no body yet"],
-	[\BhobLoShelf, "no body yet"],
 	[\BhobTone, "calls HiShelf, which no class defines"],
-	[\BtoUHJ, "no body yet"],
 	[\CheapVerb, "draws rand of the language at each build"],
-	[\DelayWr, "no body yet"],
-	[\FFTCentroid, "no body yet"],
-	[\Feedback, "no body yet"],
-	[\FreeVerb1, "no body yet"],
-	[\HighShelf, "no body yet"],
-	[\LRHPF, "no body yet"],
-	[\LRLPF, "no body yet"],
-	[\LowShelf, "no body yet"],
-	[\Notch, "no body yet"],
 	[\OnsetsDS, "deprecated, and gives a Function"],
-	[\PV_DiffMags, "no body yet"],
-	[\PanX2D, "no body yet"],
-	[\Phaser, "no body yet"],
-	[\PulseDPW, "no body yet"],
-	[\RBJHighShelf, "no body yet"],
-	[\RBJLowShelf, "no body yet"],
-	[\RBJNotch, "no body yet"],
-	[\Reflections, "computes with objects of the language, such as ZPoint"],
-	[\Rotate, "no body yet"],
-	[\SoftClipAmp, "no body yet"],
-	[\StkBowedI, "no body yet"],
-	[\TapN, "no body yet"],
-	[\Tilt, "no body yet"],
-	[\Tumble, "no body yet"],
-	[\UHJtoB, "no body yet"],
-	[\Vocode, "no body yet"],
-	[\VocodeBand, "no body yet"],
-	[\Vocoder, "no body yet"],
-	[\WarpOverlap, "no body yet"],
-	[\ZHPF, "no body yet"],
-	[\ZLPF, "no body yet"]
+	[\Reflections, "computes with objects of the language, such as ZPoint"]
 ];
 var census = bodies ++ leftOut.collect(_.first);
 
@@ -203,8 +193,8 @@ var noUnit = [\BlitB3D, \CQ_Diff, \Clipper32, \FFTSubbandFlux, \RMAFoodChainL, \
 // folder ATK, whose classes come with the quark atk-sc3.
 var classless = [\CubicDelay, \TALReverb, \Xover2];
 
-// The methods that the folder adds to classes of the core. Only
-// UGen:circleRamp builds a graph, and it has no body yet.
+// The methods that the folder adds to classes of the core. Those of UGen
+// build graphs, and the catalogue describes them: UGen:circleRamp alone.
 var extensions = [
 	[\EnvelopeView, \asEnv],
 	[\Function, \benchmark],
@@ -240,7 +230,7 @@ var extensions = [
 ];
 
 var probes, toJSON, describeClass, describePseudoClass, scanCantAlias, stats, cantAlias;
-var inputs, verdict, bare, first, ruleHolds, blobs, classes, pseudoClasses, helpDir, json;
+var inputs, verdict, bare, first, ruleHolds, blobs, classes, pseudoClasses, ugenMethods, helpDir, json;
 var measured = 0;
 
 try {
@@ -338,6 +328,7 @@ try {
 		{ \same_rate_as_first_input_if_audio } { rate != \audio or: { rates[0] == \audio } }
 		{ \n_inputs } { rate != \audio or: { rates.keep(rule[1]).every { |input| input == \audio } } }
 		{ \audio_at } { rate != \audio or: { rates[rule[1]] == \audio } }
+		{ \input_count } { rates.size == rule[1] }
 	};
 	// A bare instance of `class` at `rate`, with inputs at the rates `rates`.
 	inputs = (audio: SinOsc.newCopyArgs.rate_(\audio), control: SinOsc.newCopyArgs.rate_(\control));
@@ -351,6 +342,9 @@ try {
 		if (rule[0] == \n_inputs) { patterns = patterns ++ [first.(rule[1] - 1), first.(rule[1])] };
 		if (rule[0] == \audio_at) {
 			patterns = patterns ++ [first.(0).put(rule[1], \audio), first.(128).put(rule[1], \control)];
+		};
+		if (rule[0] == \input_count) {
+			patterns = patterns ++ [first.(rule[1]).keep(rule[1]), first.(0).keep(rule[1] - 1)];
 		};
 		[\audio, \control].every { |rate|
 			patterns.every { |rates|
@@ -403,12 +397,15 @@ try {
 		.reject { |class| (class.superclasses ? []).includes(UGen) }
 		.sort { |a, b| a.name.asString < b.name.asString }
 		.collect(describePseudoClass);
+	ugenMethods = probes[\describeUGenMethods]
+		.(extensions.select { |entry| entry[0] == \UGen }.collect(_.last));
 
 	json = toJSON.([
 		\sclang -> Main.version,
 		\sc3_plugins -> tag.drop(8),
 		\classes -> classes,
-		\pseudo_classes -> pseudoClasses
+		\pseudo_classes -> pseudoClasses,
+		\ugen_methods -> ugenMethods
 	]) ++ "\n";
 	File.use(root +/+ "generator" +/+ "sc3_plugins" +/+ "catalog.json", "w", { |file| file.write(json) });
 	("sc3_plugins/catalog.scd: % classes, % of % methods addable, % pseudo-UGen methods, "

@@ -204,6 +204,7 @@ fn number_binary(op: &str, x: f64, y: f64) -> Option<f64> {
         "roundUp" => quantize(x, y, f64::ceil),
         "trunc" => quantize(x, y, f64::floor),
         "fold2" => fold(x, -y, y),
+        "wrap2" => wrap_range(x, -y, y),
         "max" => {
             if x > y {
                 x
@@ -256,6 +257,14 @@ fn number_unary(op: &str, x: f64) -> Option<f64> {
                 -1.0
             }
         }
+        "dbamp" => 10f64.powf(x * 0.05),
+        "softclip" => {
+            if x.abs() <= 0.5 {
+                x
+            } else {
+                (x.abs() - 0.25) / x
+            }
+        }
         _ => return None,
     })
 }
@@ -284,6 +293,33 @@ fn modulo(input: f64, hi: f64) -> f64 {
     // One fused multiply-add, as sclang 3.14.1 on arm64 computes it (see the
     // README and tests/fixtures/arithmetic.json).
     (-hi).mul_add((shifted / hi).floor(), shifted)
+}
+
+/// `sc_wrap` of `SC_InlineBinaryOp.h`, which the operator `wrap2` of a
+/// Float computes as `sc_wrap(x, -y, y)`.
+#[allow(clippy::float_cmp)]
+fn wrap_range(input: f64, lo: f64, hi: f64) -> f64 {
+    let range = hi - lo;
+    let shifted = if input >= hi {
+        let shifted = input - range;
+        if shifted < hi {
+            return shifted;
+        }
+        shifted
+    } else if input < lo {
+        let shifted = input + range;
+        if shifted >= lo {
+            return shifted;
+        }
+        shifted
+    } else {
+        return input;
+    };
+    if hi == lo {
+        return lo;
+    }
+    // Fused, as in `modulo`.
+    (-range).mul_add(((shifted - lo) / range).floor(), shifted)
 }
 
 /// `Float:wrap`: `sc_mod(x - lo, hi - lo) + lo`, in f64.
@@ -346,7 +382,10 @@ mod tests {
     /// libm of another platform can round `pow`, `cos` and `sin` one unit in
     /// the last place away from the libm of the macOS that wrote the table.
     fn same(op: &str, computed: f64, expected: f64) -> bool {
-        let ulps = u64::from(matches!(op, "pow" | "cos" | "sin" | "exp" | "log"));
+        let ulps = u64::from(matches!(
+            op,
+            "pow" | "cos" | "sin" | "exp" | "log" | "dbamp"
+        ));
         (computed.is_nan() && expected.is_nan())
             || computed.to_bits().abs_diff(expected.to_bits()) <= ulps
     }
@@ -367,7 +406,7 @@ mod tests {
                 "{x} {op} {y}: {computed}, not {expected}"
             );
         }
-        assert_eq!(rows(&table, "binary").len(), 1053);
+        assert_eq!(rows(&table, "binary").len(), 1134);
     }
 
     #[test]
@@ -382,7 +421,7 @@ mod tests {
                 "{x}.{op}: {computed}, not {expected}"
             );
         }
-        assert_eq!(rows(&table, "unary").len(), 90);
+        assert_eq!(rows(&table, "unary").len(), 108);
     }
 
     #[test]

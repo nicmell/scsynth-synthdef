@@ -7,13 +7,16 @@ use crate::builder::{SynthDefBuilder, bind_optional};
 use crate::catalog::{self, SignalRange, UGenMethod};
 use crate::error::BuildError;
 use crate::rate::Rate;
+#[cfg(feature = "sc3-plugins")]
+use crate::sc3_plugins::UGEN_BODIES as PLUGIN_BODIES;
 use crate::ugen_input::{ArgValue, UGenInput};
 
 /// What one method adds for its receiver.
-type Body = fn(&mut SynthDefBuilder, UGenInput, &Args) -> Result<UGenInput, BuildError>;
+pub(crate) type MethodBody =
+    fn(&mut SynthDefBuilder, UGenInput, &Args) -> Result<UGenInput, BuildError>;
 
 /// The body of each method, by the class that owns it and its selector.
-static BODIES: &[(&str, &str, Body)] = &[
+static BODIES: &[(&str, &str, MethodBody)] = &[
     ("Array", "dpoll", array_poll),
     ("Array", "poll", array_poll),
     ("DUGen", "expexp", demand_expexp),
@@ -139,6 +142,11 @@ static BODIES: &[(&str, &str, Body)] = &[
     ("UGen", "|==|", lazy_equals),
 ];
 
+/// The bodies of the methods of sc3-plugins, without the feature
+/// `sc3-plugins`.
+#[cfg(not(feature = "sc3-plugins"))]
+static PLUGIN_BODIES: &[(&str, &str, MethodBody)] = &[];
+
 /// Sends the message of `method` to `receiver`, with the values of its
 /// arguments in their order, to the method that the receiver answers: that
 /// of `Float` for a number, of `Array` for an array, and of the class of its
@@ -162,7 +170,8 @@ pub(crate) fn send(
             .ok_or_else(|| bad_method(selector, "an Array does not understand the message"))?,
         UGenInput::Output(_) => owner_of(builder, &receiver, method),
     };
-    let body = super::body_of(BODIES, owner, selector)?;
+    let body = super::body_of(BODIES, owner, selector)
+        .or_else(|_| super::body_of(PLUGIN_BODIES, owner, selector))?;
     let args = Args {
         class: owner,
         method: &method.method,
@@ -180,7 +189,7 @@ pub(super) fn send_message(
     selector: &str,
     given: Vec<Option<ArgValue>>,
 ) -> Result<UGenInput, BuildError> {
-    let method = catalog::ugen_method(selector)
+    let method = catalog::find_ugen_method(selector)
         .ok_or_else(|| bad_method(selector, "it is no method of UGen that builds a graph"))?;
     let mut values = bind_optional("UGen", &method.method, &[])?;
     for (slot, value) in values.iter_mut().zip(given) {

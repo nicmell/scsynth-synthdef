@@ -44,13 +44,17 @@ pub(crate) fn check(rule: CheckInputs, rate: Rate, inputs: &[UGenInput]) -> Resu
             )),
         },
         CheckInputs::T2K => audio(0),
+        CheckInputs::InputCount(count) if inputs.len() != count => {
+            Err(format!("{count} inputs required ({})", inputs.len()))
+        }
         CheckInputs::Valid
         | CheckInputs::SameRateAsFirstInputIfAudio
         | CheckInputs::AudioAt(_)
         | CheckInputs::NInputs(_)
         | CheckInputs::AudioFrom(_)
         | CheckInputs::BufWr
-        | CheckInputs::Duty => Ok(()),
+        | CheckInputs::Duty
+        | CheckInputs::InputCount(_) => Ok(()),
         CheckInputs::AbstractOut { fixed } => {
             if rate == Rate::Audio {
                 (fixed..inputs.len()).try_for_each(audio)
@@ -193,5 +197,16 @@ mod tests {
     #[test]
     fn a_custom_rule_is_refused() {
         assert!(check(CheckInputs::Custom("Duty"), Rate::Audio, &[]).is_err());
+    }
+
+    #[test]
+    fn input_count_asks_for_exactly_its_count() {
+        let inputs = vec![output(Rate::Control); 3];
+        let rule = CheckInputs::InputCount(3);
+        assert!(check(rule, Rate::Audio, &inputs).is_ok());
+        assert_eq!(
+            check(rule, Rate::Audio, &inputs[..2]),
+            Err("3 inputs required (2)".to_owned())
+        );
     }
 }

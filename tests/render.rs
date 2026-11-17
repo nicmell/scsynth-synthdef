@@ -206,6 +206,7 @@ fn default(value: &Value) -> String {
 fn check_inputs(value: &Value) -> String {
     match text(&value["rule"]) {
         "n_inputs" => format!("CheckInputs::NInputs({})", number(&value["count"])),
+        "input_count" => format!("CheckInputs::InputCount({})", number(&value["count"])),
         "audio_at" => format!("CheckInputs::AudioAt({})", number(&value["index"])),
         "audio_from" => format!("CheckInputs::AudioFrom({})", number(&value["index"])),
         "abstract_out" => format!(
@@ -357,10 +358,11 @@ fn render_sc3_plugins(catalog: &Value) -> String {
     let mut rendered = header(SC3_PLUGINS);
     rendered.push_str(ALLOW);
     rendered.push_str(
-        "use crate::catalog::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,\n    Optimize, Outputs, PseudoClass, RateMethod, SignalRange, UGenClass, Wiring,\n};\nuse crate::rate::Rate;\n\n",
+        "use crate::catalog::{\n    Addable, ArgDefault, ArgKind, ArgSpec, ArrayExpansion, CheckInputs, FftSize, InputSlot,\n    Optimize, Outputs, PseudoClass, RateMethod, SignalRange, UGenClass, UGenMethod, Wiring,\n};\nuse crate::rate::Rate;\n\n",
     );
     render_classes(&mut rendered, catalog);
     render_pseudo_classes(&mut rendered, catalog);
+    render_ugen_methods(&mut rendered, catalog);
     rendered
 }
 

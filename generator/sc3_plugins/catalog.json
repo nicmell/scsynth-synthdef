@@ -8053,12 +8053,12 @@
             },
             {
               "name": "axiom",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "rules",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8076,8 +8076,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'collect' not understood."
+          "addable": "pseudo"
         }
       ]
     },
@@ -8245,7 +8244,7 @@
           "args": [
             {
               "name": "rules",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8261,8 +8260,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'rotate' not understood. Perhaps you misspelled 'rate', or meant to call 'rotate' on another receiver?"
+          "addable": "pseudo"
         }
       ]
     },
@@ -8506,12 +8504,12 @@
             },
             {
               "name": "theta",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "x",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8520,8 +8518,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Duty, Duty]"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -8538,12 +8535,12 @@
             },
             {
               "name": "theta",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "x",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8552,8 +8549,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Duty, Duty]"
+          "addable": "pseudo"
         },
         {
           "selector": "new",
@@ -8565,12 +8561,12 @@
             },
             {
               "name": "theta",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "x",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -8579,8 +8575,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "an array on argument 0 does not make one instance per element"
+          "addable": "pseudo"
         }
       ]
     },
@@ -9663,12 +9658,12 @@
             },
             {
               "name": "axiom",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "rules",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
@@ -9686,8 +9681,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'collect' not understood."
+          "addable": "pseudo"
         }
       ]
     },
@@ -9905,8 +9899,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -10612,8 +10605,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, ERROR: Non Boolean in test."
+          "addable": "pseudo"
         }
       ]
     },
@@ -10715,8 +10707,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, ERROR: Non Boolean in test."
+          "addable": "pseudo"
         }
       ]
     },
@@ -10737,8 +10728,8 @@
         "UGens>Generators>Deterministic"
       ],
       "check_inputs": {
-        "rule": "custom",
-        "owner": "FM7"
+        "rule": "input_count",
+        "count": 54
       },
       "methods": [
         {
@@ -10746,17 +10737,16 @@
           "args": [
             {
               "name": "ctlMatrix",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             },
             {
               "name": "modMatrix",
-              "kind": "signal",
+              "kind": "array",
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'flatten' not understood."
+          "addable": "pseudo"
         }
       ]
     },
@@ -12069,8 +12059,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "input 0 maps to no argument"
+          "addable": "pseudo"
         }
       ]
     },
@@ -15397,7 +15386,7 @@
           "args": [
             {
               "name": "key",
-              "kind": "signal",
+              "kind": "symbol",
               "default": null
             },
             {
@@ -15408,8 +15397,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "input 0 maps to no argument"
+          "addable": "pseudo"
         }
       ]
     },
@@ -82549,8 +82537,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, the method also creates [BinaryOpUGen, BinaryOpUGen]"
+          "addable": "pseudo"
         }
       ]
     },
@@ -82589,8 +82576,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, the method also creates [BinaryOpUGen, BinaryOpUGen]"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -82606,8 +82592,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, the method also creates [BinaryOpUGen, BinaryOpUGen]"
+          "addable": "pseudo"
         }
       ]
     },
@@ -85628,8 +85613,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: a MatchingP: numChannels must be a nonzero positive integer, but received (2104.5)."
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -85677,8 +85661,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: a MatchingP: numChannels must be a nonzero positive integer, but received (2104.5)."
+          "addable": "pseudo"
         }
       ]
     },
@@ -85739,8 +85722,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "input 2 maps to no argument"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -85777,8 +85759,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "input 2 maps to no argument"
+          "addable": "pseudo"
         }
       ]
     },
@@ -88572,8 +88553,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: a NearestN: numChannels must be a nonzero positive integer, but received (3153.75)."
+          "addable": "pseudo"
         }
       ]
     },
@@ -91394,8 +91374,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -93737,8 +93716,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -93794,8 +93772,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -95646,8 +95623,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -96080,8 +96056,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "an array on argument 3 does not make one instance per element"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -96118,8 +96093,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "an array on argument 3 does not make one instance per element"
+          "addable": "pseudo"
         }
       ]
     },
@@ -97872,8 +97846,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -98224,8 +98197,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, ERROR: Non Boolean in test."
+          "addable": "pseudo"
         }
       ]
     },
@@ -100586,30 +100558,7 @@
               }
             }
           ],
-          "addable": true,
-          "rate": "audio",
-          "inputs": [
-            {
-              "arg": 0
-            },
-            {
-              "arg": 1
-            },
-            {
-              "arg": 2
-            },
-            {
-              "arg": 3
-            }
-          ],
-          "outputs": {
-            "fixed": [
-              "audio"
-            ]
-          },
-          "special_index": 0,
-          "madd": true,
-          "nested_expansion": true
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -100657,8 +100606,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "the method applies madd otherwise than once"
+          "addable": "pseudo"
         }
       ]
     },
@@ -100696,12 +100644,11 @@
             },
             {
               "name": "rawfilepath",
-              "kind": "signal",
+              "kind": "symbol",
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "ERROR: Message 'ascii' not understood. Perhaps you misspelled 'asin', or meant to call 'ascii' on another receiver?"
+          "addable": "pseudo"
         }
       ]
     },
@@ -104098,8 +104045,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Impulse]"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -104141,8 +104087,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Impulse]"
+          "addable": "pseudo"
         },
         {
           "selector": "new",
@@ -104184,8 +104129,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Impulse]"
+          "addable": "pseudo"
         }
       ]
     },
@@ -104242,8 +104186,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -104359,8 +104302,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -105963,6 +105905,558 @@
   ],
   "pseudo_classes": [
     {
+      "name": "AutoTrack",
+      "categories": [
+        "UGens>Analysis"
+      ],
+      "methods": [
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "lock",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BFFreeVerb",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "w",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "x",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "y",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "z",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "mix",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "room",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "damp",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "diffuse",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BFGVerb",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "w",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "x",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "y",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "z",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "diffuse",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "roomsize",
+              "kind": "signal",
+              "default": {
+                "float": 10
+              }
+            },
+            {
+              "name": "revtime",
+              "kind": "signal",
+              "default": {
+                "float": 3
+              }
+            },
+            {
+              "name": "damping",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "inputbw",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "drylevel",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "earlyreflevel",
+              "kind": "signal",
+              "default": {
+                "float": 0.69999999999999996
+              }
+            },
+            {
+              "name": "taillevel",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "maxroomsize",
+              "kind": "signal",
+              "default": {
+                "float": 300
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BHPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "order",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BLPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "order",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BhobHiShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "amp",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BhobLoShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "amp",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "BtoUHJ",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "wsig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "xsig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "ysig",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "DelayWr",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Feedback",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "feedbackpct",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "delayTime",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": {
+                "float": -1
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "FreeVerb1",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "revTime",
+              "kind": "signal",
+              "default": {
+                "float": 3
+              }
+            },
+            {
+              "name": "hfDamping",
+              "kind": "signal",
+              "default": {
+                "float": 0.995
+              }
+            },
+            {
+              "name": "numTaps",
+              "kind": "signal",
+              "default": {
+                "float": 10
+              }
+            },
+            {
+              "name": "numCombs",
+              "kind": "signal",
+              "default": {
+                "float": 8
+              }
+            },
+            {
+              "name": "numAllpasses",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "tapScale",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "combScale",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "allpassScale",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
       "name": "Greyhole",
       "categories": [
         "UGens>Delays"
@@ -106023,6 +106517,61 @@
               "kind": "signal",
               "default": {
                 "float": 2
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "HighShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "shelfslope",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dbgain",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
               }
             }
           ],
@@ -106125,6 +106674,1148 @@
           "addable": "pseudo"
         }
       ]
+    },
+    {
+      "name": "LRHPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "order",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "LRLPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "order",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "LowShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "shelfslope",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dbgain",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Notch",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "rq",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Phaser",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "phase",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "phase",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "PulseDPW",
+      "categories": [
+        "UGens>Generators"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "width",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "width",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "rate",
+              "kind": "symbol",
+              "default": {
+                "symbol": "ar"
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "width",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "RBJHighShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "shelfslope",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dbgain",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "RBJLowShelf",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "shelfslope",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "dbgain",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "RBJNotch",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "rq",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "StkBowedI",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 220
+              }
+            },
+            {
+              "name": "gate",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "onamp",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "offamp",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "bowpressure",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            },
+            {
+              "name": "bowposition",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            },
+            {
+              "name": "vibfreq",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            },
+            {
+              "name": "vibgain",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            },
+            {
+              "name": "loudness",
+              "kind": "signal",
+              "default": {
+                "float": 64
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "TapN",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "bufnum",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "numChannels",
+              "kind": "count",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "delaytime",
+              "kind": "signal",
+              "default": {
+                "float": 0.20000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "UHJtoB",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "leftsig",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "rightsig",
+              "kind": "signal",
+              "default": null
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Vocode",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "src",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "harm",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "noise",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "anabwscale",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "outbw",
+              "kind": "signal",
+              "default": {
+                "float": 0.01
+              }
+            },
+            {
+              "name": "freqmul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "VocodeBand",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "src",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "band",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "harm",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "noise",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "anabwscale",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "outbw",
+              "kind": "signal",
+              "default": {
+                "float": 0.01
+              }
+            },
+            {
+              "name": "freqmul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "Vocoder",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "car",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "mod",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "num",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "low",
+              "kind": "signal",
+              "default": {
+                "float": 100
+              }
+            },
+            {
+              "name": "high",
+              "kind": "signal",
+              "default": {
+                "float": 5000
+              }
+            },
+            {
+              "name": "q",
+              "kind": "signal",
+              "default": {
+                "float": 0.02
+              }
+            },
+            {
+              "name": "hpf",
+              "kind": "signal",
+              "default": {
+                "float": 5000
+              }
+            },
+            {
+              "name": "hpfscal",
+              "kind": "signal",
+              "default": {
+                "float": 0.050000000000000003
+              }
+            },
+            {
+              "name": "outscal",
+              "kind": "signal",
+              "default": {
+                "float": 25
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "WarpOverlap",
+      "categories": [
+        "Libraries>JoshUGens"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "numChans",
+              "kind": "count",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "buffer",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "overlaps",
+              "kind": "signal",
+              "default": {
+                "float": 4
+              }
+            },
+            {
+              "name": "starttime",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            },
+            {
+              "name": "stretch",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "harm",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "windowsize",
+              "kind": "signal",
+              "default": {
+                "float": 6
+              }
+            },
+            {
+              "name": "step",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "warpwindowsize",
+              "kind": "signal",
+              "default": {
+                "float": 0.11
+              }
+            },
+            {
+              "name": "warpwindowoverlaps",
+              "kind": "signal",
+              "default": {
+                "float": 8
+              }
+            },
+            {
+              "name": "warpwindowran",
+              "kind": "signal",
+              "default": {
+                "float": 0.10000000000000001
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "ZHPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fc",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "damping",
+              "kind": "array",
+              "default": {
+                "float": 0.70699999999999996
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "ZLPF",
+      "categories": [
+        "Undocumented classes",
+        "UGens>Undocumented"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "in",
+              "kind": "signal",
+              "default": null
+            },
+            {
+              "name": "fc",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "damping",
+              "kind": "array",
+              "default": {
+                "float": 0.70699999999999996
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    }
+  ],
+  "ugen_methods": [
+    {
+      "selector": "circleRamp",
+      "args": [
+        {
+          "name": "lagTime",
+          "kind": "signal",
+          "default": {
+            "float": 0.10000000000000001
+          }
+        },
+        {
+          "name": "circmin",
+          "kind": "signal",
+          "default": {
+            "float": -180
+          }
+        },
+        {
+          "name": "circmax",
+          "kind": "signal",
+          "default": {
+            "float": 180
+          }
+        }
+      ],
+      "addable": "pseudo",
+      "number": null,
+      "array": null,
+      "overrides": []
     }
   ]
 }
