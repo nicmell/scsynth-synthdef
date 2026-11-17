@@ -155,7 +155,7 @@ fn every_case_of_the_bodies_writes_the_bytes_of_sclang() {
 #[test]
 fn every_refused_case_of_the_bodies_fails_in_the_crate() {
     let refusals: Vec<Value> = cases().into_iter().filter(refused).collect();
-    assert!(!refusals.is_empty());
+    assert_ne!(refusals.len(), 0, "bodies.json holds no refused case");
     for case in refusals {
         let name = text(&case["name"]);
         assert!(definition(&case).is_err(), "{name} builds");
