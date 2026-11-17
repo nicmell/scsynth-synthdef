@@ -4120,7 +4120,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                 args: &[
                     ArgSpec { name: "buffer", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -4542,7 +4542,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "chain", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "cutfreqs", kind: ArgKind::Array, default: None },
                 ],
-                addable: Addable::No("with control-rate inputs, ERROR: Non Boolean in test."),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -4591,7 +4591,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "square", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "scalemode", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
-                addable: Addable::No("with control-rate inputs, ERROR: Non Boolean in test."),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -6216,10 +6216,10 @@ pub(super) static CLASSES: [UGenClass; 491] = [
             RateMethod {
                 selector: "new",
                 args: &[
-                    ArgSpec { name: "key", kind: ArgKind::Signal, default: None },
+                    ArgSpec { name: "key", kind: ArgKind::Symbol, default: None },
                     ArgSpec { name: "defaultval", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("input 0 maps to no argument"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -20522,7 +20522,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "hop", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "method", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("ERROR: a MatchingP: numChannels must be a nonzero positive integer, but received (2104.5)."),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -20534,7 +20534,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "hop", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "method", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],
-                addable: Addable::No("ERROR: a MatchingP: numChannels must be a nonzero positive integer, but received (2104.5)."),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -20560,7 +20560,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "residual", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "activs", kind: ArgKind::Array, default: Some(ArgDefault::Floats(&[])) },
                 ],
-                addable: Addable::No("input 2 maps to no argument"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -20571,7 +20571,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "residual", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "activs", kind: ArgKind::Array, default: Some(ArgDefault::Floats(&[])) },
                 ],
-                addable: Addable::No("input 2 maps to no argument"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -21767,7 +21767,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "gate", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "num", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
-                addable: Addable::No("ERROR: a NearestN: numChannels must be a nonzero positive integer, but received (3153.75)."),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -22901,7 +22901,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "bufferA", kind: ArgKind::Signal, default: None },
                     ArgSpec { name: "bufferB", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method creates no instance of the class"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -25137,7 +25137,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "numdims", kind: ArgKind::Count, default: Some(ArgDefault::Float(2.0)) },
                     ArgSpec { name: "gate", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
-                addable: Addable::No("an array on argument 3 does not make one instance per element"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -25148,7 +25148,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "numdims", kind: ArgKind::Count, default: Some(ArgDefault::Float(2.0)) },
                     ArgSpec { name: "gate", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                 ],
-                addable: Addable::No("an array on argument 3 does not make one instance per element"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -28123,7 +28123,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "reset", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "ana", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method also creates [Impulse]"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "kr",
@@ -28135,7 +28135,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "reset", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "ana", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method also creates [Impulse]"),
+                addable: Addable::Pseudo,
             },
             RateMethod {
                 selector: "new",
@@ -28147,7 +28147,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
                     ArgSpec { name: "reset", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                     ArgSpec { name: "ana", kind: ArgKind::Signal, default: None },
                 ],
-                addable: Addable::No("the method also creates [Impulse]"),
+                addable: Addable::Pseudo,
             },
         ],
     },
@@ -28885,7 +28885,7 @@ pub(super) static CLASSES: [UGenClass; 491] = [
     },
 ];
 
-pub(super) static PSEUDO_CLASSES: [PseudoClass; 29] = [
+pub(super) static PSEUDO_CLASSES: [PseudoClass; 30] = [
     PseudoClass {
         name: "BFFreeVerb",
         categories: &["Undocumented classes", "UGens>Undocumented"],
@@ -29216,6 +29216,43 @@ pub(super) static PSEUDO_CLASSES: [PseudoClass; 29] = [
                 args: &[
                     ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
                     ArgSpec { name: "phase", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+        ],
+    },
+    PseudoClass {
+        name: "PulseDPW",
+        categories: &["UGens>Generators"],
+        methods: &[
+            RateMethod {
+                selector: "ar",
+                args: &[
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "width", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "kr",
+                args: &[
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "width", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
+                    ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
+                    ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
+                ],
+                addable: Addable::Pseudo,
+            },
+            RateMethod {
+                selector: "new",
+                args: &[
+                    ArgSpec { name: "rate", kind: ArgKind::Symbol, default: Some(ArgDefault::Symbol("ar")) },
+                    ArgSpec { name: "freq", kind: ArgKind::Signal, default: Some(ArgDefault::Float(440.0)) },
+                    ArgSpec { name: "width", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.5)) },
                     ArgSpec { name: "mul", kind: ArgKind::Signal, default: Some(ArgDefault::Float(1.0)) },
                     ArgSpec { name: "add", kind: ArgKind::Signal, default: Some(ArgDefault::Float(0.0)) },
                 ],

@@ -851,7 +851,7 @@ inputs: the definition needs four wire buffers.
   folder `SC3plugins` of the Extensions holds its class files.
   `Version-3.14.1` changes `VBAPSpeakerArray` alone, which builds no UGen,
   so the catalogue serves both.
-- 635 of the 679 rate methods are addable with a wiring, and nine have a
+- 635 of the 679 rate methods are addable with a wiring, and 24 have a
   body. [Pseudo-UGens of sc3-plugins](#pseudo-ugens-of-sc3-plugins) lists
   the bodies.
 - Most rules of `checkInputs` are those of the core. The 96 HOA classes
@@ -918,6 +918,26 @@ do.
   grains of `Warp1`.
 - `BhobUGens`: `BhobLoShelf.ar` and `BhobHiShelf.ar` mix `in` with an
   allpass `FOS`. Their arguments have no defaults.
+- `MCLDUGens`: `PulseDPW.ar`, `PulseDPW.kr` and `PulseDPW.new` subtract
+  two `SawDPW`. `FFTCentroid.kr` calls `SpecCentroid`, and
+  `PV_DiffMags.new` calls `PV_MagSubtract`.
+- `MCLDUGens`: `FFTSubbandPower.kr` and `FFTSubbandFlatness.kr` sort
+  `cutfreqs`, and put its size first. Their outputs are one more than
+  `cutfreqs` holds.
+- `MCLDUGens`: the outputs of `MatchingP.ar` and `MatchingP.kr` follow
+  `ntofind`, those of `NearestN.kr` follow `num`, and those of `SOMRd.ar`
+  and `SOMRd.kr` follow `numdims`. `MatchingPResynth.ar` and
+  `MatchingPResynth.kr` put half the size of `activs` before it.
+- `MCLDUGens`: `Getenv.new` and `TextVU.ar`, `TextVU.kr` and
+  `TextVU.new` write the codes of a text. A `TextVU` runs at control rate,
+  and the call gives back `in`.
+
+`TextVU` copies two traits of sclang. `TextVU:new1` turns a number
+`trig` into an `Impulse` before the default `ana` reads `trig`. So the
+`Amplitude` of `in` always gets 5 as its release time. Also, the
+`TextVU` enters the graph before that `Amplitude`, and the constants of a
+definition come in the order in which the UGens enter. A given `ana`
+is a signal, which takes the place of the `Amplitude`.
 
 These arguments set counts of the language, and must be numbers:
 `numTaps`, `numCombs` and `numAllpasses` of `FreeVerb1`, `num` of
@@ -948,21 +968,14 @@ refuses an output as an order too.
   `RosslerResL.ar`. sclang writes them, and scsynth refuses them with
   `UGen '<name>' not installed.`.
 - `StkFlute.kr` applies `madd` twice.
-- These methods create no instance of their class: `FFTCentroid.kr`,
-  `OnsetsDS.kr`, `PV_DiffMags.new` and `SoftClipAmp.ar`.
-- They put the size of an array before it: `FeatureSave.kr`,
-  `FFTSubbandFlatness.kr`, `FFTSubbandPower.kr`, `MatchingPResynth.ar`
-  and `MatchingPResynth.kr`.
-- Their outputs come from a count in another way: `MatchingP.ar`,
-  `MatchingP.kr` and `NearestN.kr`. `SOMRd.ar`, `SOMRd.kr` and
-  `SpectralEntropy.kr` test numbers.
+- `OnsetsDS.kr` and `SoftClipAmp.ar` create no instance of their class.
+- `FeatureSave.kr` puts the size of an array before it.
+- `SpectralEntropy.kr` tests numbers.
 - They compute their inputs: `DbufTag.new`, `Dtag.new` and `Dfsm.new`
   from rules, and `FM7.ar` from two matrices.
 - `Dneuromodule.ar` and `Dneuromodule.kr` put a `Duty` around
   `Dneuromodule.new`, which takes its arrays and its count in its own way.
-- `TextVU.ar`, `TextVU.kr` and `TextVU.new` work as `Poll` does.
-  `StkGlobals.ar` and `Getenv.new` write the codes of a text without its
-  size first.
+- `StkGlobals.ar` writes the codes of a text without its size first.
 
 ## Strictness
 
@@ -1097,12 +1110,14 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
   expansion).
 - An array of symbols: sclang expands a symbol argument too, as the command
   names of `SendReply` or the labels of `Poll`. `ArgValue` holds one text.
-- The default label of `Poll` for a whole number names `Integer`. sclang
-  names `Float` for a Float such as 440.0.
+- The default label of `Poll` and `TextVU` for a whole number names
+  `Integer`. sclang names `Float` for a Float such as 440.0.
 - A whole Float as `rotate` of `PingPong`, such as 2.0: `Array:rotate` of
   sclang takes only an Integer, and the crate takes it. The same goes for
   `numTaps` and `numAllpasses` of `FreeVerb1`, for which `copyRange`
-  takes only an Integer.
+  takes only an Integer. It goes too for `ntofind` of `MatchingP`, `num`
+  of `NearestN` and `numdims` of `SOMRd`, which give a count of outputs:
+  `initOutputs` takes only an Integer.
 - A count of `do` or `Array.fill` above 65535, as the `num` of `Vocoder`
   or the `overlaps` of `WarpOverlap`: sclang builds that many bands or
   grains, and the crate refuses the count.
@@ -1119,8 +1134,9 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 - An output in an array of buses of `SoundIn`: sclang builds a `+ 1` for
   its test of consecutive buses, and `optimizeGraph` removes it. `ugen`
   refuses the output.
-- The warnings of `Dstutter` and `Mix.kr`: the crate does no I/O, and
-  builds the same graph.
+- The warnings of `Dstutter` and `Mix.kr`, and those of `FFTCentroid` and
+  `PV_DiffMags` of sc3-plugins: the crate does no I/O, and builds the
+  same graph.
 - An array of specs for `DynKlank`, `DynKlang`, `Klank` and `Klang`: sclang
   expands it, as an array of `Ref`s. `ugen` takes one spec.
 - A `spread` or a `center` of `SplayAz` at scalar rate: the `blend` of its
@@ -1165,7 +1181,7 @@ writer. `tests/golden.rs` checks the round trip of every golden file.
 This is not in version 0.14, the next item of value for sc-app3:
 
 1. The bodies of the other pseudo-UGens of sc3-plugins, such as
-   `PulseDPW` and `StkBowedI`, and of the methods above that do more than
+   `FM7` and `StkBowedI`, and of the methods above that do more than
    `new1`.
 
 Of sc3-plugins, the crate also leaves out ATK, whose classes come with the

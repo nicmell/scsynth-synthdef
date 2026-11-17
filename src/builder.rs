@@ -1158,6 +1158,30 @@ impl SynthDefBuilder {
         }
     }
 
+    /// Sets input `input` of the UGen of `proxy` to `value`, for a UGen that
+    /// `addToSynth` adds before `init` makes its inputs, as `TextVU` of
+    /// sc3-plugins does. The constants of the definition come in the order of
+    /// the UGens.
+    #[cfg(feature = "sc3-plugins")]
+    pub(crate) fn set_input(
+        &mut self,
+        proxy: &OutputProxy,
+        input: usize,
+        value: &UGenInput,
+    ) -> Result<(), BuildError> {
+        let Some(node) = self.children.get(proxy.ugen).filter(|_| self.owns(proxy)) else {
+            return Err(BuildError::ForeignOutput {
+                ugen: String::new(),
+                input,
+            });
+        };
+        let source = self.source(&node.name.clone(), input, value)?;
+        if let Some(slot) = self.children[proxy.ugen].inputs.get_mut(input) {
+            *slot = source;
+        }
+        Ok(())
+    }
+
     /// Whether `proxy` is an output of a UGen of this build.
     fn owns(&self, proxy: &OutputProxy) -> bool {
         self.serials.get(proxy.ugen) == Some(&proxy.serial)

@@ -55,6 +55,7 @@ var argumentKinds = [
 	[\FFTSubbandPower, \kr, \cutfreqs, \array],
 	[\FeatureSave, \kr, \features, \array],
 	[\GaussClass, \kr, \in, \array],
+	[\Getenv, \new, \key, \symbol],
 	[\GrainBufJ, \ar, \numChannels, \count],
 	[\GrainFMJ, \ar, \numChannels, \count],
 	[\GrainInJ, \ar, \numChannels, \count],
@@ -87,6 +88,7 @@ var argumentKinds = [
 	[\PanX2D, \kr, \numChansY, \count],
 	[\PermModArray, \ar, \pattern, \array],
 	[\PlaneTree, \kr, \in, \array],
+	[\PulseDPW, \new, \rate, \symbol],
 	[\SOMAreaWr, \kr, \coords, \array],
 	[\SOMAreaWr, \kr, \inputdata, \array],
 	[\SOMRd, \ar, \inputdata, \array],
@@ -148,9 +150,11 @@ var checkRules = (
 // create no instance of the class. The crate has a body for each method of a
 // class of bodies.
 var bodies = [\BFFreeVerb, \BFGVerb, \BHPF, \BLPF, \BhobHiShelf, \BhobLoShelf, \BtoUHJ, \DelayWr,
-	\Feedback, \FreeVerb1, \Greyhole, \HighShelf, \JPverb, \LPCSynth, \LPCVals, \LRHPF, \LRLPF,
-	\LowShelf, \NHHall, \Notch, \PanX2D, \Phaser, \RBJHighShelf, \RBJLowShelf, \RBJNotch, \Rotate,
-	\TapN, \Tilt, \Tumble, \UHJtoB, \Vocode, \VocodeBand, \Vocoder, \WarpOverlap, \ZHPF, \ZLPF];
+	\FFTCentroid, \FFTSubbandFlatness, \FFTSubbandPower, \Feedback, \FreeVerb1, \Getenv, \Greyhole,
+	\HighShelf, \JPverb, \LPCSynth, \LPCVals, \LRHPF, \LRLPF, \LowShelf, \MatchingP,
+	\MatchingPResynth, \NHHall, \NearestN, \Notch, \PV_DiffMags, \PanX2D, \Phaser, \PulseDPW,
+	\RBJHighShelf, \RBJLowShelf, \RBJNotch, \Rotate, \SOMRd, \TapN, \TextVU, \Tilt, \Tumble,
+	\UHJtoB, \Vocode, \VocodeBand, \Vocoder, \WarpOverlap, \ZHPF, \ZLPF];
 // The classes of the census without a body, and why.
 var leftOut = [
 	[\AutoTrack, "no body yet"],
@@ -159,10 +163,7 @@ var leftOut = [
 	[\BFEncode, "computes with objects of the language, such as ZPoint"],
 	[\BhobTone, "calls HiShelf, which no class defines"],
 	[\CheapVerb, "draws rand of the language at each build"],
-	[\FFTCentroid, "no body yet"],
 	[\OnsetsDS, "deprecated, and gives a Function"],
-	[\PV_DiffMags, "no body yet"],
-	[\PulseDPW, "no body yet"],
 	[\Reflections, "computes with objects of the language, such as ZPoint"],
 	[\SoftClipAmp, "no body yet"],
 	[\StkBowedI, "no body yet"]

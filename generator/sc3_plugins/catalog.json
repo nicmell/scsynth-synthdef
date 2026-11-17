@@ -9905,8 +9905,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -10612,8 +10611,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, ERROR: Non Boolean in test."
+          "addable": "pseudo"
         }
       ]
     },
@@ -10715,8 +10713,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "with control-rate inputs, ERROR: Non Boolean in test."
+          "addable": "pseudo"
         }
       ]
     },
@@ -15397,7 +15394,7 @@
           "args": [
             {
               "name": "key",
-              "kind": "signal",
+              "kind": "symbol",
               "default": null
             },
             {
@@ -15408,8 +15405,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "input 0 maps to no argument"
+          "addable": "pseudo"
         }
       ]
     },
@@ -85625,8 +85621,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: a MatchingP: numChannels must be a nonzero positive integer, but received (2104.5)."
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -85674,8 +85669,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: a MatchingP: numChannels must be a nonzero positive integer, but received (2104.5)."
+          "addable": "pseudo"
         }
       ]
     },
@@ -85736,8 +85730,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "input 2 maps to no argument"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -85774,8 +85767,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "input 2 maps to no argument"
+          "addable": "pseudo"
         }
       ]
     },
@@ -88569,8 +88561,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "ERROR: a NearestN: numChannels must be a nonzero positive integer, but received (3153.75)."
+          "addable": "pseudo"
         }
       ]
     },
@@ -91391,8 +91382,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method creates no instance of the class"
+          "addable": "pseudo"
         }
       ]
     },
@@ -96074,8 +96064,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "an array on argument 3 does not make one instance per element"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -96112,8 +96101,7 @@
               }
             }
           ],
-          "addable": false,
-          "reason": "an array on argument 3 does not make one instance per element"
+          "addable": "pseudo"
         }
       ]
     },
@@ -104092,8 +104080,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Impulse]"
+          "addable": "pseudo"
         },
         {
           "selector": "kr",
@@ -104135,8 +104122,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Impulse]"
+          "addable": "pseudo"
         },
         {
           "selector": "new",
@@ -104178,8 +104164,7 @@
               "default": null
             }
           ],
-          "addable": false,
-          "reason": "the method also creates [Impulse]"
+          "addable": "pseudo"
         }
       ]
     },
@@ -106954,6 +106939,123 @@
               "kind": "signal",
               "default": {
                 "float": 0
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        }
+      ]
+    },
+    {
+      "name": "PulseDPW",
+      "categories": [
+        "UGens>Generators"
+      ],
+      "methods": [
+        {
+          "selector": "ar",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "width",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "kr",
+          "args": [
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "width",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
+              }
+            },
+            {
+              "name": "mul",
+              "kind": "signal",
+              "default": {
+                "float": 1
+              }
+            },
+            {
+              "name": "add",
+              "kind": "signal",
+              "default": {
+                "float": 0
+              }
+            }
+          ],
+          "addable": "pseudo"
+        },
+        {
+          "selector": "new",
+          "args": [
+            {
+              "name": "rate",
+              "kind": "symbol",
+              "default": {
+                "symbol": "ar"
+              }
+            },
+            {
+              "name": "freq",
+              "kind": "signal",
+              "default": {
+                "float": 440
+              }
+            },
+            {
+              "name": "width",
+              "kind": "signal",
+              "default": {
+                "float": 0.5
               }
             },
             {

@@ -64,7 +64,7 @@ fn the_readme_lists_every_method_of_sc3_plugins_that_ugen_refuses() {
     assert_listed(
         "### Methods of sc3-plugins that `ugen` refuses",
         classes,
-        35,
+        20,
     );
 }
 
@@ -90,5 +90,5 @@ fn the_readme_lists_every_pseudo_ugen_of_sc3_plugins() {
         .chain(classes)
         .collect();
     assert_eq!(listed("### Pseudo-UGens of sc3-plugins"), bodies);
-    assert_eq!(bodies.len(), 39);
+    assert_eq!(bodies.len(), 57);
 }

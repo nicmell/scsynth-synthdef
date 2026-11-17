@@ -149,9 +149,18 @@ try {
 		{ value["bool"].notNil } { value["bool"] }
 		{ fail.("bodies.json has the value %".format(value)) }
 	};
+	// sclang drops a keyword for the variable arguments of a method
+	// (measured), so a call that gives them goes by position, and spreads
+	// them. Such a case gives every argument before them.
 	callCode = { |call, controls|
+		var method = call[0].asSymbol.asClass.class.findRespondingMethodFor(call[1].asSymbol);
+		var rest = method !? { if (method.varArgs) { method.argNames.last } };
+		var spread = rest.notNil and: { call[2].any { |pair| pair[0].asSymbol == rest } };
 		"%.%(%)".format(call[0], call[1], call[2].collect { |pair|
-			pair[0] ++ ": " ++ valueCode.(pair[1], controls)
+			case
+			{ spread.not } { pair[0] ++ ": " ++ valueCode.(pair[1], controls) }
+			{ pair[0].asSymbol == rest } { "*" ++ valueCode.(pair[1], controls) }
+			{ valueCode.(pair[1], controls) }
 		}.join(", "))
 	};
 	(fixtures +/+ "bodies.json").parseJSONFile["cases"].do { |case|

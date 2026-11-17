@@ -33,5 +33,7 @@ pub(super) fn nh_hall(builder: &mut SynthDefBuilder, args: &Args) -> Result<UGen
         names.push(name);
         inputs.push(args.input(name)?);
     }
-    multi_new(builder, ("NHHall", Rate::Audio), &names, &inputs, 2)
+    multi_new(builder, ("NHHall", Rate::Audio), &names, &inputs, &|_| {
+        Ok(2)
+    })
 }

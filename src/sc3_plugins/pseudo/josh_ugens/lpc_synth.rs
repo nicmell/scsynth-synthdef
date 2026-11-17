@@ -16,7 +16,9 @@ pub(crate) fn lpc_synth(
     let pointer = clipped(builder, args)?;
     let inputs = [args.input("buffer")?, args.input("signal")?, pointer];
     let names = ["buffer", "signal", "pointer"];
-    let synth = multi_new(builder, ("LPCSynth", Rate::Audio), &names, &inputs, 1)?;
+    let synth = multi_new(builder, ("LPCSynth", Rate::Audio), &names, &inputs, &|_| {
+        Ok(1)
+    })?;
     builder.madd(synth, args.input("mul")?, args.input("add")?)
 }
 
@@ -38,7 +40,7 @@ pub(crate) fn lpc_vals(
         ("LPCVals", rate),
         &["buffer", "pointer"],
         &inputs,
-        3,
+        &|_| Ok(3),
     )
 }
 

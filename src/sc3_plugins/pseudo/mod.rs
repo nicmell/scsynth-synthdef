@@ -5,6 +5,7 @@
 mod bhob_ugens;
 mod deind_ugens;
 mod josh_ugens;
+mod mcld_ugens;
 mod nh_ugens;
 
 use josh_ugens::{
@@ -12,7 +13,7 @@ use josh_ugens::{
     uhj, vocode, vocoder, warp_overlap,
 };
 
-use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize};
+use crate::builder::{NewUGen, SynthDefBuilder, count_to_usize, whole_count};
 use crate::catalog;
 use crate::error::BuildError;
 use crate::pseudo::{Args, Body, elements};
@@ -30,8 +31,12 @@ pub(crate) static BODIES: &[(&str, &str, Body)] = &[
     ("BhobLoShelf", "ar", bhob_ugens::lo_shelf),
     ("BtoUHJ", "ar", uhj::b_to_uhj),
     ("DelayWr", "ar", sc2_compat::delay_wr),
+    ("FFTCentroid", "kr", mcld_ugens::fft_centroid),
+    ("FFTSubbandFlatness", "kr", mcld_ugens::fft_subband_flatness),
+    ("FFTSubbandPower", "kr", mcld_ugens::fft_subband_power),
     ("Feedback", "ar", feedback::feedback),
     ("FreeVerb1", "ar", free_verb1::free_verb1),
+    ("Getenv", "new", mcld_ugens::getenv),
     ("Greyhole", "ar", deind_ugens::greyhole),
     ("HighShelf", "ar", biquad_eq::high_shelf),
     ("JPverb", "ar", deind_ugens::jp_verb),
@@ -41,17 +46,31 @@ pub(crate) static BODIES: &[(&str, &str, Body)] = &[
     ("LRHPF", "ar", joshfilts::lrhpf),
     ("LRLPF", "ar", joshfilts::lrlpf),
     ("LowShelf", "ar", biquad_eq::low_shelf),
+    ("MatchingP", "ar", mcld_ugens::matching_p),
+    ("MatchingP", "kr", mcld_ugens::matching_p),
+    ("MatchingPResynth", "ar", mcld_ugens::matching_p_resynth),
+    ("MatchingPResynth", "kr", mcld_ugens::matching_p_resynth),
     ("NHHall", "ar", nh_ugens::nh_hall),
+    ("NearestN", "kr", mcld_ugens::nearest_n),
     ("Notch", "ar", biquad_eq::notch),
+    ("PV_DiffMags", "new", mcld_ugens::pv_diff_mags),
     ("PanX2D", "ar", pan_x::pan_x2d),
     ("PanX2D", "kr", pan_x::pan_x2d),
     ("Phaser", "ar", phaser::phaser),
     ("Phaser", "kr", phaser::phaser),
+    ("PulseDPW", "ar", mcld_ugens::pulse_dpw),
+    ("PulseDPW", "kr", mcld_ugens::pulse_dpw),
+    ("PulseDPW", "new", mcld_ugens::pulse_dpw),
     ("RBJHighShelf", "ar", biquad_eq::high_shelf),
     ("RBJLowShelf", "ar", biquad_eq::low_shelf),
     ("RBJNotch", "ar", biquad_eq::notch),
     ("Rotate", "ar", ambisonics::rotate),
+    ("SOMRd", "ar", mcld_ugens::som_rd),
+    ("SOMRd", "kr", mcld_ugens::som_rd),
     ("TapN", "ar", sc2_compat::tap_n),
+    ("TextVU", "ar", mcld_ugens::text_vu),
+    ("TextVU", "kr", mcld_ugens::text_vu),
+    ("TextVU", "new", mcld_ugens::text_vu),
     ("Tilt", "ar", ambisonics::tilt),
     ("Tumble", "ar", ambisonics::tumble),
     ("UHJtoB", "ar", uhj::uhj_to_b),
@@ -86,22 +105,35 @@ fn first<const N: usize>(
 }
 
 /// `multiNew` of `class` at `rate`: the expansion of `multiNewList`, then
-/// an instance for each, with `outputs` outputs at `rate`, after the rule of
-/// its `checkInputs`.
+/// an instance for each, after the rule of its `checkInputs`. `outputs`
+/// gives the count of outputs at `rate` of an instance from its inputs.
 fn multi_new(
     builder: &mut SynthDefBuilder,
     (class, rate): (&str, Rate),
     names: &[&str],
     inputs: &[UGenInput],
-    outputs: usize,
+    outputs: &dyn Fn(&[UGenInput]) -> Result<usize, BuildError>,
 ) -> Result<UGenInput, BuildError> {
     let ugen = catalog::find(class).ok_or_else(|| BuildError::UnknownClass(class.to_owned()))?;
     builder.expand(class, names, inputs, true, &mut |builder, instance| {
         let new = NewUGen::new(class, rate)
             .inputs(instance.to_vec())
-            .outputs(vec![rate; outputs]);
+            .outputs(vec![rate; outputs(instance)?]);
         builder.add_checked(ugen, new)
     })
+}
+
+/// The count of outputs that `initOutputs` takes, `count`, from the value
+/// `input` of the argument `name`. sclang throws unless both are Integers
+/// and the count is 1 or more. The crate takes a whole number for an
+/// Integer, and refuses a count above 65535 too.
+#[allow(clippy::float_cmp)]
+fn output_count(args: &Args, name: &str, input: f64, count: f64) -> Result<usize, BuildError> {
+    let refused = || args.wrong_kind(name, "a whole number that gives one output or more");
+    if input.fract() != 0.0 {
+        return Err(refused());
+    }
+    whole_count(count).ok_or_else(refused)
 }
 
 /// An array of numbers, as an array literal of sclang gives it.
